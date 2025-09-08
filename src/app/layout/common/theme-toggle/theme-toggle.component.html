@@ -1,0 +1,25 @@
+<!-- Theme Toggle Button -->
+<button mat-icon-button [matMenuTriggerFor]="themeMenu" matTooltip="Toggle theme" class="relative">
+	<mat-icon [svgIcon]="getSchemeIcon()" class="icon-size-5"></mat-icon>
+</button>
+
+<!-- Theme Menu -->
+<mat-menu #themeMenu="matMenu" class="theme-menu">
+	<!-- Auto -->
+	<button mat-menu-item (click)="setScheme('auto')" [class.bg-primary]="scheme === 'auto'" [class.text-white]="scheme === 'auto'">
+		<mat-icon [svgIcon]="'heroicons_solid:bolt'" class="icon-size-5"></mat-icon>
+		<span class="ml-3">Auto</span>
+	</button>
+
+	<!-- Light -->
+	<button mat-menu-item (click)="setScheme('light')" [class.bg-primary]="scheme === 'light'" [class.text-white]="scheme === 'light'">
+		<mat-icon [svgIcon]="'heroicons_solid:sun'" class="icon-size-5"></mat-icon>
+		<span class="ml-3">Light</span>
+	</button>
+
+	<!-- Dark -->
+	<button mat-menu-item (click)="setScheme('dark')" [class.bg-primary]="scheme === 'dark'" [class.text-white]="scheme === 'dark'">
+		<mat-icon [svgIcon]="'heroicons_solid:moon'" class="icon-size-5"></mat-icon>
+		<span class="ml-3">Dark</span>
+	</button>
+</mat-menu>
