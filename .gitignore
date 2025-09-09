@@ -103,6 +103,49 @@ typings/
 # Optional eslint cache
 .eslintcache
 
+# Angular cache
+.angular/
+.ng_build/
+.ng_pkg_build/
+
+# Build cache
+.cache/
+.parcel-cache/
+.rollup.cache/
+
+# Webpack cache
+.webpack/
+
+# Vite cache
+.vite/
+
+# Turbo cache
+.turbo/
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Stylelint cache
+.stylelintcache
+
+# PostCSS cache
+.postcss-cache/
+
+# Sass cache
+.sass-cache/
+
+# Additional cache patterns
+*.cache
+.cache/
+cache/
+.cache-*/
+
+# Browser cache
+.browserslistrc
+
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/

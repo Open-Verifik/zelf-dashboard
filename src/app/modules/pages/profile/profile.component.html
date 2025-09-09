@@ -1,0 +1,276 @@
+<div class="flex min-w-0 flex-auto flex-col">
+	<!-- Header -->
+	<div class="bg-card flex flex-col shadow">
+		<!-- Cover image -->
+		<div>
+			<img class="h-40 object-cover lg:h-80" src="images/pages/profile/cover.jpg" alt="Cover image" />
+		</div>
+
+		<!-- User info -->
+		<div class="bg-card mx-auto flex w-full max-w-5xl flex-0 flex-col items-center px-8 lg:h-18 lg:flex-row">
+			<!-- Avatar -->
+			<div class="-mt-26 rounded-full lg:-mt-22">
+				<img class="ring-bg-card h-32 w-32 rounded-full ring-4" src="images/avatars/male-04.jpg" alt="User avatar" />
+			</div>
+
+			<!-- Details -->
+			<div class="mt-4 flex flex-col items-center lg:ml-8 lg:mt-0 lg:items-start">
+				<div class="text-lg font-bold leading-none">Zelf User</div>
+				<div class="text-secondary">Zelf License Holder</div>
+			</div>
+
+			<!-- Separator -->
+			<div class="mx-8 hidden h-8 border-l-2 lg:flex"></div>
+
+			<!-- Stats -->
+			<div class="mt-6 flex items-center space-x-6 lg:mt-0">
+				<div class="flex flex-col items-center">
+					<span class="font-bold">Active</span>
+					<span class="text-secondary text-sm font-medium">STATUS</span>
+				</div>
+				<div class="flex flex-col items-center">
+					<span class="font-bold">Premium</span>
+					<span class="text-secondary text-sm font-medium">LICENSE</span>
+				</div>
+			</div>
+
+			<!-- Menu -->
+			<div class="mb-4 mt-8 flex items-center space-x-6 lg:m-0 lg:ml-auto">
+				<a class="font-medium" [routerLink]="['./']"> Profile </a>
+				<a class="text-secondary" [routerLink]="['./']"> Settings </a>
+				<a class="text-secondary" [routerLink]="['./']"> License </a>
+				<a class="text-secondary" [routerLink]="['./']"> Support </a>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main -->
+	<div class="mx-auto flex w-full max-w-5xl flex-auto justify-center p-6 sm:p-8">
+		<!-- Column -->
+		<div class="mr-8 hidden flex-col items-start lg:flex">
+			<!-- About me -->
+			<fuse-card class="flex w-full max-w-80 flex-col p-8">
+				<div class="text-2xl font-semibold leading-tight">About Me</div>
+				<div class="mt-4">
+					I'm a Zelf technology user with a premium license for advanced features and analytics.
+					<br /><br />
+					Using Zelf's cutting-edge technology to manage my digital identity and blockchain interactions.
+				</div>
+				<hr class="my-6 w-full border-t" />
+				<div class="flex flex-col">
+					<div class="flex items-center">
+						<mat-icon class="mr-3 icon-size-5" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+						<span class="leading-none">Global</span>
+					</div>
+					<div class="mt-4 flex items-center">
+						<mat-icon class="mr-3 icon-size-5" [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+						<span class="leading-none">Zelf Technology User</span>
+					</div>
+					<div class="mt-4 flex items-center">
+						<mat-icon class="mr-3 icon-size-5" [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
+						<span class="leading-none">Member since 2024</span>
+					</div>
+					<div class="mt-4 flex items-center">
+						<mat-icon class="mr-3 icon-size-5" [svgIcon]="'heroicons_solid:shield-check'"></mat-icon>
+						<span class="leading-none">Verified Account</span>
+					</div>
+				</div>
+			</fuse-card>
+
+			<!-- Recent activity -->
+			<fuse-card class="mt-8 flex w-full max-w-80 flex-col p-8">
+				<div class="text-2xl font-semibold leading-tight">Recent Activity</div>
+				<div class="mt-8 flex flex-col">
+					<div class="flex items-center">
+						<div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+							<mat-icon class="text-primary icon-size-5" [svgIcon]="'heroicons_solid:chart-bar'"></mat-icon>
+						</div>
+						<div class="flex flex-col">
+							<span class="font-medium leading-none">Analytics Updated</span>
+							<span class="text-secondary mt-1 text-sm leading-none">2 hours ago</span>
+						</div>
+					</div>
+					<div class="mt-6 flex items-center">
+						<div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+							<mat-icon class="text-primary icon-size-5" [svgIcon]="'heroicons_solid:cog-6-tooth'"></mat-icon>
+						</div>
+						<div class="flex flex-col">
+							<span class="font-medium leading-none">Settings Modified</span>
+							<span class="text-secondary mt-1 text-sm leading-none">1 day ago</span>
+						</div>
+					</div>
+					<div class="mt-6 flex items-center">
+						<div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+							<mat-icon class="text-primary icon-size-5" [svgIcon]="'heroicons_solid:shield-check'"></mat-icon>
+						</div>
+						<div class="flex flex-col">
+							<span class="font-medium leading-none">License Verified</span>
+							<span class="text-secondary mt-1 text-sm leading-none">3 days ago</span>
+						</div>
+					</div>
+					<div class="mt-6 flex items-center">
+						<div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+							<mat-icon class="text-primary icon-size-5" [svgIcon]="'heroicons_solid:user-plus'"></mat-icon>
+						</div>
+						<div class="flex flex-col">
+							<span class="font-medium leading-none">Account Created</span>
+							<span class="text-secondary mt-1 text-sm leading-none">1 week ago</span>
+						</div>
+					</div>
+				</div>
+				<div class="mt-8">
+					<a class="text-primary font-medium" [routerLink]="['./']"> See entire activity feed </a>
+				</div>
+			</fuse-card>
+		</div>
+
+		<!-- Column -->
+		<div class="flex flex-col items-start">
+			<!-- Profile Information -->
+			<fuse-card class="flex w-full max-w-140 flex-col p-6 pb-6 sm:p-8">
+				<div class="text-xl font-semibold">Profile Information</div>
+				<div class="mt-8 flex flex-col space-y-6">
+					<!-- Personal Information -->
+					<div class="flex flex-col space-y-4">
+						<h3 class="text-lg font-medium">Personal Information</h3>
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+								<mat-label>First Name</mat-label>
+								<input matInput placeholder="Enter your first name" value="John" />
+							</mat-form-field>
+							<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+								<mat-label>Last Name</mat-label>
+								<input matInput placeholder="Enter your last name" value="Doe" />
+							</mat-form-field>
+						</div>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>Email</mat-label>
+							<input matInput placeholder="Enter your email" value="john.doe@example.com" />
+						</mat-form-field>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>Phone</mat-label>
+							<input matInput placeholder="Enter your phone number" value="+1 (555) 123-4567" />
+						</mat-form-field>
+					</div>
+
+					<mat-divider></mat-divider>
+
+					<!-- Zelf License Information -->
+					<div class="flex flex-col space-y-4">
+						<h3 class="text-lg font-medium">Zelf License Information</h3>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>License Type</mat-label>
+							<mat-select value="premium">
+								<mat-option value="basic">Basic</mat-option>
+								<mat-option value="premium">Premium</mat-option>
+								<mat-option value="enterprise">Enterprise</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>License Key</mat-label>
+							<input matInput placeholder="Enter your license key" value="ZELF-2024-PREM-XXXX-XXXX" readonly />
+						</mat-form-field>
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+								<mat-label>Expiry Date</mat-label>
+								<input matInput placeholder="License expiry date" value="2025-12-31" readonly />
+							</mat-form-field>
+							<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+								<mat-label>Status</mat-label>
+								<input matInput placeholder="License status" value="Active" readonly />
+							</mat-form-field>
+						</div>
+					</div>
+
+					<mat-divider></mat-divider>
+
+					<!-- Preferences -->
+					<div class="flex flex-col space-y-4">
+						<h3 class="text-lg font-medium">Preferences</h3>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>Language</mat-label>
+							<mat-select value="en">
+								<mat-option value="en">English</mat-option>
+								<mat-option value="es">Spanish</mat-option>
+								<mat-option value="fr">French</mat-option>
+								<mat-option value="zh">Chinese</mat-option>
+								<mat-option value="ja">Japanese</mat-option>
+								<mat-option value="ko">Korean</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+							<mat-label>Timezone</mat-label>
+							<mat-select value="utc">
+								<mat-option value="utc">UTC</mat-option>
+								<mat-option value="est">Eastern Time</mat-option>
+								<mat-option value="pst">Pacific Time</mat-option>
+								<mat-option value="cet">Central European Time</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+
+					<!-- Action Buttons -->
+					<div class="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+						<button class="w-full sm:w-auto" mat-flat-button [color]="'primary'">
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+							<span class="ml-2">Save Changes</span>
+						</button>
+						<button class="w-full sm:w-auto" mat-stroked-button>
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:arrow-path'"></mat-icon>
+							<span class="ml-2">Reset</span>
+						</button>
+						<button class="w-full sm:w-auto" mat-stroked-button>
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:key'"></mat-icon>
+							<span class="ml-2">Change Password</span>
+						</button>
+					</div>
+				</div>
+			</fuse-card>
+
+			<!-- License Details -->
+			<fuse-card class="mt-8 flex w-full max-w-140 flex-col p-6 pb-6 sm:p-8">
+				<div class="text-xl font-semibold">License Details</div>
+				<div class="mt-8 flex flex-col space-y-6">
+					<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+						<div class="flex flex-col">
+							<span class="text-secondary text-sm font-medium">License Type</span>
+							<span class="mt-1 text-lg font-semibold">Premium</span>
+						</div>
+						<div class="flex flex-col">
+							<span class="text-secondary text-sm font-medium">Status</span>
+							<span class="mt-1 text-lg font-semibold text-green-500">Active</span>
+						</div>
+						<div class="flex flex-col">
+							<span class="text-secondary text-sm font-medium">Expires</span>
+							<span class="mt-1 text-lg font-semibold">Dec 31, 2025</span>
+						</div>
+						<div class="flex flex-col">
+							<span class="text-secondary text-sm font-medium">Features</span>
+							<span class="mt-1 text-lg font-semibold">All Features</span>
+						</div>
+					</div>
+					<div class="flex flex-col space-y-2">
+						<h4 class="font-medium">Included Features:</h4>
+						<ul class="text-secondary space-y-1 text-sm">
+							<li>• Advanced Analytics Dashboard</li>
+							<li>• Real-time Data Processing</li>
+							<li>• Priority Support</li>
+							<li>• API Access</li>
+							<li>• Custom Integrations</li>
+						</ul>
+					</div>
+					<div class="flex space-x-3">
+						<button class="flex-1" mat-stroked-button>
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:arrow-path'"></mat-icon>
+							<span class="ml-2">Renew License</span>
+						</button>
+						<button class="flex-1" mat-stroked-button>
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:document-arrow-down'"></mat-icon>
+							<span class="ml-2">Download</span>
+						</button>
+					</div>
+				</div>
+			</fuse-card>
+		</div>
+	</div>
+</div>
