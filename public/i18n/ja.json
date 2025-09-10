@@ -1,5 +1,12 @@
 {
 	"welcome-back": "おかえりなさい",
 	"Project": "プロジェクト",
-	"Analytics": "分析"
+	"Analytics": "分析",
+	"errors": {
+		"phone_already_exists": "この電話番号は既に登録されています。別の電話番号を使用するか、ログインを試してください。",
+		"email_already_exists": "このメールアドレスは既に登録されています。別のメールを使用するか、ログインを試してください。",
+		"unknown_error": "エラーが発生しました。もう一度お試しください。",
+		"network_error": "ネットワークエラー。接続を確認してもう一度お試しください。",
+		"validation_error": "情報を確認してもう一度お試しください。"
+	}
 }

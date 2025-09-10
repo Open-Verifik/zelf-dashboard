@@ -136,6 +136,7 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 	onBiometricsSuccess(faceBase64: string, password?: string): void {
 		// Stop camera before emitting success
 		this._stopCamera();
+
 		this.biometricsSuccess.emit({
 			faceBase64,
 			password: this.masterPassword || password,

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
+import { Component, OnInit, ViewChild, ViewEncapsulation, inject } from "@angular/core";
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -12,6 +12,7 @@ import { fuseAnimations } from "@fuse/animations";
 import { FuseAlertComponent, FuseAlertType } from "@fuse/components/alert";
 import { AuthService } from "app/core/auth/auth.service";
 import { DataBiometricsComponent, BiometricData } from "../biometric-verification/biometric-verification.component";
+import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 
 @Component({
 	selector: "auth-sign-up",
@@ -31,6 +32,7 @@ import { DataBiometricsComponent, BiometricData } from "../biometric-verificatio
 		MatProgressSpinnerModule,
 		MatSelectModule,
 		DataBiometricsComponent,
+		TranslocoModule,
 	],
 })
 export class AuthSignUpComponent implements OnInit {
@@ -44,6 +46,17 @@ export class AuthSignUpComponent implements OnInit {
 	showAlert: boolean = false;
 	showBiometricVerification: boolean = false;
 	userData: any = {};
+
+	// Language picker
+	availableLanguages = [
+		{ code: "en", name: "English", flag: "🇺🇸" },
+		{ code: "es", name: "Español", flag: "🇪🇸" },
+		{ code: "fr", name: "Français", flag: "🇫🇷" },
+		{ code: "zh", name: "中文", flag: "🇨🇳" },
+		{ code: "ja", name: "日本語", flag: "🇯🇵" },
+		{ code: "ko", name: "한국어", flag: "🇰🇷" },
+	];
+	currentLanguage = "en";
 
 	// Country codes for phone number
 	countryCodes = [
@@ -385,6 +398,8 @@ export class AuthSignUpComponent implements OnInit {
 	/**
 	 * Constructor
 	 */
+	private _translocoService = inject(TranslocoService);
+
 	constructor(
 		private _authService: AuthService,
 		private _formBuilder: UntypedFormBuilder,
@@ -405,13 +420,64 @@ export class AuthSignUpComponent implements OnInit {
 			email: ["", [Validators.required, Validators.email]],
 			password: ["", Validators.required],
 			countryCode: ["+1", Validators.required],
-			phoneNumber: ["", [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
+			phone: ["", [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
 			company: ["", Validators.required],
 			agreements: ["", Validators.requiredTrue],
 		});
 
+		// Initialize current language
+		this.currentLanguage = this._translocoService.getActiveLang() || "en";
+
 		// Auto-fill form with random data for testing
 		this.fillRandomData();
+	}
+
+	// -----------------------------------------------------------------------------------------------------
+	// @ Private methods
+	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Map error codes to translated messages
+	 */
+	private getErrorMessage(error: any): string {
+		// Extract error code from error response
+		// Backend returns: { status, message, code }
+		const errorCode = error?.code || error?.message || "unknown_error";
+
+		// Map error codes to translation keys
+		const errorMapping: { [key: string]: string } = {
+			phone_already_exists: "errors.phone_already_exists",
+			email_already_exists: "errors.email_already_exists",
+			"403:phone_already_exists": "errors.phone_already_exists",
+			"403:email_already_exists": "errors.email_already_exists",
+			Forbidden: "errors.unknown_error", // Generic 403 error
+			Conflict: "errors.unknown_error", // Generic 409 error
+			BadRequest: "errors.validation_error",
+			UnprocessableEntity: "errors.validation_error",
+			InternalServerError: "errors.unknown_error",
+			Timeout: "errors.network_error",
+			unknown_error: "errors.unknown_error",
+			network_error: "errors.network_error",
+			validation_error: "errors.validation_error",
+		};
+
+		// Check if it's a specific error message that contains our error codes
+		if (error?.message) {
+			if (error.message.includes("phone_already_exists")) {
+				return this._translocoService.translate("errors.phone_already_exists");
+			}
+			if (error.message.includes("email_already_exists")) {
+				return this._translocoService.translate("errors.email_already_exists");
+			}
+			if (error.message.includes("Incomplete authentication data received")) {
+				return this._translocoService.translate("errors.incomplete_auth_data");
+			}
+		}
+
+		const translationKey = errorMapping[errorCode] || "errors.unknown_error";
+
+		// Return translated message
+		return this._translocoService.translate(translationKey);
 	}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -447,13 +513,46 @@ export class AuthSignUpComponent implements OnInit {
 			masterPassword: biometricData.password,
 		};
 
+		console.info({ signUpData });
+
 		// Sign up with biometric data
-		this._authService.signUp(signUpData).subscribe(
-			(response) => {
-				// Navigate to the confirmation required page
-				this._router.navigateByUrl("/confirmation-required");
-			},
-			(response) => {
+		this._authService
+			.signUp(signUpData)
+			.then((response) => {
+				console.log({ response });
+
+				// Check if we have all required data for authentication
+				if (response.data?.token && response.data?.zelfProof && response.data?.zelfAccount) {
+					// Set session data
+					this._authService.setSession({
+						zelfProof: response.data.zelfProof,
+						zelfAccount: response.data.zelfAccount,
+					});
+
+					// Set access token
+					this._authService.setAccessToken(response.data.token);
+
+					// Navigate to dashboard
+					this._router.navigateByUrl("/analytics");
+				} else {
+					// Handle case where required data is missing
+					console.error("Sign up response missing required authentication data:", response);
+
+					// Show error message
+					this.alert = {
+						type: "error",
+						message: this.getErrorMessage({ message: "Incomplete authentication data received" }),
+					};
+					this.showAlert = true;
+
+					// Re-enable the form
+					this.signUpForm.enable();
+					this.showBiometricVerification = false;
+				}
+			})
+			.catch((error) => {
+				console.error("Sign up error:", error);
+
 				// Re-enable the form
 				this.signUpForm.enable();
 
@@ -463,16 +562,18 @@ export class AuthSignUpComponent implements OnInit {
 				// Hide biometric verification
 				this.showBiometricVerification = false;
 
-				// Set the alert
+				// Get translated error message
+				const errorMessage = this.getErrorMessage(error);
+
+				// Set the alert with translated message
 				this.alert = {
 					type: "error",
-					message: "Something went wrong, please try again.",
+					message: errorMessage,
 				};
 
 				// Show the alert
 				this.showAlert = true;
-			}
-		);
+			});
 	}
 
 	/**
@@ -498,8 +599,10 @@ export class AuthSignUpComponent implements OnInit {
 			email: randomData.email,
 			password: randomData.password,
 			countryCode: randomData.countryCode,
-			phoneNumber: randomData.phoneNumber,
+			phone: randomData.phone,
 			company: randomData.company,
+			faceBase64: randomData.faceBase64,
+			masterPassword: randomData.masterPassword,
 			agreements: true,
 		});
 	}
@@ -519,7 +622,7 @@ export class AuthSignUpComponent implements OnInit {
 			email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${domain}`,
 			password: this.generateRandomPassword(),
 			countryCode: countryCode.code,
-			phoneNumber: this.generateRandomPhoneNumber(),
+			phone: this.generateRandomPhoneNumber(),
 			company: company,
 		};
 	}
@@ -556,5 +659,13 @@ export class AuthSignUpComponent implements OnInit {
 	 */
 	onFillRandomData(): void {
 		this.fillRandomData();
+	}
+
+	/**
+	 * Change language
+	 */
+	onLanguageChange(languageCode: string): void {
+		this.currentLanguage = languageCode;
+		this._translocoService.setActiveLang(languageCode);
 	}
 }

@@ -1,5 +1,37 @@
 {
 	"welcome-back": "Bienvenido de nuevo",
 	"Project": "Proyecto",
-	"Analytics": "Analíticas"
+	"Analytics": "Analíticas",
+	"signUp": {
+		"title": "Registrarse",
+		"alreadyHaveAccount": "¿Ya tienes una cuenta?",
+		"signIn": "Iniciar sesión",
+		"fullName": "Nombre completo",
+		"emailAddress": "Dirección de correo electrónico",
+		"country": "País",
+		"phoneNumber": "Número de teléfono",
+		"password": "Contraseña",
+		"companyName": "Nombre de la empresa",
+		"agreements": "Estoy de acuerdo con",
+		"terms": "Términos",
+		"and": "y",
+		"privacyPolicy": "Política de Privacidad",
+		"createAccount": "Crea tu cuenta gratuita",
+		"phoneRequired": "El número de teléfono es requerido",
+		"phonePattern": "Por favor ingresa un número de teléfono válido (10-15 dígitos)",
+		"nameRequired": "El nombre completo es requerido",
+		"emailRequired": "La dirección de correo electrónico es requerida",
+		"emailInvalid": "Por favor ingresa una dirección de correo electrónico válida",
+		"passwordRequired": "La contraseña es requerida",
+		"companyRequired": "El nombre de la empresa es requerido",
+		"countryRequired": "El código de país es requerido"
+	},
+	"errors": {
+		"phone_already_exists": "Este número de teléfono ya está registrado. Por favor usa un número diferente o intenta iniciar sesión.",
+		"email_already_exists": "Esta dirección de email ya está registrada. Por favor usa un email diferente o intenta iniciar sesión.",
+		"unknown_error": "Algo salió mal, por favor intenta de nuevo.",
+		"network_error": "Error de red. Por favor verifica tu conexión e intenta de nuevo.",
+		"validation_error": "Por favor verifica tu información e intenta de nuevo.",
+		"incomplete_auth_data": "Se recibieron datos de autenticación incompletos. Por favor intenta de nuevo."
+	}
 }

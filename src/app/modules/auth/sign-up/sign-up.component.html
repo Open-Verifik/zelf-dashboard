@@ -36,21 +36,12 @@
 			<!-- Title -->
 			<div class="mt-8 flex items-center justify-between">
 				<div>
-					<div class="text-4xl font-extrabold leading-tight tracking-tight">Sign up</div>
+					<div class="text-4xl font-extrabold leading-tight tracking-tight">{{ "signUp.title" | transloco }}</div>
 					<div class="mt-0.5 flex items-baseline font-medium">
-						<div>Already have an account?</div>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-in']">Sign in </a>
+						<div>{{ "signUp.alreadyHaveAccount" | transloco }}</div>
+						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-in']">{{ "signUp.signIn" | transloco }} </a>
 					</div>
 				</div>
-				<!-- Random data button for testing -->
-				<button
-					type="button"
-					(click)="onFillRandomData()"
-					class="px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-					title="Fill form with random data for testing"
-				>
-					🎲 Random
-				</button>
 			</div>
 
 			<!-- Alert -->
@@ -64,22 +55,22 @@
 			<form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm">
 				<!-- Name field -->
 				<mat-form-field class="w-full">
-					<mat-label>Full name</mat-label>
+					<mat-label>{{ "signUp.fullName" | transloco }}</mat-label>
 					<input id="name" matInput [formControlName]="'name'" />
 					@if (signUpForm.get("name").hasError("required")) {
-						<mat-error> Full name is required </mat-error>
+						<mat-error>{{ "signUp.nameRequired" | transloco }}</mat-error>
 					}
 				</mat-form-field>
 
 				<!-- Email field -->
 				<mat-form-field class="w-full">
-					<mat-label>Email address</mat-label>
+					<mat-label>{{ "signUp.emailAddress" | transloco }}</mat-label>
 					<input id="email" matInput [formControlName]="'email'" />
 					@if (signUpForm.get("email").hasError("required")) {
-						<mat-error> Email address is required </mat-error>
+						<mat-error>{{ "signUp.emailRequired" | transloco }}</mat-error>
 					}
 					@if (signUpForm.get("email").hasError("email")) {
-						<mat-error> Please enter a valid email address </mat-error>
+						<mat-error>{{ "signUp.emailInvalid" | transloco }}</mat-error>
 					}
 				</mat-form-field>
 
@@ -87,33 +78,33 @@
 				<div class="flex w-full gap-2">
 					<!-- Country code field -->
 					<mat-form-field class="w-32">
-						<mat-label>Country</mat-label>
+						<mat-label>{{ "signUp.country" | transloco }}</mat-label>
 						<mat-select [formControlName]="'countryCode'">
 							@for (country of countryCodes; track country.code) {
 								<mat-option [value]="country.code"> {{ country.flag }} {{ country.code }} </mat-option>
 							}
 						</mat-select>
 						@if (signUpForm.get("countryCode").hasError("required")) {
-							<mat-error> Country code is required </mat-error>
+							<mat-error>{{ "signUp.countryRequired" | transloco }}</mat-error>
 						}
 					</mat-form-field>
 
 					<!-- Phone number field -->
 					<mat-form-field class="flex-1">
-						<mat-label>Phone number</mat-label>
-						<input id="phone" matInput type="tel" [formControlName]="'phoneNumber'" placeholder="1234567890" />
-						@if (signUpForm.get("phoneNumber").hasError("required")) {
-							<mat-error> Phone number is required </mat-error>
+						<mat-label>{{ "signUp.phoneNumber" | transloco }}</mat-label>
+						<input id="phone" matInput type="tel" [formControlName]="'phone'" placeholder="1234567890" />
+						@if (signUpForm.get("phone").hasError("required")) {
+							<mat-error>{{ "signUp.phoneRequired" | transloco }}</mat-error>
 						}
-						@if (signUpForm.get("phoneNumber").hasError("pattern")) {
-							<mat-error> Please enter a valid phone number (10-15 digits) </mat-error>
+						@if (signUpForm.get("phone").hasError("pattern")) {
+							<mat-error>{{ "signUp.phonePattern" | transloco }}</mat-error>
 						}
 					</mat-form-field>
 				</div>
 
 				<!-- Password field -->
 				<mat-form-field class="w-full">
-					<mat-label>Password</mat-label>
+					<mat-label>{{ "signUp.password" | transloco }}</mat-label>
 					<input id="password" matInput type="password" [formControlName]="'password'" #passwordField />
 					<button
 						mat-icon-button
@@ -129,26 +120,26 @@
 						}
 					</button>
 					@if (signUpForm.get("password").hasError("required")) {
-						<mat-error> Password is required </mat-error>
+						<mat-error>{{ "signUp.passwordRequired" | transloco }}</mat-error>
 					}
 				</mat-form-field>
 
 				<!-- Company field -->
 				<mat-form-field class="w-full">
-					<mat-label>Company name</mat-label>
+					<mat-label>{{ "signUp.companyName" | transloco }}</mat-label>
 					<input id="company" matInput [formControlName]="'company'" placeholder="Your company name" />
 					@if (signUpForm.get("company").hasError("required")) {
-						<mat-error> Company name is required </mat-error>
+						<mat-error>{{ "signUp.companyRequired" | transloco }}</mat-error>
 					}
 				</mat-form-field>
 
 				<!-- ToS and PP -->
 				<div class="mt-1.5 inline-flex w-full items-end">
 					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'agreements'">
-						<span>I agree with</span>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">Terms </a>
-						<span>and</span>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">Privacy Policy </a>
+						<span>{{ "signUp.agreements" | transloco }}</span>
+						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">{{ "signUp.terms" | transloco }} </a>
+						<span>{{ "signUp.and" | transloco }}</span>
+						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">{{ "signUp.privacyPolicy" | transloco }} </a>
 					</mat-checkbox>
 				</div>
 
@@ -161,7 +152,7 @@
 					(click)="signUp()"
 				>
 					@if (!signUpForm.disabled) {
-						<span> Create your free account </span>
+						<span>{{ "signUp.createAccount" | transloco }}</span>
 					}
 					@if (signUpForm.disabled) {
 						<mat-progress-spinner [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
@@ -196,12 +187,39 @@
 		<div class="relative z-10 w-full max-w-2xl">
 			<div class="text-7xl font-bold leading-none text-gray-100">
 				<div>Welcome to</div>
-				<div>Zelf Platform</div>
+				<div class="text-primary-400">Zelf</div>
 			</div>
 			<div class="mt-6 text-lg leading-6 tracking-tight text-gray-400">
-				Join thousands of companies using Zelf's cutting-edge technology to manage their digital identity, blockchain operations, and Web3
-				integrations. Start your journey with us today.
+				Join the future of decentralized identity and secure digital authentication. Experience biometric verification and blockchain-powered
+				security like never before.
 			</div>
+
+			<!-- Language Picker -->
+			<div class="relative pt-4">
+				<select
+					[value]="currentLanguage"
+					(change)="onLanguageChange($event.target.value)"
+					class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+				>
+					@for (lang of availableLanguages; track lang.code) {
+						<option [value]="lang.code">{{ lang.flag }} {{ lang.name }}</option>
+					}
+				</select>
+			</div>
+
+			<!-- Language picker and Random data button -->
+			<div class="flex items-center gap-2 pt-4">
+				<!-- Random data button for testing -->
+				<button
+					type="button"
+					(click)="fillRandomData()"
+					class="px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+					title="Fill form with random data for testing"
+				>
+					🎲 Random
+				</button>
+			</div>
+
 			<div class="mt-8 flex items-center">
 				<div class="flex flex-0 items-center -space-x-1.5">
 					<img
@@ -221,7 +239,58 @@
 						src="images/avatars/male-16.jpg"
 					/>
 				</div>
-				<div class="ml-4 font-medium tracking-tight text-gray-400">Join 500+ companies already using Zelf</div>
+				<div class="ml-4 font-medium tracking-tight text-gray-400">Join the early adopters building the future</div>
+			</div>
+			<!-- Feature highlights -->
+			<div class="mt-8 grid grid-cols-2 gap-4">
+				<div class="flex items-center space-x-3">
+					<div class="flex-shrink-0">
+						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+							<path
+								fill-rule="evenodd"
+								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</div>
+					<span class="text-sm text-gray-300">Biometric Security</span>
+				</div>
+				<div class="flex items-center space-x-3">
+					<div class="flex-shrink-0">
+						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+							<path
+								fill-rule="evenodd"
+								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</div>
+					<span class="text-sm text-gray-300">Blockchain Identity</span>
+				</div>
+				<div class="flex items-center space-x-3">
+					<div class="flex-shrink-0">
+						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+							<path
+								fill-rule="evenodd"
+								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</div>
+					<span class="text-sm text-gray-300">Zero-Knowledge Face Proofs</span>
+				</div>
+				<div class="flex items-center space-x-3">
+					<div class="flex-shrink-0">
+						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+							<path
+								fill-rule="evenodd"
+								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</div>
+					<span class="text-sm text-gray-300">Decentralized Storage</span>
+				</div>
 			</div>
 		</div>
 	</div>

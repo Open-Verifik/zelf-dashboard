@@ -1,5 +1,36 @@
 {
 	"welcome-back": "Bon retour",
 	"Project": "Projet",
-	"Analytics": "Analytiques"
+	"Analytics": "Analytiques",
+	"signUp": {
+		"title": "S'inscrire",
+		"alreadyHaveAccount": "Vous avez déjà un compte ?",
+		"signIn": "Se connecter",
+		"fullName": "Nom complet",
+		"emailAddress": "Adresse e-mail",
+		"country": "Pays",
+		"phoneNumber": "Numéro de téléphone",
+		"password": "Mot de passe",
+		"companyName": "Nom de l'entreprise",
+		"agreements": "J'accepte les",
+		"terms": "Conditions",
+		"and": "et la",
+		"privacyPolicy": "Politique de confidentialité",
+		"createAccount": "Créez votre compte gratuit",
+		"phoneRequired": "Le numéro de téléphone est requis",
+		"phonePattern": "Veuillez entrer un numéro de téléphone valide (10-15 chiffres)",
+		"nameRequired": "Le nom complet est requis",
+		"emailRequired": "L'adresse e-mail est requise",
+		"emailInvalid": "Veuillez entrer une adresse e-mail valide",
+		"passwordRequired": "Le mot de passe est requis",
+		"companyRequired": "Le nom de l'entreprise est requis",
+		"countryRequired": "Le code pays est requis"
+	},
+	"errors": {
+		"phone_already_exists": "Ce numéro de téléphone est déjà enregistré. Veuillez utiliser un numéro différent ou essayer de vous connecter.",
+		"email_already_exists": "Cette adresse e-mail est déjà enregistrée. Veuillez utiliser un e-mail différent ou essayer de vous connecter.",
+		"unknown_error": "Quelque chose s'est mal passé, veuillez réessayer.",
+		"network_error": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
+		"validation_error": "Veuillez vérifier vos informations et réessayer."
+	}
 }
