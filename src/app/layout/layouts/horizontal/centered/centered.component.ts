@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { FuseFullscreenComponent } from "@fuse/components/fullscreen";
 import { FuseLoadingBarComponent } from "@fuse/components/loading-bar";
 import { FuseHorizontalNavigationComponent, FuseNavigationService, FuseVerticalNavigationComponent } from "@fuse/components/navigation";
+import { FuseConfigService } from "@fuse/services/config";
 import { FuseMediaWatcherService } from "@fuse/services/media-watcher";
 import { NavigationService } from "app/core/navigation/navigation.service";
 import { Navigation } from "app/core/navigation/navigation.types";
@@ -41,6 +42,7 @@ import { Subject, takeUntil } from "rxjs";
 export class CenteredLayoutComponent implements OnInit, OnDestroy {
 	navigation: Navigation;
 	isScreenSmall: boolean;
+	currentScheme: string = "light";
 	private _unsubscribeAll: Subject<any> = new Subject<any>();
 
 	/**
@@ -51,7 +53,8 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 		private _router: Router,
 		private _navigationService: NavigationService,
 		private _fuseMediaWatcherService: FuseMediaWatcherService,
-		private _fuseNavigationService: FuseNavigationService
+		private _fuseNavigationService: FuseNavigationService,
+		private _fuseConfigService: FuseConfigService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -83,6 +86,11 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 			// Check if the screen is small
 			this.isScreenSmall = !matchingAliases.includes("md");
 		});
+
+		// Subscribe to config changes to track theme
+		this._fuseConfigService.config$.pipe(takeUntil(this._unsubscribeAll)).subscribe((config) => {
+			this.currentScheme = config.scheme;
+		});
 	}
 
 	/**
@@ -111,5 +119,16 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 			// Toggle the opened status
 			navigation.toggle();
 		}
+	}
+
+	/**
+	 * Get the appropriate logo source based on current theme
+	 */
+	getLogoSrc(): string {
+		// Check if we're in dark mode
+		const isDarkMode =
+			this.currentScheme === "dark" || (this.currentScheme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+		return isDarkMode ? "images/logo/logo-text-on-dark.svg" : "images/logo/logo-text.svg";
 	}
 }

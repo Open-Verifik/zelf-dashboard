@@ -15,7 +15,7 @@
 			<ng-container fuseVerticalNavigationContentHeader>
 				<!-- Logo -->
 				<div class="flex h-20 items-center px-8 pt-6">
-					<img class="h-8 w-auto" src="images/logo/logo-text-on-dark.svg" alt="Zelf logo" />
+					<img class="h-8 w-auto" [src]="getLogoSrc()" alt="Zelf logo" />
 				</div>
 			</ng-container>
 		</fuse-vertical-navigation>
@@ -29,13 +29,11 @@
 				<!-- Logo -->
 				<div class="mx-2 flex items-center lg:mr-8">
 					<div class="hidden lg:flex">
-						<!-- Light version -->
-						<img class="h-8 w-auto dark:hidden" src="images/logo/logo-text.svg" alt="Zelf logo" />
-						<!-- Dark version -->
-						<img class="hidden h-8 w-auto dark:flex" src="images/logo/logo-text-on-dark.svg" alt="Zelf logo" />
+						<!-- Logo with proper dark mode handling -->
+						<img class="h-8 w-auto" [src]="getLogoSrc()" alt="Zelf logo" />
 					</div>
 					<!-- Small version -->
-					<img class="flex h-8 w-auto lg:hidden" src="images/logo/logo.svg" alt="Logo image" />
+					<img class="flex h-8 w-auto lg:hidden" [src]="getLogoSrc()" alt="Logo image" />
 				</div>
 				<!-- Horizontal navigation -->
 				<fuse-horizontal-navigation class="mr-2" [name]="'mainNavigation'" [navigation]="navigation.horizontal"></fuse-horizontal-navigation>
