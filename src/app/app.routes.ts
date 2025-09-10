@@ -33,6 +33,7 @@ export const appRoutes: Route[] = [
 			{ path: "reset-password", loadChildren: () => import("app/modules/auth/reset-password/reset-password.routes") },
 			{ path: "sign-in", loadChildren: () => import("app/modules/auth/sign-in/sign-in.routes") },
 			{ path: "sign-up", loadChildren: () => import("app/modules/auth/sign-up/sign-up.routes") },
+			{ path: "biometric-verification", loadChildren: () => import("app/modules/auth/biometric-verification/biometric-verification.routes") },
 		],
 	},
 

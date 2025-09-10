@@ -1,0 +1,171 @@
+<div class="data-biometrics-container">
+	<div class="biometrics-content" fxLayout="column" fxLayoutAlign="center center">
+		<div
+			*ngIf="!camera.isLoading && camera.hasPermissions && !camera.isLowQuality && !hasApiError && !response.isLoading"
+			class="camera-container"
+			fxLayout="column"
+			fxLayoutAlign="center center"
+		>
+			<!-- Camera View - Much Larger Now -->
+			<div class="camera-view" [style.width.px]="camera.dimensions.video.width" [style.height.px]="camera.dimensions.video.height">
+				<webcam
+					(imageCapture)="processImage($event)"
+					(initError)="cameraError($event)"
+					[allowCameraSwitch]="false"
+					[captureImageData]="true"
+					[height]="camera.dimensions.video.height"
+					[imageQuality]="1"
+					[trigger]="takePicture$"
+					[videoOptions]="camera.configuration"
+					[width]="camera.dimensions.video.width"
+					*ngIf="!response.base64Image"
+					#webcam
+					mirrorImage="always"
+				></webcam>
+
+				<canvas
+					[style.height.px]="response.base64Image ? camera.dimensions.result.height : camera.dimensions.video.height"
+					[style.width.px]="response.base64Image ? camera.dimensions.result.width : camera.dimensions.video.width"
+					#maskResult
+					class="face-mask-canvas"
+				></canvas>
+
+				<canvas #toSend hidden="true"></canvas>
+			</div>
+
+			<!-- Status Messages - Positioned Below Camera -->
+			<div class="status-messages" fxLayout="column" fxLayoutAlign="center center">
+				<div *ngIf="errorFace && !response.isLoading" class="biometric__error">
+					<div class="biometric__error-title">{{ errorFace.title }}</div>
+					<div class="biometric__error-subtitle">{{ errorFace.subtitle }}</div>
+				</div>
+
+				<div *ngIf="!errorFace && !response.isLoading" class="biometric__instructions">
+					<div class="biometric__instruction-title">Position your face in the center</div>
+					<div class="biometric__instruction-subtitle">Look directly at the camera and stay still</div>
+				</div>
+			</div>
+
+			<!-- Instructions - Compact and Strategic -->
+			<div class="compact-instructions">
+				<p>Please look at the camera to verify your identity and complete your account registration</p>
+			</div>
+
+			<!-- User Data Preview -->
+			<div class="user-data-preview" *ngIf="userData">
+				<div class="user-data-details">
+					<strong>Creating account for:</strong> {{ userData.name }} ({{ userData.email }})
+					<div class="company-preview" *ngIf="userData.company">{{ userData.company }}</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Liveness Detection Controls - Only show when camera is active and no errors -->
+		<div class="liveness-controls" *ngIf="!livenessDetection.isActive && !hasApiError && !response.isLoading">
+			<button class="btn-liveness" (click)="startLivenessDetection()">🔄 Start Active Liveness Detection</button>
+			<small>For enhanced security, move your face to different angles</small>
+		</div>
+
+		<!-- Liveness Detection Progress - Only show when active and no errors -->
+		<div class="liveness-progress" *ngIf="livenessDetection.isActive && !hasApiError && !response.isLoading">
+			<h3>Active Liveness Detection</h3>
+			<div class="liveness-steps">
+				<div
+					*ngFor="let step of livenessDetection.steps; let i = index"
+					class="liveness-step"
+					[class.active]="i === livenessDetection.currentStep"
+					[class.completed]="step.completed"
+				>
+					<div class="step-indicator">
+						<span *ngIf="step.completed">✅</span>
+						<span *ngIf="!step.completed && i === livenessDetection.currentStep">🔄</span>
+						<span *ngIf="!step.completed && i !== livenessDetection.currentStep">⏳</span>
+					</div>
+					<div class="step-info">
+						<div class="step-name">{{ step.name }}</div>
+						<div class="step-angle">{{ step.angle }}°</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="liveness-instructions" *ngIf="livenessDetection.isActive">
+				<div class="current-step">
+					{{ livenessDetection.steps[livenessDetection.currentStep].name }}: Turn your head
+					{{
+						livenessDetection.steps[livenessDetection.currentStep].angle > 0
+							? "right"
+							: livenessDetection.steps[livenessDetection.currentStep].angle < 0
+								? "left"
+								: "center"
+					}}
+				</div>
+				<div class="hold-instruction" *ngIf="livenessDetection.isHolding">
+					Hold position...
+					{{ Math.ceil((livenessDetection.requiredHoldTime - (Date.now() - livenessDetection.holdStartTime)) / 1000) }}s
+				</div>
+			</div>
+		</div>
+
+		<!-- Optional Master Password Input - Only show when camera is active and no errors -->
+		<div class="password-input-container" *ngIf="!hasApiError && !response.isLoading">
+			<div class="password-toggle">
+				<label class="form-label">Add Master Password (Optional)</label>
+				<div class="toggle-switch" (click)="toggleMasterPassword()">
+					<div class="toggle-slider" [class.active]="useMasterPassword"></div>
+				</div>
+			</div>
+
+			<div *ngIf="useMasterPassword" class="password-input-field">
+				<input
+					type="password"
+					id="masterPassword"
+					placeholder="Enter your master password (optional)"
+					[(ngModel)]="masterPassword"
+					class="password-input"
+				/>
+				<small>Adding a master password provides additional security layer. Biometric verification is always required.</small>
+			</div>
+		</div>
+
+		<!-- API Error Display -->
+		<div class="api-error-container" fxLayout="column" fxLayoutAlign="center center" *ngIf="hasApiError && !response.isLoading">
+			<div class="api-error-card">
+				<div class="error-icon">⚠️</div>
+				<h3 class="error-title">Verification Failed</h3>
+				<p class="error-message">{{ apiError }}</p>
+				<div class="error-actions">
+					<button class="btn-retry" (click)="clearApiError()">Try Again</button>
+					<button class="btn-back-error" (click)="onBiometricsCancel()">Cancel</button>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="loading-container"
+			fxLayout="column"
+			fxLayoutAlign="center center"
+			*ngIf="(response.base64Image || camera.isLoading) && !hasApiError"
+		>
+			<mat-spinner [diameter]="120"></mat-spinner>
+			<div *ngIf="response.isLoading" class="processing-message">Processing your biometric data...</div>
+		</div>
+
+		<div class="error-container" fxLayout="column" fxLayoutAlign="center center" *ngIf="!camera.isLoading && camera.isLowQuality && !hasApiError">
+			<mat-icon class="camera-error-icon" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+			<h2 class="error-title">Camera not available</h2>
+			<p class="error-description">Please ensure your camera is enabled and accessible for biometric verification</p>
+		</div>
+
+		<div
+			class="permission-container"
+			fxLayout="column"
+			fxLayoutAlign="center center"
+			*ngIf="!camera.isLoading && !camera.hasPermissions && !hasApiError"
+		>
+			<mat-icon class="permission-icon" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
+			<h2 class="permission-title">Camera Permission Required</h2>
+			<p class="permission-description">Please allow camera access to continue with biometric verification</p>
+			<button class="btn-retry" (click)="onBiometricsCancel()">Cancel</button>
+		</div>
+	</div>
+</div>
