@@ -48,90 +48,19 @@ export class AuthService {
 	// -----------------------------------------------------------------------------------------------------
 
 	/**
-	 * Forgot password
-	 *
-	 * @param email
-	 */
-	forgotPassword(email: string): Observable<any> {
-		return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.forgotPassword}`, email);
-	}
-
-	/**
-	 * Reset password
-	 *
-	 * @param password
-	 */
-	resetPassword(password: string): Observable<any> {
-		return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.resetPassword}`, password);
-	}
-
-	/**
 	 * Sign in
 	 *
 	 * @param credentials
 	 */
-	signIn(credentials: { email: string; password: string }): Observable<any> {
+	signIn(credentials: { email: string; countryCode: string; phone: string; zelfProof: string }): Promise<any> {
 		// Throw error, if the user is already logged in
 		if (this._authenticated) {
-			return throwError("User is already logged in.");
+			throwError(() => new Error("User is already logged in."));
+			return Promise.resolve(false);
 		}
 
-		return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials).pipe(
-			switchMap((response: any) => {
-				// Store the access token in the local storage
-				this.accessToken = response.accessToken;
-
-				// Set the authenticated flag to true
-				this._authenticated = true;
-
-				// Store the user on the user service
-				this._userService.user = response.user;
-
-				// Return a new observable with the response
-				return of(response);
-			})
-		);
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials);
 	}
-
-	/**
-	 * Sign in using the access token
-	 * NOTE: This method is disabled because the /auth/sign-in-with-token endpoint doesn't exist
-	 * For our custom auth system, we validate tokens locally without server calls
-	 */
-	// signInUsingToken(): Observable<any> {
-	// 	// Sign in using the token
-	// 	return this._httpClient
-	// 		.post(`${environment.apiUrl}${environment.endpoints.auth.signInWithToken}`, {
-	// 			accessToken: this.accessToken,
-	// 		})
-	// 		.pipe(
-	// 			catchError(() =>
-	// 				// Return false
-	// 				of(false)
-	// 			),
-	// 			switchMap((response: any) => {
-	// 				// Replace the access token with the new one if it's available on
-	// 				// the response object.
-	// 				//
-	// 				// This is an added optional step for better security. Once you sign
-	// 				// in using the token, you should generate a new one on the server
-	// 				// side and attach it to the response object. Then the following
-	// 				// piece of code can replace the token with the refreshed one.
-	// 				if (response.accessToken) {
-	// 					this.accessToken = response.accessToken;
-	// 				}
-
-	// 				// Set the authenticated flag to true
-	// 				this._authenticated = true;
-
-	// 				// Store the user on the user service
-	// 				this._userService.user = response.user;
-
-	// 				// Return true
-	// 				return of(true);
-	// 			})
-	// 		);
-	// }
 
 	/**
 	 * Sign out
@@ -216,5 +145,9 @@ export class AuthService {
 
 	setAccessToken(token: string): void {
 		localStorage.setItem("accessToken", token);
+	}
+
+	verifyClientExists(user: { email: string; phone: string }): Observable<any> {
+		return this._httpClient.get(`${environment.apiUrl}${environment.endpoints.auth.verifyClientExists}`, { params: user });
 	}
 }

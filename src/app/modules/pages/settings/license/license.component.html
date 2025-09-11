@@ -1,0 +1,95 @@
+<div class="w-full max-w-3xl">
+	<!-- Alert Messages -->
+	<div
+		*ngIf="showAlert"
+		class="mb-6 p-4 rounded-lg"
+		[ngClass]="{
+			'bg-green-100 text-green-800 border border-green-200': alertType === 'success',
+			'bg-red-100 text-red-800 border border-red-200': alertType === 'error',
+		}"
+	>
+		<div class="flex items-center">
+			<mat-icon
+				class="mr-2"
+				[ngClass]="{
+					'text-green-600': alertType === 'success',
+					'text-red-600': alertType === 'error',
+				}"
+			>
+				{{ alertType === "success" ? "check_circle" : "error" }}
+			</mat-icon>
+			<span>{{ alertMessage }}</span>
+		</div>
+	</div>
+
+	<!-- Form -->
+	<form [formGroup]="accountForm">
+		<!-- Section -->
+		<div class="mt-8 grid w-full gap-6 sm:grid-cols-4">
+			<div class="sm:col-span-4">
+				<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
+					<mat-label>Domain</mat-label>
+					<div class="text-secondary" matPrefix>domain.</div>
+					<input [formControlName]="'domain'" matInput placeholder="mycompany" />
+					<mat-error *ngIf="accountForm.get('domain')?.hasError('required')"> Domain is required </mat-error>
+					<mat-error *ngIf="accountForm.get('domain')?.hasError('pattern')">
+						Domain must contain only letters, numbers, and hyphens
+					</mat-error>
+				</mat-form-field>
+			</div>
+		</div>
+
+		<!-- Current License Info -->
+		<div *ngIf="currentLicense" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+			<h3 class="text-sm font-medium text-blue-800 mb-2">Current License</h3>
+			<p class="text-sm text-blue-700">
+				<strong>Domain:</strong> {{ currentLicense.domain }}<br />
+				<strong>Created:</strong> {{ currentLicense.createdAt | date: "medium" }}<br />
+				<strong>IPFS Hash:</strong> {{ currentLicense.ipfsHash | slice: 0 : 20 }}...
+			</p>
+		</div>
+
+		<!-- Divider -->
+		<div class="my-10 border-t"></div>
+
+		<!-- Actions -->
+		<div class="flex items-center justify-end">
+			<button mat-stroked-button type="button" (click)="cancel()" [disabled]="isLoading">Cancel</button>
+			<button
+				class="ml-4"
+				mat-flat-button
+				type="button"
+				[color]="'primary'"
+				(click)="saveLicense()"
+				[disabled]="isLoading || accountForm.invalid"
+			>
+				<mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
+				{{ isLoading ? "Processing..." : "Save License" }}
+			</button>
+		</div>
+	</form>
+
+	<!-- Biometric Verification Modal -->
+	<div *ngIf="showBiometricModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+			<div class="flex items-center justify-between mb-4">
+				<h2 class="text-lg font-semibold">Biometric Verification</h2>
+				<button mat-icon-button (click)="onBiometricCancel()">
+					<mat-icon>close</mat-icon>
+				</button>
+			</div>
+
+			<p class="text-sm text-gray-600 mb-4">
+				Please verify your identity to create/update the license for domain: <strong>{{ userData.domain }}</strong>
+			</p>
+
+			<!-- Biometric Component -->
+			<app-data-biometrics
+				#biometricVerification
+				[userData]="userData"
+				(biometricsSuccess)="onBiometricSuccess($event)"
+				(biometricsCancel)="onBiometricCancel()"
+			></app-data-biometrics>
+		</div>
+	</div>
+</div>

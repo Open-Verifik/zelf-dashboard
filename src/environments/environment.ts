@@ -11,10 +11,8 @@ export const environment = {
 	endpoints: {
 		auth: {
 			signUp: "/api/clients",
-			signIn: "/clients/auth",
-			signOut: "/auth/sign-out",
-			forgotPassword: "/auth/forgot-password",
-			resetPassword: "/auth/reset-password",
+			signIn: "/api/clients/auth",
+			verifyClientExists: "/api/clients",
 			unlockSession: "/auth/unlock-session",
 			// signInWithToken: "/auth/sign-in-with-token", // Disabled - endpoint doesn't exist
 		},
@@ -25,6 +23,11 @@ export const environment = {
 		biometric: {
 			verify: "/biometric/verify",
 			enroll: "/biometric/enroll",
+		},
+		license: {
+			create: "/api/license",
+			search: "/api/license",
+			delete: "/api/license",
 		},
 	},
 	// Feature flags

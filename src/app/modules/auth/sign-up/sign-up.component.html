@@ -14,6 +14,7 @@
 
 			<!-- Biometric component -->
 			<app-data-biometrics
+				#biometricVerification
 				[userData]="userData"
 				(biometricsSuccess)="onBiometricSuccess($event)"
 				(biometricsCancel)="onBiometricCancel()"

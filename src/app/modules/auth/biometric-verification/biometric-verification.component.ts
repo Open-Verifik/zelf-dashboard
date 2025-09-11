@@ -201,6 +201,32 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Handle API errors from parent component
+	 */
+	handleApiError(error: any): void {
+		console.error("API Error in biometric verification:", error);
+
+		// Check for specific error messages
+		if (error?.message) {
+			if (error.message.includes("Multiple face were detected")) {
+				this.apiError = "Multiple faces detected in the image. Please ensure only one person is visible in the camera frame.";
+			} else if (error.message.includes("No face detected")) {
+				this.apiError = "No face detected. Please look directly at the camera.";
+			} else if (error.message.includes("Face not recognized")) {
+				this.apiError = "Face not recognized. Please try again or contact support.";
+			} else {
+				this.apiError = error.message;
+			}
+		} else {
+			this.apiError = "Biometric verification failed. Please try again.";
+		}
+
+		this.hasApiError = true;
+		this.response.isLoading = false;
+		this._changeDetectorRef.markForCheck();
+	}
+
+	/**
 	 * Start active liveness detection
 	 */
 	startLivenessDetection(): void {

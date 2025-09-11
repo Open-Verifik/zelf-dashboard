@@ -37,6 +37,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 })
 export class AuthSignUpComponent implements OnInit {
 	@ViewChild("signUpNgForm") signUpNgForm: NgForm;
+	@ViewChild("biometricVerification") biometricVerification: DataBiometricsComponent;
 
 	alert: { type: FuseAlertType; message: string } = {
 		type: "success",
@@ -552,6 +553,22 @@ export class AuthSignUpComponent implements OnInit {
 			})
 			.catch((error) => {
 				console.error("Sign up error:", error);
+
+				// Check if this is a biometric-related error
+				if (
+					error?.message &&
+					(error.message.includes("Multiple face were detected") ||
+						error.message.includes("No face detected") ||
+						error.message.includes("Face not recognized") ||
+						error.message.includes("biometric") ||
+						error.message.includes("face"))
+				) {
+					// Handle biometric-specific errors in the biometric component
+					if (this.biometricVerification) {
+						this.biometricVerification.handleApiError(error);
+					}
+					return; // Don't show the general error alert
+				}
 
 				// Re-enable the form
 				this.signUpForm.enable();

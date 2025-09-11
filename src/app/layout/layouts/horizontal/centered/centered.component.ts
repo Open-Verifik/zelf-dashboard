@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
-import { FuseFullscreenComponent } from "@fuse/components/fullscreen";
 import { FuseLoadingBarComponent } from "@fuse/components/loading-bar";
 import { FuseHorizontalNavigationComponent, FuseNavigationService, FuseVerticalNavigationComponent } from "@fuse/components/navigation";
 import { FuseConfigService } from "@fuse/services/config";
@@ -10,10 +9,7 @@ import { FuseMediaWatcherService } from "@fuse/services/media-watcher";
 import { NavigationService } from "app/core/navigation/navigation.service";
 import { Navigation } from "app/core/navigation/navigation.types";
 import { LanguagesComponent } from "app/layout/common/languages/languages.component";
-import { MessagesComponent } from "app/layout/common/messages/messages.component";
-import { NotificationsComponent } from "app/layout/common/notifications/notifications.component";
 import { SearchComponent } from "app/layout/common/search/search.component";
-import { ShortcutsComponent } from "app/layout/common/shortcuts/shortcuts.component";
 import { ThemeToggleComponent } from "app/layout/common/theme-toggle/theme-toggle.component";
 import { UserComponent } from "app/layout/common/user/user.component";
 import { Subject, takeUntil } from "rxjs";
@@ -29,11 +25,7 @@ import { Subject, takeUntil } from "rxjs";
 		MatButtonModule,
 		MatIconModule,
 		LanguagesComponent,
-		FuseFullscreenComponent,
 		SearchComponent,
-		ShortcutsComponent,
-		MessagesComponent,
-		NotificationsComponent,
 		ThemeToggleComponent,
 		UserComponent,
 		RouterOutlet,
