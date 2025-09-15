@@ -30,8 +30,26 @@
 	},
 	"signIn": {
 		"title": "登录",
+		"dontHaveAccount": "没有账户？",
+		"signUp": "注册",
+		"email": "邮箱",
+		"phone": "电话",
+		"emailAddress": "邮箱地址",
+		"emailRequired": "邮箱地址是必需的",
+		"emailInvalid": "请输入有效的邮箱地址",
+		"country": "国家",
+		"countryRequired": "需要国家",
+		"phoneNumber": "电话号码",
+		"phoneRequired": "电话号码是必需的",
+		"phonePattern": "请输入有效的电话号码",
 		"masterPassword": "主密码",
-		"masterPasswordRequired": "需要主密码"
+		"masterPasswordRequired": "需要主密码",
+		"rememberMe": "记住我的凭据",
+		"signInButton": "登录",
+		"termsAgreement": "登录即表示您同意我们的",
+		"termsOfUse": "使用条款",
+		"and": "和",
+		"privacyPolicy": "隐私政策"
 	},
 	"errors": {
 		"phone_already_exists": "此电话号码已注册。请使用不同的电话号码或尝试登录。",

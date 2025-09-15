@@ -30,8 +30,26 @@
 	},
 	"signIn": {
 		"title": "サインイン",
+		"dontHaveAccount": "アカウントをお持ちでないですか？",
+		"signUp": "サインアップ",
+		"email": "メール",
+		"phone": "電話",
+		"emailAddress": "メールアドレス",
+		"emailRequired": "メールアドレスが必要です",
+		"emailInvalid": "有効なメールアドレスを入力してください",
+		"country": "国",
+		"countryRequired": "国が必要です",
+		"phoneNumber": "電話番号",
+		"phoneRequired": "電話番号が必要です",
+		"phonePattern": "有効な電話番号を入力してください",
 		"masterPassword": "マスターパスワード",
-		"masterPasswordRequired": "マスターパスワードが必要です"
+		"masterPasswordRequired": "マスターパスワードが必要です",
+		"rememberMe": "認証情報を記憶",
+		"signInButton": "サインイン",
+		"termsAgreement": "サインインすることで、以下に同意したことになります：",
+		"termsOfUse": "利用規約",
+		"and": "および",
+		"privacyPolicy": "プライバシーポリシー"
 	},
 	"errors": {
 		"phone_already_exists": "この電話番号は既に登録されています。別の電話番号を使用するか、ログインを試してください。",

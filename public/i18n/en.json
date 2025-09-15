@@ -30,8 +30,26 @@
 	},
 	"signIn": {
 		"title": "Sign in",
+		"dontHaveAccount": "Don't have an account?",
+		"signUp": "Sign up",
+		"email": "Email",
+		"phone": "Phone",
+		"emailAddress": "Email address",
+		"emailRequired": "Email address is required",
+		"emailInvalid": "Please enter a valid email address",
+		"country": "Country",
+		"countryRequired": "Country required",
+		"phoneNumber": "Phone number",
+		"phoneRequired": "Phone number is required",
+		"phonePattern": "Please enter a valid phone number",
 		"masterPassword": "Master Password",
-		"masterPasswordRequired": "Master Password is required"
+		"masterPasswordRequired": "Master Password is required",
+		"rememberMe": "Remember my credentials",
+		"signInButton": "Sign in",
+		"termsAgreement": "By signing in, you agree to our",
+		"termsOfUse": "Terms of Use",
+		"and": "and",
+		"privacyPolicy": "Privacy Policy"
 	},
 	"errors": {
 		"phone_already_exists": "This phone number is already registered. Please use a different phone number or try signing in.",

@@ -34,10 +34,10 @@
 			</div>
 
 			<!-- Title -->
-			<div class="mt-8 text-4xl font-extrabold leading-tight tracking-tight">Sign in</div>
+			<div class="mt-8 text-4xl font-extrabold leading-tight tracking-tight">{{ "signIn.title" | transloco }}</div>
 			<div class="mt-0.5 flex items-baseline font-medium">
-				<div>Don't have an account?</div>
-				<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-up']">Sign up </a>
+				<div>{{ "signIn.dontHaveAccount" | transloco }}</div>
+				<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-up']">{{ "signIn.signUp" | transloco }} </a>
 			</div>
 
 			<!-- Alert -->
@@ -52,21 +52,21 @@
 				<!-- Identification method selector -->
 				<div class="mb-4">
 					<mat-radio-group [formControlName]="'identificationMethod'" class="flex gap-4">
-						<mat-radio-button value="email">Email</mat-radio-button>
-						<mat-radio-button value="phone">Phone</mat-radio-button>
+						<mat-radio-button value="email">{{ "signIn.email" | transloco }}</mat-radio-button>
+						<mat-radio-button value="phone">{{ "signIn.phone" | transloco }}</mat-radio-button>
 					</mat-radio-group>
 				</div>
 
 				<!-- Email field (shown when email is selected) -->
 				@if (signInForm.get("identificationMethod")?.value === "email") {
 					<mat-form-field class="w-full">
-						<mat-label>Email address</mat-label>
+						<mat-label>{{ "signIn.emailAddress" | transloco }}</mat-label>
 						<input id="email" matInput [formControlName]="'email'" />
 						@if (signInForm.get("email").hasError("required")) {
-							<mat-error>Email address is required</mat-error>
+							<mat-error>{{ "signIn.emailRequired" | transloco }}</mat-error>
 						}
 						@if (signInForm.get("email").hasError("email")) {
-							<mat-error>Please enter a valid email address</mat-error>
+							<mat-error>{{ "signIn.emailInvalid" | transloco }}</mat-error>
 						}
 					</mat-form-field>
 				}
@@ -76,26 +76,26 @@
 					<div class="flex w-full gap-2">
 						<!-- Country code field -->
 						<mat-form-field class="w-32">
-							<mat-label>Country</mat-label>
+							<mat-label>{{ "signIn.country" | transloco }}</mat-label>
 							<mat-select [formControlName]="'countryCode'">
 								@for (country of countryCodes; track country.code) {
 									<mat-option [value]="country.code">{{ country.flag }} {{ country.code }}</mat-option>
 								}
 							</mat-select>
 							@if (signInForm.get("countryCode").hasError("required")) {
-								<mat-error>Country required</mat-error>
+								<mat-error>{{ "signIn.countryRequired" | transloco }}</mat-error>
 							}
 						</mat-form-field>
 
 						<!-- Phone number field -->
 						<mat-form-field class="flex-1">
-							<mat-label>Phone number</mat-label>
+							<mat-label>{{ "signIn.phoneNumber" | transloco }}</mat-label>
 							<input id="phone" matInput type="tel" [formControlName]="'phone'" placeholder="1234567890" />
 							@if (signInForm.get("phone").hasError("required")) {
-								<mat-error>Phone number is required</mat-error>
+								<mat-error>{{ "signIn.phoneRequired" | transloco }}</mat-error>
 							}
 							@if (signInForm.get("phone").hasError("pattern")) {
-								<mat-error>Please enter a valid phone number</mat-error>
+								<mat-error>{{ "signIn.phonePattern" | transloco }}</mat-error>
 							}
 						</mat-form-field>
 					</div>
@@ -127,26 +127,28 @@
 
 				<!-- Actions -->
 				<div class="mt-1.5 inline-flex w-full items-center justify-start">
-					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'rememberMe'"> Remember me </mat-checkbox>
+					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'rememberMe'">
+						{{ "signIn.rememberMe" | transloco }}
+					</mat-checkbox>
 				</div>
 
 				<!-- Terms and Privacy Policy -->
 				<div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-					By signing in, you agree to our
+					{{ "signIn.termsAgreement" | transloco }}
 					<a
 						class="text-primary-500 hover:underline"
 						href="https://docs.zelf.world/zelf-legal/terms-of-use"
 						target="_blank"
 						rel="noopener noreferrer"
-						>Terms of Use</a
+						>{{ "signIn.termsOfUse" | transloco }}</a
 					>
-					and
+					{{ "signIn.and" | transloco }}
 					<a
 						class="text-primary-500 hover:underline"
 						href="https://docs.zelf.world/zelf-legal/privacy-policy"
 						target="_blank"
 						rel="noopener noreferrer"
-						>Privacy Policy</a
+						>{{ "signIn.privacyPolicy" | transloco }}</a
 					>.
 				</div>
 
@@ -159,7 +161,7 @@
 					(click)="signIn()"
 				>
 					@if (!signInForm.disabled) {
-						<span>Sign in</span>
+						<span>{{ "signIn.signInButton" | transloco }}</span>
 					}
 					@if (signInForm.disabled) {
 						<mat-progress-spinner [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
@@ -199,6 +201,19 @@
 			<div class="mt-6 text-lg leading-6 tracking-tight text-gray-400">
 				Access your secure dashboard to monitor encryption/decryption operations, manage your Zelf license, and track your biometric
 				authentication usage across all your applications.
+			</div>
+
+			<!-- Language Picker -->
+			<div class="relative pt-4">
+				<select
+					[value]="currentLanguage"
+					(change)="onLanguageChange($event.target.value)"
+					class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+				>
+					@for (lang of availableLanguages; track lang.code) {
+						<option [value]="lang.code">{{ lang.flag }} {{ lang.name }}</option>
+					}
+				</select>
 			</div>
 		</div>
 	</div>

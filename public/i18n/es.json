@@ -30,8 +30,26 @@
 	},
 	"signIn": {
 		"title": "Iniciar sesión",
+		"dontHaveAccount": "¿No tienes una cuenta?",
+		"signUp": "Registrarse",
+		"email": "Correo electrónico",
+		"phone": "Teléfono",
+		"emailAddress": "Dirección de correo electrónico",
+		"emailRequired": "La dirección de correo electrónico es requerida",
+		"emailInvalid": "Por favor ingresa una dirección de correo electrónico válida",
+		"country": "País",
+		"countryRequired": "País requerido",
+		"phoneNumber": "Número de teléfono",
+		"phoneRequired": "El número de teléfono es requerido",
+		"phonePattern": "Por favor ingresa un número de teléfono válido",
 		"masterPassword": "Contraseña Maestra",
-		"masterPasswordRequired": "La Contraseña Maestra es requerida"
+		"masterPasswordRequired": "La Contraseña Maestra es requerida",
+		"rememberMe": "Recordar mis credenciales",
+		"signInButton": "Iniciar sesión",
+		"termsAgreement": "Al iniciar sesión, aceptas nuestros",
+		"termsOfUse": "Términos de Uso",
+		"and": "y",
+		"privacyPolicy": "Política de Privacidad"
 	},
 	"errors": {
 		"phone_already_exists": "Este número de teléfono ya está registrado. Por favor usa un número diferente o intenta iniciar sesión.",

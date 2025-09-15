@@ -50,6 +50,17 @@ export class AuthSignInComponent implements OnInit {
 	showBiometricVerification: boolean = false;
 	userData: any = {};
 
+	// Language picker
+	availableLanguages = [
+		{ code: "en", name: "English", flag: "🇺🇸" },
+		{ code: "es", name: "Español", flag: "🇪🇸" },
+		{ code: "fr", name: "Français", flag: "🇫🇷" },
+		{ code: "zh", name: "中文", flag: "🇨🇳" },
+		{ code: "ja", name: "日本語", flag: "🇯🇵" },
+		{ code: "ko", name: "한국어", flag: "🇰🇷" },
+	];
+	currentLanguage = "en";
+
 	// Country codes for phone number
 	countryCodes = [
 		{ code: "+1", country: "United States", flag: "🇺🇸" },
@@ -344,6 +355,9 @@ export class AuthSignInComponent implements OnInit {
 
 		// Load saved data from localStorage
 		this.loadRememberedData();
+
+		// Initialize current language
+		this.currentLanguage = this._translocoService.getActiveLang() || "en";
 	}
 
 	/**
@@ -716,5 +730,13 @@ export class AuthSignInComponent implements OnInit {
 	 */
 	private clearRememberedData(): void {
 		localStorage.removeItem("zelf_remembered_signin");
+	}
+
+	/**
+	 * Change language
+	 */
+	onLanguageChange(languageCode: string): void {
+		this.currentLanguage = languageCode;
+		this._translocoService.setActiveLang(languageCode);
 	}
 }
