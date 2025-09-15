@@ -78,6 +78,7 @@ export class AuthService {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("zelfProof");
 		localStorage.removeItem("zelfAccount");
+		localStorage.removeItem("license");
 
 		// Set the authenticated flag to false
 		this._authenticated = false;

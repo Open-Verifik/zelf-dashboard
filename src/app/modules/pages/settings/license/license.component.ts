@@ -344,12 +344,171 @@ export class SettingsLicenseComponent implements OnInit {
 	}
 
 	/**
-	 * Build domain configuration object
+	 * Check if there are any changes between current license and form data
 	 */
-	buildDomainConfig(): DomainConfig {
-		const formValue = this.accountForm.value;
+	hasLicenseChanges(newDomain: string): boolean {
+		if (!this.currentLicense) {
+			return true; // No current license, so any data is a change
+		}
 
-		// Build whitelist object
+		const formValue = this.accountForm.value;
+		const currentConfig = this.currentLicense.domainConfig;
+
+		// Check basic domain info
+		if (this.currentLicense.domain !== newDomain) return true;
+		if (currentConfig.name !== newDomain) return true;
+		if (currentConfig.type !== formValue.type) return true;
+		if (currentConfig.holdSuffix !== formValue.holdSuffix) return true;
+		if (currentConfig.status !== formValue.status) return true;
+		if (currentConfig.owner !== formValue.owner) return true;
+		if (currentConfig.description !== formValue.description) return true;
+
+		// Check limits
+		if (currentConfig.limits.tags !== formValue.maxTags) return true;
+		if (currentConfig.limits.zelfkeys !== formValue.maxZelfkeys) return true;
+
+		// Check features
+		const currentZnsEnabled = currentConfig.features.find((f) => f.code === "zns")?.enabled;
+		const currentZelfkeysEnabled = currentConfig.features.find((f) => f.code === "zelfkeys")?.enabled;
+		if (currentZnsEnabled !== formValue.znsEnabled) return true;
+		if (currentZelfkeysEnabled !== formValue.zelfkeysEnabled) return true;
+
+		// Check validation rules
+		if (currentConfig.validation.minLength !== formValue.minLength) return true;
+		if (currentConfig.validation.maxLength !== formValue.maxLength) return true;
+
+		// Check storage settings
+		if (currentConfig.storage.keyPrefix !== formValue.keyPrefix) return true;
+		if (currentConfig.storage.ipfsEnabled !== formValue.ipfsEnabled) return true;
+		if (currentConfig.storage.arweaveEnabled !== formValue.arweaveEnabled) return true;
+		if (currentConfig.storage.walrusEnabled !== formValue.walrusEnabled) return true;
+
+		// Check payment methods
+		const currentMethods = currentConfig.tagPaymentSettings.methods;
+		const newMethods = this.getPaymentMethods();
+		if (JSON.stringify(currentMethods.sort()) !== JSON.stringify(newMethods.sort())) return true;
+
+		// Check currencies
+		const currentCurrencies = currentConfig.tagPaymentSettings.currencies;
+		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) return true;
+
+		// Check whitelist
+		const currentWhitelist = currentConfig.tagPaymentSettings.whitelist;
+		const newWhitelist = this.buildWhitelistFromForm();
+		if (JSON.stringify(currentWhitelist) !== JSON.stringify(newWhitelist)) return true;
+
+		// Check pricing table
+		const currentPricingTable = currentConfig.tagPaymentSettings.pricingTable;
+		const newPricingTable = this.getPricingTableFromRows();
+		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) return true;
+
+		// Check metadata
+		if (currentConfig.metadata.launchDate !== formValue.launchDate) return true;
+		if (currentConfig.metadata.version !== formValue.version) return true;
+		if (currentConfig.metadata.documentation !== formValue.documentation) return true;
+		if (currentConfig.metadata.community !== formValue.community) return true;
+		if (currentConfig.metadata.enterprise !== formValue.enterprise) return true;
+		if (currentConfig.metadata.support !== formValue.support) return true;
+
+		return false; // No changes detected
+	}
+
+	/**
+	 * Get detailed list of changes between current license and form data
+	 * Useful for debugging and user feedback
+	 */
+	getLicenseChanges(newDomain: string): string[] {
+		if (!this.currentLicense) {
+			return ["Creating new license"];
+		}
+
+		const changes: string[] = [];
+		const formValue = this.accountForm.value;
+		const currentConfig = this.currentLicense.domainConfig;
+
+		// Check basic domain info
+		if (this.currentLicense.domain !== newDomain) changes.push(`Domain: ${this.currentLicense.domain} → ${newDomain}`);
+		if (currentConfig.name !== newDomain) changes.push(`Name: ${currentConfig.name} → ${newDomain}`);
+		if (currentConfig.type !== formValue.type) changes.push(`Type: ${currentConfig.type} → ${formValue.type}`);
+		if (currentConfig.holdSuffix !== formValue.holdSuffix) changes.push(`Hold Suffix: ${currentConfig.holdSuffix} → ${formValue.holdSuffix}`);
+		if (currentConfig.status !== formValue.status) changes.push(`Status: ${currentConfig.status} → ${formValue.status}`);
+		if (currentConfig.owner !== formValue.owner) changes.push(`Owner: ${currentConfig.owner} → ${formValue.owner}`);
+		if (currentConfig.description !== formValue.description) changes.push(`Description: ${currentConfig.description} → ${formValue.description}`);
+
+		// Check limits
+		if (currentConfig.limits.tags !== formValue.maxTags) changes.push(`Max Tags: ${currentConfig.limits.tags} → ${formValue.maxTags}`);
+		if (currentConfig.limits.zelfkeys !== formValue.maxZelfkeys)
+			changes.push(`Max Zelfkeys: ${currentConfig.limits.zelfkeys} → ${formValue.maxZelfkeys}`);
+
+		// Check features
+		const currentZnsEnabled = currentConfig.features.find((f) => f.code === "zns")?.enabled;
+		const currentZelfkeysEnabled = currentConfig.features.find((f) => f.code === "zelfkeys")?.enabled;
+		if (currentZnsEnabled !== formValue.znsEnabled) changes.push(`ZNS Feature: ${currentZnsEnabled} → ${formValue.znsEnabled}`);
+		if (currentZelfkeysEnabled !== formValue.zelfkeysEnabled)
+			changes.push(`Zelfkeys Feature: ${currentZelfkeysEnabled} → ${formValue.zelfkeysEnabled}`);
+
+		// Check validation rules
+		if (currentConfig.validation.minLength !== formValue.minLength)
+			changes.push(`Min Length: ${currentConfig.validation.minLength} → ${formValue.minLength}`);
+		if (currentConfig.validation.maxLength !== formValue.maxLength)
+			changes.push(`Max Length: ${currentConfig.validation.maxLength} → ${formValue.maxLength}`);
+
+		// Check storage settings
+		if (currentConfig.storage.keyPrefix !== formValue.keyPrefix)
+			changes.push(`Key Prefix: ${currentConfig.storage.keyPrefix} → ${formValue.keyPrefix}`);
+		if (currentConfig.storage.ipfsEnabled !== formValue.ipfsEnabled)
+			changes.push(`IPFS Enabled: ${currentConfig.storage.ipfsEnabled} → ${formValue.ipfsEnabled}`);
+		if (currentConfig.storage.arweaveEnabled !== formValue.arweaveEnabled)
+			changes.push(`Arweave Enabled: ${currentConfig.storage.arweaveEnabled} → ${formValue.arweaveEnabled}`);
+		if (currentConfig.storage.walrusEnabled !== formValue.walrusEnabled)
+			changes.push(`Walrus Enabled: ${currentConfig.storage.walrusEnabled} → ${formValue.walrusEnabled}`);
+
+		// Check payment methods
+		const currentMethods = currentConfig.tagPaymentSettings.methods;
+		const newMethods = this.getPaymentMethods();
+		if (JSON.stringify(currentMethods.sort()) !== JSON.stringify(newMethods.sort())) {
+			changes.push(`Payment Methods: ${currentMethods.join(", ")} → ${newMethods.join(", ")}`);
+		}
+
+		// Check currencies
+		const currentCurrencies = currentConfig.tagPaymentSettings.currencies;
+		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) {
+			changes.push(`Currencies: ${currentCurrencies.join(", ")} → ${this.supportedCurrencies.join(", ")}`);
+		}
+
+		// Check whitelist
+		const currentWhitelist = currentConfig.tagPaymentSettings.whitelist;
+		const newWhitelist = this.buildWhitelistFromForm();
+		if (JSON.stringify(currentWhitelist) !== JSON.stringify(newWhitelist)) {
+			changes.push(`Whitelist: ${Object.keys(currentWhitelist).length} → ${Object.keys(newWhitelist).length} entries`);
+		}
+
+		// Check pricing table
+		const currentPricingTable = currentConfig.tagPaymentSettings.pricingTable;
+		const newPricingTable = this.getPricingTableFromRows();
+		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) {
+			changes.push(`Pricing Table: Updated`);
+		}
+
+		// Check metadata
+		if (currentConfig.metadata.launchDate !== formValue.launchDate)
+			changes.push(`Launch Date: ${currentConfig.metadata.launchDate} → ${formValue.launchDate}`);
+		if (currentConfig.metadata.version !== formValue.version) changes.push(`Version: ${currentConfig.metadata.version} → ${formValue.version}`);
+		if (currentConfig.metadata.documentation !== formValue.documentation)
+			changes.push(`Documentation: ${currentConfig.metadata.documentation} → ${formValue.documentation}`);
+		if (currentConfig.metadata.community !== formValue.community)
+			changes.push(`Community: ${currentConfig.metadata.community} → ${formValue.community}`);
+		if (currentConfig.metadata.enterprise !== formValue.enterprise)
+			changes.push(`Enterprise: ${currentConfig.metadata.enterprise} → ${formValue.enterprise}`);
+		if (currentConfig.metadata.support !== formValue.support) changes.push(`Support: ${currentConfig.metadata.support} → ${formValue.support}`);
+
+		return changes;
+	}
+
+	/**
+	 * Build whitelist object from form data
+	 */
+	private buildWhitelistFromForm(): any {
 		const whitelist: any = {};
 		this.whitelistItems.forEach((_, index) => {
 			const domain = this.accountForm.get(`whitelistDomain_${index}`)?.value;
@@ -360,6 +519,17 @@ export class SettingsLicenseComponent implements OnInit {
 				whitelist[domain] = `${discount}${type}`;
 			}
 		});
+		return whitelist;
+	}
+
+	/**
+	 * Build domain configuration object
+	 */
+	buildDomainConfig(): DomainConfig {
+		const formValue = this.accountForm.value;
+
+		// Build whitelist object
+		const whitelist = this.buildWhitelistFromForm();
 
 		return {
 			name: formValue.domain,
@@ -529,9 +699,9 @@ export class SettingsLicenseComponent implements OnInit {
 			return;
 		}
 
-		// Check if domain has changed
-		if (this.currentLicense && this.currentLicense.domain === domain) {
-			this.showError("Domain is already set to this value");
+		// Check if there are any actual changes
+		if (this.currentLicense && !this.hasLicenseChanges(domain)) {
+			this.showError("No changes detected. Please modify at least one field before saving.");
 			return;
 		}
 
