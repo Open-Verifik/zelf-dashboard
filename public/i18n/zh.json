@@ -39,5 +39,43 @@
 		"unknown_error": "出现错误，请重试。",
 		"network_error": "网络错误。请检查您的连接并重试。",
 		"validation_error": "请检查您的信息并重试。"
+	},
+	"saving_operations": {
+		"confirm_changes": "确认更改",
+		"enter_password_proceed": "请输入您的主密码以继续",
+		"password_encrypt_data": "此密码将用于加密您的{{itemName}}数据。",
+		"verify_identity": "请验证您的身份以{{action}}{{itemName}}：",
+		"created_successfully": "{{itemName}}创建成功！",
+		"updated_successfully": "{{itemName}}更新成功！",
+		"license_configuration": {
+			"title": "确认许可证配置",
+			"description": "请输入您的主密码以继续保存许可证配置",
+			"action": "保存",
+			"itemName": "许可证配置"
+		},
+		"security_settings": {
+			"title": "确认安全设置更改",
+			"description": "请输入您的主密码以继续更新您的安全设置",
+			"action": "更新",
+			"itemName": "安全设置"
+		},
+		"team_permissions": {
+			"title": "确认团队权限更改",
+			"description": "请输入您的主密码以继续修改团队权限",
+			"action": "修改",
+			"itemName": "团队权限"
+		},
+		"plan_billing": {
+			"title": "确认计划和计费更改",
+			"description": "请输入您的主密码以继续更新您的订阅计划",
+			"action": "更新",
+			"itemName": "订阅计划"
+		},
+		"notifications": {
+			"title": "确认通知设置",
+			"description": "请输入您的主密码以继续更新您的通知偏好",
+			"action": "更新",
+			"itemName": "通知偏好"
+		}
 	}
 }

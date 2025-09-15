@@ -39,5 +39,43 @@
 		"unknown_error": "エラーが発生しました。もう一度お試しください。",
 		"network_error": "ネットワークエラー。接続を確認してもう一度お試しください。",
 		"validation_error": "情報を確認してもう一度お試しください。"
+	},
+	"saving_operations": {
+		"confirm_changes": "変更を確認",
+		"enter_password_proceed": "続行するにはマスターパスワードを入力してください",
+		"password_encrypt_data": "このパスワードは{{itemName}}のデータを暗号化するために使用されます。",
+		"verify_identity": "{{itemName}}を{{action}}するために身元を確認してください：",
+		"created_successfully": "{{itemName}}が正常に作成されました！",
+		"updated_successfully": "{{itemName}}が正常に更新されました！",
+		"license_configuration": {
+			"title": "ライセンス設定を確認",
+			"description": "ライセンス設定を保存するには、マスターパスワードを入力してください",
+			"action": "保存中",
+			"itemName": "ライセンス設定"
+		},
+		"security_settings": {
+			"title": "セキュリティ設定の変更を確認",
+			"description": "セキュリティ設定を更新するには、マスターパスワードを入力してください",
+			"action": "更新中",
+			"itemName": "セキュリティ設定"
+		},
+		"team_permissions": {
+			"title": "チーム権限の変更を確認",
+			"description": "チーム権限を変更するには、マスターパスワードを入力してください",
+			"action": "変更中",
+			"itemName": "チーム権限"
+		},
+		"plan_billing": {
+			"title": "プランと請求の変更を確認",
+			"description": "サブスクリプションプランを更新するには、マスターパスワードを入力してください",
+			"action": "更新中",
+			"itemName": "サブスクリプションプラン"
+		},
+		"notifications": {
+			"title": "通知設定を確認",
+			"description": "通知設定を更新するには、マスターパスワードを入力してください",
+			"action": "更新中",
+			"itemName": "通知設定"
+		}
 	}
 }

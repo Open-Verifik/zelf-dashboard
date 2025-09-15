@@ -39,5 +39,43 @@
 		"unknown_error": "문제가 발생했습니다. 다시 시도해주세요.",
 		"network_error": "네트워크 오류입니다. 연결을 확인하고 다시 시도해주세요.",
 		"validation_error": "정보를 확인하고 다시 시도해주세요."
+	},
+	"saving_operations": {
+		"confirm_changes": "변경사항 확인",
+		"enter_password_proceed": "계속하려면 마스터 비밀번호를 입력해주세요",
+		"password_encrypt_data": "이 비밀번호는 {{itemName}} 데이터를 암호화하는 데 사용됩니다.",
+		"verify_identity": "{{itemName}}을(를) {{action}}하기 위해 신원을 확인해주세요:",
+		"created_successfully": "{{itemName}}이(가) 성공적으로 생성되었습니다!",
+		"updated_successfully": "{{itemName}}이(가) 성공적으로 업데이트되었습니다!",
+		"license_configuration": {
+			"title": "라이선스 설정 확인",
+			"description": "라이선스 설정을 저장하려면 마스터 비밀번호를 입력해주세요",
+			"action": "저장 중",
+			"itemName": "라이선스 설정"
+		},
+		"security_settings": {
+			"title": "보안 설정 변경 확인",
+			"description": "보안 설정을 업데이트하려면 마스터 비밀번호를 입력해주세요",
+			"action": "업데이트 중",
+			"itemName": "보안 설정"
+		},
+		"team_permissions": {
+			"title": "팀 권한 변경 확인",
+			"description": "팀 권한을 수정하려면 마스터 비밀번호를 입력해주세요",
+			"action": "수정 중",
+			"itemName": "팀 권한"
+		},
+		"plan_billing": {
+			"title": "플랜 및 결제 변경 확인",
+			"description": "구독 플랜을 업데이트하려면 마스터 비밀번호를 입력해주세요",
+			"action": "업데이트 중",
+			"itemName": "구독 플랜"
+		},
+		"notifications": {
+			"title": "알림 설정 확인",
+			"description": "알림 설정을 업데이트하려면 마스터 비밀번호를 입력해주세요",
+			"action": "업데이트 중",
+			"itemName": "알림 설정"
+		}
 	}
 }

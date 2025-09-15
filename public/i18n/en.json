@@ -40,5 +40,43 @@
 		"network_error": "Network error. Please check your connection and try again.",
 		"validation_error": "Please check your information and try again.",
 		"incomplete_auth_data": "Incomplete authentication data received. Please try again."
+	},
+	"saving_operations": {
+		"confirm_changes": "Confirm Changes",
+		"enter_password_proceed": "Please enter your master password to proceed",
+		"password_encrypt_data": "This password will be used to encrypt your {{itemName}} data.",
+		"verify_identity": "Please verify your identity to {{action}} the {{itemName}} for:",
+		"created_successfully": "{{itemName}} created successfully!",
+		"updated_successfully": "{{itemName}} updated successfully!",
+		"license_configuration": {
+			"title": "Confirm License Configuration",
+			"description": "Please enter your master password to proceed with saving the license configuration",
+			"action": "saving",
+			"itemName": "license configuration"
+		},
+		"security_settings": {
+			"title": "Confirm Security Changes",
+			"description": "Please enter your master password to proceed with updating your security settings",
+			"action": "updating",
+			"itemName": "security settings"
+		},
+		"team_permissions": {
+			"title": "Confirm Team Changes",
+			"description": "Please enter your master password to proceed with modifying team permissions",
+			"action": "modifying",
+			"itemName": "team permissions"
+		},
+		"plan_billing": {
+			"title": "Confirm Plan & Billing Changes",
+			"description": "Please enter your master password to proceed with updating your subscription plan",
+			"action": "updating",
+			"itemName": "subscription plan"
+		},
+		"notifications": {
+			"title": "Confirm Notification Settings",
+			"description": "Please enter your master password to proceed with updating your notification preferences",
+			"action": "updating",
+			"itemName": "notification preferences"
+		}
 	}
 }

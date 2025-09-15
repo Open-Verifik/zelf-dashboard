@@ -68,28 +68,7 @@
 
 				<!-- Load settings panel -->
 				<div class="mt-8">
-					@switch (selectedPanel) {
-						<!-- License -->
-						@case ("license") {
-							<settings-license></settings-license>
-						}
-						<!-- Security -->
-						@case ("security") {
-							<settings-security></settings-security>
-						}
-						<!-- Plan & Billing -->
-						@case ("plan-billing") {
-							<settings-plan-billing></settings-plan-billing>
-						}
-						<!-- Notifications -->
-						@case ("notifications") {
-							<settings-notifications></settings-notifications>
-						}
-						<!-- Team -->
-						@case ("team") {
-							<settings-team></settings-team>
-						}
-					}
+					<router-outlet></router-outlet>
 				</div>
 			</div>
 		</mat-drawer-content>

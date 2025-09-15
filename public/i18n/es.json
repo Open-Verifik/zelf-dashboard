@@ -40,5 +40,43 @@
 		"network_error": "Error de red. Por favor verifica tu conexión e intenta de nuevo.",
 		"validation_error": "Por favor verifica tu información e intenta de nuevo.",
 		"incomplete_auth_data": "Se recibieron datos de autenticación incompletos. Por favor intenta de nuevo."
+	},
+	"saving_operations": {
+		"confirm_changes": "Confirmar Cambios",
+		"enter_password_proceed": "Por favor ingresa tu contraseña maestra para continuar",
+		"password_encrypt_data": "Esta contraseña se usará para encriptar los datos de tu {{itemName}}.",
+		"verify_identity": "Por favor verifica tu identidad para {{action}} el {{itemName}} para:",
+		"created_successfully": "¡{{itemName}} creado exitosamente!",
+		"updated_successfully": "¡{{itemName}} actualizado exitosamente!",
+		"license_configuration": {
+			"title": "Confirmar Configuración de Licencia",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con el guardado de la configuración de licencia",
+			"action": "guardando",
+			"itemName": "configuración de licencia"
+		},
+		"security_settings": {
+			"title": "Confirmar Cambios de Seguridad",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu configuración de seguridad",
+			"action": "actualizando",
+			"itemName": "configuración de seguridad"
+		},
+		"team_permissions": {
+			"title": "Confirmar Cambios de Equipo",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la modificación de permisos del equipo",
+			"action": "modificando",
+			"itemName": "permisos del equipo"
+		},
+		"plan_billing": {
+			"title": "Confirmar Cambios de Plan y Facturación",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu plan de suscripción",
+			"action": "actualizando",
+			"itemName": "plan de suscripción"
+		},
+		"notifications": {
+			"title": "Confirmar Configuración de Notificaciones",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tus preferencias de notificación",
+			"action": "actualizando",
+			"itemName": "preferencias de notificación"
+		}
 	}
 }

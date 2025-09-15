@@ -38,5 +38,43 @@
 		"unknown_error": "Quelque chose s'est mal passé, veuillez réessayer.",
 		"network_error": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
 		"validation_error": "Veuillez vérifier vos informations et réessayer."
+	},
+	"saving_operations": {
+		"confirm_changes": "Confirmer les modifications",
+		"enter_password_proceed": "Veuillez entrer votre mot de passe maître pour continuer",
+		"password_encrypt_data": "Ce mot de passe sera utilisé pour chiffrer les données de votre {{itemName}}.",
+		"verify_identity": "Veuillez vérifier votre identité pour {{action}} le {{itemName}} pour :",
+		"created_successfully": "{{itemName}} créé avec succès !",
+		"updated_successfully": "{{itemName}} mis à jour avec succès !",
+		"license_configuration": {
+			"title": "Confirmer la configuration de licence",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la sauvegarde de la configuration de licence",
+			"action": "sauvegarde",
+			"itemName": "configuration de licence"
+		},
+		"security_settings": {
+			"title": "Confirmer les modifications de sécurité",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos paramètres de sécurité",
+			"action": "mise à jour",
+			"itemName": "paramètres de sécurité"
+		},
+		"team_permissions": {
+			"title": "Confirmer les modifications d'équipe",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la modification des permissions d'équipe",
+			"action": "modification",
+			"itemName": "permissions d'équipe"
+		},
+		"plan_billing": {
+			"title": "Confirmer les modifications de plan et facturation",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de votre plan d'abonnement",
+			"action": "mise à jour",
+			"itemName": "plan d'abonnement"
+		},
+		"notifications": {
+			"title": "Confirmer les paramètres de notification",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos préférences de notification",
+			"action": "mise à jour",
+			"itemName": "préférences de notification"
+		}
 	}
 }

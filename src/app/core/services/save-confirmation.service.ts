@@ -1,0 +1,44 @@
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { License, DomainConfig } from "../../modules/pages/settings/license/license.class";
+
+export interface SaveConfirmationData {
+	license: License;
+	domainConfig: DomainConfig;
+	redirectUrl: string;
+	operation: {
+		title: string;
+		description: string;
+		action: string; // e.g., "saving", "updating", "creating"
+		itemName: string; // e.g., "domain configuration", "license", "security settings"
+	};
+}
+
+@Injectable({
+	providedIn: "root",
+})
+export class SaveConfirmationService {
+	private saveDataSubject = new BehaviorSubject<SaveConfirmationData | null>(null);
+	public saveData$ = this.saveDataSubject.asObservable();
+
+	/**
+	 * Set the data to be saved
+	 */
+	setSaveData(data: SaveConfirmationData): void {
+		this.saveDataSubject.next(data);
+	}
+
+	/**
+	 * Get the current save data
+	 */
+	getSaveData(): SaveConfirmationData | null {
+		return this.saveDataSubject.value;
+	}
+
+	/**
+	 * Clear the save data
+	 */
+	clearSaveData(): void {
+		this.saveDataSubject.next(null);
+	}
+}

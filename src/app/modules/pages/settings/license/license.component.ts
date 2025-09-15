@@ -12,12 +12,13 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { DataBiometricsComponent, BiometricData } from "../../../auth/biometric-verification/biometric-verification.component";
+import { Router } from "@angular/router";
 import { AuthService } from "app/core/auth/auth.service";
 import { HttpWrapperService } from "app/http-wrapper.service";
 import { environment } from "../../../../../environments/environment";
 import { License, LicenseData, DomainConfig } from "./license.class";
-
+import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
+import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 @Component({
 	selector: "settings-license",
 	templateUrl: "./license.component.html",
@@ -38,14 +39,10 @@ import { License, LicenseData, DomainConfig } from "./license.class";
 		MatProgressSpinnerModule,
 		MatSlideToggleModule,
 		MatCheckboxModule,
-		DataBiometricsComponent,
 	],
 })
 export class SettingsLicenseComponent implements OnInit {
-	@ViewChild("biometricVerification") biometricVerification: DataBiometricsComponent;
-
 	accountForm: UntypedFormGroup;
-	showBiometricModal: boolean = false;
 	isLoading: boolean = false;
 	showAlert: boolean = false;
 	alertMessage: string = "";
@@ -53,7 +50,6 @@ export class SettingsLicenseComponent implements OnInit {
 
 	// License data
 	currentLicense: License | null = null;
-	userData: any = {};
 
 	// Domain configuration arrays
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
@@ -99,7 +95,10 @@ export class SettingsLicenseComponent implements OnInit {
 	constructor(
 		private _formBuilder: UntypedFormBuilder,
 		private _authService: AuthService,
-		private _httpWrapper: HttpWrapperService
+		private _httpWrapper: HttpWrapperService,
+		private _router: Router,
+		private _saveConfirmationService: SaveConfirmationService,
+		private _translocoService: TranslocoService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -535,132 +534,35 @@ export class SettingsLicenseComponent implements OnInit {
 			return;
 		}
 
-		// Show biometric verification modal
-		this.showBiometricModal = true;
-		this.userData = { domain };
-	}
-
-	/**
-	 * Handle successful biometric verification
-	 */
-	onBiometricSuccess(biometricData: BiometricData): void {
-		this.showBiometricModal = false;
-		this.isLoading = true;
-
-		const domain = this.accountForm.get("domain")?.value;
+		// Build domain configuration
 		const domainConfig = this.buildDomainConfig();
 
+		// Create license object
 		const licenseData: LicenseData = {
 			domain,
 			domainConfig,
-			faceBase64: biometricData.faceBase64,
-			masterPassword: biometricData.password,
+			faceBase64: "", // Will be set during biometric verification
+			masterPassword: "", // Will be set during biometric verification
 		};
-
-		// Create License object
 		const license = new License(licenseData);
 
-		// Call license API
-		this.createOrUpdateLicense(license);
-	}
+		// Set save data in service
+		this._saveConfirmationService.setSaveData({
+			license,
+			domainConfig,
+			redirectUrl: "/settings/license",
+			operation: {
+				title: this._translocoService.translate("saving_operations.license_configuration.title"),
+				description: this._translocoService.translate("saving_operations.license_configuration.description"),
+				action: this._translocoService.translate("saving_operations.license_configuration.action"),
+				itemName: this._translocoService.translate("saving_operations.license_configuration.itemName"),
+			},
+		});
 
-	/**
-	 * Handle biometric verification cancellation
-	 */
-	onBiometricCancel(): void {
-		this.showBiometricModal = false;
-	}
-
-	/**
-	 * Create or update license
-	 */
-	private async createOrUpdateLicense(license: License): Promise<void> {
-		try {
-			// First, check if domain already exists
-			const existingLicense = await this.searchLicense(license.domain);
-
-			if (existingLicense) {
-				// Update existing license
-				await this.updateLicense(license, existingLicense);
-			} else {
-				// Create new license
-				await this.createLicense(license);
-			}
-		} catch (error) {
-			console.error("License operation error:", error);
-			this.showError("Failed to save license. Please try again.");
-		} finally {
-			this.isLoading = false;
-		}
-	}
-
-	/**
-	 * Search for existing license by domain
-	 */
-	private async searchLicense(domain: string): Promise<any> {
-		try {
-			const response = await this._httpWrapper.sendRequest("get", `${environment.apiUrl}${environment.endpoints.license.search}`, { domain });
-			return response.data;
-		} catch (error) {
-			// If not found, return null
-			if (error.status === 404) {
-				return null;
-			}
-			throw error;
-		}
-	}
-
-	/**
-	 * Create new license
-	 */
-	private async createLicense(license: License): Promise<void> {
-		try {
-			const response = await this._httpWrapper.sendRequest(
-				"post",
-				`${environment.apiUrl}${environment.endpoints.license.create}`,
-				license.toJSON()
-			);
-
-			// Store in localStorage
-			const createdLicense = License.fromJSON(response.data);
-			localStorage.setItem("license", JSON.stringify(createdLicense.toJSON()));
-			this.currentLicense = createdLicense;
-
-			this.showSuccess("License created successfully!");
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
-	 * Update existing license
-	 */
-	private async updateLicense(license: License, existingLicense: any): Promise<void> {
-		try {
-			// Delete previous IPFS record if exists
-			if (existingLicense.ipfsHash) {
-				await this.deleteLicense(existingLicense.ipfsHash);
-			}
-
-			// Create new license with updated domain
-			await this.createLicense(license);
-
-			this.showSuccess("License updated successfully!");
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
-	 * Delete license from IPFS
-	 */
-	private async deleteLicense(ipfsHash: string): Promise<void> {
-		try {
-			await this._httpWrapper.sendRequest("delete", `${environment.apiUrl}${environment.endpoints.license.delete}/${ipfsHash}`);
-		} catch (error) {
-			console.warn("Failed to delete previous license record:", error);
-			// Continue with creation even if deletion fails
-		}
+		// Navigate to save confirmation page
+		this._router.navigate(["/save-confirmation"], {
+			queryParams: { redirect: "/settings/license" },
+		});
 	}
 
 	/**

@@ -1,0 +1,136 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 w-full">
+	<div class="max-w-md w-full space-y-8">
+		<!-- Header -->
+		<div class="text-center">
+			<div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+				<mat-icon class="h-6 w-6 text-blue-600 dark:text-blue-400">security</mat-icon>
+			</div>
+			<h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+				{{ saveData?.operation?.title || ("saving_operations.confirm_changes" | transloco) }}
+			</h2>
+			<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+				{{ saveData?.operation?.description || ("saving_operations.enter_password_proceed" | transloco) }}
+			</p>
+		</div>
+
+		<!-- Alert Messages -->
+		<div
+			*ngIf="showAlert"
+			class="rounded-md p-4"
+			[ngClass]="{
+				'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-200 dark:border-green-700':
+					alertType === 'success',
+				'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-200 dark:border-red-700': alertType === 'error',
+			}"
+		>
+			<div class="flex">
+				<mat-icon
+					class="h-5 w-5 mr-2"
+					[ngClass]="{
+						'text-green-400': alertType === 'success',
+						'text-red-400': alertType === 'error',
+					}"
+				>
+					{{ alertType === "success" ? "check_circle" : "error" }}
+				</mat-icon>
+				<span class="text-sm font-medium">{{ alertMessage }}</span>
+			</div>
+		</div>
+
+		<!-- Configuration Info Card -->
+		<div *ngIf="saveData" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+			<div class="flex items-center mb-4">
+				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">domain</mat-icon>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
+					{{ saveData.operation?.itemName || ("saving_operations.confirm_changes" | transloco) }}
+				</h3>
+			</div>
+			<div class="space-y-2">
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Domain:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">{{ saveData.domainConfig.name }}</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Type:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">{{ saveData.domainConfig.type }}</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Status:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">{{ saveData.domainConfig.status }}</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Password Form -->
+		<form class="mt-8 space-y-6" (ngSubmit)="proceedToBiometric()">
+			<div>
+				<mat-form-field class="w-full" appearance="outline">
+					<mat-label>Master Password</mat-label>
+					<input
+						matInput
+						[(ngModel)]="masterPassword"
+						[type]="showPassword ? 'text' : 'password'"
+						name="masterPassword"
+						placeholder="Enter your master password"
+						required
+					/>
+					<button
+						mat-icon-button
+						matSuffix
+						type="button"
+						(click)="togglePasswordVisibility()"
+						[attr.aria-label]="'Toggle password visibility'"
+					>
+						<mat-icon>{{ showPassword ? "visibility_off" : "visibility" }}</mat-icon>
+					</button>
+				</mat-form-field>
+				<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+					{{ "saving_operations.password_encrypt_data" | transloco: { itemName: saveData?.operation?.itemName || "configuration" } }}
+				</p>
+			</div>
+
+			<!-- Action Buttons -->
+			<div class="flex space-x-4">
+				<button mat-stroked-button type="button" (click)="goBack()" [disabled]="isLoading" class="flex-1">Cancel</button>
+				<button mat-flat-button type="submit" color="primary" [disabled]="isLoading || !masterPassword.trim()" class="flex-1">
+					<mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
+					{{ isLoading ? "Processing..." : "Continue" }}
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- Biometric Verification Modal - Full Screen -->
+	<div *ngIf="showBiometricModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+		<div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+			<div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white">Biometric Verification</h2>
+				<button
+					mat-icon-button
+					(click)="onBiometricCancel()"
+					class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+				>
+					<mat-icon>close</mat-icon>
+				</button>
+			</div>
+
+			<div class="p-6">
+				<p class="text-sm text-gray-600 dark:text-gray-300 mb-6 text-center">
+					{{
+						"saving_operations.verify_identity"
+							| transloco: { action: saveData?.operation?.action || "save", itemName: saveData?.operation?.itemName || "configuration" }
+					}}
+					<strong class="text-gray-900 dark:text-white block mt-1">{{ saveData?.domainConfig.name }}</strong>
+				</p>
+
+				<!-- Biometric Component -->
+				<app-data-biometrics
+					[userData]="{ domain: saveData?.domainConfig.name, password: masterPassword }"
+					[isModalContext]="false"
+					(biometricsSuccess)="onBiometricSuccess($event)"
+					(biometricsCancel)="onBiometricCancel()"
+				></app-data-biometrics>
+			</div>
+		</div>
+	</div>
+</div>

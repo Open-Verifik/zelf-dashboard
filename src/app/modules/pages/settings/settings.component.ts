@@ -1,32 +1,18 @@
 import { NgClass } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
+import { Router, ActivatedRoute, NavigationEnd, RouterModule } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDrawer, MatSidenavModule } from "@angular/material/sidenav";
 import { FuseMediaWatcherService } from "@fuse/services/media-watcher";
-import { Subject, takeUntil } from "rxjs";
-import { SettingsLicenseComponent } from "./license/license.component";
-import { SettingsNotificationsComponent } from "./notifications/notifications.component";
-import { SettingsPlanBillingComponent } from "./plan-billing/plan-billing.component";
-import { SettingsSecurityComponent } from "./security/security.component";
-import { SettingsTeamComponent } from "./team/team.component";
+import { Subject, takeUntil, filter } from "rxjs";
 
 @Component({
 	selector: "settings",
 	templateUrl: "./settings.component.html",
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [
-		MatSidenavModule,
-		MatButtonModule,
-		MatIconModule,
-		NgClass,
-		SettingsLicenseComponent,
-		SettingsSecurityComponent,
-		SettingsPlanBillingComponent,
-		SettingsNotificationsComponent,
-		SettingsTeamComponent,
-	],
+	imports: [MatSidenavModule, MatButtonModule, MatIconModule, NgClass, RouterModule],
 })
 export class SettingsComponent implements OnInit, OnDestroy {
 	@ViewChild("drawer") drawer: MatDrawer;
@@ -41,7 +27,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
 	 */
 	constructor(
 		private _changeDetectorRef: ChangeDetectorRef,
-		private _fuseMediaWatcherService: FuseMediaWatcherService
+		private _fuseMediaWatcherService: FuseMediaWatcherService,
+		private _router: Router,
+		private _activatedRoute: ActivatedRoute
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -86,6 +74,24 @@ export class SettingsComponent implements OnInit, OnDestroy {
 			},
 		];
 
+		// Subscribe to router events to update selected panel
+		this._router.events
+			.pipe(
+				filter((event) => event instanceof NavigationEnd),
+				takeUntil(this._unsubscribeAll)
+			)
+			.subscribe((event: NavigationEnd) => {
+				// Extract the panel from the URL
+				const urlSegments = event.url.split("/");
+				const panel = urlSegments[urlSegments.length - 1];
+
+				// Update selected panel if it's a valid panel
+				if (this.panels.find((p) => p.id === panel)) {
+					this.selectedPanel = panel;
+					this._changeDetectorRef.markForCheck();
+				}
+			});
+
 		// Subscribe to media changes
 		this._fuseMediaWatcherService.onMediaChange$.pipe(takeUntil(this._unsubscribeAll)).subscribe(({ matchingAliases }) => {
 			// Set the drawerMode and drawerOpened
@@ -121,7 +127,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 	 * @param panel
 	 */
 	goToPanel(panel: string): void {
-		this.selectedPanel = panel;
+		// Navigate to the panel route
+		this._router.navigate([panel], { relativeTo: this._activatedRoute });
 
 		// Close the drawer on 'over' mode
 		if (this.drawerMode === "over") {

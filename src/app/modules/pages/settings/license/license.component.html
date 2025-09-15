@@ -678,36 +678,4 @@
 			</button>
 		</div>
 	</form>
-
-	<!-- Biometric Verification Modal -->
-	<div *ngIf="showBiometricModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-		<div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
-			<div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white">Biometric Verification</h2>
-				<button
-					mat-icon-button
-					(click)="onBiometricCancel()"
-					class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-				>
-					<mat-icon>close</mat-icon>
-				</button>
-			</div>
-
-			<div class="p-6">
-				<p class="text-sm text-gray-600 dark:text-gray-300 mb-6 text-center">
-					Please verify your identity to create/update the domain configuration for:
-					<strong class="text-gray-900 dark:text-white block mt-1">{{ userData.domain }}</strong>
-				</p>
-
-				<!-- Biometric Component -->
-				<app-data-biometrics
-					#biometricVerification
-					[userData]="userData"
-					[isModalContext]="true"
-					(biometricsSuccess)="onBiometricSuccess($event)"
-					(biometricsCancel)="onBiometricCancel()"
-				></app-data-biometrics>
-			</div>
-		</div>
-	</div>
 </div>

@@ -49,6 +49,11 @@ export const appRoutes: Route[] = [
 		children: [
 			{ path: "sign-out", loadChildren: () => import("app/modules/auth/sign-out/sign-out.routes") },
 			{ path: "unlock-session", loadChildren: () => import("app/modules/auth/unlock-session/unlock-session.routes") },
+			{
+				path: "save-confirmation",
+				loadComponent: () =>
+					import("app/modules/pages/save-confirmation/save-confirmation.component").then((m) => m.SaveConfirmationComponent),
+			},
 		],
 	},
 
