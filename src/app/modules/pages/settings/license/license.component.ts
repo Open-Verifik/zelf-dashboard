@@ -132,7 +132,7 @@ export class SettingsLicenseComponent implements OnInit {
 			ipfsEnabled: [true],
 			arweaveEnabled: [true],
 			walrusEnabled: [true],
-			keyPrefix: ["zelfName", Validators.required],
+			keyPrefix: ["tagName", Validators.required],
 
 			// Payment Settings
 			coinbaseEnabled: [true],
@@ -442,7 +442,7 @@ export class SettingsLicenseComponent implements OnInit {
 						ipfsEnabled: config.storage?.ipfsEnabled || true,
 						arweaveEnabled: config.storage?.arweaveEnabled || true,
 						walrusEnabled: config.storage?.walrusEnabled || true,
-						keyPrefix: config.storage?.keyPrefix || "zelfName",
+						keyPrefix: config.storage?.keyPrefix || "tagName",
 						coinbaseEnabled: config.tagPaymentSettings?.methods?.includes("coinbase") || true,
 						cryptoEnabled: config.tagPaymentSettings?.methods?.includes("crypto") || true,
 						stripeEnabled: config.tagPaymentSettings?.methods?.includes("stripe") || true,
