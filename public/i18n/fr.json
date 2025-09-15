@@ -47,6 +47,11 @@
 		"verify_identity": "Veuillez vérifier votre identité pour {{action}} le {{itemName}} pour :",
 		"created_successfully": "{{itemName}} créé avec succès !",
 		"updated_successfully": "{{itemName}} mis à jour avec succès !",
+		"processing": "Traitement...",
+		"please_wait": "Veuillez patienter pendant que nous traitons votre demande",
+		"continue": "Continuer",
+		"success": "Succès !",
+		"redirecting": "Redirection en cours...",
 		"license_configuration": {
 			"title": "Confirmer la configuration de licence",
 			"description": "Veuillez entrer votre mot de passe maître pour procéder à la sauvegarde de la configuration de licence",

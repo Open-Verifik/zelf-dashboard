@@ -42,6 +42,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	// Modal state
 	showBiometricModal: boolean = false;
 	isLoading: boolean = false;
+	isSuccess: boolean = false;
 	showAlert: boolean = false;
 	alertMessage: string = "";
 	alertType: "success" | "error" = "success";
@@ -192,6 +193,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 * Show success message
 	 */
 	private showSuccess(message: string): void {
+		this.isSuccess = true;
 		this.alertMessage = message;
 		this.alertType = "success";
 		this.showAlert = true;

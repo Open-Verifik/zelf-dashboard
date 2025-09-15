@@ -48,6 +48,11 @@
 		"verify_identity": "Please verify your identity to {{action}} the {{itemName}} for:",
 		"created_successfully": "{{itemName}} created successfully!",
 		"updated_successfully": "{{itemName}} updated successfully!",
+		"processing": "Processing...",
+		"please_wait": "Please wait while we process your request",
+		"continue": "Continue",
+		"success": "Success!",
+		"redirecting": "Redirecting you back...",
 		"license_configuration": {
 			"title": "Confirm License Configuration",
 			"description": "Please enter your master password to proceed with saving the license configuration",

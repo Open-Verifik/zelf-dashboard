@@ -37,8 +37,40 @@
 			</div>
 		</div>
 
+		<!-- Loading State -->
+		<div *ngIf="isLoading" class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+			<div class="flex flex-col items-center space-y-4">
+				<mat-spinner diameter="48" class="text-blue-600 dark:text-blue-400"></mat-spinner>
+				<div class="space-y-2">
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">
+						{{ "saving_operations.processing" | transloco }}
+					</h3>
+					<p class="text-sm text-gray-600 dark:text-gray-400">
+						{{ "saving_operations.please_wait" | transloco }}
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Success State -->
+		<div *ngIf="isSuccess" class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+			<div class="flex flex-col items-center space-y-4">
+				<div class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+					<mat-icon class="h-8 w-8 text-green-600 dark:text-green-400">check_circle</mat-icon>
+				</div>
+				<div class="space-y-2">
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">
+						{{ "saving_operations.success" | transloco }}
+					</h3>
+					<p class="text-sm text-gray-600 dark:text-gray-400">
+						{{ "saving_operations.redirecting" | transloco }}
+					</p>
+				</div>
+			</div>
+		</div>
+
 		<!-- Configuration Info Card -->
-		<div *ngIf="saveData" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+		<div *ngIf="saveData && !isLoading && !isSuccess" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">domain</mat-icon>
 				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -62,7 +94,7 @@
 		</div>
 
 		<!-- Password Form -->
-		<form class="mt-8 space-y-6" (ngSubmit)="proceedToBiometric()">
+		<form *ngIf="!isLoading && !isSuccess" class="mt-8 space-y-6" (ngSubmit)="proceedToBiometric()">
 			<div>
 				<mat-form-field class="w-full" appearance="outline">
 					<mat-label>Master Password</mat-label>
@@ -93,8 +125,7 @@
 			<div class="flex space-x-4">
 				<button mat-stroked-button type="button" (click)="goBack()" [disabled]="isLoading" class="flex-1">Cancel</button>
 				<button mat-flat-button type="submit" color="primary" [disabled]="isLoading || !masterPassword.trim()" class="flex-1">
-					<mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
-					{{ isLoading ? "Processing..." : "Continue" }}
+					{{ "saving_operations.continue" | transloco }}
 				</button>
 			</div>
 		</form>

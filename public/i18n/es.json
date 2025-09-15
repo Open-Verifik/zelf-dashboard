@@ -48,6 +48,11 @@
 		"verify_identity": "Por favor verifica tu identidad para {{action}} el {{itemName}} para:",
 		"created_successfully": "¡{{itemName}} creado exitosamente!",
 		"updated_successfully": "¡{{itemName}} actualizado exitosamente!",
+		"processing": "Procesando...",
+		"please_wait": "Por favor espera mientras procesamos tu solicitud",
+		"continue": "Continuar",
+		"success": "¡Éxito!",
+		"redirecting": "Redirigiendo...",
 		"license_configuration": {
 			"title": "Confirmar Configuración de Licencia",
 			"description": "Por favor ingresa tu contraseña maestra para proceder con el guardado de la configuración de licencia",

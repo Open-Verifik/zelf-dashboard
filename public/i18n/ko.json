@@ -48,6 +48,11 @@
 		"verify_identity": "{{itemName}}을(를) {{action}}하기 위해 신원을 확인해주세요:",
 		"created_successfully": "{{itemName}}이(가) 성공적으로 생성되었습니다!",
 		"updated_successfully": "{{itemName}}이(가) 성공적으로 업데이트되었습니다!",
+		"processing": "처리 중...",
+		"please_wait": "요청을 처리하는 동안 잠시 기다려주세요",
+		"continue": "계속",
+		"success": "성공!",
+		"redirecting": "리디렉션 중...",
 		"license_configuration": {
 			"title": "라이선스 설정 확인",
 			"description": "라이선스 설정을 저장하려면 마스터 비밀번호를 입력해주세요",

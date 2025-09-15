@@ -48,6 +48,11 @@
 		"verify_identity": "请验证您的身份以{{action}}{{itemName}}：",
 		"created_successfully": "{{itemName}}创建成功！",
 		"updated_successfully": "{{itemName}}更新成功！",
+		"processing": "处理中...",
+		"please_wait": "请等待我们处理您的请求",
+		"continue": "继续",
+		"success": "成功！",
+		"redirecting": "正在重定向...",
 		"license_configuration": {
 			"title": "确认许可证配置",
 			"description": "请输入您的主密码以继续保存许可证配置",
