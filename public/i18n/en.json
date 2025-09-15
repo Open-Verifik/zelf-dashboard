@@ -36,6 +36,8 @@
 	"errors": {
 		"phone_already_exists": "This phone number is already registered. Please use a different phone number or try signing in.",
 		"email_already_exists": "This email address is already registered. Please use a different email or try signing in.",
+		"client_not_found": "No account found with the provided credentials. Please check your information and try again.",
+		"client_invalid_api_key": "Invalid API key. Please contact support.",
 		"unknown_error": "Something went wrong, please try again.",
 		"network_error": "Network error. Please check your connection and try again.",
 		"validation_error": "Please check your information and try again.",

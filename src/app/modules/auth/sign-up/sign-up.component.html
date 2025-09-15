@@ -179,9 +179,21 @@
 				<div class="mt-1.5 inline-flex w-full items-end">
 					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'agreements'">
 						<span>{{ "signUp.agreements" | transloco }}</span>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">{{ "signUp.terms" | transloco }} </a>
+						<a
+							class="ml-1 text-primary-500 hover:underline"
+							href="https://docs.zelf.world/zelf-legal/terms-of-use"
+							target="_blank"
+							rel="noopener noreferrer"
+							>{{ "signUp.terms" | transloco }}
+						</a>
 						<span>{{ "signUp.and" | transloco }}</span>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['./']">{{ "signUp.privacyPolicy" | transloco }} </a>
+						<a
+							class="ml-1 text-primary-500 hover:underline"
+							href="https://docs.zelf.world/zelf-legal/privacy-policy"
+							target="_blank"
+							rel="noopener noreferrer"
+							>{{ "signUp.privacyPolicy" | transloco }}
+						</a>
 					</mat-checkbox>
 				</div>
 

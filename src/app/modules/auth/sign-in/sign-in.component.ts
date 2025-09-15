@@ -588,8 +588,9 @@ export class AuthSignInComponent implements OnInit {
 	 */
 	private getErrorMessage(error: any): string {
 		// Extract error code from error response
-		// Backend returns: { status, message, code }
-		const errorCode = error?.code || error?.message || "unknown_error";
+		// Backend returns: { status, message, code } or HttpErrorResponse with nested error structure
+		const errorCode = error?.error?.code || error?.code || error?.error?.message || error?.message || "unknown_error";
+		const errorMessage = error?.error?.message || error?.message || "";
 
 		// Map error codes to translation keys
 		const errorMapping: { [key: string]: string } = {
@@ -609,14 +610,14 @@ export class AuthSignInComponent implements OnInit {
 		};
 
 		// Check if it's a specific error message that contains our error codes
-		if (error?.message) {
-			if (error.message.includes("client_not_found")) {
+		if (errorMessage) {
+			if (errorMessage.includes("client_not_found")) {
 				return this._translocoService.translate("errors.client_not_found");
 			}
-			if (error.message.includes("client_invalid_api_key")) {
+			if (errorMessage.includes("client_invalid_api_key")) {
 				return this._translocoService.translate("errors.client_invalid_api_key");
 			}
-			if (error.message.includes("Incomplete authentication data received")) {
+			if (errorMessage.includes("Incomplete authentication data received")) {
 				return this._translocoService.translate("errors.incomplete_auth_data");
 			}
 		}
