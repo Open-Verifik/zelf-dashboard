@@ -460,13 +460,11 @@ export class AuthSignInComponent implements OnInit {
 
 				this.userData = {
 					...this.userData, // Preserve original userData including masterPassword and identificationMethod
-					email: metadata?.email,
-					phone: metadata?.phone,
-					countryCode: metadata?.countryCode,
-					zelfProof: metadata?.zelfProof,
+					email: metadata?.accountEmail,
+					phone: metadata?.accountPhone,
+					countryCode: metadata?.accountCountryCode,
+					zelfProof: metadata?.accountZelfProof,
 				};
-
-				console.log("Updated userData with masterPassword:", this.userData);
 
 				if (this.userData.zelfProof) {
 					this.showBiometricVerification = true;
