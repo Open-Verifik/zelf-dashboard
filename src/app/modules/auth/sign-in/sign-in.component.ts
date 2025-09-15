@@ -330,6 +330,7 @@ export class AuthSignInComponent implements OnInit {
 			email: ["", [Validators.required, Validators.email]],
 			countryCode: ["+1"],
 			phone: [""],
+			masterPassword: ["", Validators.required],
 			rememberMe: [""],
 		});
 
@@ -340,6 +341,9 @@ export class AuthSignInComponent implements OnInit {
 
 		// Set initial validation
 		this.updateValidation("email");
+
+		// Load saved data from localStorage
+		this.loadRememberedData();
 	}
 
 	/**
@@ -359,7 +363,7 @@ export class AuthSignInComponent implements OnInit {
 			// Phone validation
 			emailControl?.clearValidators();
 			countryCodeControl?.setValidators([Validators.required]);
-			phoneControl?.setValidators([Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]);
+			phoneControl?.setValidators([Validators.required, Validators.pattern(/^[0-9]{8,12}$/)]);
 		}
 
 		// Update validation status
@@ -376,17 +380,10 @@ export class AuthSignInComponent implements OnInit {
 	 * Sign in
 	 */
 	signIn(): void {
-		// Return if the form is invalid
-		console.info({ signInForm: this.signInForm.value });
-		console.info({ signInFormInvalid: this.signInForm.invalid });
-
-		// Debug form validation
-		Object.keys(this.signInForm.controls).forEach((key) => {
-			const control = this.signInForm.get(key);
-			console.log(`${key}: valid=${control?.valid}, errors=`, control?.errors);
-		});
-
 		if (this.signInForm.invalid) return;
+
+		// Save remembered data if checkbox is checked
+		this.saveRememberedData();
 
 		// Prepare user data based on identification method
 		const formValue = this.signInForm.value;
@@ -395,12 +392,14 @@ export class AuthSignInComponent implements OnInit {
 		if (identificationMethod === "email") {
 			this.userData = {
 				email: formValue.email,
+				masterPassword: formValue.masterPassword,
 				identificationMethod: "email",
 			};
 		} else if (identificationMethod === "phone") {
 			this.userData = {
 				countryCode: formValue.countryCode,
 				phone: formValue.phone,
+				masterPassword: formValue.masterPassword,
 				identificationMethod: "phone",
 			};
 		}
@@ -446,11 +445,14 @@ export class AuthSignInComponent implements OnInit {
 				const metadata = response.data?.metadata?.keyvalues;
 
 				this.userData = {
+					...this.userData, // Preserve original userData including masterPassword and identificationMethod
 					email: metadata?.email,
 					phone: metadata?.phone,
 					countryCode: metadata?.countryCode,
 					zelfProof: metadata?.zelfProof,
 				};
+
+				console.log("Updated userData with masterPassword:", this.userData);
 
 				if (this.userData.zelfProof) {
 					this.showBiometricVerification = true;
@@ -488,11 +490,11 @@ export class AuthSignInComponent implements OnInit {
 		// Combine user data with biometric data
 		const signInData = {
 			...this.userData,
-			faceBase64: biometricData.faceBase64,
 			masterPassword: biometricData.password,
+			faceBase64: biometricData.faceBase64,
 		};
 
-		console.info({ signInData });
+		console.info({ signInData, biometricData });
 
 		// Sign in with biometric data
 		this._authService.signIn(signInData).then(
@@ -577,6 +579,8 @@ export class AuthSignInComponent implements OnInit {
 	onBiometricCancel(): void {
 		this.showBiometricVerification = false;
 		this.userData = {};
+		// Clear remembered data when user cancels biometric verification
+		this.clearRememberedData();
 	}
 
 	/**
@@ -621,5 +625,95 @@ export class AuthSignInComponent implements OnInit {
 
 		// Return translated message
 		return this._translocoService.translate(translationKey);
+	}
+
+	/**
+	 * Load remembered data from localStorage
+	 */
+	private loadRememberedData(): void {
+		try {
+			const rememberedData = localStorage.getItem("zelf_remembered_signin");
+			if (rememberedData) {
+				const data = JSON.parse(rememberedData);
+
+				// Set the identification method
+				if (data.identificationMethod) {
+					this.signInForm.patchValue({
+						identificationMethod: data.identificationMethod,
+					});
+					this.updateValidation(data.identificationMethod);
+				}
+
+				// Set email if available
+				if (data.email) {
+					this.signInForm.patchValue({
+						email: data.email,
+					});
+				}
+
+				// Set phone data if available
+				if (data.countryCode) {
+					this.signInForm.patchValue({
+						countryCode: data.countryCode,
+					});
+				}
+				if (data.phone) {
+					this.signInForm.patchValue({
+						phone: data.phone,
+					});
+				}
+
+				// Set remember me checkbox
+				if (data.rememberMe) {
+					this.signInForm.patchValue({
+						rememberMe: data.rememberMe,
+					});
+				}
+			}
+		} catch (error) {
+			console.error("Error loading remembered data:", error);
+		}
+	}
+
+	/**
+	 * Save data to localStorage if remember me is checked
+	 */
+	private saveRememberedData(): void {
+		const formValue = this.signInForm.value;
+		const rememberMe = formValue.rememberMe;
+
+		if (rememberMe) {
+			try {
+				const dataToSave: any = {
+					identificationMethod: formValue.identificationMethod,
+					rememberMe: true,
+				};
+
+				if (formValue.identificationMethod === "email" && formValue.email) {
+					dataToSave.email = formValue.email;
+				} else if (formValue.identificationMethod === "phone") {
+					if (formValue.countryCode) {
+						dataToSave.countryCode = formValue.countryCode;
+					}
+					if (formValue.phone) {
+						dataToSave.phone = formValue.phone;
+					}
+				}
+
+				localStorage.setItem("zelf_remembered_signin", JSON.stringify(dataToSave));
+			} catch (error) {
+				console.error("Error saving remembered data:", error);
+			}
+		} else {
+			// Clear saved data if remember me is unchecked
+			localStorage.removeItem("zelf_remembered_signin");
+		}
+	}
+
+	/**
+	 * Clear remembered data from localStorage
+	 */
+	private clearRememberedData(): void {
+		localStorage.removeItem("zelf_remembered_signin");
 	}
 }

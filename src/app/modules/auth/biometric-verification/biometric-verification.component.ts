@@ -28,6 +28,7 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 	@ViewChild("webcam", { static: false }) public webcamRef?: WebcamComponent;
 
 	@Input() userData: any = {};
+	@Input() isModalContext: boolean = false;
 	@Output() biometricsSuccess: EventEmitter<BiometricData> = new EventEmitter<BiometricData>();
 	@Output() biometricsCancel: EventEmitter<void> = new EventEmitter<void>();
 
@@ -352,6 +353,13 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
 	private async _initializeBiometrics(): Promise<void> {
 		try {
+			console.log({ userData: this.userData });
+			// Initialize master password from user data
+			if (this.userData && this.userData.masterPassword) {
+				this.masterPassword = this.userData.masterPassword;
+				this.useMasterPassword = true;
+			}
+
 			// Always wait for the biometric service to load the models
 			this._biometricService.faceapi$.pipe(takeUntil(this.unsubscriber$)).subscribe(async (isLoaded) => {
 				if (!isLoaded) return;

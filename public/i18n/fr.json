@@ -5,13 +5,18 @@
 	"signUp": {
 		"title": "S'inscrire",
 		"alreadyHaveAccount": "Vous avez déjà un compte ?",
-		"signIn": "Se connecter",
 		"fullName": "Nom complet",
 		"emailAddress": "Adresse e-mail",
 		"country": "Pays",
 		"phoneNumber": "Numéro de téléphone",
 		"password": "Mot de passe",
+		"masterPassword": "Mot de passe maître",
 		"companyName": "Nom de l'entreprise",
+		"signIn": {
+			"title": "Se connecter",
+			"masterPassword": "Mot de passe maître",
+			"masterPasswordRequired": "Le mot de passe maître est requis"
+		},
 		"agreements": "J'accepte les",
 		"terms": "Conditions",
 		"and": "et la",
@@ -23,6 +28,7 @@
 		"emailRequired": "L'adresse e-mail est requise",
 		"emailInvalid": "Veuillez entrer une adresse e-mail valide",
 		"passwordRequired": "Le mot de passe est requis",
+		"masterPasswordRequired": "Le mot de passe maître est requis",
 		"companyRequired": "Le nom de l'entreprise est requis",
 		"countryRequired": "Le code pays est requis"
 	},

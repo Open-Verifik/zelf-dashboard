@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation, inject } from "@angular/core";
+import { Component, OnInit, ViewChild, ViewEncapsulation, inject, HostListener } from "@angular/core";
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -58,6 +58,11 @@ export class AuthSignUpComponent implements OnInit {
 		{ code: "ko", name: "한국어", flag: "🇰🇷" },
 	];
 	currentLanguage = "en";
+
+	// Country code search functionality
+	countryCodeSearchTerm = "";
+	filteredCountryCodes: any[] = [];
+	showCountryDropdown = false;
 
 	// Country codes for phone number
 	countryCodes = [
@@ -419,15 +424,18 @@ export class AuthSignUpComponent implements OnInit {
 		this.signUpForm = this._formBuilder.group({
 			name: ["", Validators.required],
 			email: ["", [Validators.required, Validators.email]],
-			password: ["", Validators.required],
+			masterPassword: ["", Validators.required],
 			countryCode: ["+1", Validators.required],
-			phone: ["", [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
+			phone: ["", [Validators.required, Validators.pattern(/^[0-9]{8,12}$/)]],
 			company: ["", Validators.required],
 			agreements: ["", Validators.requiredTrue],
 		});
 
 		// Initialize current language
 		this.currentLanguage = this._translocoService.getActiveLang() || "en";
+
+		// Initialize filtered country codes
+		this.filteredCountryCodes = this.countryCodes;
 
 		// Auto-fill form with random data for testing
 		this.fillRandomData();
@@ -614,12 +622,10 @@ export class AuthSignUpComponent implements OnInit {
 		this.signUpForm.patchValue({
 			name: randomData.name,
 			email: randomData.email,
-			password: randomData.password,
+			masterPassword: randomData.masterPassword,
 			countryCode: randomData.countryCode,
 			phone: randomData.phone,
 			company: randomData.company,
-			faceBase64: randomData.faceBase64,
-			masterPassword: randomData.masterPassword,
 			agreements: true,
 		});
 	}
@@ -637,7 +643,7 @@ export class AuthSignUpComponent implements OnInit {
 		return {
 			name: `${firstName} ${lastName}`,
 			email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${domain}`,
-			password: this.generateRandomPassword(),
+			masterPassword: this.generateRandomPassword(),
 			countryCode: countryCode.code,
 			phone: this.generateRandomPhoneNumber(),
 			company: company,
@@ -684,5 +690,65 @@ export class AuthSignUpComponent implements OnInit {
 	onLanguageChange(languageCode: string): void {
 		this.currentLanguage = languageCode;
 		this._translocoService.setActiveLang(languageCode);
+	}
+
+	/**
+	 * Filter country codes based on search term
+	 */
+	filterCountryCodes(): void {
+		if (!this.countryCodeSearchTerm.trim()) {
+			this.filteredCountryCodes = this.countryCodes;
+			this.showCountryDropdown = false;
+			return;
+		}
+
+		const searchTerm = this.countryCodeSearchTerm.toLowerCase().trim();
+		this.filteredCountryCodes = this.countryCodes.filter(
+			(country) => country.country.toLowerCase().includes(searchTerm) || country.code.includes(searchTerm) || country.flag.includes(searchTerm)
+		);
+		this.showCountryDropdown = this.filteredCountryCodes.length > 0;
+	}
+
+	/**
+	 * Clear country code search
+	 */
+	clearCountryCodeSearch(): void {
+		this.countryCodeSearchTerm = "";
+		this.filteredCountryCodes = this.countryCodes;
+		this.showCountryDropdown = false;
+		this.signUpForm.patchValue({ countryCode: "" });
+	}
+
+	/**
+	 * Toggle country dropdown visibility
+	 */
+	toggleCountryDropdown(): void {
+		if (!this.countryCodeSearchTerm) {
+			this.countryCodeSearchTerm = "";
+			this.filteredCountryCodes = this.countryCodes;
+			this.showCountryDropdown = true;
+		}
+	}
+
+	/**
+	 * Select a country code from the dropdown
+	 */
+	selectCountryCode(country: any): void {
+		this.signUpForm.patchValue({ countryCode: country.code });
+		this.countryCodeSearchTerm = `${country.flag} ${country.code}`;
+		this.filteredCountryCodes = this.countryCodes;
+		this.showCountryDropdown = false;
+	}
+
+	/**
+	 * Close dropdown when clicking outside
+	 */
+	@HostListener("document:click", ["$event"])
+	onDocumentClick(event: Event): void {
+		const target = event.target as HTMLElement;
+		const countryCodeField = target.closest(".country-code-field");
+		if (!countryCodeField) {
+			this.showCountryDropdown = false;
+		}
 	}
 }

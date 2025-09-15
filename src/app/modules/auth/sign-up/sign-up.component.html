@@ -76,19 +76,58 @@
 				</mat-form-field>
 
 				<!-- Phone number fields -->
-				<div class="flex w-full gap-2">
+				<div class="flex w-full gap-2 relative">
 					<!-- Country code field -->
-					<mat-form-field class="w-32">
+					<mat-form-field class="w-40 country-code-field">
 						<mat-label>{{ "signUp.country" | transloco }}</mat-label>
-						<mat-select [formControlName]="'countryCode'">
-							@for (country of countryCodes; track country.code) {
-								<mat-option [value]="country.code"> {{ country.flag }} {{ country.code }} </mat-option>
-							}
-						</mat-select>
+						<!-- Searchable country code input -->
+						<input
+							matInput
+							[formControlName]="'countryCode'"
+							[(ngModel)]="countryCodeSearchTerm"
+							(input)="filterCountryCodes()"
+							placeholder="Search countries..."
+							class="text-sm"
+						/>
+						<!-- Clear search button -->
+						@if (countryCodeSearchTerm) {
+							<button
+								mat-icon-button
+								matSuffix
+								type="button"
+								(click)="clearCountryCodeSearch()"
+								class="text-gray-400 hover:text-gray-600"
+							>
+								<mat-icon class="icon-size-4">clear</mat-icon>
+							</button>
+						}
+						<!-- Dropdown arrow -->
+						<button mat-icon-button matSuffix type="button" (click)="toggleCountryDropdown()" class="text-gray-400 hover:text-gray-600">
+							<mat-icon class="icon-size-4">keyboard_arrow_down</mat-icon>
+						</button>
 						@if (signUpForm.get("countryCode").hasError("required")) {
 							<mat-error>{{ "signUp.countryRequired" | transloco }}</mat-error>
 						}
 					</mat-form-field>
+
+					<!-- Country code dropdown (shown when searching) -->
+					@if (showCountryDropdown && filteredCountryCodes.length > 0) {
+						<div
+							class="absolute z-50 w-40 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
+						>
+							@for (country of filteredCountryCodes; track country.code + country.country) {
+								<button
+									type="button"
+									(click)="selectCountryCode(country)"
+									class="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+								>
+									<span>{{ country.flag }}</span>
+									<span class="text-sm">{{ country.code }}</span>
+									<span class="text-xs text-gray-500">{{ country.country }}</span>
+								</button>
+							}
+						</div>
+					}
 
 					<!-- Phone number field -->
 					<mat-form-field class="flex-1">
@@ -103,25 +142,27 @@
 					</mat-form-field>
 				</div>
 
-				<!-- Password field -->
+				<!-- Master Password field -->
 				<mat-form-field class="w-full">
-					<mat-label>{{ "signUp.password" | transloco }}</mat-label>
-					<input id="password" matInput type="password" [formControlName]="'password'" #passwordField />
+					<mat-label>{{ "signUp.masterPassword" | transloco }}</mat-label>
+					<input id="masterPassword" matInput type="password" [formControlName]="'masterPassword'" #masterPasswordField />
 					<button
 						mat-icon-button
 						type="button"
-						(click)="passwordField.type === 'password' ? (passwordField.type = 'text') : (passwordField.type = 'password')"
+						(click)="
+							masterPasswordField.type === 'password' ? (masterPasswordField.type = 'text') : (masterPasswordField.type = 'password')
+						"
 						matSuffix
 					>
-						@if (passwordField.type === "password") {
+						@if (masterPasswordField.type === "password") {
 							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye'"></mat-icon>
 						}
-						@if (passwordField.type === "text") {
+						@if (masterPasswordField.type === "text") {
 							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
 						}
 					</button>
-					@if (signUpForm.get("password").hasError("required")) {
-						<mat-error>{{ "signUp.passwordRequired" | transloco }}</mat-error>
+					@if (signUpForm.get("masterPassword").hasError("required")) {
+						<mat-error>{{ "signUp.masterPasswordRequired" | transloco }}</mat-error>
 					}
 				</mat-form-field>
 

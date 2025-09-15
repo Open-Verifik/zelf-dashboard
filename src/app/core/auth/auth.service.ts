@@ -52,7 +52,15 @@ export class AuthService {
 	 *
 	 * @param credentials
 	 */
-	signIn(credentials: { email: string; countryCode: string; phone: string; zelfProof: string }): Promise<any> {
+	signIn(credentials: {
+		email?: string;
+		countryCode?: string;
+		phone?: string;
+		zelfProof: string;
+		faceBase64: string;
+		masterPassword: string;
+		identificationMethod: string;
+	}): Promise<any> {
 		// Throw error, if the user is already logged in
 		if (this._authenticated) {
 			throwError(() => new Error("User is already logged in."));

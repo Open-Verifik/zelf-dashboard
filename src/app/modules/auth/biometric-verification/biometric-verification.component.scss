@@ -4,6 +4,29 @@
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	padding: 20px;
 
+	// Modal-specific styling
+	&.modal-context {
+		min-height: auto;
+		background: transparent;
+		padding: 0;
+
+		.biometrics-content {
+			min-height: auto;
+			padding: 0;
+
+			.camera-container {
+				max-width: 100%;
+				width: 100%;
+
+				.camera-view {
+					width: 100% !important;
+					max-width: 600px;
+					margin: 0 auto;
+				}
+			}
+		}
+	}
+
 	.biometrics-content {
 		display: flex;
 		flex-direction: column;
@@ -359,6 +382,20 @@
 
 				.password-input-container {
 					max-width: 100%;
+				}
+			}
+		}
+
+		// Modal context responsive
+		&.modal-context {
+			padding: 0;
+
+			.biometrics-content {
+				.camera-container {
+					.camera-view {
+						max-width: 100%;
+						height: auto !important;
+					}
 				}
 			}
 		}

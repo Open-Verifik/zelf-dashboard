@@ -11,6 +11,7 @@
 		"country": "País",
 		"phoneNumber": "Número de teléfono",
 		"password": "Contraseña",
+		"masterPassword": "Contraseña Maestra",
 		"companyName": "Nombre de la empresa",
 		"agreements": "Estoy de acuerdo con",
 		"terms": "Términos",
@@ -23,8 +24,14 @@
 		"emailRequired": "La dirección de correo electrónico es requerida",
 		"emailInvalid": "Por favor ingresa una dirección de correo electrónico válida",
 		"passwordRequired": "La contraseña es requerida",
+		"masterPasswordRequired": "La Contraseña Maestra es requerida",
 		"companyRequired": "El nombre de la empresa es requerido",
 		"countryRequired": "El código de país es requerido"
+	},
+	"signIn": {
+		"title": "Iniciar sesión",
+		"masterPassword": "Contraseña Maestra",
+		"masterPasswordRequired": "La Contraseña Maestra es requerida"
 	},
 	"errors": {
 		"phone_already_exists": "Este número de teléfono ya está registrado. Por favor usa un número diferente o intenta iniciar sesión.",

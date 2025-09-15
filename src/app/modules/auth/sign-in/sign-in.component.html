@@ -101,10 +101,33 @@
 					</div>
 				}
 
+				<!-- Master Password field -->
+				<mat-form-field class="w-full">
+					<mat-label>{{ "signIn.masterPassword" | transloco }}</mat-label>
+					<input id="masterPassword" matInput type="password" [formControlName]="'masterPassword'" #masterPasswordField />
+					<button
+						mat-icon-button
+						type="button"
+						(click)="
+							masterPasswordField.type === 'password' ? (masterPasswordField.type = 'text') : (masterPasswordField.type = 'password')
+						"
+						matSuffix
+					>
+						@if (masterPasswordField.type === "password") {
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+						}
+						@if (masterPasswordField.type === "text") {
+							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
+						}
+					</button>
+					@if (signInForm.get("masterPassword").hasError("required")) {
+						<mat-error>{{ "signIn.masterPasswordRequired" | transloco }}</mat-error>
+					}
+				</mat-form-field>
+
 				<!-- Actions -->
-				<div class="mt-1.5 inline-flex w-full items-center justify-between">
+				<div class="mt-1.5 inline-flex w-full items-center justify-start">
 					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'rememberMe'"> Remember me </mat-checkbox>
-					<a class="text-md font-medium text-primary-500 hover:underline" [routerLink]="['/forgot-password']">Forgot password? </a>
 				</div>
 
 				<!-- Submit button -->

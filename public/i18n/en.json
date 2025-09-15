@@ -11,6 +11,7 @@
 		"country": "Country",
 		"phoneNumber": "Phone number",
 		"password": "Password",
+		"masterPassword": "Master Password",
 		"companyName": "Company name",
 		"agreements": "I agree with",
 		"terms": "Terms",
@@ -23,8 +24,14 @@
 		"emailRequired": "Email address is required",
 		"emailInvalid": "Please enter a valid email address",
 		"passwordRequired": "Password is required",
+		"masterPasswordRequired": "Master Password is required",
 		"companyRequired": "Company name is required",
 		"countryRequired": "Country code is required"
+	},
+	"signIn": {
+		"title": "Sign in",
+		"masterPassword": "Master Password",
+		"masterPasswordRequired": "Master Password is required"
 	},
 	"errors": {
 		"phone_already_exists": "This phone number is already registered. Please use a different phone number or try signing in.",

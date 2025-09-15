@@ -1,4 +1,4 @@
-<div class="data-biometrics-container">
+<div class="data-biometrics-container" [class.modal-context]="isModalContext">
 	<div class="biometrics-content" fxLayout="column" fxLayoutAlign="center center">
 		<div
 			*ngIf="!camera.isLoading && camera.hasPermissions && !camera.isLowQuality && !hasApiError && !response.isLoading"
