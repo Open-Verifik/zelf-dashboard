@@ -52,7 +52,7 @@
 					</mat-form-field>
 				</div>
 
-				<div>
+				<!-- <div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
 						<mat-label>{{ "license.basic_information.domain_type" | transloco }}</mat-label>
 						<mat-select [formControlName]="'type'">
@@ -62,9 +62,9 @@
 							<mat-option value="enterprise">{{ "license.basic_information.domain_type_enterprise" | transloco }}</mat-option>
 						</mat-select>
 					</mat-form-field>
-				</div>
+				</div> -->
 
-				<div>
+				<!-- <div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
 						<mat-label>{{ "license.basic_information.status" | transloco }}</mat-label>
 						<mat-select [formControlName]="'status'">
@@ -74,7 +74,7 @@
 							<mat-option value="beta">{{ "license.basic_information.status_beta" | transloco }}</mat-option>
 						</mat-select>
 					</mat-form-field>
-				</div>
+				</div> -->
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
@@ -702,16 +702,6 @@
 					</mat-form-field>
 				</div>
 			</div>
-		</div>
-
-		<!-- Current License Info -->
-		<div *ngIf="currentLicense" class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
-			<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">{{ "license.current_license.title" | transloco }}</h3>
-			<p class="text-sm text-blue-700 dark:text-blue-300">
-				<strong>{{ "license.current_license.domain" | transloco }}:</strong> {{ currentLicense.domain }}<br />
-				<strong>{{ "license.current_license.created" | transloco }}:</strong> {{ currentLicense.createdAt | date: "medium" }}<br />
-				<strong>{{ "license.current_license.ipfs_hash" | transloco }}:</strong> {{ currentLicense.ipfsHash | slice: 0 : 20 }}...
-			</p>
 		</div>
 
 		<!-- Actions -->

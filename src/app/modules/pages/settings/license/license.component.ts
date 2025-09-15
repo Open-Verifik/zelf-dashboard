@@ -1,5 +1,15 @@
 import { TextFieldModule } from "@angular/cdk/text-field";
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation, ViewChild } from "@angular/core";
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	OnInit,
+	AfterViewInit,
+	ViewEncapsulation,
+	ViewChild,
+	ElementRef,
+} from "@angular/core";
+import { MatSelect } from "@angular/material/select";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators, FormArray, FormControl } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -15,7 +25,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from "@angular/router";
 import { AuthService } from "app/core/auth/auth.service";
 import { HttpWrapperService } from "app/http-wrapper.service";
-import { environment } from "../../../../../environments/environment";
+
 import { License, LicenseData, DomainConfig } from "./license.class";
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
@@ -42,7 +52,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 		TranslocoModule,
 	],
 })
-export class SettingsLicenseComponent implements OnInit {
+export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	accountForm: UntypedFormGroup;
 	isLoading: boolean = false;
 	showAlert: boolean = false;
@@ -99,7 +109,8 @@ export class SettingsLicenseComponent implements OnInit {
 		private _httpWrapper: HttpWrapperService,
 		private _router: Router,
 		private _saveConfirmationService: SaveConfirmationService,
-		private _translocoService: TranslocoService
+		private _translocoService: TranslocoService,
+		private _cdr: ChangeDetectorRef
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -110,7 +121,26 @@ export class SettingsLicenseComponent implements OnInit {
 	 * On init
 	 */
 	ngOnInit(): void {
-		// Create the comprehensive form
+		// Initialize arrays first
+		this.initializeWhitelistItems();
+		this.initializePricingTable();
+
+		// Create empty form to prevent template errors
+		this.createEmptyForm();
+	}
+
+	/**
+	 * After view init - load license data and populate form
+	 */
+	ngAfterViewInit(): void {
+		this.loadCurrentLicense();
+		this.populateFormFromLicense();
+	}
+
+	/**
+	 * Create empty form to prevent template errors
+	 */
+	private createEmptyForm(): void {
 		this.accountForm = this._formBuilder.group({
 			// Basic Information
 			domain: ["", [Validators.required, Validators.pattern(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/)]],
@@ -153,19 +183,8 @@ export class SettingsLicenseComponent implements OnInit {
 			support: ["standard"],
 		});
 
-		// Load current license if exists first
-		this.loadCurrentLicense();
-
-		// Initialize whitelist items if not loaded from license
-		if (this.whitelistItems.length === 0) {
-			this.initializeWhitelistItems();
-		}
-
-		// Add whitelist form controls
+		// Add whitelist form controls immediately
 		this.addWhitelistFormControls();
-
-		// Initialize pricing table
-		this.initializePricingTable();
 	}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -595,87 +614,96 @@ export class SettingsLicenseComponent implements OnInit {
 			try {
 				const licenseData = JSON.parse(storedLicense);
 				this.currentLicense = License.fromJSON(licenseData);
-
-				// Populate form with existing license data
-				if (this.currentLicense.domainConfig) {
-					const config = this.currentLicense.domainConfig;
-					this.accountForm.patchValue({
-						domain: config.name || "",
-						type: config.type || "custom",
-						status: config.status || "active",
-						owner: config.owner || "zelf-team",
-						description: config.description || "",
-						znsEnabled: config.features?.[0]?.enabled || true,
-						zelfkeysEnabled: config.features?.[1]?.enabled || true,
-						minLength: config.validation?.minLength || 3,
-						maxLength: config.validation?.maxLength || 50,
-						holdSuffix: config.holdSuffix || ".hold",
-						ipfsEnabled: config.storage?.ipfsEnabled || true,
-						arweaveEnabled: config.storage?.arweaveEnabled || true,
-						walrusEnabled: config.storage?.walrusEnabled || true,
-						keyPrefix: config.storage?.keyPrefix || "tagName",
-						coinbaseEnabled: config.tagPaymentSettings?.methods?.includes("coinbase") || true,
-						cryptoEnabled: config.tagPaymentSettings?.methods?.includes("crypto") || true,
-						stripeEnabled: config.tagPaymentSettings?.methods?.includes("stripe") || true,
-						maxTags: config.limits?.tags || 10000,
-						maxZelfkeys: config.limits?.zelfkeys || 10000,
-						launchDate: config.metadata?.launchDate || "2023-01-01",
-						version: config.metadata?.version || "1.0.0",
-						documentation: config.metadata?.documentation || "",
-						community: config.metadata?.community || "",
-						enterprise: config.metadata?.enterprise || "",
-						support: config.metadata?.support || "standard",
-					});
-
-					// Populate arrays
-					if (config.validation?.reserved) {
-						this.reservedWords = [...config.validation.reserved];
-					}
-					if (config.tagPaymentSettings?.currencies) {
-						this.supportedCurrencies = [...config.tagPaymentSettings.currencies];
-					}
-					if (config.tagPaymentSettings?.pricingTable) {
-						this.loadPricingTableFromConfig(config.tagPaymentSettings.pricingTable);
-					}
-					if (config.tagPaymentSettings?.whitelist) {
-						this.whitelistItems = Object.entries(config.tagPaymentSettings.whitelist).map(([domain, price]) => {
-							const priceStr = price as string;
-							const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
-							if (match) {
-								return {
-									domain,
-									discount: match[1],
-									type: match[2],
-								};
-							}
-							return {
-								domain,
-								discount: priceStr,
-								type: "%",
-							};
-						});
-
-						// Rebuild form controls with loaded data
-						this.removeWhitelistFormControls();
-						this.addWhitelistFormControls();
-
-						// Populate form controls
-						this.whitelistItems.forEach((item, index) => {
-							this.accountForm.get(`whitelistDomain_${index}`)?.setValue(item.domain);
-							this.accountForm.get(`whitelistDiscount_${index}`)?.setValue(item.discount);
-							this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
-						});
-					}
-				} else {
-					// Fallback for old license format
-					this.accountForm.patchValue({
-						domain: this.currentLicense.domain || "",
-					});
-				}
 			} catch (error) {
 				console.error("Error parsing stored license:", error);
 			}
+		} else {
+			console.log("No license found in localStorage");
 		}
+	}
+
+	/**
+	 * Populate form from license data
+	 */
+	populateFormFromLicense(): void {
+		const config = this.currentLicense?.domainConfig;
+
+		if (config) {
+			// Set values individually for better control
+			this.accountForm.get("domain")?.setValue(config.name || "");
+			this.accountForm.get("type")?.setValue(this.currentLicense?.type || config.type || "custom");
+			this.accountForm.get("status")?.setValue(config.status || "active");
+			this.accountForm.get("owner")?.setValue(config.owner || "zelf-team");
+			this.accountForm.get("description")?.setValue(config.description || "Official Zelf domain");
+			this.accountForm.get("znsEnabled")?.setValue(config.features?.[0]?.enabled ?? true);
+			this.accountForm.get("zelfkeysEnabled")?.setValue(config.features?.[1]?.enabled ?? true);
+			this.accountForm.get("minLength")?.setValue(config.validation?.minLength || 3);
+			this.accountForm.get("maxLength")?.setValue(config.validation?.maxLength || 50);
+			this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
+			this.accountForm.get("ipfsEnabled")?.setValue(config.storage?.ipfsEnabled ?? true);
+			this.accountForm.get("arweaveEnabled")?.setValue(config.storage?.arweaveEnabled ?? true);
+			this.accountForm.get("walrusEnabled")?.setValue(config.storage?.walrusEnabled ?? true);
+			this.accountForm.get("keyPrefix")?.setValue(config.storage?.keyPrefix || "tagName");
+			this.accountForm.get("coinbaseEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("coinbase") ?? true);
+			this.accountForm.get("cryptoEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("crypto") ?? true);
+			this.accountForm.get("stripeEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("stripe") ?? true);
+			this.accountForm.get("maxTags")?.setValue(config.limits?.tags || 10000);
+			this.accountForm.get("maxZelfkeys")?.setValue(config.limits?.zelfkeys || 10000);
+			this.accountForm.get("launchDate")?.setValue(config.metadata?.launchDate || "2023-01-01");
+			this.accountForm.get("version")?.setValue(config.metadata?.version || "1.0.0");
+			this.accountForm.get("documentation")?.setValue(config.metadata?.documentation || "https://docs.zelf.world");
+			this.accountForm.get("community")?.setValue(config.metadata?.community || "");
+			this.accountForm.get("enterprise")?.setValue(config.metadata?.enterprise || "");
+			this.accountForm.get("support")?.setValue(config.metadata?.support || "standard");
+
+			// Populate arrays from license data
+			if (config.validation?.reserved) {
+				this.reservedWords = [...config.validation.reserved];
+			}
+			if (config.tagPaymentSettings?.currencies) {
+				this.supportedCurrencies = [...config.tagPaymentSettings.currencies];
+			}
+			if (config.tagPaymentSettings?.pricingTable) {
+				this.loadPricingTableFromConfig(config.tagPaymentSettings.pricingTable);
+			}
+			if (config.tagPaymentSettings?.whitelist) {
+				this.whitelistItems = Object.entries(config.tagPaymentSettings.whitelist).map(([domain, price]) => {
+					const priceStr = price as string;
+					const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
+					if (match) {
+						return {
+							domain,
+							discount: match[1],
+							type: match[2],
+						};
+					}
+					return {
+						domain,
+						discount: priceStr,
+						type: "%",
+					};
+				});
+			}
+
+			// Populate whitelist form controls
+			this.whitelistItems.forEach((item, index) => {
+				this.accountForm.get(`whitelistDomain_${index}`)?.setValue(item.domain);
+				this.accountForm.get(`whitelistDiscount_${index}`)?.setValue(item.discount);
+				this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
+			});
+
+			// Log final form values
+			setTimeout(() => {
+				console.log("Final form values:", {
+					type: this.accountForm.get("type")?.value,
+					status: this.accountForm.get("status")?.value,
+					support: this.accountForm.get("support")?.value,
+				});
+			}, 100);
+		}
+
+		// Trigger change detection
+		this._cdr.detectChanges();
 	}
 
 	/**
