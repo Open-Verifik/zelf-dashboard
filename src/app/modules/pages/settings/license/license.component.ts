@@ -39,6 +39,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 		MatProgressSpinnerModule,
 		MatSlideToggleModule,
 		MatCheckboxModule,
+		TranslocoModule,
 	],
 })
 export class SettingsLicenseComponent implements OnInit {

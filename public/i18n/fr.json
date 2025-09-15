@@ -12,11 +12,6 @@
 		"password": "Mot de passe",
 		"masterPassword": "Mot de passe maître",
 		"companyName": "Nom de l'entreprise",
-		"signIn": {
-			"title": "Se connecter",
-			"masterPassword": "Mot de passe maître",
-			"masterPasswordRequired": "Le mot de passe maître est requis"
-		},
 		"agreements": "J'accepte les",
 		"terms": "Conditions",
 		"and": "et la",
@@ -32,12 +27,18 @@
 		"companyRequired": "Le nom de l'entreprise est requis",
 		"countryRequired": "Le code pays est requis"
 	},
+	"signIn": {
+		"title": "Se connecter",
+		"masterPassword": "Mot de passe maître",
+		"masterPasswordRequired": "Le mot de passe maître est requis"
+	},
 	"errors": {
 		"phone_already_exists": "Ce numéro de téléphone est déjà enregistré. Veuillez utiliser un numéro différent ou essayer de vous connecter.",
 		"email_already_exists": "Cette adresse e-mail est déjà enregistrée. Veuillez utiliser un e-mail différent ou essayer de vous connecter.",
 		"unknown_error": "Quelque chose s'est mal passé, veuillez réessayer.",
 		"network_error": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
-		"validation_error": "Veuillez vérifier vos informations et réessayer."
+		"validation_error": "Veuillez vérifier vos informations et réessayer.",
+		"incomplete_auth_data": "Données d'authentification incomplètes reçues. Veuillez réessayer."
 	},
 	"saving_operations": {
 		"confirm_changes": "Confirmer les modifications",
@@ -75,6 +76,144 @@
 			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos préférences de notification",
 			"action": "mise à jour",
 			"itemName": "préférences de notification"
+		}
+	},
+	"save_confirmation": {
+		"master_password": "Mot de passe maître",
+		"master_password_placeholder": "Entrez votre mot de passe maître",
+		"toggle_password_visibility": "Basculer la visibilité du mot de passe",
+		"cancel": "Annuler",
+		"processing": "Traitement en cours...",
+		"continue": "Continuer",
+		"biometric_verification": "Vérification biométrique"
+	},
+	"license": {
+		"title": "Configuration de domaine",
+		"subtitle": "Configurez vos paramètres de domaine personnalisé pour l'écosystème Zelf",
+		"basic_information": {
+			"title": "Informations de base",
+			"domain_name": "Nom de domaine",
+			"domain_prefix": "domaine.",
+			"domain_placeholder": "monentreprise",
+			"domain_required": "Le domaine est requis",
+			"domain_pattern_error": "Le domaine doit contenir uniquement des lettres, des chiffres et des tirets",
+			"domain_type": "Type de domaine",
+			"domain_type_official": "Officiel",
+			"domain_type_custom": "Personnalisé",
+			"domain_type_community": "Communauté",
+			"domain_type_enterprise": "Entreprise",
+			"status": "Statut",
+			"status_active": "Actif",
+			"status_inactive": "Inactif",
+			"status_maintenance": "Maintenance",
+			"status_beta": "Bêta",
+			"owner": "Propriétaire",
+			"owner_placeholder": "équipe-zelf",
+			"description": "Description",
+			"description_placeholder": "Domaine officiel Zelf"
+		},
+		"features": {
+			"title": "Fonctionnalités",
+			"zns_title": "Système de noms Zelf (ZNS)",
+			"zns_description": "Chiffrements, Déchiffrements, aperçus de ZelfProofs",
+			"zelfkeys_title": "Clés Zelf",
+			"zelfkeys_description": "Mots de passe, Notes, Cartes de crédit, etc."
+		},
+		"validation_rules": {
+			"title": "Règles de validation",
+			"min_length": "Longueur minimale",
+			"min_length_placeholder": "3",
+			"max_length": "Longueur maximale",
+			"max_length_placeholder": "50",
+			"hold_suffix": "Suffixe de réservation",
+			"hold_suffix_placeholder": ".hold",
+			"reserved_words": "Mots réservés",
+			"add_reserved_word": "Ajouter un mot réservé",
+			"content_filter": "Filtre de contenu",
+			"content_filter_description": "Bloquer automatiquement les mots inappropriés comme \"dick\", \"vagina\", etc."
+		},
+		"storage_options": {
+			"title": "Options de stockage",
+			"ipfs_title": "IPFS",
+			"ipfs_description": "Utilisé pour les domaines d'étiquettes avec suffixe .hold",
+			"arweave_title": "Arweave",
+			"arweave_description": "Pour les domaines déjà achetés",
+			"walrus_title": "Walrus",
+			"walrus_description": "Option de stockage alternative",
+			"key_prefix": "Préfixe de clé",
+			"key_prefix_placeholder": "nomÉtiquette"
+		},
+		"payment_settings": {
+			"title": "Paramètres de paiement",
+			"payment_methods": "Méthodes de paiement",
+			"coinbase": "Coinbase",
+			"crypto_payments": "Paiements crypto",
+			"stripe": "Stripe",
+			"supported_currencies": "Devises supportées",
+			"add_currency": "Ajouter une devise",
+			"whitelist_title": "Liste blanche (Tarification spéciale)",
+			"add_item": "Ajouter un élément",
+			"tag_name": "Nom d'étiquette",
+			"discount": "Remise",
+			"type": "Type",
+			"percentage": "Pourcentage (%)",
+			"fixed_amount": "Montant fixe ($)",
+			"no_items": "Aucun élément dans la liste blanche pour le moment. Cliquez sur \"Ajouter un élément\" pour commencer.",
+			"examples": "Exemples :",
+			"example_1": "miguel.zelf avec 25 et % = 25% de remise",
+			"example_2": "vip.avax avec 50 et $ = 50$ de remise"
+		},
+		"pricing_table": {
+			"title": "Tableau des prix",
+			"reset_default": "Réinitialiser par défaut",
+			"description": "Configurez les prix pour différentes longueurs d'étiquettes et durées d'abonnement. Les prix sont en centimes (ex., 240 = 2,40$).",
+			"length": "Longueur",
+			"one_year": "1 An",
+			"two_years": "2 Ans",
+			"three_years": "3 Ans",
+			"four_years": "4 Ans",
+			"five_years": "5 Ans",
+			"lifetime": "À vie",
+			"pricing_info": "Informations sur les prix",
+			"pricing_info_1": "• Les prix sont affichés en dollars",
+			"pricing_info_2": "• La ligne \"6-15\" s'applique aux noms d'étiquettes avec 6-15 caractères",
+			"pricing_info_3": "• Les lignes de longueur individuelle (16-27) remplacent la tarification de plage",
+			"pricing_info_4": "• Les modifications sont automatiquement sauvegardées lorsque vous mettez à jour le formulaire"
+		},
+		"limits": {
+			"title": "Limites",
+			"max_tags": "Max Étiquettes",
+			"max_tags_placeholder": "10000",
+			"max_zelfkeys": "Max ZelfKeys",
+			"max_zelfkeys_placeholder": "10000"
+		},
+		"metadata": {
+			"title": "Métadonnées",
+			"launch_date": "Date de lancement",
+			"version": "Version",
+			"version_placeholder": "1.0.0",
+			"documentation_url": "URL de documentation",
+			"documentation_placeholder": "https://docs.exemple.com",
+			"community": "Communauté",
+			"community_placeholder": "avalanche",
+			"enterprise": "Entreprise",
+			"enterprise_placeholder": "blockDAG",
+			"support_level": "Niveau de support",
+			"support_standard": "Standard",
+			"support_premium": "Premium",
+			"support_enterprise": "Entreprise"
+		},
+		"current_license": {
+			"title": "Licence actuelle",
+			"domain": "Domaine :",
+			"created": "Créé :",
+			"ipfs_hash": "Hash IPFS :"
+		},
+		"actions": {
+			"cancel": "Annuler",
+			"save": "Enregistrer la configuration du domaine",
+			"save_configuration": "Enregistrer la configuration",
+			"processing": "Traitement en cours..."
 		}
 	}
 }

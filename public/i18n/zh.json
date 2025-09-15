@@ -38,7 +38,8 @@
 		"email_already_exists": "此电子邮件地址已注册。请使用不同的电子邮件或尝试登录。",
 		"unknown_error": "出现错误，请重试。",
 		"network_error": "网络错误。请检查您的连接并重试。",
-		"validation_error": "请检查您的信息并重试。"
+		"validation_error": "请检查您的信息并重试。",
+		"incomplete_auth_data": "收到不完整的认证数据。请重试。"
 	},
 	"saving_operations": {
 		"confirm_changes": "确认更改",
@@ -76,6 +77,144 @@
 			"description": "请输入您的主密码以继续更新您的通知偏好",
 			"action": "更新",
 			"itemName": "通知偏好"
+		}
+	},
+	"save_confirmation": {
+		"master_password": "主密码",
+		"master_password_placeholder": "请输入您的主密码",
+		"toggle_password_visibility": "切换密码可见性",
+		"cancel": "取消",
+		"processing": "处理中...",
+		"continue": "继续",
+		"biometric_verification": "生物识别验证"
+	},
+	"license": {
+		"title": "域名配置",
+		"subtitle": "为Zelf生态系统配置您的自定义域名设置",
+		"basic_information": {
+			"title": "基本信息",
+			"domain_name": "域名",
+			"domain_prefix": "域名.",
+			"domain_placeholder": "我的公司",
+			"domain_required": "域名是必需的",
+			"domain_pattern_error": "域名只能包含字母、数字和连字符",
+			"domain_type": "域名类型",
+			"domain_type_official": "官方",
+			"domain_type_custom": "自定义",
+			"domain_type_community": "社区",
+			"domain_type_enterprise": "企业",
+			"status": "状态",
+			"status_active": "活跃",
+			"status_inactive": "非活跃",
+			"status_maintenance": "维护",
+			"status_beta": "测试版",
+			"owner": "所有者",
+			"owner_placeholder": "zelf团队",
+			"description": "描述",
+			"description_placeholder": "官方Zelf域名"
+		},
+		"features": {
+			"title": "功能",
+			"zns_title": "Zelf名称系统 (ZNS)",
+			"zns_description": "加密、解密、ZelfProofs预览",
+			"zelfkeys_title": "Zelf密钥",
+			"zelfkeys_description": "密码、笔记、信用卡等"
+		},
+		"validation_rules": {
+			"title": "验证规则",
+			"min_length": "最小长度",
+			"min_length_placeholder": "3",
+			"max_length": "最大长度",
+			"max_length_placeholder": "50",
+			"hold_suffix": "保留后缀",
+			"hold_suffix_placeholder": ".hold",
+			"reserved_words": "保留词",
+			"add_reserved_word": "添加保留词",
+			"content_filter": "内容过滤器",
+			"content_filter_description": "自动阻止不当词汇，如\"dick\"、\"vagina\"等"
+		},
+		"storage_options": {
+			"title": "存储选项",
+			"ipfs_title": "IPFS",
+			"ipfs_description": "用于.hold后缀标签域名",
+			"arweave_title": "Arweave",
+			"arweave_description": "用于已购买的域名",
+			"walrus_title": "Walrus",
+			"walrus_description": "替代存储选项",
+			"key_prefix": "键前缀",
+			"key_prefix_placeholder": "标签名"
+		},
+		"payment_settings": {
+			"title": "支付设置",
+			"payment_methods": "支付方式",
+			"coinbase": "Coinbase",
+			"crypto_payments": "加密货币支付",
+			"stripe": "Stripe",
+			"supported_currencies": "支持的货币",
+			"add_currency": "添加货币",
+			"whitelist_title": "白名单（特殊定价）",
+			"add_item": "添加项目",
+			"tag_name": "标签名称",
+			"discount": "折扣",
+			"type": "类型",
+			"percentage": "百分比 (%)",
+			"fixed_amount": "固定金额 ($)",
+			"no_items": "还没有白名单项目。点击\"添加项目\"开始。",
+			"examples": "示例：",
+			"example_1": "miguel.zelf 25 和 % = 25% 折扣",
+			"example_2": "vip.avax 50 和 $ = $50 折扣"
+		},
+		"pricing_table": {
+			"title": "价格表",
+			"reset_default": "重置为默认",
+			"description": "为不同的标签长度和订阅期限配置价格。价格以分为单位（例如：240 = $2.40）。",
+			"length": "长度",
+			"one_year": "1年",
+			"two_years": "2年",
+			"three_years": "3年",
+			"four_years": "4年",
+			"five_years": "5年",
+			"lifetime": "终身",
+			"pricing_info": "价格信息",
+			"pricing_info_1": "• 价格以美元显示",
+			"pricing_info_2": "• \"6-15\"行适用于6-15个字符的标签名称",
+			"pricing_info_3": "• 个别长度行（16-27）覆盖范围定价",
+			"pricing_info_4": "• 更新表单时更改会自动保存"
+		},
+		"limits": {
+			"title": "限制",
+			"max_tags": "最大标签",
+			"max_tags_placeholder": "10000",
+			"max_zelfkeys": "最大ZelfKeys",
+			"max_zelfkeys_placeholder": "10000"
+		},
+		"metadata": {
+			"title": "元数据",
+			"launch_date": "发布日期",
+			"version": "版本",
+			"version_placeholder": "1.0.0",
+			"documentation_url": "文档URL",
+			"documentation_placeholder": "https://docs.example.com",
+			"community": "社区",
+			"community_placeholder": "avalanche",
+			"enterprise": "企业",
+			"enterprise_placeholder": "blockDAG",
+			"support_level": "支持级别",
+			"support_standard": "标准",
+			"support_premium": "高级",
+			"support_enterprise": "企业"
+		},
+		"current_license": {
+			"title": "当前许可证",
+			"domain": "域名：",
+			"created": "创建：",
+			"ipfs_hash": "IPFS哈希："
+		},
+		"actions": {
+			"cancel": "取消",
+			"save": "保存域名配置",
+			"save_configuration": "保存配置",
+			"processing": "处理中..."
 		}
 	}
 }

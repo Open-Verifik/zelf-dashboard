@@ -14,6 +14,35 @@ export interface LicenseData {
 	ipfsHash?: string;
 	createdAt?: string;
 	updatedAt?: string;
+	// New fields from API response
+	ipfs?: IPFSData;
+	zelfProof?: string;
+	expiresAt?: string;
+	subscriptionId?: string;
+	previousDomain?: string;
+	type?: "official" | "custom" | "community" | "enterprise";
+}
+
+export interface IPFSData {
+	url: string;
+	IpfsHash: string;
+	PinSize: number;
+	Timestamp: string;
+	ID: string;
+	Name: string;
+	NumberOfFiles: number;
+	MimeType: boolean | string;
+	GroupId: string | null;
+	pinned: boolean;
+	web3: boolean;
+	name: string;
+	metadata: {
+		type: string;
+		owner: string;
+		domain: string;
+		zelfProof: string;
+		subscriptionId: string;
+	};
 }
 
 export interface DomainConfig {
@@ -80,6 +109,13 @@ export class License {
 	public ipfsHash?: string;
 	public createdAt?: string;
 	public updatedAt?: string;
+	// New fields from API response
+	public ipfs?: IPFSData;
+	public zelfProof?: string;
+	public expiresAt?: string;
+	public subscriptionId?: string;
+	public previousDomain?: string;
+	public type?: "official" | "custom" | "community" | "enterprise";
 
 	constructor(licenseData: LicenseData) {
 		this.domain = licenseData.domain || "";
@@ -89,24 +125,35 @@ export class License {
 		this.ipfsHash = licenseData.ipfsHash;
 		this.createdAt = licenseData.createdAt;
 		this.updatedAt = licenseData.updatedAt;
+		// New fields
+		this.ipfs = licenseData.ipfs;
+		this.zelfProof = licenseData.zelfProof;
+		this.expiresAt = licenseData.expiresAt;
+		this.subscriptionId = licenseData.subscriptionId;
+		this.previousDomain = licenseData.previousDomain;
+		this.type = licenseData.type;
 	}
 
 	/**
 	 * Build domain configuration with defaults
+	 * Handles both nested domainConfig structure and flat API response structure
 	 */
 	private buildDomainConfig(config: any): DomainConfig {
+		// Handle both nested domainConfig and flat structure from API response
+		const configData = config?.domainConfig || config;
+
 		return {
-			name: config?.name || "",
-			type: config?.type || "custom",
-			holdSuffix: config?.holdSuffix || ".hold",
-			status: config?.status || "inactive",
-			owner: config?.owner || "",
-			description: config?.description || "",
+			name: configData?.name || "",
+			type: configData?.type || "custom",
+			holdSuffix: configData?.holdSuffix || ".hold",
+			status: configData?.status || "inactive",
+			owner: configData?.owner || "",
+			description: configData?.description || "",
 			limits: {
-				tags: config?.limits?.tags || 10000,
-				zelfkeys: config?.limits?.zelfkeys || 10000,
+				tags: configData?.limits?.tags || 10000,
+				zelfkeys: configData?.limits?.zelfkeys || 10000,
 			},
-			features: config?.features || [
+			features: configData?.features || [
 				{
 					name: "Zelf Name System",
 					code: "zns",
@@ -121,31 +168,31 @@ export class License {
 				},
 			],
 			validation: {
-				minLength: config?.validation?.minLength || 3,
-				maxLength: config?.validation?.maxLength || 50,
-				allowedChars: config?.validation?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-				reserved: config?.validation?.reserved || ["www", "api", "admin", "support", "help"],
-				customRules: config?.validation?.customRules || [],
+				minLength: configData?.validation?.minLength || 3,
+				maxLength: configData?.validation?.maxLength || 50,
+				allowedChars: configData?.validation?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+				reserved: configData?.validation?.reserved || ["www", "api", "admin", "support", "help"],
+				customRules: configData?.validation?.customRules || [],
 			},
 			storage: {
-				keyPrefix: config?.storage?.keyPrefix || "tagName",
-				ipfsEnabled: config?.storage?.ipfsEnabled || true,
-				arweaveEnabled: config?.storage?.arweaveEnabled || true,
-				walrusEnabled: config?.storage?.walrusEnabled || true,
+				keyPrefix: configData?.storage?.keyPrefix || "tagName",
+				ipfsEnabled: configData?.storage?.ipfsEnabled || true,
+				arweaveEnabled: configData?.storage?.arweaveEnabled || true,
+				walrusEnabled: configData?.storage?.walrusEnabled || true,
 			},
 			tagPaymentSettings: {
-				methods: config?.tagPaymentSettings?.methods || ["coinbase", "crypto", "stripe"],
-				currencies: config?.tagPaymentSettings?.currencies || ["USD", "BTC", "ETH", "SOL"],
-				whitelist: config?.tagPaymentSettings?.whitelist || {},
-				pricingTable: config?.tagPaymentSettings?.pricingTable || this.getDefaultPricingTable(),
+				methods: configData?.tagPaymentSettings?.methods || ["coinbase", "crypto", "stripe"],
+				currencies: configData?.tagPaymentSettings?.currencies || ["USD", "BTC", "ETH", "SOL"],
+				whitelist: configData?.tagPaymentSettings?.whitelist || {},
+				pricingTable: configData?.tagPaymentSettings?.pricingTable || this.getDefaultPricingTable(),
 			},
 			metadata: {
-				launchDate: config?.metadata?.launchDate || new Date().toISOString().split("T")[0],
-				version: config?.metadata?.version || "1.0.0",
-				documentation: config?.metadata?.documentation || "",
-				community: config?.metadata?.community,
-				enterprise: config?.metadata?.enterprise,
-				support: config?.metadata?.support || "standard",
+				launchDate: configData?.metadata?.launchDate || new Date().toISOString().split("T")[0],
+				version: configData?.metadata?.version || "1.0.0",
+				documentation: configData?.metadata?.documentation || "",
+				community: configData?.metadata?.community,
+				enterprise: configData?.metadata?.enterprise,
+				support: configData?.metadata?.support || "standard",
 			},
 		};
 	}
@@ -174,6 +221,77 @@ export class License {
 			26: { 1: 13, 2: 23, 3: 33, 4: 42, 5: 49, lifetime: 195 },
 			27: { 1: 12, 2: 22, 3: 31, 4: 38, 5: 45, lifetime: 180 },
 		};
+	}
+
+	/**
+	 * Get IPFS data
+	 */
+	getIPFSData(): IPFSData | undefined {
+		return this.ipfs;
+	}
+
+	/**
+	 * Get IPFS hash
+	 */
+	getIPFSHash(): string | undefined {
+		return this.ipfs?.IpfsHash || this.ipfsHash;
+	}
+
+	/**
+	 * Get IPFS URL
+	 */
+	getIPFSUrl(): string | undefined {
+		return this.ipfs?.url;
+	}
+
+	/**
+	 * Get IPFS metadata
+	 */
+	getIPFSMetadata(): { type: string; owner: string; domain: string; zelfProof: string; subscriptionId: string } | undefined {
+		return this.ipfs?.metadata;
+	}
+
+	/**
+	 * Get zelfProof
+	 */
+	getZelfProof(): string | undefined {
+		return this.zelfProof;
+	}
+
+	/**
+	 * Get expiration date
+	 */
+	getExpirationDate(): Date | undefined {
+		return this.expiresAt ? new Date(this.expiresAt) : undefined;
+	}
+
+	/**
+	 * Check if license is expired
+	 */
+	isExpired(): boolean {
+		if (!this.expiresAt) return false;
+		return new Date(this.expiresAt) < new Date();
+	}
+
+	/**
+	 * Get subscription ID
+	 */
+	getSubscriptionId(): string | undefined {
+		return this.subscriptionId;
+	}
+
+	/**
+	 * Get previous domain (for domain changes)
+	 */
+	getPreviousDomain(): string | undefined {
+		return this.previousDomain;
+	}
+
+	/**
+	 * Get license type
+	 */
+	getLicenseType(): "official" | "custom" | "community" | "enterprise" | undefined {
+		return this.type || this.domainConfig.type;
 	}
 
 	/**
@@ -374,6 +492,13 @@ export class License {
 			ipfsHash: this.ipfsHash,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
+			// New fields
+			ipfs: this.ipfs,
+			zelfProof: this.zelfProof,
+			expiresAt: this.expiresAt,
+			subscriptionId: this.subscriptionId,
+			previousDomain: this.previousDomain,
+			type: this.type,
 		};
 	}
 
@@ -382,6 +507,49 @@ export class License {
 	 */
 	static fromJSON(data: any): License {
 		return new License(data);
+	}
+
+	/**
+	 * Create from API response data
+	 * Handles the flat structure returned by the API
+	 */
+	static fromAPIResponse(data: any): License {
+		// Transform API response to LicenseData format
+		const licenseData: LicenseData = {
+			domain: data.domain,
+			domainConfig: {
+				name: data.name,
+				type: data.type,
+				holdSuffix: data.holdSuffix,
+				status: data.status,
+				owner: data.owner,
+				description: data.description,
+				limits: data.limits,
+				features: data.features,
+				validation: data.validation,
+				storage: data.storage,
+				tagPaymentSettings: data.tagPaymentSettings,
+				metadata: data.metadata,
+			},
+			ipfs: data.ipfs,
+			zelfProof: data.zelfProof,
+			expiresAt: data.expiresAt,
+			subscriptionId: data.subscriptionId,
+			previousDomain: data.previousDomain,
+			type: data.type,
+		};
+
+		return new License(licenseData);
+	}
+
+	/**
+	 * Create from API response with data wrapper
+	 * Handles responses like { data: { ... } }
+	 */
+	static fromAPIResponseWithWrapper(response: any): License {
+		// Extract data from wrapper if it exists
+		const data = response.data || response;
+		return License.fromAPIResponse(data);
 	}
 
 	/**

@@ -26,65 +26,72 @@
 	<form [formGroup]="accountForm">
 		<!-- Domain Configuration Header -->
 		<div class="mb-8">
-			<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Domain Configuration</h1>
-			<p class="text-gray-600 dark:text-gray-300">Configure your custom domain settings for the Zelf ecosystem</p>
+			<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ "license.title" | transloco }}</h1>
+			<p class="text-gray-600 dark:text-gray-300">{{ "license.subtitle" | transloco }}</p>
 		</div>
 
 		<!-- Basic Domain Information -->
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">domain</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.basic_information.title" | transloco }}</h2>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Domain Name</mat-label>
-						<div class="text-secondary" matPrefix>domain.</div>
-						<input [formControlName]="'domain'" matInput placeholder="mycompany" />
-						<mat-error *ngIf="accountForm.get('domain')?.hasError('required')"> Domain is required </mat-error>
+						<mat-label>{{ "license.basic_information.domain_name" | transloco }}</mat-label>
+						<div class="text-secondary" matPrefix>{{ "license.basic_information.domain_prefix" | transloco }}</div>
+						<input [formControlName]="'domain'" matInput [placeholder]="'license.basic_information.domain_placeholder' | transloco" />
+						<mat-error *ngIf="accountForm.get('domain')?.hasError('required')">{{
+							"license.basic_information.domain_required" | transloco
+						}}</mat-error>
 						<mat-error *ngIf="accountForm.get('domain')?.hasError('pattern')">
-							Domain must contain only letters, numbers, and hyphens
+							{{ "license.basic_information.domain_pattern_error" | transloco }}
 						</mat-error>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Domain Type</mat-label>
+						<mat-label>{{ "license.basic_information.domain_type" | transloco }}</mat-label>
 						<mat-select [formControlName]="'type'">
-							<mat-option value="official">Official</mat-option>
-							<mat-option value="custom">Custom</mat-option>
-							<mat-option value="community">Community</mat-option>
-							<mat-option value="enterprise">Enterprise</mat-option>
+							<mat-option value="official">{{ "license.basic_information.domain_type_official" | transloco }}</mat-option>
+							<mat-option value="custom">{{ "license.basic_information.domain_type_custom" | transloco }}</mat-option>
+							<mat-option value="community">{{ "license.basic_information.domain_type_community" | transloco }}</mat-option>
+							<mat-option value="enterprise">{{ "license.basic_information.domain_type_enterprise" | transloco }}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Status</mat-label>
+						<mat-label>{{ "license.basic_information.status" | transloco }}</mat-label>
 						<mat-select [formControlName]="'status'">
-							<mat-option value="active">Active</mat-option>
-							<mat-option value="inactive">Inactive</mat-option>
-							<mat-option value="maintenance">Maintenance</mat-option>
-							<mat-option value="beta">Beta</mat-option>
+							<mat-option value="active">{{ "license.basic_information.status_active" | transloco }}</mat-option>
+							<mat-option value="inactive">{{ "license.basic_information.status_inactive" | transloco }}</mat-option>
+							<mat-option value="maintenance">{{ "license.basic_information.status_maintenance" | transloco }}</mat-option>
+							<mat-option value="beta">{{ "license.basic_information.status_beta" | transloco }}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Owner</mat-label>
-						<input [formControlName]="'owner'" matInput placeholder="zelf-team" />
+						<mat-label>{{ "license.basic_information.owner" | transloco }}</mat-label>
+						<input [formControlName]="'owner'" matInput [placeholder]="'license.basic_information.owner_placeholder' | transloco" />
 					</mat-form-field>
 				</div>
 
 				<div class="md:col-span-2">
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Description</mat-label>
-						<textarea [formControlName]="'description'" matInput placeholder="Official Zelf domain" rows="3"></textarea>
+						<mat-label>{{ "license.basic_information.description" | transloco }}</mat-label>
+						<textarea
+							[formControlName]="'description'"
+							matInput
+							[placeholder]="'license.basic_information.description_placeholder' | transloco"
+							rows="3"
+						></textarea>
 					</mat-form-field>
 				</div>
 			</div>
@@ -94,25 +101,25 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-green-600 dark:text-green-400 mr-2">extension</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Features</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.features.title" | transloco }}</h2>
 			</div>
 
 			<div class="space-y-4">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
 						<div class="flex items-center justify-between mb-2">
-							<h3 class="font-medium text-gray-900 dark:text-white">Zelf Name System (ZNS)</h3>
+							<h3 class="font-medium text-gray-900 dark:text-white">{{ "license.features.zns_title" | transloco }}</h3>
 							<mat-slide-toggle [formControlName]="'znsEnabled'"></mat-slide-toggle>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">Encryptions, Decryptions, previews of ZelfProofs</p>
+						<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.features.zns_description" | transloco }}</p>
 					</div>
 
 					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
 						<div class="flex items-center justify-between mb-2">
-							<h3 class="font-medium text-gray-900 dark:text-white">Zelf Keys</h3>
+							<h3 class="font-medium text-gray-900 dark:text-white">{{ "license.features.zelfkeys_title" | transloco }}</h3>
 							<mat-slide-toggle [formControlName]="'zelfkeysEnabled'"></mat-slide-toggle>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">Passwords, Notes, Credit Cards, etc.</p>
+						<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.features.zelfkeys_description" | transloco }}</p>
 					</div>
 				</div>
 			</div>
@@ -122,35 +129,51 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-orange-600 dark:text-orange-400 mr-2">rule</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Validation Rules</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.validation_rules.title" | transloco }}</h2>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Minimum Length</mat-label>
-						<input [formControlName]="'minLength'" matInput type="number" placeholder="3" />
+						<mat-label>{{ "license.validation_rules.min_length" | transloco }}</mat-label>
+						<input
+							[formControlName]="'minLength'"
+							matInput
+							type="number"
+							[placeholder]="'license.validation_rules.min_length_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Maximum Length</mat-label>
-						<input [formControlName]="'maxLength'" matInput type="number" placeholder="50" />
+						<mat-label>{{ "license.validation_rules.max_length" | transloco }}</mat-label>
+						<input
+							[formControlName]="'maxLength'"
+							matInput
+							type="number"
+							[placeholder]="'license.validation_rules.max_length_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Hold Suffix</mat-label>
-						<input [formControlName]="'holdSuffix'" matInput placeholder=".hold" />
+						<mat-label>{{ "license.validation_rules.hold_suffix" | transloco }}</mat-label>
+						<input
+							[formControlName]="'holdSuffix'"
+							matInput
+							[placeholder]="'license.validation_rules.hold_suffix_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 			</div>
 
 			<!-- Reserved Words -->
 			<div class="mt-4">
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reserved Words</label>
+				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{
+					"license.validation_rules.reserved_words" | transloco
+				}}</label>
 				<div class="flex flex-wrap gap-2">
 					<span
 						*ngFor="let word of reservedWords"
@@ -169,7 +192,7 @@
 						<input
 							#newReservedWord
 							type="text"
-							placeholder="Add reserved word"
+							[placeholder]="'license.validation_rules.add_reserved_word' | transloco"
 							class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 							(keyup.enter)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
 						/>
@@ -188,10 +211,12 @@
 			<div class="mt-4">
 				<div class="flex items-center mb-2">
 					<mat-icon class="text-red-600 dark:text-red-400 mr-2">block</mat-icon>
-					<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Content Filter</label>
+					<label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
+						"license.validation_rules.content_filter" | transloco
+					}}</label>
 					<mat-slide-toggle [formControlName]="'contentFilterEnabled'" class="ml-2"></mat-slide-toggle>
 				</div>
-				<p class="text-sm text-gray-600 dark:text-gray-300">Automatically block inappropriate words like "dick", "vagina", etc.</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.validation_rules.content_filter_description" | transloco }}</p>
 			</div>
 		</div>
 
@@ -199,7 +224,7 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-purple-600 dark:text-purple-400 mr-2">storage</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Storage Options</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.storage_options.title" | transloco }}</h2>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,41 +233,45 @@
 						<div class="flex items-center justify-between mb-2">
 							<div class="flex items-center">
 								<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">cloud</mat-icon>
-								<h3 class="font-medium text-gray-900 dark:text-white">IPFS</h3>
+								<h3 class="font-medium text-gray-900 dark:text-white">{{ "license.storage_options.ipfs_title" | transloco }}</h3>
 							</div>
 							<mat-slide-toggle [formControlName]="'ipfsEnabled'"></mat-slide-toggle>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">Used for .hold suffix tag domains</p>
+						<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.storage_options.ipfs_description" | transloco }}</p>
 					</div>
 
 					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
 						<div class="flex items-center justify-between mb-2">
 							<div class="flex items-center">
 								<mat-icon class="text-green-600 dark:text-green-400 mr-2">archive</mat-icon>
-								<h3 class="font-medium text-gray-900 dark:text-white">Arweave</h3>
+								<h3 class="font-medium text-gray-900 dark:text-white">{{ "license.storage_options.arweave_title" | transloco }}</h3>
 							</div>
 							<mat-slide-toggle [formControlName]="'arweaveEnabled'"></mat-slide-toggle>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">For already purchased domains</p>
+						<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.storage_options.arweave_description" | transloco }}</p>
 					</div>
 
 					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
 						<div class="flex items-center justify-between mb-2">
 							<div class="flex items-center">
 								<mat-icon class="text-orange-600 dark:text-orange-400 mr-2">pets</mat-icon>
-								<h3 class="font-medium text-gray-900 dark:text-white">Walrus</h3>
+								<h3 class="font-medium text-gray-900 dark:text-white">{{ "license.storage_options.walrus_title" | transloco }}</h3>
 							</div>
 							<mat-slide-toggle [formControlName]="'walrusEnabled'"></mat-slide-toggle>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">Alternative storage option</p>
+						<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.storage_options.walrus_description" | transloco }}</p>
 					</div>
 				</div>
 
 				<div class="space-y-4">
 					<div>
 						<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-							<mat-label>Key Prefix</mat-label>
-							<input [formControlName]="'keyPrefix'" matInput placeholder="tagName" />
+							<mat-label>{{ "license.storage_options.key_prefix" | transloco }}</mat-label>
+							<input
+								[formControlName]="'keyPrefix'"
+								matInput
+								[placeholder]="'license.storage_options.key_prefix_placeholder' | transloco"
+							/>
 						</mat-form-field>
 					</div>
 				</div>
@@ -253,32 +282,38 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-green-600 dark:text-green-400 mr-2">payment</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Payment Settings</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.payment_settings.title" | transloco }}</h2>
 			</div>
 
 			<div class="space-y-6">
 				<!-- Payment Methods -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Methods</label>
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{
+						"license.payment_settings.payment_methods" | transloco
+					}}</label>
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<div class="flex items-center">
 							<mat-checkbox [formControlName]="'coinbaseEnabled'"></mat-checkbox>
-							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Coinbase</span>
+							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ "license.payment_settings.coinbase" | transloco }}</span>
 						</div>
 						<div class="flex items-center">
 							<mat-checkbox [formControlName]="'cryptoEnabled'"></mat-checkbox>
-							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Crypto Payments</span>
+							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{
+								"license.payment_settings.crypto_payments" | transloco
+							}}</span>
 						</div>
 						<div class="flex items-center">
 							<mat-checkbox [formControlName]="'stripeEnabled'"></mat-checkbox>
-							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Stripe</span>
+							<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ "license.payment_settings.stripe" | transloco }}</span>
 						</div>
 					</div>
 				</div>
 
 				<!-- Supported Currencies -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Supported Currencies</label>
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{
+						"license.payment_settings.supported_currencies" | transloco
+					}}</label>
 					<div class="flex flex-wrap gap-2">
 						<span
 							*ngFor="let currency of supportedCurrencies"
@@ -297,7 +332,7 @@
 							<input
 								#newCurrency
 								type="text"
-								placeholder="Add currency"
+								[placeholder]="'license.payment_settings.add_currency' | transloco"
 								class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 								(keyup.enter)="addCurrency(newCurrency.value); newCurrency.value = ''"
 							/>
@@ -315,14 +350,16 @@
 				<!-- Whitelist -->
 				<div>
 					<div class="flex items-center justify-between mb-4">
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Whitelist (Special Pricing)</label>
+						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{
+							"license.payment_settings.whitelist_title" | transloco
+						}}</label>
 						<button
 							type="button"
 							(click)="addWhitelistItem()"
 							class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
 						>
 							<mat-icon class="text-sm mr-1">add</mat-icon>
-							Add Item
+							{{ "license.payment_settings.add_item" | transloco }}
 						</button>
 					</div>
 
@@ -334,19 +371,19 @@
 										scope="col"
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 									>
-										Tag Name
+										{{ "license.payment_settings.tag_name" | transloco }}
 									</th>
 									<th
 										scope="col"
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 									>
-										Discount
+										{{ "license.payment_settings.discount" | transloco }}
 									</th>
 									<th
 										scope="col"
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 									>
-										Type
+										{{ "license.payment_settings.type" | transloco }}
 									</th>
 									<th scope="col" class="relative px-6 py-3">
 										<span class="sr-only">Actions</span>
@@ -379,8 +416,8 @@
 											[formControlName]="'whitelistType_' + i"
 											class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
 										>
-											<option value="%">Percentage (%)</option>
-											<option value="$">Fixed Amount ($)</option>
+											<option value="%">{{ "license.payment_settings.percentage" | transloco }}</option>
+											<option value="$">{{ "license.payment_settings.fixed_amount" | transloco }}</option>
 										</select>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -397,7 +434,7 @@
 								<tr *ngIf="whitelistItems.length === 0" class="bg-gray-50 dark:bg-gray-700">
 									<td colspan="4" class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
 										<mat-icon class="text-4xl text-gray-300 dark:text-gray-600 mb-2">inbox</mat-icon>
-										<p>No whitelist items yet. Click "Add Item" to get started.</p>
+										<p>{{ "license.payment_settings.no_items" | transloco }}</p>
 									</td>
 								</tr>
 							</tbody>
@@ -405,18 +442,12 @@
 					</div>
 
 					<div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-						<p><strong>Examples:</strong></p>
+						<p>
+							<strong>{{ "license.payment_settings.examples" | transloco }}</strong>
+						</p>
 						<ul class="list-disc list-inside mt-1 space-y-1">
-							<li>
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">miguel.zelf</code> with
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">25</code> and
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">%</code> = 25% discount
-							</li>
-							<li>
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">vip.avax</code> with
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">50</code> and
-								<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">$</code> = $50 discount
-							</li>
+							<li>{{ "license.payment_settings.example_1" | transloco }}</li>
+							<li>{{ "license.payment_settings.example_2" | transloco }}</li>
 						</ul>
 					</div>
 				</div>
@@ -428,7 +459,7 @@
 			<div class="flex items-center justify-between mb-4">
 				<div class="flex items-center">
 					<mat-icon class="text-purple-600 dark:text-purple-400 mr-2">table_chart</mat-icon>
-					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Pricing Table</h2>
+					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.pricing_table.title" | transloco }}</h2>
 				</div>
 				<button
 					type="button"
@@ -436,13 +467,13 @@
 					class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
 				>
 					<mat-icon class="text-sm mr-1">refresh</mat-icon>
-					Reset to Default
+					{{ "license.pricing_table.reset_default" | transloco }}
 				</button>
 			</div>
 
 			<div class="mb-4">
 				<p class="text-sm text-gray-600 dark:text-gray-400">
-					Configure pricing for different tag lengths and subscription durations. Prices are in cents (e.g., 240 = $2.40).
+					{{ "license.pricing_table.description" | transloco }}
 				</p>
 			</div>
 
@@ -451,43 +482,43 @@
 					<thead class="bg-gray-50 dark:bg-gray-700">
 						<tr>
 							<th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-								Length
+								{{ "license.pricing_table.length" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								1 Year
+								{{ "license.pricing_table.one_year" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								2 Years
+								{{ "license.pricing_table.two_years" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								3 Years
+								{{ "license.pricing_table.three_years" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								4 Years
+								{{ "license.pricing_table.four_years" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								5 Years
+								{{ "license.pricing_table.five_years" | transloco }}
 							</th>
 							<th
 								scope="col"
 								class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
 							>
-								Lifetime
+								{{ "license.pricing_table.lifetime" | transloco }}
 							</th>
 						</tr>
 					</thead>
@@ -567,12 +598,12 @@
 						<mat-icon class="text-blue-400">info</mat-icon>
 					</div>
 					<div class="ml-3">
-						<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Pricing Information</h3>
+						<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">{{ "license.pricing_table.pricing_info" | transloco }}</h3>
 						<div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-							<p>• Prices are displayed in dollars</p>
-							<p>• The "6-15" row applies to tag names with 6-15 characters</p>
-							<p>• Individual length rows (16-27) override the range pricing</p>
-							<p>• Changes are automatically saved when you update the form</p>
+							<p>{{ "license.pricing_table.pricing_info_1" | transloco }}</p>
+							<p>{{ "license.pricing_table.pricing_info_2" | transloco }}</p>
+							<p>{{ "license.pricing_table.pricing_info_3" | transloco }}</p>
+							<p>{{ "license.pricing_table.pricing_info_4" | transloco }}</p>
 						</div>
 					</div>
 				</div>
@@ -583,21 +614,31 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-yellow-600 dark:text-yellow-400 mr-2">speed</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Limits</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.limits.title" | transloco }}</h2>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Max Tags</mat-label>
-						<input [formControlName]="'maxTags'" matInput type="number" placeholder="10000" />
+						<mat-label>{{ "license.limits.max_tags" | transloco }}</mat-label>
+						<input
+							[formControlName]="'maxTags'"
+							matInput
+							type="number"
+							[placeholder]="'license.limits.max_tags_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Max ZelfKeys</mat-label>
-						<input [formControlName]="'maxZelfkeys'" matInput type="number" placeholder="10000" />
+						<mat-label>{{ "license.limits.max_zelfkeys" | transloco }}</mat-label>
+						<input
+							[formControlName]="'maxZelfkeys'"
+							matInput
+							type="number"
+							[placeholder]="'license.limits.max_zelfkeys_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 			</div>
@@ -607,52 +648,56 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-indigo-600 dark:text-indigo-400 mr-2">info</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Metadata</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "license.metadata.title" | transloco }}</h2>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Launch Date</mat-label>
+						<mat-label>{{ "license.metadata.launch_date" | transloco }}</mat-label>
 						<input [formControlName]="'launchDate'" matInput type="date" />
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Version</mat-label>
-						<input [formControlName]="'version'" matInput placeholder="1.0.0" />
+						<mat-label>{{ "license.metadata.version" | transloco }}</mat-label>
+						<input [formControlName]="'version'" matInput [placeholder]="'license.metadata.version_placeholder' | transloco" />
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Documentation URL</mat-label>
-						<input [formControlName]="'documentation'" matInput placeholder="https://docs.example.com" />
+						<mat-label>{{ "license.metadata.documentation_url" | transloco }}</mat-label>
+						<input
+							[formControlName]="'documentation'"
+							matInput
+							[placeholder]="'license.metadata.documentation_placeholder' | transloco"
+						/>
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Community</mat-label>
-						<input [formControlName]="'community'" matInput placeholder="avalanche" />
+						<mat-label>{{ "license.metadata.community" | transloco }}</mat-label>
+						<input [formControlName]="'community'" matInput [placeholder]="'license.metadata.community_placeholder' | transloco" />
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Enterprise</mat-label>
-						<input [formControlName]="'enterprise'" matInput placeholder="blockDAG" />
+						<mat-label>{{ "license.metadata.enterprise" | transloco }}</mat-label>
+						<input [formControlName]="'enterprise'" matInput [placeholder]="'license.metadata.enterprise_placeholder' | transloco" />
 					</mat-form-field>
 				</div>
 
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Support Level</mat-label>
+						<mat-label>{{ "license.metadata.support_level" | transloco }}</mat-label>
 						<mat-select [formControlName]="'support'">
-							<mat-option value="standard">Standard</mat-option>
-							<mat-option value="premium">Premium</mat-option>
-							<mat-option value="enterprise">Enterprise</mat-option>
+							<mat-option value="standard">{{ "license.metadata.support_standard" | transloco }}</mat-option>
+							<mat-option value="premium">{{ "license.metadata.support_premium" | transloco }}</mat-option>
+							<mat-option value="enterprise">{{ "license.metadata.support_enterprise" | transloco }}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
@@ -661,20 +706,20 @@
 
 		<!-- Current License Info -->
 		<div *ngIf="currentLicense" class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
-			<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Current License</h3>
+			<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">{{ "license.current_license.title" | transloco }}</h3>
 			<p class="text-sm text-blue-700 dark:text-blue-300">
-				<strong>Domain:</strong> {{ currentLicense.domain }}<br />
-				<strong>Created:</strong> {{ currentLicense.createdAt | date: "medium" }}<br />
-				<strong>IPFS Hash:</strong> {{ currentLicense.ipfsHash | slice: 0 : 20 }}...
+				<strong>{{ "license.current_license.domain" | transloco }}:</strong> {{ currentLicense.domain }}<br />
+				<strong>{{ "license.current_license.created" | transloco }}:</strong> {{ currentLicense.createdAt | date: "medium" }}<br />
+				<strong>{{ "license.current_license.ipfs_hash" | transloco }}:</strong> {{ currentLicense.ipfsHash | slice: 0 : 20 }}...
 			</p>
 		</div>
 
 		<!-- Actions -->
 		<div class="flex items-center justify-end space-x-4">
-			<button mat-stroked-button type="button" (click)="cancel()" [disabled]="isLoading">Cancel</button>
+			<button mat-stroked-button type="button" (click)="cancel()" [disabled]="isLoading">{{ "license.actions.cancel" | transloco }}</button>
 			<button mat-flat-button type="button" [color]="'primary'" (click)="saveLicense()" [disabled]="isLoading || accountForm.invalid">
 				<mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
-				{{ isLoading ? "Processing..." : "Save Domain Configuration" }}
+				{{ isLoading ? ("license.actions.processing" | transloco) : ("license.actions.save_configuration" | transloco) }}
 			</button>
 		</div>
 	</form>

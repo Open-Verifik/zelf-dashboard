@@ -78,5 +78,143 @@
 			"action": "updating",
 			"itemName": "notification preferences"
 		}
+	},
+	"save_confirmation": {
+		"master_password": "Master Password",
+		"master_password_placeholder": "Enter your master password",
+		"toggle_password_visibility": "Toggle password visibility",
+		"cancel": "Cancel",
+		"processing": "Processing...",
+		"continue": "Continue",
+		"biometric_verification": "Biometric Verification"
+	},
+	"license": {
+		"title": "Domain Configuration",
+		"subtitle": "Configure your custom domain settings for the Zelf ecosystem",
+		"basic_information": {
+			"title": "Basic Information",
+			"domain_name": "Domain Name",
+			"domain_prefix": "domain.",
+			"domain_placeholder": "mycompany",
+			"domain_required": "Domain is required",
+			"domain_pattern_error": "Domain must contain only letters, numbers, and hyphens",
+			"domain_type": "Domain Type",
+			"domain_type_official": "Official",
+			"domain_type_custom": "Custom",
+			"domain_type_community": "Community",
+			"domain_type_enterprise": "Enterprise",
+			"status": "Status",
+			"status_active": "Active",
+			"status_inactive": "Inactive",
+			"status_maintenance": "Maintenance",
+			"status_beta": "Beta",
+			"owner": "Owner",
+			"owner_placeholder": "zelf-team",
+			"description": "Description",
+			"description_placeholder": "Official Zelf domain"
+		},
+		"features": {
+			"title": "Features",
+			"zns_title": "Zelf Name System (ZNS)",
+			"zns_description": "Encryptions, Decryptions, previews of ZelfProofs",
+			"zelfkeys_title": "Zelf Keys",
+			"zelfkeys_description": "Passwords, Notes, Credit Cards, etc."
+		},
+		"validation_rules": {
+			"title": "Validation Rules",
+			"min_length": "Minimum Length",
+			"min_length_placeholder": "3",
+			"max_length": "Maximum Length",
+			"max_length_placeholder": "50",
+			"hold_suffix": "Hold Suffix",
+			"hold_suffix_placeholder": ".hold",
+			"reserved_words": "Reserved Words",
+			"add_reserved_word": "Add reserved word",
+			"content_filter": "Content Filter",
+			"content_filter_description": "Automatically block inappropriate words like \"dick\", \"vagina\", etc."
+		},
+		"storage_options": {
+			"title": "Storage Options",
+			"ipfs_title": "IPFS",
+			"ipfs_description": "Used for .hold suffix tag domains",
+			"arweave_title": "Arweave",
+			"arweave_description": "For already purchased domains",
+			"walrus_title": "Walrus",
+			"walrus_description": "Alternative storage option",
+			"key_prefix": "Key Prefix",
+			"key_prefix_placeholder": "tagName"
+		},
+		"payment_settings": {
+			"title": "Payment Settings",
+			"payment_methods": "Payment Methods",
+			"coinbase": "Coinbase",
+			"crypto_payments": "Crypto Payments",
+			"stripe": "Stripe",
+			"supported_currencies": "Supported Currencies",
+			"add_currency": "Add currency",
+			"whitelist_title": "Whitelist (Special Pricing)",
+			"add_item": "Add Item",
+			"tag_name": "Tag Name",
+			"discount": "Discount",
+			"type": "Type",
+			"percentage": "Percentage (%)",
+			"fixed_amount": "Fixed Amount ($)",
+			"no_items": "No whitelist items yet. Click \"Add Item\" to get started.",
+			"examples": "Examples:",
+			"example_1": "miguel.zelf with 25 and % = 25% discount",
+			"example_2": "vip.avax with 50 and $ = $50 discount"
+		},
+		"pricing_table": {
+			"title": "Pricing Table",
+			"reset_default": "Reset to Default",
+			"description": "Configure pricing for different tag lengths and subscription durations. Prices are in cents (e.g., 240 = $2.40).",
+			"length": "Length",
+			"one_year": "1 Year",
+			"two_years": "2 Years",
+			"three_years": "3 Years",
+			"four_years": "4 Years",
+			"five_years": "5 Years",
+			"lifetime": "Lifetime",
+			"pricing_info": "Pricing Information",
+			"pricing_info_1": "• Prices are displayed in dollars",
+			"pricing_info_2": "• The \"6-15\" row applies to tag names with 6-15 characters",
+			"pricing_info_3": "• Individual length rows (16-27) override the range pricing",
+			"pricing_info_4": "• Changes are automatically saved when you update the form"
+		},
+		"limits": {
+			"title": "Limits",
+			"max_tags": "Max Tags",
+			"max_tags_placeholder": "10000",
+			"max_zelfkeys": "Max ZelfKeys",
+			"max_zelfkeys_placeholder": "10000"
+		},
+		"metadata": {
+			"title": "Metadata",
+			"launch_date": "Launch Date",
+			"version": "Version",
+			"version_placeholder": "1.0.0",
+			"documentation_url": "Documentation URL",
+			"documentation_placeholder": "https://docs.example.com",
+			"community": "Community",
+			"community_placeholder": "avalanche",
+			"enterprise": "Enterprise",
+			"enterprise_placeholder": "blockDAG",
+			"support_level": "Support Level",
+			"support_standard": "Standard",
+			"support_premium": "Premium",
+			"support_enterprise": "Enterprise"
+		},
+		"current_license": {
+			"title": "Current License",
+			"domain": "Domain:",
+			"created": "Created:",
+			"ipfs_hash": "IPFS Hash:"
+		},
+		"actions": {
+			"cancel": "Cancel",
+			"save": "Save Domain Configuration",
+			"save_configuration": "Save Configuration",
+			"processing": "Processing..."
+		}
 	}
 }

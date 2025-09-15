@@ -13,6 +13,7 @@ import { DataBiometricsComponent, BiometricData } from "../../auth/biometric-ver
 import { SaveConfirmationService, SaveConfirmationData } from "../../../core/services/save-confirmation.service";
 import { HttpWrapperService } from "../../../http-wrapper.service";
 import { environment } from "../../../../environments/environment";
+import { License } from "../settings/license/license.class";
 
 @Component({
 	selector: "app-save-confirmation",
@@ -150,37 +151,12 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 */
 	private async createOrUpdateLicense(licenseData: any): Promise<void> {
 		try {
-			// First, check if domain already exists
-			const existingLicense = await this.searchLicense(licenseData.domain);
-
-			if (existingLicense) {
-				// Update existing license
-				await this.updateLicense(licenseData, existingLicense);
-			} else {
-				// Create new license
-				await this.createLicense(licenseData);
-			}
+			await this.createLicense(licenseData);
 		} catch (error) {
 			console.error("License operation error:", error);
 			this.showError("Failed to save license. Please try again.");
 		} finally {
 			this.isLoading = false;
-		}
-	}
-
-	/**
-	 * Search for existing license by domain
-	 */
-	private async searchLicense(domain: string): Promise<any> {
-		try {
-			const response = await this.httpWrapper.sendRequest("get", `${environment.apiUrl}${environment.endpoints.license.search}`, { domain });
-			return response.data;
-		} catch (error) {
-			// If not found, return null
-			if (error.status === 404) {
-				return null;
-			}
-			throw error;
 		}
 	}
 
@@ -191,8 +167,10 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		try {
 			const response = await this.httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.license.create}`, licenseData);
 
+			const license = License.fromAPIResponseWithWrapper(response);
+
 			// Store in localStorage
-			localStorage.setItem("license", JSON.stringify(response.data));
+			localStorage.setItem("license", JSON.stringify(license.toJSON()));
 
 			this.showSuccess(
 				this.translocoService.translate("saving_operations.created_successfully", {
@@ -207,47 +185,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 			}, 2000);
 		} catch (error) {
 			throw error;
-		}
-	}
-
-	/**
-	 * Update existing license
-	 */
-	private async updateLicense(licenseData: any, existingLicense: any): Promise<void> {
-		try {
-			// Delete previous IPFS record if exists
-			if (existingLicense.ipfsHash) {
-				await this.deleteLicense(existingLicense.ipfsHash);
-			}
-
-			// Create new license with updated domain
-			await this.createLicense(licenseData);
-
-			this.showSuccess(
-				this.translocoService.translate("saving_operations.updated_successfully", {
-					itemName: this.saveData?.operation?.itemName || "Configuration",
-				})
-			);
-
-			// Redirect after success
-			setTimeout(() => {
-				this.saveConfirmationService.clearSaveData();
-				this.router.navigate([this.redirectUrl]);
-			}, 2000);
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
-	 * Delete license from IPFS
-	 */
-	private async deleteLicense(ipfsHash: string): Promise<void> {
-		try {
-			await this.httpWrapper.sendRequest("delete", `${environment.apiUrl}${environment.endpoints.license.delete}/${ipfsHash}`);
-		} catch (error) {
-			console.warn("Failed to delete previous license record:", error);
-			// Continue with creation even if deletion fails
 		}
 	}
 

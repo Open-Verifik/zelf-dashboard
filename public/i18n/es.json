@@ -78,5 +78,143 @@
 			"action": "actualizando",
 			"itemName": "preferencias de notificación"
 		}
+	},
+	"save_confirmation": {
+		"master_password": "Contraseña Maestra",
+		"master_password_placeholder": "Ingresa tu contraseña maestra",
+		"toggle_password_visibility": "Alternar visibilidad de contraseña",
+		"cancel": "Cancelar",
+		"processing": "Procesando...",
+		"continue": "Continuar",
+		"biometric_verification": "Verificación Biométrica"
+	},
+	"license": {
+		"title": "Configuración de Dominio",
+		"subtitle": "Configura las opciones de dominio personalizado para el ecosistema Zelf",
+		"basic_information": {
+			"title": "Información Básica",
+			"domain_name": "Nombre de Dominio",
+			"domain_prefix": "dominio.",
+			"domain_placeholder": "micompania",
+			"domain_required": "El dominio es requerido",
+			"domain_pattern_error": "El dominio debe contener solo letras, números y guiones",
+			"domain_type": "Tipo de Dominio",
+			"domain_type_official": "Oficial",
+			"domain_type_custom": "Personalizado",
+			"domain_type_community": "Comunidad",
+			"domain_type_enterprise": "Empresarial",
+			"status": "Estado",
+			"status_active": "Activo",
+			"status_inactive": "Inactivo",
+			"status_maintenance": "Mantenimiento",
+			"status_beta": "Beta",
+			"owner": "Propietario",
+			"owner_placeholder": "equipo-zelf",
+			"description": "Descripción",
+			"description_placeholder": "Dominio oficial de Zelf"
+		},
+		"features": {
+			"title": "Características",
+			"zns_title": "Sistema de Nombres Zelf (ZNS)",
+			"zns_description": "Encriptaciones, Desencriptaciones, vistas previas de ZelfProofs",
+			"zelfkeys_title": "Claves Zelf",
+			"zelfkeys_description": "Contraseñas, Notas, Tarjetas de Crédito, etc."
+		},
+		"validation_rules": {
+			"title": "Reglas de Validación",
+			"min_length": "Longitud Mínima",
+			"min_length_placeholder": "3",
+			"max_length": "Longitud Máxima",
+			"max_length_placeholder": "50",
+			"hold_suffix": "Sufijo de Espera",
+			"hold_suffix_placeholder": ".hold",
+			"reserved_words": "Palabras Reservadas",
+			"add_reserved_word": "Agregar palabra reservada",
+			"content_filter": "Filtro de Contenido",
+			"content_filter_description": "Bloquear automáticamente palabras inapropiadas como \"dick\", \"vagina\", etc."
+		},
+		"storage_options": {
+			"title": "Opciones de Almacenamiento",
+			"ipfs_title": "IPFS",
+			"ipfs_description": "Usado para dominios de etiquetas con sufijo .hold",
+			"arweave_title": "Arweave",
+			"arweave_description": "Para dominios ya comprados",
+			"walrus_title": "Walrus",
+			"walrus_description": "Opción de almacenamiento alternativa",
+			"key_prefix": "Prefijo de Clave",
+			"key_prefix_placeholder": "nombreEtiqueta"
+		},
+		"payment_settings": {
+			"title": "Configuración de Pagos",
+			"payment_methods": "Métodos de Pago",
+			"coinbase": "Coinbase",
+			"crypto_payments": "Pagos con Criptomonedas",
+			"stripe": "Stripe",
+			"supported_currencies": "Monedas Soportadas",
+			"add_currency": "Agregar moneda",
+			"whitelist_title": "Lista Blanca (Precios Especiales)",
+			"add_item": "Agregar Elemento",
+			"tag_name": "Nombre de Etiqueta",
+			"discount": "Descuento",
+			"type": "Tipo",
+			"percentage": "Porcentaje (%)",
+			"fixed_amount": "Cantidad Fija ($)",
+			"no_items": "No hay elementos en la lista blanca aún. Haz clic en \"Agregar Elemento\" para comenzar.",
+			"examples": "Ejemplos:",
+			"example_1": "miguel.zelf con 25 y % = 25% de descuento",
+			"example_2": "vip.avax con 50 y $ = $50 de descuento"
+		},
+		"pricing_table": {
+			"title": "Tabla de Precios",
+			"reset_default": "Restablecer a Predeterminado",
+			"description": "Configurar precios para diferentes longitudes de etiquetas y duraciones de suscripción. Los precios están en centavos (ej., 240 = $2.40).",
+			"length": "Longitud",
+			"one_year": "1 Año",
+			"two_years": "2 Años",
+			"three_years": "3 Años",
+			"four_years": "4 Años",
+			"five_years": "5 Años",
+			"lifetime": "De por Vida",
+			"pricing_info": "Información de Precios",
+			"pricing_info_1": "• Los precios se muestran en dólares",
+			"pricing_info_2": "• La fila \"6-15\" se aplica a nombres de etiquetas con 6-15 caracteres",
+			"pricing_info_3": "• Las filas de longitud individual (16-27) anulan el precio de rango",
+			"pricing_info_4": "• Los cambios se guardan automáticamente cuando actualizas el formulario"
+		},
+		"limits": {
+			"title": "Límites",
+			"max_tags": "Máx. Etiquetas",
+			"max_tags_placeholder": "10000",
+			"max_zelfkeys": "Máx. ZelfKeys",
+			"max_zelfkeys_placeholder": "10000"
+		},
+		"metadata": {
+			"title": "Metadatos",
+			"launch_date": "Fecha de Lanzamiento",
+			"version": "Versión",
+			"version_placeholder": "1.0.0",
+			"documentation_url": "URL de Documentación",
+			"documentation_placeholder": "https://docs.ejemplo.com",
+			"community": "Comunidad",
+			"community_placeholder": "avalanche",
+			"enterprise": "Empresarial",
+			"enterprise_placeholder": "blockDAG",
+			"support_level": "Nivel de Soporte",
+			"support_standard": "Estándar",
+			"support_premium": "Premium",
+			"support_enterprise": "Empresarial"
+		},
+		"current_license": {
+			"title": "Licencia Actual",
+			"domain": "Dominio:",
+			"created": "Creado:",
+			"ipfs_hash": "Hash IPFS:"
+		},
+		"actions": {
+			"cancel": "Cancelar",
+			"save": "Guardar Configuración de Dominio",
+			"save_configuration": "Guardar Configuración",
+			"processing": "Procesando..."
+		}
 	}
 }

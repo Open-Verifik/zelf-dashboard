@@ -41,10 +41,19 @@ export class LanguagesComponent implements OnInit, OnDestroy {
 		// Get the available languages from transloco
 		this.availableLangs = this._translocoService.getAvailableLangs();
 
+		// Load saved language from localStorage
+		const savedLang = this._getSavedLanguage();
+		if (savedLang) {
+			this._translocoService.setActiveLang(savedLang);
+		}
+
 		// Subscribe to language changes
 		this._translocoService.langChanges$.subscribe((activeLang) => {
 			// Get the active lang
 			this.activeLang = activeLang;
+
+			// Save the selected language to localStorage
+			this._saveLanguage(activeLang);
 
 			// Update the navigation
 			this._updateNavigation(activeLang);
@@ -93,6 +102,34 @@ export class LanguagesComponent implements OnInit, OnDestroy {
 	// -----------------------------------------------------------------------------------------------------
 	// @ Private methods
 	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Save the selected language to localStorage
+	 *
+	 * @param lang
+	 * @private
+	 */
+	private _saveLanguage(lang: string): void {
+		try {
+			localStorage.setItem("selectedLanguage", lang);
+		} catch (error) {
+			console.warn("Could not save language to localStorage:", error);
+		}
+	}
+
+	/**
+	 * Get the saved language from localStorage
+	 *
+	 * @private
+	 */
+	private _getSavedLanguage(): string | null {
+		try {
+			return localStorage.getItem("selectedLanguage");
+		} catch (error) {
+			console.warn("Could not load language from localStorage:", error);
+			return null;
+		}
+	}
 
 	/**
 	 * Update the navigation
