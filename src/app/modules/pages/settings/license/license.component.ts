@@ -1,17 +1,7 @@
 import { TextFieldModule } from "@angular/cdk/text-field";
-import {
-	ChangeDetectionStrategy,
-	ChangeDetectorRef,
-	Component,
-	OnInit,
-	AfterViewInit,
-	ViewEncapsulation,
-	ViewChild,
-	ElementRef,
-} from "@angular/core";
-import { MatSelect } from "@angular/material/select";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, AfterViewInit, ViewEncapsulation } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators, FormArray, FormControl } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators, FormControl } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatOptionModule } from "@angular/material/core";
@@ -23,9 +13,6 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from "@angular/router";
-import { AuthService } from "app/core/auth/auth.service";
-import { HttpWrapperService } from "app/http-wrapper.service";
-
 import { License, LicenseData, DomainConfig } from "./license.class";
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
@@ -105,8 +92,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	constructor(
 		private _formBuilder: UntypedFormBuilder,
-		private _authService: AuthService,
-		private _httpWrapper: HttpWrapperService,
 		private _router: Router,
 		private _saveConfirmationService: SaveConfirmationService,
 		private _translocoService: TranslocoService,
@@ -269,22 +254,15 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * Add whitelist item
 	 */
 	addWhitelistItem(): void {
-		console.log("Adding whitelist item, current length:", this.whitelistItems.length);
-
 		// Add new item to array
 		const newItem = { domain: "", discount: "", type: "%" };
 		this.whitelistItems.push(newItem);
-
-		console.log("After adding, length:", this.whitelistItems.length);
-		console.log("Whitelist items:", this.whitelistItems);
 
 		// Add form controls for the new item
 		const newIndex = this.whitelistItems.length - 1;
 		this.accountForm.addControl(`whitelistDomain_${newIndex}`, new FormControl(""));
 		this.accountForm.addControl(`whitelistDiscount_${newIndex}`, new FormControl(""));
 		this.accountForm.addControl(`whitelistType_${newIndex}`, new FormControl("%"));
-
-		console.log("Form controls added for index:", newIndex);
 	}
 
 	/**
@@ -610,6 +588,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	loadCurrentLicense(): void {
 		const storedLicense = localStorage.getItem("license");
+
 		if (storedLicense) {
 			try {
 				const licenseData = JSON.parse(storedLicense);
@@ -617,8 +596,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			} catch (error) {
 				console.error("Error parsing stored license:", error);
 			}
-		} else {
-			console.log("No license found in localStorage");
 		}
 	}
 
@@ -691,15 +668,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				this.accountForm.get(`whitelistDiscount_${index}`)?.setValue(item.discount);
 				this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
 			});
-
-			// Log final form values
-			setTimeout(() => {
-				console.log("Final form values:", {
-					type: this.accountForm.get("type")?.value,
-					status: this.accountForm.get("status")?.value,
-					support: this.accountForm.get("support")?.value,
-				});
-			}, 100);
 		}
 
 		// Trigger change detection
