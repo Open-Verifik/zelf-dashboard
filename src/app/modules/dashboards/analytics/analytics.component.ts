@@ -9,13 +9,23 @@ import { Router } from "@angular/router";
 import { AnalyticsService } from "app/modules/dashboards/analytics/analytics.service";
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
 import { Subject, takeUntil } from "rxjs";
+import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
 
 @Component({
 	selector: "analytics",
 	templateUrl: "./analytics.component.html",
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [MatButtonModule, MatIconModule, MatMenuModule, MatButtonToggleModule, NgApexchartsModule, MatTooltipModule, DecimalPipe],
+	imports: [
+		MatButtonModule,
+		MatIconModule,
+		MatMenuModule,
+		MatButtonToggleModule,
+		NgApexchartsModule,
+		MatTooltipModule,
+		DecimalPipe,
+		TranslocoModule,
+	],
 })
 export class AnalyticsComponent implements OnInit, OnDestroy {
 	chartVisitors: ApexOptions;
@@ -35,7 +45,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 	 */
 	constructor(
 		private _analyticsService: AnalyticsService,
-		private _router: Router
+		private _router: Router,
+		private _translocoService: TranslocoService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -180,7 +191,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 				followCursor: true,
 				theme: "dark",
 				x: {
-					format: "MMM dd, yyyy",
+					format: this._translocoService.translate("analytics.chart.dateFormat"),
 				},
 				y: {
 					formatter: (value: number): string => `${value}`,
@@ -398,7 +409,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 				followCursor: true,
 				theme: "dark",
 				x: {
-					format: "MMM dd, yyyy",
+					format: this._translocoService.translate("analytics.chart.dateFormat"),
 				},
 			},
 			xaxis: {
@@ -478,8 +489,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 				theme: "dark",
 				custom: ({ seriesIndex, w }): string => `<div class="flex items-center h-8 min-h-8 max-h-8 px-3">
                                                     <div class="w-3 h-3 rounded-full" style="background-color: ${w.config.colors[seriesIndex]};"></div>
-                                                    <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]}:</div>
-                                                    <div class="ml-2 text-md font-bold leading-none">${w.config.series[seriesIndex]}%</div>
+                                                    <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]}${this._translocoService.translate("analytics.chart.tooltip.colon")}</div>
+                                                    <div class="ml-2 text-md font-bold leading-none">${w.config.series[seriesIndex]}${this._translocoService.translate("analytics.chart.tooltip.percentage")}</div>
                                                 </div>`,
 			},
 		};
@@ -584,8 +595,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 				theme: "dark",
 				custom: ({ seriesIndex, w }): string => `<div class="flex items-center h-8 min-h-8 max-h-8 px-3">
                                                     <div class="w-3 h-3 rounded-full" style="background-color: ${w.config.colors[seriesIndex]};"></div>
-                                                    <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]}:</div>
-                                                    <div class="ml-2 text-md font-bold leading-none">${w.config.series[seriesIndex]}%</div>
+                                                    <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]}${this._translocoService.translate("analytics.chart.tooltip.colon")}</div>
+                                                    <div class="ml-2 text-md font-bold leading-none">${w.config.series[seriesIndex]}${this._translocoService.translate("analytics.chart.tooltip.percentage")}</div>
                                                 </div>`,
 			},
 		};

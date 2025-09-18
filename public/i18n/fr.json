@@ -240,5 +240,94 @@
 			"save_configuration": "Enregistrer la configuration",
 			"processing": "Traitement en cours..."
 		}
+	},
+	"analytics": {
+		"title": "Tableau de Bord Analytique",
+		"description": "Surveillez la création de domaines de tags, les abonnements et les métriques d'activité",
+		"tagDomainsOverview": {
+			"title": "Aperçu des Domaines de Tags",
+			"subtitle": "Nombre de domaines de tags créés (gratuits et premium)",
+			"thisMonth": "Ce Mois",
+			"previousMonth": "Mois Précédent"
+		},
+		"paidTags": {
+			"title": "Tags Payants",
+			"subtitle": "Nombre de domaines de tags premium créés"
+		},
+		"zelfkeySubscriptions": {
+			"title": "Abonnements ZelfKey",
+			"subtitle": "Nombre d'abonnements ZelfKey"
+		},
+		"activeTags": {
+			"title": "Tags Actifs",
+			"subtitle": "Nombre de domaines de tags actuellement actifs"
+		},
+		"allTagsVsPaidTags": {
+			"title": "Tous les Tags vs. Tags Payants",
+			"subtitle": "Comparaison entre domaines de tags totaux et payants"
+		},
+		"metrics": {
+			"conversionRate": {
+				"title": "Taux de Conversion",
+				"description": "Le taux de conversion montre le pourcentage d'enregistrements totaux de tags qui se convertissent en tags payants/premium. Plus élevé est meilleur."
+			},
+			"premiumAdoption": {
+				"title": "Adoption Premium",
+				"description": "L'Adoption Premium montre le pourcentage d'utilisateurs qui passent aux fonctionnalités de tags payants. Plus élevé indique une meilleure monétisation."
+			},
+			"revenuePotential": {
+				"title": "Potentiel de Revenus",
+				"description": "Le Potentiel de Revenus montre le taux de conversion projeté basé sur les tendances actuelles et les modèles de comportement des utilisateurs."
+			}
+		},
+		"zelfUsers": {
+			"title": "Utilisateurs Zelf",
+			"subtitle": "Propriétés démographiques des utilisateurs de la plateforme Zelf"
+		},
+		"tagLeaseLengths": {
+			"title": "Durées de Bail des Tags",
+			"subtitle": "Distribution des durées de bail des domaines de tags"
+		},
+		"domainLength": {
+			"title": "Longueur du Domaine",
+			"subtitle": "Distribution des longueurs de caractères des domaines de tags"
+		},
+		"origin": {
+			"title": "Origine",
+			"subtitle": "Distribution des plateformes des utilisateurs Zelf"
+		},
+		"timePeriods": {
+			"30days": "30 jours",
+			"3months": "3 mois",
+			"9months": "9 mois"
+		},
+		"chart": {
+			"dateFormat": "dd MMM yyyy",
+			"tooltip": {
+				"colon": " :",
+				"percentage": "%"
+			}
+		},
+		"chartLabels": {
+			"tagLeaseLengths": {
+				"1year": "1 An",
+				"2years": "2 Ans",
+				"3years": "3 Ans",
+				"4years": "4 Ans",
+				"5years": "5 Ans",
+				"lifetime": "À vie"
+			},
+			"domainLength": {
+				"1to3": "1-3",
+				"4to10": "4-10",
+				"11to20": "11-20",
+				"21to27": "21-27"
+			},
+			"origin": {
+				"extension": "Extension",
+				"android": "Android",
+				"ios": "iOS"
+			}
+		}
 	}
 }

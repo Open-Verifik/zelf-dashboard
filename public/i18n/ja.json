@@ -241,5 +241,94 @@
 			"save_configuration": "設定を保存",
 			"processing": "処理中..."
 		}
+	},
+	"analytics": {
+		"title": "分析ダッシュボード",
+		"description": "タグドメインの作成、サブスクリプション、アクティビティメトリクスを監視",
+		"tagDomainsOverview": {
+			"title": "タグドメイン概要",
+			"subtitle": "作成されたタグドメイン数（無料およびプレミアム）",
+			"thisMonth": "今月",
+			"previousMonth": "先月"
+		},
+		"paidTags": {
+			"title": "有料タグ",
+			"subtitle": "作成されたプレミアムタグドメイン数"
+		},
+		"zelfkeySubscriptions": {
+			"title": "ZelfKeyサブスクリプション",
+			"subtitle": "ZelfKeyサブスクリプション数"
+		},
+		"activeTags": {
+			"title": "アクティブタグ",
+			"subtitle": "現在アクティブなタグドメイン数"
+		},
+		"allTagsVsPaidTags": {
+			"title": "全タグ vs. 有料タグ",
+			"subtitle": "総タグドメインと有料タグドメインの比較"
+		},
+		"metrics": {
+			"conversionRate": {
+				"title": "コンバージョン率",
+				"description": "コンバージョン率は、総タグ登録のうち有料/プレミアムタグに変換される割合を示します。高いほど良いです。"
+			},
+			"premiumAdoption": {
+				"title": "プレミアム採用率",
+				"description": "プレミアム採用率は、有料タグ機能にアップグレードするユーザーの割合を示します。高いほど収益化が良好です。"
+			},
+			"revenuePotential": {
+				"title": "収益ポテンシャル",
+				"description": "収益ポテンシャルは、現在のトレンドとユーザー行動パターンに基づいた予想コンバージョン率を示します。"
+			}
+		},
+		"zelfUsers": {
+			"title": "Zelfユーザー",
+			"subtitle": "Zelfプラットフォームユーザーの人口統計的特性"
+		},
+		"tagLeaseLengths": {
+			"title": "タグリース期間",
+			"subtitle": "タグドメインリース期間の分布"
+		},
+		"domainLength": {
+			"title": "ドメイン長",
+			"subtitle": "タグドメイン文字長の分布"
+		},
+		"origin": {
+			"title": "オリジン",
+			"subtitle": "Zelfユーザーのプラットフォーム分布"
+		},
+		"timePeriods": {
+			"30days": "30日",
+			"3months": "3ヶ月",
+			"9months": "9ヶ月"
+		},
+		"chart": {
+			"dateFormat": "yyyy年MMMdd日",
+			"tooltip": {
+				"colon": "：",
+				"percentage": "%"
+			}
+		},
+		"chartLabels": {
+			"tagLeaseLengths": {
+				"1year": "1年",
+				"2years": "2年",
+				"3years": "3年",
+				"4years": "4年",
+				"5years": "5年",
+				"lifetime": "生涯"
+			},
+			"domainLength": {
+				"1to3": "1-3",
+				"4to10": "4-10",
+				"11to20": "11-20",
+				"21to27": "21-27"
+			},
+			"origin": {
+				"extension": "拡張機能",
+				"android": "Android",
+				"ios": "iOS"
+			}
+		}
 	}
 }

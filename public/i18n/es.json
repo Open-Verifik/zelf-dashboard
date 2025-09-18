@@ -241,5 +241,94 @@
 			"save_configuration": "Guardar Configuración",
 			"processing": "Procesando..."
 		}
+	},
+	"analytics": {
+		"title": "Panel de Análisis",
+		"description": "Monitorea la creación de dominios de etiquetas, suscripciones y métricas de actividad",
+		"tagDomainsOverview": {
+			"title": "Resumen de Dominios de Etiquetas",
+			"subtitle": "Número de dominios de etiquetas creados (gratuitos y premium)",
+			"thisMonth": "Este Mes",
+			"previousMonth": "Mes Anterior"
+		},
+		"paidTags": {
+			"title": "Etiquetas Pagas",
+			"subtitle": "Número de dominios de etiquetas premium creados"
+		},
+		"zelfkeySubscriptions": {
+			"title": "Suscripciones ZelfKey",
+			"subtitle": "Número de suscripciones ZelfKey"
+		},
+		"activeTags": {
+			"title": "Etiquetas Activas",
+			"subtitle": "Número de dominios de etiquetas actualmente activos"
+		},
+		"allTagsVsPaidTags": {
+			"title": "Todas las Etiquetas vs. Etiquetas Pagas",
+			"subtitle": "Comparación entre dominios de etiquetas totales y pagos"
+		},
+		"metrics": {
+			"conversionRate": {
+				"title": "Tasa de Conversión",
+				"description": "La tasa de conversión muestra el porcentaje de registros totales de etiquetas que se convierten en etiquetas pagas/premium. Más alto es mejor."
+			},
+			"premiumAdoption": {
+				"title": "Adopción Premium",
+				"description": "La Adopción Premium muestra el porcentaje de usuarios que actualizan a funciones de etiquetas pagas. Más alto indica mejor monetización."
+			},
+			"revenuePotential": {
+				"title": "Potencial de Ingresos",
+				"description": "El Potencial de Ingresos muestra la tasa de conversión proyectada basada en tendencias actuales y patrones de comportamiento del usuario."
+			}
+		},
+		"zelfUsers": {
+			"title": "Usuarios de Zelf",
+			"subtitle": "Propiedades demográficas de los usuarios de la plataforma Zelf"
+		},
+		"tagLeaseLengths": {
+			"title": "Duración de Arrendamiento de Etiquetas",
+			"subtitle": "Distribución de duraciones de arrendamiento de dominios de etiquetas"
+		},
+		"domainLength": {
+			"title": "Longitud del Dominio",
+			"subtitle": "Distribución de longitudes de caracteres de dominios de etiquetas"
+		},
+		"origin": {
+			"title": "Origen",
+			"subtitle": "Distribución de plataformas de usuarios de Zelf"
+		},
+		"timePeriods": {
+			"30days": "30 días",
+			"3months": "3 meses",
+			"9months": "9 meses"
+		},
+		"chart": {
+			"dateFormat": "dd MMM, yyyy",
+			"tooltip": {
+				"colon": ":",
+				"percentage": "%"
+			}
+		},
+		"chartLabels": {
+			"tagLeaseLengths": {
+				"1year": "1 Año",
+				"2years": "2 Años",
+				"3years": "3 Años",
+				"4years": "4 Años",
+				"5years": "5 Años",
+				"lifetime": "De por vida"
+			},
+			"domainLength": {
+				"1to3": "1-3",
+				"4to10": "4-10",
+				"11to20": "11-20",
+				"21to27": "21-27"
+			},
+			"origin": {
+				"extension": "Extensión",
+				"android": "Android",
+				"ios": "iOS"
+			}
+		}
 	}
 }

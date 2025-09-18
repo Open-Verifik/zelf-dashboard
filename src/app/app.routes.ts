@@ -78,6 +78,8 @@ export const appRoutes: Route[] = [
 		},
 		children: [
 			{ path: "analytics", loadChildren: () => import("app/modules/dashboards/analytics/analytics.routes") },
+			{ path: "tags", loadChildren: () => import("app/modules/tags/tags.routes") },
+			{ path: "zelfkeys", loadChildren: () => import("app/modules/zelfkeys/zelfkeys.routes") },
 			{ path: "profile", loadChildren: () => import("app/modules/pages/profile/profile.routes") },
 			{ path: "settings", loadChildren: () => import("app/modules/pages/settings/settings.routes") },
 			{ path: "example", loadChildren: () => import("app/modules/admin/example/example.routes") },

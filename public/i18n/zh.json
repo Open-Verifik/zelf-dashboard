@@ -241,5 +241,94 @@
 			"save_configuration": "保存配置",
 			"processing": "处理中..."
 		}
+	},
+	"analytics": {
+		"title": "分析仪表板",
+		"description": "监控标签域名创建、订阅和活动指标",
+		"tagDomainsOverview": {
+			"title": "标签域名概览",
+			"subtitle": "创建的标签域名数量（免费和高级）",
+			"thisMonth": "本月",
+			"previousMonth": "上月"
+		},
+		"paidTags": {
+			"title": "付费标签",
+			"subtitle": "创建的高级标签域名数量"
+		},
+		"zelfkeySubscriptions": {
+			"title": "ZelfKey订阅",
+			"subtitle": "ZelfKey订阅数量"
+		},
+		"activeTags": {
+			"title": "活跃标签",
+			"subtitle": "当前活跃的标签域名数量"
+		},
+		"allTagsVsPaidTags": {
+			"title": "所有标签 vs. 付费标签",
+			"subtitle": "总标签域名与付费标签域名比较"
+		},
+		"metrics": {
+			"conversionRate": {
+				"title": "转化率",
+				"description": "转化率显示总标签注册中转化为付费/高级标签的百分比。越高越好。"
+			},
+			"premiumAdoption": {
+				"title": "高级采用率",
+				"description": "高级采用率显示升级到付费标签功能的用户百分比。越高表示变现越好。"
+			},
+			"revenuePotential": {
+				"title": "收入潜力",
+				"description": "收入潜力显示基于当前趋势和用户行为模式的预测转化率。"
+			}
+		},
+		"zelfUsers": {
+			"title": "Zelf用户",
+			"subtitle": "Zelf平台用户的人口统计特性"
+		},
+		"tagLeaseLengths": {
+			"title": "标签租期长度",
+			"subtitle": "标签域名租期长度分布"
+		},
+		"domainLength": {
+			"title": "域名长度",
+			"subtitle": "标签域名字符长度分布"
+		},
+		"origin": {
+			"title": "来源",
+			"subtitle": "Zelf用户的平台分布"
+		},
+		"timePeriods": {
+			"30days": "30天",
+			"3months": "3个月",
+			"9months": "9个月"
+		},
+		"chart": {
+			"dateFormat": "yyyy年MM月dd日",
+			"tooltip": {
+				"colon": "：",
+				"percentage": "%"
+			}
+		},
+		"chartLabels": {
+			"tagLeaseLengths": {
+				"1year": "1年",
+				"2years": "2年",
+				"3years": "3年",
+				"4years": "4年",
+				"5years": "5年",
+				"lifetime": "终身"
+			},
+			"domainLength": {
+				"1to3": "1-3",
+				"4to10": "4-10",
+				"11to20": "11-20",
+				"21to27": "21-27"
+			},
+			"origin": {
+				"extension": "扩展程序",
+				"android": "Android",
+				"ios": "iOS"
+			}
+		}
 	}
 }

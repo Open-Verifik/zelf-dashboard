@@ -10,11 +10,18 @@ export const defaultNavigation: FuseNavigationItem[] = [
 		link: "/analytics",
 	},
 	{
-		id: "example",
-		title: "Example",
+		id: "tags",
+		title: "Tags",
 		type: "basic",
-		icon: "heroicons_outline:document-text",
-		link: "/example",
+		icon: "heroicons_outline:tag",
+		link: "/tags",
+	},
+	{
+		id: "zelfkeys",
+		title: "ZelfKeys",
+		type: "basic",
+		icon: "heroicons_outline:key",
+		link: "/zelfkeys",
 	},
 ];
 
@@ -27,10 +34,17 @@ export const horizontalNavigation: FuseNavigationItem[] = [
 		link: "/analytics",
 	},
 	{
-		id: "example",
-		title: "Example",
+		id: "tags",
+		title: "Tags",
 		type: "basic",
-		icon: "heroicons_outline:document-text",
-		link: "/example",
+		icon: "heroicons_outline:tag",
+		link: "/tags",
+	},
+	{
+		id: "zelfkeys",
+		title: "ZelfKeys",
+		type: "basic",
+		icon: "heroicons_outline:key",
+		link: "/zelfkeys",
 	},
 ];
