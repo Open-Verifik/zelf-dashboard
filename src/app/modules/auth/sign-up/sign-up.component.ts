@@ -528,8 +528,6 @@ export class AuthSignUpComponent implements OnInit {
 		this._authService
 			.signUp(signUpData)
 			.then((response) => {
-				console.log({ response });
-
 				// Check if we have all required data for authentication
 				if (response.data?.token && response.data?.zelfProof && response.data?.zelfAccount) {
 					// Set session data

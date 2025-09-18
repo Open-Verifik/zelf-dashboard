@@ -9,7 +9,7 @@ export const analytics = {
         series: {
             'this-year': [
                 {
-                    name: 'Visitors',
+                    name: 'Tag Domains',
                     data: [
                         {
                             x: now
@@ -856,7 +856,7 @@ export const analytics = {
             ],
             'last-year': [
                 {
-                    name: 'Visitors',
+                    name: 'Tag Domains',
                     data: [
                         {
                             x: now
@@ -1704,7 +1704,7 @@ export const analytics = {
         },
     },
     conversions: {
-        amount: 4123,
+        amount: 1247,
         labels: [
             now.minus({ days: 47 }).toFormat('dd MMM') +
                 ' - ' +
@@ -1727,13 +1727,13 @@ export const analytics = {
         ],
         series: [
             {
-                name: 'Conversions',
-                data: [4412, 4345, 4541, 4677, 4322, 4123],
+                name: 'Paid Tags',
+                data: [1189, 1245, 1321, 1287, 1198, 1247],
             },
         ],
     },
     impressions: {
-        amount: 46085,
+        amount: 2847,
         labels: [
             now.minus({ days: 31 }).toFormat('dd MMM') +
                 ' - ' +
@@ -1750,13 +1750,13 @@ export const analytics = {
         ],
         series: [
             {
-                name: 'Impressions',
-                data: [11577, 11441, 11544, 11523],
+                name: 'ZelfKey Subscriptions',
+                data: [712, 689, 723, 723],
             },
         ],
     },
     visits: {
-        amount: 62083,
+        amount: 3847,
         labels: [
             now.minus({ days: 31 }).toFormat('dd MMM') +
                 ' - ' +
@@ -1773,8 +1773,8 @@ export const analytics = {
         ],
         series: [
             {
-                name: 'Visits',
-                data: [15521, 15519, 15522, 15521],
+                name: 'Active Tags',
+                data: [962, 961, 962, 962],
             },
         ],
     },
@@ -1784,7 +1784,7 @@ export const analytics = {
         predictedRatio: 55,
         series: [
             {
-                name: 'Page Views',
+                name: 'Active Usage',
                 data: [
                     {
                         x: now.minus({ days: 65 }).toJSDate(),
@@ -2049,7 +2049,7 @@ export const analytics = {
                 ],
             },
             {
-                name: 'Visitors',
+                name: 'Tag Domains',
                 data: [
                     {
                         x: now.minus({ days: 65 }).toJSDate(),
@@ -2316,23 +2316,23 @@ export const analytics = {
         ],
     },
     newVsReturning: {
-        uniqueVisitors: 46085,
-        series: [80, 20],
-        labels: ['New', 'Returning'],
+        uniqueVisitors: 2847,
+        series: [75, 25],
+        labels: ['New Users', 'Returning Users'],
     },
     gender: {
-        uniqueVisitors: 46085,
-        series: [55, 45],
+        uniqueVisitors: 2847,
+        series: [60, 40],
         labels: ['Male', 'Female'],
     },
     age: {
-        uniqueVisitors: 46085,
-        series: [35, 65],
+        uniqueVisitors: 2847,
+        series: [40, 60],
         labels: ['Under 30', 'Over 30'],
     },
     language: {
-        uniqueVisitors: 46085,
-        series: [25, 75],
+        uniqueVisitors: 2847,
+        series: [30, 70],
         labels: ['English', 'Other'],
     },
 };

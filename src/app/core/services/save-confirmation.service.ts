@@ -3,14 +3,21 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { License, DomainConfig } from "../../modules/pages/settings/license/license.class";
 
 export interface SaveConfirmationData {
-	license: License;
-	domainConfig: DomainConfig;
+	license: License | null;
+	domainConfig: DomainConfig | null;
 	redirectUrl: string;
 	operation: {
 		title: string;
 		description: string;
 		action: string; // e.g., "saving", "updating", "creating"
 		itemName: string; // e.g., "domain configuration", "license", "security settings"
+	};
+	securityData?: {
+		currentPassword?: string;
+		newPassword?: string;
+		operation?: string; // "changePassword" or "loadApiKey"
+		faceBase64: string;
+		masterPassword: string;
 	};
 }
 

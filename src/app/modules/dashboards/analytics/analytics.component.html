@@ -3,8 +3,8 @@
 		<!-- Title and action buttons -->
 		<div class="flex w-full items-center justify-between">
 			<div>
-				<div class="text-3xl font-semibold leading-8 tracking-tight">Zelf Analytics Dashboard</div>
-				<div class="text-secondary font-medium tracking-tight">Monitor your account statistics, track performance and review analytics</div>
+				<div class="text-3xl font-semibold leading-8 tracking-tight">Analytics Dashboard</div>
+				<div class="text-secondary font-medium tracking-tight">Monitor tag domain creation, subscriptions and activity metrics</div>
 			</div>
 			<div class="ml-6 flex items-center">
 				<button class="hidden sm:inline-flex" mat-stroked-button>
@@ -34,20 +34,20 @@
 			<div class="bg-card dark flex flex-auto flex-col overflow-hidden rounded-2xl shadow sm:col-span-2 lg:col-span-3">
 				<div class="ml-10 mr-6 mt-10 flex items-center justify-between sm:mr-10">
 					<div class="flex flex-col">
-						<div class="mr-4 text-2xl font-semibold leading-7 tracking-tight md:text-3xl">Visitors Overview</div>
-						<div class="text-secondary font-medium">Number of unique visitors</div>
+						<div class="mr-4 text-2xl font-semibold leading-7 tracking-tight md:text-3xl">Tag Domains Overview</div>
+						<div class="text-secondary font-medium">Number of tag domains created (free and premium)</div>
 					</div>
 					<div class="ml-2">
 						<mat-button-toggle-group
 							class="hidden space-x-1 border-none sm:inline-flex"
-							value="this-year"
+							value="this-month"
 							#visitorsYearSelector="matButtonToggleGroup"
 						>
-							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="last-year"
-								>Last Year
+							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="previous-month"
+								>Previous Month
 							</mat-button-toggle>
-							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="this-year"
-								>This Year
+							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="this-month"
+								>This Month
 							</mat-button-toggle>
 						</mat-button-toggle-group>
 						<div class="sm:hidden">
@@ -55,8 +55,8 @@
 								<mat-icon [svgIcon]="'heroicons_outline:ellipsis-vertical'"></mat-icon>
 							</button>
 							<mat-menu #visitorsMenu="matMenu">
-								<button mat-menu-item>This Year</button>
-								<button mat-menu-item>Last Year</button>
+								<button mat-menu-item>This Month</button>
+								<button mat-menu-item>Previous Month</button>
 							</mat-menu>
 						</div>
 					</div>
@@ -80,7 +80,7 @@
 			<!-- Conversions -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow sm:col-span-2 lg:col-span-1">
 				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Conversions</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">Paid Tags</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -120,7 +120,7 @@
 			<!-- Impressions -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
 				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Impressions</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">ZelfKey Subscriptions</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="impressionsMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -160,7 +160,7 @@
 			<!-- Visits -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
 				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Visits</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">Active Tags</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="impressionsMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -202,7 +202,7 @@
 		<!-- Visitors vs. Page Views -->
 		<div class="bg-card mt-8 flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
 			<div class="m-6 mb-0 flex items-start justify-between">
-				<div class="truncate text-lg font-medium leading-6 tracking-tight">Visitors vs. Page Views</div>
+				<div class="truncate text-lg font-medium leading-6 tracking-tight">All Tags vs. Paid Tags</div>
 				<div class="ml-2">
 					<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
 						<span class="text-secondary text-sm font-medium">30 days</span>
@@ -218,12 +218,12 @@
 				<div class="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-12">
 					<div class="flex flex-col">
 						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">Overall Score</div>
+							<div class="text-secondary font-medium leading-5">Conversion Rate</div>
 							<mat-icon
 								class="text-hint ml-1.5 icon-size-4"
 								[svgIcon]="'heroicons_mini:information-circle'"
 								[matTooltip]="
-									'Score is calculated by using the historical ratio between Page Views and Visitors. Best score is 1000, worst score is 0.'
+									'Conversion rate shows the percentage of total tag registrations that convert to paid/premium tags. Higher is better.'
 								"
 							></mat-icon>
 						</div>
@@ -239,11 +239,13 @@
 					</div>
 					<div class="flex flex-col">
 						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">Average Ratio</div>
+							<div class="text-secondary font-medium leading-5">Premium Adoption</div>
 							<mat-icon
 								class="text-hint ml-1.5 icon-size-4"
 								[svgIcon]="'heroicons_mini:information-circle'"
-								[matTooltip]="'Average Ratio is the average ratio between Page Views and Visitors'"
+								[matTooltip]="
+									'Premium Adoption shows the percentage of users who upgrade to paid tag features. Higher indicates better monetization.'
+								"
 							></mat-icon>
 						</div>
 						<div class="mt-2 flex items-start">
@@ -258,11 +260,13 @@
 					</div>
 					<div class="flex flex-col">
 						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">Predicted Ratio</div>
+							<div class="text-secondary font-medium leading-5">Revenue Potential</div>
 							<mat-icon
 								class="text-hint ml-1.5 icon-size-4"
 								[svgIcon]="'heroicons_mini:information-circle'"
-								[matTooltip]="'Predicted Ratio is calculated by using historical ratio, current trends and your goal targets.'"
+								[matTooltip]="
+									'Revenue Potential shows the projected conversion rate based on current trends and user behavior patterns.'
+								"
 							></mat-icon>
 						</div>
 						<div class="mt-2 flex items-start">
@@ -296,14 +300,14 @@
 
 		<!-- Section title -->
 		<div class="mt-12 w-full">
-			<div class="text-2xl font-semibold leading-6 tracking-tight">Your Audience</div>
-			<div class="text-secondary font-medium tracking-tight">Demographic properties of your users</div>
+			<div class="text-2xl font-semibold leading-6 tracking-tight">Zelf Users</div>
+			<div class="text-secondary font-medium tracking-tight">Demographic properties of Zelf platform users</div>
 		</div>
 		<div class="mt-6 grid w-full grid-cols-1 gap-8 sm:grid-cols-2 md:mt-8 lg:grid-cols-4">
-			<!-- New vs. Returning -->
+			<!-- Tag Lease Lengths -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
 				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">New vs. Returning</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">Tag Lease Lengths</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -318,27 +322,27 @@
 				<div class="mt-6 flex h-44 flex-auto flex-col">
 					<apx-chart
 						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartNewVsReturning.chart"
-						[colors]="chartNewVsReturning.colors"
-						[labels]="chartNewVsReturning.labels"
-						[plotOptions]="chartNewVsReturning.plotOptions"
-						[series]="chartNewVsReturning.series"
-						[states]="chartNewVsReturning.states"
-						[tooltip]="chartNewVsReturning.tooltip"
+						[chart]="chartTagLeaseLengths.chart"
+						[colors]="chartTagLeaseLengths.colors"
+						[labels]="chartTagLeaseLengths.labels"
+						[plotOptions]="chartTagLeaseLengths.plotOptions"
+						[series]="chartTagLeaseLengths.series"
+						[states]="chartTagLeaseLengths.states"
+						[tooltip]="chartTagLeaseLengths.tooltip"
 					></apx-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.newVsReturning.series; track dataset; let i = $index) {
+						@for (dataset of data.tagLeaseLengths.series; track dataset; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartNewVsReturning.colors[i]"></div>
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartTagLeaseLengths.colors[i]"></div>
 									<div class="ml-3 truncate">
-										{{ data.newVsReturning.labels[i] }}
+										{{ data.tagLeaseLengths.labels[i] }}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.newVsReturning.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ (data.tagLeaseLengths.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
@@ -346,10 +350,10 @@
 					</div>
 				</div>
 			</div>
-			<!-- Gender -->
+			<!-- Domain Length -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
 				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Gender</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">Domain Length</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -364,27 +368,27 @@
 				<div class="mt-6 flex h-44 flex-auto flex-col">
 					<apx-chart
 						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartGender.chart"
-						[colors]="chartGender.colors"
-						[labels]="chartGender.labels"
-						[plotOptions]="chartGender.plotOptions"
-						[series]="chartGender.series"
-						[states]="chartGender.states"
-						[tooltip]="chartGender.tooltip"
+						[chart]="chartDomainLength.chart"
+						[colors]="chartDomainLength.colors"
+						[labels]="chartDomainLength.labels"
+						[plotOptions]="chartDomainLength.plotOptions"
+						[series]="chartDomainLength.series"
+						[states]="chartDomainLength.states"
+						[tooltip]="chartDomainLength.tooltip"
 					></apx-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.gender.series; track dataset; let i = $index) {
+						@for (dataset of data.domainLength.series; track dataset; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartGender.colors[i]"></div>
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartDomainLength.colors[i]"></div>
 									<div class="ml-3 truncate">
-										{{ data.gender.labels[i] }}
+										{{ data.domainLength.labels[i] }}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.gender.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ (data.domainLength.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
@@ -392,10 +396,10 @@
 					</div>
 				</div>
 			</div>
-			<!-- Age -->
+			<!-- Origin -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
 				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Age</div>
+					<div class="truncate text-lg font-medium leading-6 tracking-tight">Origin</div>
 					<div class="ml-2">
 						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
 							<span class="text-secondary text-sm font-medium">30 days</span>
@@ -410,73 +414,27 @@
 				<div class="mt-6 flex h-44 flex-auto flex-col">
 					<apx-chart
 						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartAge.chart"
-						[colors]="chartAge.colors"
-						[labels]="chartAge.labels"
-						[plotOptions]="chartAge.plotOptions"
-						[series]="chartAge.series"
-						[states]="chartAge.states"
-						[tooltip]="chartAge.tooltip"
+						[chart]="chartOrigin.chart"
+						[colors]="chartOrigin.colors"
+						[labels]="chartOrigin.labels"
+						[plotOptions]="chartOrigin.plotOptions"
+						[series]="chartOrigin.series"
+						[states]="chartOrigin.states"
+						[tooltip]="chartOrigin.tooltip"
 					></apx-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.age.series; track dataset; let i = $index) {
+						@for (dataset of data.origin.series; track dataset; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartAge.colors[i]"></div>
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartOrigin.colors[i]"></div>
 									<div class="ml-3 truncate">
-										{{ data.age.labels[i] }}
+										{{ data.origin.labels[i] }}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.age.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
-								</div>
-								<div class="text-secondary text-right">{{ dataset }}%</div>
-							</div>
-						}
-					</div>
-				</div>
-			</div>
-			<!-- Language -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
-				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">Language</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-							<span class="text-secondary text-sm font-medium">30 days</span>
-						</button>
-						<mat-menu #conversionMenu="matMenu">
-							<button mat-menu-item>30 days</button>
-							<button mat-menu-item>3 months</button>
-							<button mat-menu-item>9 months</button>
-						</mat-menu>
-					</div>
-				</div>
-				<div class="mt-6 flex h-44 flex-auto flex-col">
-					<apx-chart
-						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartLanguage.chart"
-						[colors]="chartLanguage.colors"
-						[labels]="chartLanguage.labels"
-						[plotOptions]="chartLanguage.plotOptions"
-						[series]="chartLanguage.series"
-						[states]="chartLanguage.states"
-						[tooltip]="chartLanguage.tooltip"
-					></apx-chart>
-				</div>
-				<div class="mt-8">
-					<div class="-my-3 divide-y">
-						@for (dataset of data.language.series; track dataset; let i = $index) {
-							<div class="grid grid-cols-3 py-3">
-								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartLanguage.colors[i]"></div>
-									<div class="ml-3 truncate">
-										{{ data.language.labels[i] }}
-									</div>
-								</div>
-								<div class="text-right font-medium">
-									{{ (data.language.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ (data.origin.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>

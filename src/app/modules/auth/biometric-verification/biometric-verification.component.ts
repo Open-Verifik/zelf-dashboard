@@ -353,7 +353,6 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
 	private async _initializeBiometrics(): Promise<void> {
 		try {
-			console.log({ userData: this.userData });
 			// Initialize master password from user data
 			if (this.userData && this.userData.masterPassword) {
 				this.masterPassword = this.userData.masterPassword;

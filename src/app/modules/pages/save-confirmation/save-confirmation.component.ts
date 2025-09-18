@@ -12,6 +12,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { DataBiometricsComponent, BiometricData } from "../../auth/biometric-verification/biometric-verification.component";
 import { SaveConfirmationService, SaveConfirmationData } from "../../../core/services/save-confirmation.service";
 import { HttpWrapperService } from "../../../http-wrapper.service";
+import { AuthService } from "../../../core/auth/auth.service";
 import { environment } from "../../../../environments/environment";
 import { License } from "../settings/license/license.class";
 
@@ -54,6 +55,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	constructor(
 		private saveConfirmationService: SaveConfirmationService,
 		private httpWrapper: HttpWrapperService,
+		private authService: AuthService,
 		private router: Router,
 		private route: ActivatedRoute,
 		private translocoService: TranslocoService
@@ -121,15 +123,17 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		// Create license with biometric data
-		const licenseData = {
-			...this.saveData.license.toJSON(),
-			faceBase64: biometricData.faceBase64,
-			masterPassword: biometricData.password || this.masterPassword,
-		};
-
-		// Call license API
-		this.createOrUpdateLicense(licenseData);
+		// Check if this is a security operation
+		if (this.saveData.securityData) {
+			// Handle security operation (password change)
+			this.handleSecurityOperation(biometricData);
+		} else if (this.saveData.license) {
+			// Handle license operation
+			this.handleLicenseOperation(biometricData);
+		} else {
+			this.showError("Invalid operation data");
+			this.isLoading = false;
+		}
 	}
 
 	/**
@@ -148,16 +152,159 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Create or update license
+	 * Handle security operation (password change or load API key)
 	 */
-	private async createOrUpdateLicense(licenseData: any): Promise<void> {
+	private async handleSecurityOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.securityData) {
+			this.showError("No security data available");
+			this.isLoading = false;
+			return;
+		}
+
 		try {
+			const securityData = {
+				...this.saveData.securityData,
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
+			// Check operation type
+			if (securityData.operation === "loadApiKey") {
+				await this.loadApiKey(securityData);
+			} else if (securityData.operation === "changePassword") {
+				await this.changePassword(securityData);
+			} else {
+				this.showError("Unknown security operation");
+				this.isLoading = false;
+			}
+		} catch (error) {
+			console.error("Security operation error:", error);
+			const operation = this.saveData?.securityData?.operation === "loadApiKey" ? "load API key" : "change password";
+			this.showError(`Failed to ${operation}. Please try again.`);
+		} finally {
+			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Handle license operation
+	 */
+	private async handleLicenseOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.license) {
+			this.showError("No license data available");
+			this.isLoading = false;
+			return;
+		}
+
+		try {
+			const licenseData = {
+				...this.saveData.license.toJSON(),
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
 			await this.createLicense(licenseData);
 		} catch (error) {
 			console.error("License operation error:", error);
 			this.showError("Failed to save license. Please try again.");
 		} finally {
 			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Load API key
+	 */
+	private async loadApiKey(securityData: any): Promise<void> {
+		try {
+			// Get account information from zelfAccount
+			const zelfAccount = this.authService.zelfAccount;
+			const accountEmail = zelfAccount?.metadata?.accountEmail;
+
+			const requestData = {
+				...securityData,
+				email: accountEmail,
+				identificationMethod: "email",
+			};
+
+			const response = await this.httpWrapper.sendRequest(
+				"post",
+				`${environment.apiUrl}${environment.endpoints.security.loadApiKey}`,
+				requestData
+			);
+
+			if (response && response.data && response.data.apiKey) {
+				// Store API key in sessionStorage as requested
+				sessionStorage.setItem("apiKey", response.data.apiKey);
+
+				// Update access token if provided
+				if (response.data.token) {
+					localStorage.setItem("accessToken", response.data.token);
+				}
+
+				// Update zelfAccount if provided
+				if (response.data.zelfAccount) {
+					localStorage.setItem("zelfAccount", JSON.stringify(response.data.zelfAccount));
+				}
+
+				// Update zelfProof if provided
+				if (response.data.zelfProof) {
+					localStorage.setItem("zelfProof", response.data.zelfProof);
+				}
+
+				this.showSuccess(
+					this.translocoService.translate("saving_operations.api_key_loaded_successfully", {
+						itemName: this.saveData?.operation?.itemName || "API Key",
+					})
+				);
+			} else {
+				throw new Error("No API key received from server");
+			}
+
+			// Redirect after success
+			setTimeout(() => {
+				this.saveConfirmationService.clearSaveData();
+				this.router.navigate([this.redirectUrl]);
+			}, 2000);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Change password
+	 */
+	private async changePassword(securityData: any): Promise<void> {
+		try {
+			// Get account information from zelfAccount
+			const zelfAccount = this.authService.zelfAccount;
+			const accountEmail = zelfAccount?.metadata?.email;
+
+			const requestData = {
+				...securityData,
+				email: accountEmail,
+				identificationMethod: "email",
+			};
+
+			const response = await this.httpWrapper.sendRequest(
+				"post",
+				`${environment.apiUrl}${environment.endpoints.security.changePassword}`,
+				requestData
+			);
+
+			this.showSuccess(
+				this.translocoService.translate("saving_operations.password_changed_successfully", {
+					itemName: this.saveData?.operation?.itemName || "Password",
+				})
+			);
+
+			// Redirect after success
+			setTimeout(() => {
+				this.saveConfirmationService.clearSaveData();
+				this.router.navigate([this.redirectUrl]);
+			}, 2000);
+		} catch (error) {
+			throw error;
 		}
 	}
 

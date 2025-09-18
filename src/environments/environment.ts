@@ -29,6 +29,10 @@ export const environment = {
 			search: "/api/license",
 			delete: "/api/license",
 		},
+		security: {
+			changePassword: "/api/clients/auth/password",
+			loadApiKey: "/api/clients/auth",
+		},
 	},
 	// Feature flags
 	features: {

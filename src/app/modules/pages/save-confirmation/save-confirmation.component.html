@@ -72,12 +72,16 @@
 		<!-- Configuration Info Card -->
 		<div *ngIf="saveData && !isLoading && !isSuccess" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 			<div class="flex items-center mb-4">
-				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">domain</mat-icon>
+				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">
+					{{ saveData.securityData ? "security" : "domain" }}
+				</mat-icon>
 				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
 					{{ saveData.operation?.itemName || ("saving_operations.confirm_changes" | transloco) }}
 				</h3>
 			</div>
-			<div class="space-y-2">
+
+			<!-- License Configuration Info -->
+			<div *ngIf="saveData.domainConfig" class="space-y-2">
 				<div class="flex justify-between">
 					<span class="text-sm text-gray-500 dark:text-gray-400">Domain:</span>
 					<span class="text-sm font-medium text-gray-900 dark:text-white">{{ saveData.domainConfig.name }}</span>
@@ -89,6 +93,24 @@
 				<div class="flex justify-between">
 					<span class="text-sm text-gray-500 dark:text-gray-400">Status:</span>
 					<span class="text-sm font-medium text-gray-900 dark:text-white">{{ saveData.domainConfig.status }}</span>
+				</div>
+			</div>
+
+			<!-- Security Operation Info -->
+			<div *ngIf="saveData.securityData" class="space-y-2">
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Operation:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">
+						{{ saveData.securityData.operation === "loadApiKey" ? "Load API Key" : "Change Password" }}
+					</span>
+				</div>
+				<div *ngIf="saveData.securityData.operation === 'changePassword'" class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Security:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">Password Update</span>
+				</div>
+				<div *ngIf="saveData.securityData.operation === 'loadApiKey'" class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Security:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">API Key Access</span>
 				</div>
 			</div>
 		</div>
@@ -123,7 +145,9 @@
 
 			<!-- Action Buttons -->
 			<div class="flex space-x-4">
-				<button mat-stroked-button type="button" (click)="goBack()" [disabled]="isLoading" class="flex-1">Cancel</button>
+				<button mat-stroked-button type="button" (click)="goBack()" [disabled]="isLoading" class="flex-1">
+					{{ "saving_operations.cancel" | transloco }}
+				</button>
 				<button mat-flat-button type="submit" color="primary" [disabled]="isLoading || !masterPassword.trim()" class="flex-1">
 					{{ "saving_operations.continue" | transloco }}
 				</button>
@@ -151,12 +175,17 @@
 						"saving_operations.verify_identity"
 							| transloco: { action: saveData?.operation?.action || "save", itemName: saveData?.operation?.itemName || "configuration" }
 					}}
-					<strong class="text-gray-900 dark:text-white block mt-1">{{ saveData?.domainConfig.name }}</strong>
+					<strong class="text-gray-900 dark:text-white block mt-1">
+						{{ saveData?.domainConfig?.name || saveData?.operation?.itemName || "configuration" }}
+					</strong>
 				</p>
 
 				<!-- Biometric Component -->
 				<app-data-biometrics
-					[userData]="{ domain: saveData?.domainConfig.name, password: masterPassword }"
+					[userData]="{
+						domain: saveData?.domainConfig?.name || saveData?.operation?.itemName,
+						masterPassword: masterPassword,
+					}"
 					[isModalContext]="false"
 					(biometricsSuccess)="onBiometricSuccess($event)"
 					(biometricsCancel)="onBiometricCancel()"

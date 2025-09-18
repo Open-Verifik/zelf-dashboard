@@ -511,8 +511,6 @@ export class AuthSignInComponent implements OnInit {
 		// Sign in with biometric data
 		this._authService.signIn(signInData).then(
 			(response) => {
-				console.info({ response });
-
 				// Check if we have all required data for authentication
 				if (response.data?.token && response.data?.zelfProof && response.data?.zelfAccount) {
 					// Set session data

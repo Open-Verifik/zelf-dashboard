@@ -71,6 +71,7 @@
 		"processing": "Processing...",
 		"please_wait": "Please wait while we process your request",
 		"continue": "Continue",
+		"cancel": "Cancel",
 		"success": "Success!",
 		"redirecting": "Redirecting you back...",
 		"license_configuration": {
@@ -85,6 +86,20 @@
 			"action": "updating",
 			"itemName": "security settings"
 		},
+		"password_change": {
+			"title": "Confirm Password Change",
+			"description": "Please enter your master password to proceed with changing your password",
+			"action": "changing",
+			"itemName": "password"
+		},
+		"load_api_key": {
+			"title": "Confirm API Key Loading",
+			"description": "Please enter your master password to proceed with loading your API key",
+			"action": "loading",
+			"itemName": "API key"
+		},
+		"password_changed_successfully": "{{itemName}} changed successfully!",
+		"api_key_loaded_successfully": "{{itemName}} loaded successfully!",
 		"team_permissions": {
 			"title": "Confirm Team Changes",
 			"description": "Please enter your master password to proceed with modifying team permissions",

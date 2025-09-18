@@ -23,10 +23,9 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 	chartImpressions: ApexOptions;
 	chartVisits: ApexOptions;
 	chartVisitorsVsPageViews: ApexOptions;
-	chartNewVsReturning: ApexOptions;
-	chartGender: ApexOptions;
-	chartAge: ApexOptions;
-	chartLanguage: ApexOptions;
+	chartTagLeaseLengths: ApexOptions;
+	chartDomainLength: ApexOptions;
+	chartOrigin: ApexOptions;
 	data: any;
 
 	private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -162,9 +161,9 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 				borderColor: "#334155",
 				padding: {
 					top: 10,
-					bottom: -40,
-					left: 0,
-					right: 0,
+					bottom: 60,
+					left: 20,
+					right: 40,
 				},
 				position: "back",
 				xaxis: {
@@ -201,17 +200,30 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 						width: 2,
 					},
 				},
-				labels: {
-					offsetY: -20,
-					style: {
-						colors: "#CBD5E1",
-					},
-				},
-				tickAmount: 20,
 				tooltip: {
 					enabled: false,
 				},
 				type: "datetime",
+				tickPlacement: "on",
+				floating: false,
+				position: "bottom",
+				labels: {
+					offsetY: 0,
+					style: {
+						colors: "#CBD5E1",
+						fontSize: "11px",
+					},
+					rotate: -45,
+					trim: false,
+					hideOverlappingLabels: false,
+					show: true,
+					formatter: function (value: any) {
+						return new Date(value).toLocaleDateString("en-US", {
+							month: "short",
+							day: "numeric",
+						});
+					},
+				},
 			},
 			yaxis: {
 				axisTicks: {
@@ -419,8 +431,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 			},
 		};
 
-		// New vs. returning
-		this.chartNewVsReturning = {
+		// Tag Lease Lengths
+		this.chartTagLeaseLengths = {
 			chart: {
 				animations: {
 					speed: 400,
@@ -436,8 +448,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					enabled: true,
 				},
 			},
-			colors: ["#3182CE", "#63B3ED"],
-			labels: this.data.newVsReturning.labels,
+			colors: ["#3182CE", "#63B3ED", "#90CDF4", "#BEE3F8", "#DBEAFE", "#EFF6FF"],
+			labels: this.data.tagLeaseLengths.labels,
 			plotOptions: {
 				pie: {
 					customScale: 0.9,
@@ -447,7 +459,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					},
 				},
 			},
-			series: this.data.newVsReturning.series,
+			series: this.data.tagLeaseLengths.series,
 			states: {
 				hover: {
 					filter: {
@@ -472,8 +484,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 			},
 		};
 
-		// Gender
-		this.chartGender = {
+		// Domain Length
+		this.chartDomainLength = {
 			chart: {
 				animations: {
 					speed: 400,
@@ -489,8 +501,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					enabled: true,
 				},
 			},
-			colors: ["#319795", "#4FD1C5"],
-			labels: this.data.gender.labels,
+			colors: ["#319795", "#4FD1C5", "#81E6D9", "#B2F5EA"],
+			labels: this.data.domainLength.labels,
 			plotOptions: {
 				pie: {
 					customScale: 0.9,
@@ -500,7 +512,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					},
 				},
 			},
-			series: this.data.gender.series,
+			series: this.data.domainLength.series,
 			states: {
 				hover: {
 					filter: {
@@ -525,8 +537,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 			},
 		};
 
-		// Age
-		this.chartAge = {
+		// Origin
+		this.chartOrigin = {
 			chart: {
 				animations: {
 					speed: 400,
@@ -542,8 +554,8 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					enabled: true,
 				},
 			},
-			colors: ["#DD6B20", "#F6AD55"],
-			labels: this.data.age.labels,
+			colors: ["#DD6B20", "#F6AD55", "#FED7AA"],
+			labels: this.data.origin.labels,
 			plotOptions: {
 				pie: {
 					customScale: 0.9,
@@ -553,60 +565,7 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
 					},
 				},
 			},
-			series: this.data.age.series,
-			states: {
-				hover: {
-					filter: {
-						type: "none",
-					},
-				},
-				active: {
-					filter: {
-						type: "none",
-					},
-				},
-			},
-			tooltip: {
-				enabled: true,
-				fillSeriesColor: false,
-				theme: "dark",
-				custom: ({ seriesIndex, w }): string => `<div class="flex items-center h-8 min-h-8 max-h-8 px-3">
-                                                    <div class="w-3 h-3 rounded-full" style="background-color: ${w.config.colors[seriesIndex]};"></div>
-                                                    <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]}:</div>
-                                                    <div class="ml-2 text-md font-bold leading-none">${w.config.series[seriesIndex]}%</div>
-                                                </div>`,
-			},
-		};
-
-		// Language
-		this.chartLanguage = {
-			chart: {
-				animations: {
-					speed: 400,
-					animateGradually: {
-						enabled: false,
-					},
-				},
-				fontFamily: "inherit",
-				foreColor: "inherit",
-				height: "100%",
-				type: "donut",
-				sparkline: {
-					enabled: true,
-				},
-			},
-			colors: ["#805AD5", "#B794F4"],
-			labels: this.data.language.labels,
-			plotOptions: {
-				pie: {
-					customScale: 0.9,
-					expandOnClick: false,
-					donut: {
-						size: "70%",
-					},
-				},
-			},
-			series: this.data.language.series,
+			series: this.data.origin.series,
 			states: {
 				hover: {
 					filter: {
