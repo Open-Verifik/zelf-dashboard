@@ -26,7 +26,7 @@ export interface ZelfAccount {
 	user_id: string;
 	date_pinned: string;
 	date_unpinned: string | null;
-	metadata: ZelfAccountMetadata;
+	publicData: ZelfAccountMetadata;
 	regions: Array<{
 		regionId: string;
 		currentReplicationCount: number;
@@ -52,7 +52,7 @@ export class ZelfUser {
 	public readonly userId: string;
 
 	constructor(zelfAccount: ZelfAccount) {
-		const metadata = zelfAccount.metadata;
+		const metadata = zelfAccount.publicData;
 
 		this.id = zelfAccount.id;
 		this.email = metadata.accountEmail || "";

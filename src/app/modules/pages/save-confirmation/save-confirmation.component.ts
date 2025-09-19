@@ -262,7 +262,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		try {
 			// Get account information from zelfAccount
 			const zelfAccount = this.authService.zelfAccount;
-			const accountEmail = zelfAccount?.metadata?.accountEmail;
+			const accountEmail = zelfAccount?.publicData?.accountEmail;
 
 			const requestData = {
 				...securityData,

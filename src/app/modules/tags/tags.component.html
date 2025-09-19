@@ -1,7 +1,140 @@
 <div class="flex min-w-0 flex-auto flex-col">
 	<!-- Main -->
 	<div class="flex-auto p-6 sm:p-10">
-		<!-- CONTENT GOES HERE -->
-		<div class="h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300"></div>
+		<!-- Header -->
+		<div class="mb-8">
+			<h1 class="text-3xl font-bold text-gray-900 mb-2">Tags Management</h1>
+			<p class="text-gray-600">Manage your blockchain tags and QR codes</p>
+		</div>
+
+		<!-- Table Container -->
+		<div class="tags-container">
+			<div class="table-container">
+				<table mat-table [dataSource]="dataSource" class="mat-mdc-table">
+					<!-- Name Column -->
+					<ng-container matColumnDef="name">
+						<th mat-header-cell *matHeaderCellDef>Tag Name</th>
+						<td mat-cell *matCellDef="let record">
+							<div class="flex items-center">
+								<span
+									class="status-indicator"
+									[class.active]="record.name.includes('.hold')"
+									[class.expired]="!record.name.includes('.hold')"
+								></span>
+								<span class="tag-name">{{ record.name }}</span>
+							</div>
+						</td>
+					</ng-container>
+
+					<!-- Domain Column -->
+					<ng-container matColumnDef="domain">
+						<th mat-header-cell *matHeaderCellDef>Domain</th>
+						<td mat-cell *matCellDef="let record">
+							<span class="domain-chip">{{ record.publicData.domain }}</span>
+						</td>
+					</ng-container>
+
+					<!-- Created Date Column -->
+					<ng-container matColumnDef="created_at">
+						<th mat-header-cell *matHeaderCellDef>Created</th>
+						<td mat-cell *matCellDef="let record">
+							<span class="date-text">{{ formatDate(record.created_at) }}</span>
+						</td>
+					</ng-container>
+
+					<!-- Size Column -->
+					<ng-container matColumnDef="size">
+						<th mat-header-cell *matHeaderCellDef>Size</th>
+						<td mat-cell *matCellDef="let record">
+							<span class="size-text">{{ formatFileSize(record.size) }}</span>
+						</td>
+					</ng-container>
+
+					<!-- Actions Column -->
+					<ng-container matColumnDef="actions">
+						<th mat-header-cell *matHeaderCellDef>Actions</th>
+						<td mat-cell *matCellDef="let record">
+							<div class="action-buttons">
+								<!-- QR Code Button -->
+								<button mat-icon-button class="action-btn qr-btn" matTooltip="Preview QR Code" (click)="openQRCodeModal(record)">
+									<mat-icon>qr_code</mat-icon>
+								</button>
+
+								<!-- Details Button -->
+								<button mat-icon-button class="action-btn details-btn" matTooltip="View Details" (click)="openDetailsModal(record)">
+									<mat-icon>visibility</mat-icon>
+								</button>
+
+								<!-- Edit Button -->
+								<button mat-icon-button class="action-btn edit-btn" matTooltip="Edit Lease" (click)="openEditModal(record)">
+									<mat-icon>edit</mat-icon>
+								</button>
+
+								<!-- Delete Button -->
+								<button
+									mat-icon-button
+									class="action-btn"
+									[class.delete-btn]="canDelete(record)"
+									[class.disabled]="!canDelete(record)"
+									[matTooltip]="canDelete(record) ? 'Delete Tag' : 'Cannot delete - not a .hold tag'"
+									[disabled]="!canDelete(record)"
+									(click)="deleteRecord(record)"
+								>
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+						</td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+				</table>
+			</div>
+
+			<!-- Pagination -->
+			<div class="pagination-container">
+				<div class="pagination-info">
+					<span class="pagination-text">Showing {{ getStartItem() }}-{{ getEndItem() }} of {{ totalItems }} results</span>
+				</div>
+				<div class="pagination-controls">
+					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === 1" (click)="goToFirstPage()">
+						<mat-icon>first_page</mat-icon>
+					</button>
+					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === 1" (click)="goToPreviousPage()">
+						<mat-icon>chevron_left</mat-icon>
+					</button>
+
+					<div class="page-numbers">
+						<button
+							*ngFor="let page of visiblePages"
+							mat-icon-button
+							class="pagination-btn page-number"
+							[class.active]="page === currentPage"
+							[disabled]="page === '...'"
+							(click)="goToPage(page)"
+						>
+							{{ page }}
+						</button>
+					</div>
+
+					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="goToNextPage()">
+						<mat-icon>chevron_right</mat-icon>
+					</button>
+					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="goToLastPage()">
+						<mat-icon>last_page</mat-icon>
+					</button>
+				</div>
+				<div class="pagination-size">
+					<mat-form-field appearance="outline" class="page-size-selector">
+						<mat-label>Rows per page</mat-label>
+						<mat-select [(ngModel)]="pageSize" (selectionChange)="onPageSizeChange()">
+							<mat-option *ngFor="let size of pageSizeOptions" [value]="size">
+								{{ size }}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

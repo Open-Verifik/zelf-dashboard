@@ -178,16 +178,13 @@ export class AuthSignInComponent implements OnInit {
         "date_pinned": "2025-09-11T16:32:04.266Z",
         "date_unpinned": null,
         "metadata": {
-            "name": "emery.garcia@icloud.com.account",
-            "keyvalues": {
-                "type": "client_account",
-                "email": "emery.garcia@icloud.com",
-                "phone": "8131259467",
-                "company": "Smart Contracts Ltd",
-                "zelfProof": "A5boXuG+IXX0FsSzEmPfXQLCT7dP2qKum81DZqaDkInIYNkO6mmYFIo9j7dgsAaF5fA4TuRYeewTOXuiF4k2+L6USP2qC7lpMiOUr8cqWshWaqCROorkA9+cJ2AAYY0bJIuTcoSUWX5tec9HoYHC1TGcoMOnYvIX7IMiDQpkdbD59TA+BD6H3yAa6vCS6bp5Enezyj474jg8ODy5CJHDuh1jRs9X+UE41j5IQGecKR64zKMjc4SflfvkdrLuXKfrsxuKBO/q15EllywddDNyH8DnLsGi8BYYXAiJ3V4n3J26nJhyIs1v0gVMXpxHd3P30pZOIQFXWYDr3kcKGoLOFBfPsqf8gSoD61cMtm4Bso9mh6WMkCk8zlEhQrqH8W7O6+dbkc6dlWJAC6stLAQAC0lyiReiEif5HXKSwRbMxh5di73IeQVl2VPD4OXP7nHV0/u3rMjXrh7ZZ4pMQWjgsbirko6roO/at9KegvOODD0LSgFAEbUM+hq3bGkGiisQNjYYV595Z9onflJxWUYu9Xv+upsEo99tYfO4soqmANlNcEtDC6OPOIQ6CpRpHxyzDbbdckWMl4QASI2uuHmlUAhuQ84UzrLiPdHDc9dOvK2E8gewm9adQXlej/MOtLcU+T7h4o8lqyTYYorlooTLinlmmh3aM/+rxaCTc3i5LAMIoSFN1vI5KsoGfIm4T6XTObB2/BKMCFgcUlXsKqi5LEKf3UvLZ4ZrJWFX6M2pRsDTMre2xLckyjg3XwK6ywoiRL2agxSMuh+5hVq1AwVUmw5W1XVdSpxMDtn+I7KpP3Vn7YcyGQOhrG6lTkjl6haqldJ2J1aFqql8jNwoZVUS28ImOkiWJUwugLwrnwU02BkeybceYsKzzSC/zYY3sf32bDDx0OYgThxqSc2hCdLBKWaeG3wBaMnkFX4r5nFmnoD/8IqFY5F/B34Io1JZAA==",
-                "countryCode": "+64",
-                "subscriptionId": "free"
-            }
+			"type": "client_account",
+			"email": "emery.garcia@icloud.com",
+			"phone": "8131259467",
+			"company": "Smart Contracts Ltd",
+			"zelfProof": "A5boXuG+IXX0FsSzEmPfXQLCT7dP2qKum81DZqaDkInIYNkO6mmYFIo9j7dgsAaF5fA4TuRYeewTOXuiF4k2+L6USP2qC7lpMiOUr8cqWshWaqCROorkA9+cJ2AAYY0bJIuTcoSUWX5tec9HoYHC1TGcoMOnYvIX7IMiDQpkdbD59TA+BD6H3yAa6vCS6bp5Enezyj474jg8ODy5CJHDuh1jRs9X+UE41j5IQGecKR64zKMjc4SflfvkdrLuXKfrsxuKBO/q15EllywddDNyH8DnLsGi8BYYXAiJ3V4n3J26nJhyIs1v0gVMXpxHd3P30pZOIQFXWYDr3kcKGoLOFBfPsqf8gSoD61cMtm4Bso9mh6WMkCk8zlEhQrqH8W7O6+dbkc6dlWJAC6stLAQAC0lyiReiEif5HXKSwRbMxh5di73IeQVl2VPD4OXP7nHV0/u3rMjXrh7ZZ4pMQWjgsbirko6roO/at9KegvOODD0LSgFAEbUM+hq3bGkGiisQNjYYV595Z9onflJxWUYu9Xv+upsEo99tYfO4soqmANlNcEtDC6OPOIQ6CpRpHxyzDbbdckWMl4QASI2uuHmlUAhuQ84UzrLiPdHDc9dOvK2E8gewm9adQXlej/MOtLcU+T7h4o8lqyTYYorlooTLinlmmh3aM/+rxaCTc3i5LAMIoSFN1vI5KsoGfIm4T6XTObB2/BKMCFgcUlXsKqi5LEKf3UvLZ4ZrJWFX6M2pRsDTMre2xLckyjg3XwK6ywoiRL2agxSMuh+5hVq1AwVUmw5W1XVdSpxMDtn+I7KpP3Vn7YcyGQOhrG6lTkjl6haqldJ2J1aFqql8jNwoZVUS28ImOkiWJUwugLwrnwU02BkeybceYsKzzSC/zYY3sf32bDDx0OYgThxqSc2hCdLBKWaeG3wBaMnkFX4r5nFmnoD/8IqFY5F/B34Io1JZAA==",
+			"countryCode": "+64",
+			"subscriptionId": "free" 
         },
         "regions": [
             {
@@ -206,17 +203,16 @@ export class AuthSignInComponent implements OnInit {
 		// here we will need to call the backend to try to find the client using the identification method and the identifier
 		this._authService.verifyClientExists(this.userData).subscribe(
 			(response) => {
-				const metadata = response.data?.metadata?.keyvalues;
+				const publicData = response.data?.publicData;
 
 				this.userData = {
 					...this.userData, // Preserve original userData including masterPassword and identificationMethod
-					email: metadata?.accountEmail,
-					phone: metadata?.accountPhone,
-					countryCode: metadata?.accountCountryCode,
-					zelfProof: metadata?.accountZelfProof,
+					email: publicData?.accountEmail,
+					phone: publicData?.accountPhone,
+					countryCode: publicData?.accountCountryCode,
 				};
 
-				if (this.userData.zelfProof) {
+				if (publicData?.accountEmail) {
 					this.showBiometricVerification = true;
 
 					this.showAlert = false;
