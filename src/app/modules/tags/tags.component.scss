@@ -173,6 +173,141 @@
 	}
 }
 
+// Search and Filter styles
+.search-filter-container {
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	margin-bottom: 24px;
+	overflow: hidden;
+
+	.search-controls {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 20px 24px;
+		border-bottom: 1px solid #e5e7eb;
+
+		.domain-filter-field {
+			.mat-mdc-form-field {
+				width: 120px;
+			}
+		}
+
+		.search-type-field {
+			.mat-mdc-form-field {
+				width: 160px;
+			}
+		}
+
+		.search-input-field {
+			flex: 1;
+			min-width: 200px;
+
+			.mat-mdc-form-field {
+				width: 100%;
+			}
+		}
+
+		.clear-filters-btn {
+			background: #f3f4f6;
+			color: #6b7280;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+			transition: all 0.2s ease-in-out;
+
+			&:hover {
+				background: #e5e7eb;
+				color: #374151;
+				transform: translateY(-1px);
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+		}
+
+		// Form field styling
+		.mat-mdc-form-field {
+			.mat-mdc-form-field-wrapper {
+				padding-bottom: 0;
+			}
+
+			.mat-mdc-form-field-subscript-wrapper {
+				display: none;
+			}
+
+			.mat-mdc-form-field-outline {
+				color: #d1d5db;
+			}
+
+			&.mat-focused .mat-mdc-form-field-outline-thick {
+				color: #1f2937;
+			}
+
+			.mat-mdc-form-field-label {
+				color: #6b7280;
+			}
+
+			.mat-mdc-select-value {
+				color: #374151;
+			}
+
+			.mat-mdc-input-element {
+				color: #374151;
+
+				&::placeholder {
+					color: #9ca3af;
+				}
+			}
+		}
+	}
+
+	.active-filters {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 16px 24px;
+		background: #f8fafc;
+		border-top: 1px solid #e5e7eb;
+
+		.filters-label {
+			color: #6b7280;
+			font-size: 14px;
+			font-weight: 500;
+			min-width: fit-content;
+		}
+
+		.filter-chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+
+			.filter-chip {
+				background: #e5e7eb;
+				color: #374151;
+				border: 1px solid #d1d5db;
+				border-radius: 16px;
+				font-size: 13px;
+				font-weight: 500;
+				padding: 4px 8px;
+				cursor: pointer;
+				transition: all 0.2s ease-in-out;
+
+				&:hover {
+					background: #d1d5db;
+					transform: translateY(-1px);
+					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				}
+
+				.mat-icon {
+					font-size: 16px;
+					width: 16px;
+					height: 16px;
+					margin-left: 4px;
+				}
+			}
+		}
+	}
+}
+
 // Pagination styles
 .pagination-container {
 	display: flex;

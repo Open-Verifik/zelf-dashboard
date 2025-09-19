@@ -7,6 +7,67 @@
 			<p class="text-gray-600">Manage your blockchain tags and QR codes</p>
 		</div>
 
+		<!-- Search and Filter Bar -->
+		<div class="search-filter-container">
+			<div class="search-controls">
+				<!-- Domain Filter Dropdown -->
+				<mat-form-field appearance="outline" class="domain-filter-field">
+					<mat-label>Domain</mat-label>
+					<mat-select [(ngModel)]="selectedDomain" name="domain" (selectionChange)="onDomainChange()">
+						<mat-option value="all">All Domains</mat-option>
+						<mat-option *ngFor="let domain of availableDomains" [value]="domain">
+							{{ domain }}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<!-- Search Type Dropdown -->
+				<mat-form-field appearance="outline" class="search-type-field">
+					<mat-label>Filter by</mat-label>
+					<mat-select [(ngModel)]="searchType" name="searchType">
+						<mat-option value="all">All</mat-option>
+						<mat-option value="name">Tag Name</mat-option>
+						<mat-option value="blockdag">BlockDAG Address</mat-option>
+						<mat-option value="eth">ETH Address</mat-option>
+						<mat-option value="solana">Solana Address</mat-option>
+						<mat-option value="bitcoin">Bitcoin Address</mat-option>
+						<mat-option value="sui">SUI Address</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<!-- Search Input -->
+				<mat-form-field appearance="outline" class="search-input-field">
+					<mat-label>Search tags...</mat-label>
+					<input matInput [(ngModel)]="searchQuery" (input)="onSearchChange()" placeholder="Enter search term" />
+					<mat-icon matSuffix>search</mat-icon>
+				</mat-form-field>
+
+				<!-- Clear Filters Button -->
+				<button mat-icon-button class="clear-filters-btn" (click)="clearFilters()" matTooltip="Clear all filters">
+					<mat-icon>clear</mat-icon>
+				</button>
+			</div>
+
+			<!-- Active Filters Display -->
+			<div class="active-filters" *ngIf="hasActiveFilters()">
+				<span class="filters-label">Active filters:</span>
+				<div class="filter-chips">
+					<mat-chip *ngIf="searchType !== 'all'" class="filter-chip" (click)="removeSearchTypeFilter()">
+						{{ getSearchTypeLabel() }}
+						<mat-icon matChipRemove>close</mat-icon>
+					</mat-chip>
+					<mat-chip *ngIf="selectedDomain !== 'all'" class="filter-chip" (click)="removeDomainFilter()">
+						{{ selectedDomain }}
+						<mat-icon matChipRemove>close</mat-icon>
+					</mat-chip>
+					<mat-chip *ngIf="searchQuery" class="filter-chip" (click)="clearSearchQuery()">
+						"{{ searchQuery }}"
+						<mat-icon matChipRemove>close</mat-icon>
+					</mat-chip>
+				</div>
+			</div>
+		</div>
+
 		<!-- Table Container -->
 		<div class="tags-container">
 			<div class="table-container">

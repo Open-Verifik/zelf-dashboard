@@ -73,6 +73,12 @@ export class TagsComponent implements OnInit {
 	pageSizeOptions: number[] = [5, 10, 25, 50];
 	visiblePages: (number | string)[] = [1, 2, 3, 4, 5];
 
+	// Search and Filter properties
+	searchType: string = "all";
+	selectedDomain: string = "all";
+	searchQuery: string = "";
+	availableDomains: string[] = ["avax", "eth", "btc", "sol"];
+
 	// Sample data - replace with actual API call
 	sampleData: TagsResponse = {
 		data: [
@@ -474,5 +480,67 @@ export class TagsComponent implements OnInit {
 	getEndItem(): number {
 		const end = this.currentPage * this.pageSize;
 		return Math.min(end, this.totalItems);
+	}
+
+	// Search and Filter methods
+	onSearchChange(): void {
+		console.log("Search query changed:", this.searchQuery);
+		// TODO: Implement actual search logic
+		this.performSearch();
+	}
+
+	onDomainChange(): void {
+		console.log("Domain filter changed:", this.selectedDomain);
+		// TODO: Implement actual domain filtering logic
+		this.performSearch();
+	}
+
+	performSearch(): void {
+		// TODO: Implement actual search and filter logic
+		console.log("Performing search with:", {
+			searchType: this.searchType,
+			selectedDomain: this.selectedDomain,
+			searchQuery: this.searchQuery,
+		});
+	}
+
+	hasActiveFilters(): boolean {
+		return this.searchType !== "all" || this.selectedDomain !== "all" || this.searchQuery.trim() !== "";
+	}
+
+	getSearchTypeLabel(): string {
+		const labels: { [key: string]: string } = {
+			all: "All",
+			name: "Tag Name",
+			blockdag: "BlockDAG Address",
+			eth: "ETH Address",
+			solana: "Solana Address",
+			bitcoin: "Bitcoin Address",
+			sui: "SUI Address",
+		};
+		return labels[this.searchType] || "All";
+	}
+
+	clearFilters(): void {
+		this.searchType = "all";
+		this.selectedDomain = "all";
+		this.searchQuery = "";
+		this.performSearch();
+		console.log("All filters cleared");
+	}
+
+	removeSearchTypeFilter(): void {
+		this.searchType = "all";
+		this.performSearch();
+	}
+
+	removeDomainFilter(): void {
+		this.selectedDomain = "all";
+		this.performSearch();
+	}
+
+	clearSearchQuery(): void {
+		this.searchQuery = "";
+		this.performSearch();
 	}
 }
