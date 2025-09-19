@@ -39,7 +39,7 @@
 
 			<div class="space-y-4">
 				<!-- API Key -->
-				<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+				<!-- <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
 					<div class="flex items-center justify-between mb-2">
 						<div class="flex items-center">
 							<mat-icon class="text-green-600 dark:text-green-400 mr-2">key</mat-icon>
@@ -78,7 +78,7 @@
 					<p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
 						Your API key is used to authenticate requests to the Zelf API. Keep it secure and never share it publicly.
 					</p>
-				</div>
+				</div> -->
 
 				<!-- JWT Token -->
 				<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
@@ -124,22 +124,13 @@
 					<div class="ml-3">
 						<h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Password Change Policy</h3>
 						<div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-							<p>You can only change your password twice within 24 hours for security reasons.</p>
+							<p>You can only change your password once within 24 hours for security reasons.</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>Current Password</mat-label>
-						<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:key'" matPrefix></mat-icon>
-						<input [formControlName]="'currentPassword'" type="password" matInput />
-						<mat-error *ngIf="securityForm.get('currentPassword')?.hasError('required')"> Current password is required </mat-error>
-					</mat-form-field>
-				</div>
-
 				<div>
 					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
 						<mat-label>New Password</mat-label>
@@ -149,6 +140,16 @@
 						<mat-error *ngIf="securityForm.get('newPassword')?.hasError('minlength')">
 							Password must be at least 8 characters long
 						</mat-error>
+					</mat-form-field>
+				</div>
+
+				<div>
+					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
+						<mat-label>Confirm Password</mat-label>
+						<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:key'" matPrefix></mat-icon>
+						<input [formControlName]="'confirmPassword'" type="password" matInput />
+						<mat-error *ngIf="securityForm.get('confirmPassword')?.hasError('required')"> Confirm password is required </mat-error>
+						<mat-error *ngIf="securityForm.get('confirmPassword')?.hasError('passwordMismatch')"> Passwords do not match </mat-error>
 					</mat-form-field>
 				</div>
 			</div>

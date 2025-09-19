@@ -102,6 +102,12 @@
 			"description": "请输入您的主密码以继续更新您的通知偏好",
 			"action": "更新",
 			"itemName": "通知偏好"
+		},
+		"profile_update": {
+			"title": "确认个人资料更新",
+			"description": "请输入您的主密码以继续更新您的个人资料信息",
+			"action": "更新",
+			"itemName": "个人资料"
 		}
 	},
 	"save_confirmation": {
@@ -329,6 +335,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "正在加载个人资料...",
+		"status": "状态",
+		"menu": {
+			"profile": "个人资料",
+			"settings": "设置",
+			"license": "许可证",
+			"support": "支持"
+		},
+		"information": {
+			"title": "个人资料信息",
+			"name": "姓名",
+			"name_placeholder": "请输入您的姓名",
+			"name_required": "姓名是必填项",
+			"name_minlength": "姓名至少需要2个字符",
+			"company": "公司",
+			"company_placeholder": "请输入您的公司",
+			"company_required": "公司是必填项",
+			"email": "邮箱",
+			"email_placeholder": "请输入您的邮箱",
+			"email_required": "邮箱是必填项",
+			"email_invalid": "请输入有效的邮箱地址",
+			"country": "国家",
+			"country_required": "国家是必填项",
+			"phone": "电话",
+			"phone_placeholder": "请输入您的电话号码",
+			"phone_required": "电话号码是必填项",
+			"phone_invalid": "请输入有效的电话号码"
+		},
+		"account": {
+			"title": "账户信息",
+			"created_at": "创建时间",
+			"subscription": "订阅"
+		},
+		"edit": "编辑",
+		"save": "保存",
+		"cancel": "取消",
+		"license": {
+			"title": "许可证详情",
+			"type": "许可证类型",
+			"status": "状态",
+			"created": "创建时间",
+			"features": "功能",
+			"all_features": "所有功能",
+			"included_features": "包含的功能",
+			"feature_analytics": "高级分析仪表板",
+			"feature_processing": "实时数据处理",
+			"feature_support": "优先支持",
+			"feature_api": "API访问",
+			"feature_integrations": "自定义集成",
+			"renew": "续费许可证",
+			"download": "下载"
 		}
 	}
 }

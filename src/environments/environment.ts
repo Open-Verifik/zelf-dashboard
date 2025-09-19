@@ -7,6 +7,7 @@ export const environment = {
 	// Development specific settings
 	enableLogging: true,
 	enableMockData: true,
+	// Force TypeScript refresh
 	// API endpoints
 	endpoints: {
 		auth: {
@@ -14,7 +15,8 @@ export const environment = {
 			signIn: "/api/clients/auth",
 			verifyClientExists: "/api/clients",
 			unlockSession: "/auth/unlock-session",
-			// signInWithToken: "/auth/sign-in-with-token", // Disabled - endpoint doesn't exist
+			signOut: "/auth/sign-out",
+			signInWithToken: "/auth/sign-in-with-token",
 		},
 		user: {
 			profile: "/user/profile",
@@ -30,8 +32,11 @@ export const environment = {
 			delete: "/api/license",
 		},
 		security: {
-			changePassword: "/api/clients/auth/password",
+			changePassword: "/api/clients/sync/password",
 			loadApiKey: "/api/clients/auth",
+		},
+		client: {
+			update: "/api/clients/sync",
 		},
 	},
 	// Feature flags

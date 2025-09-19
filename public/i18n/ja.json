@@ -102,6 +102,12 @@
 			"description": "通知設定を更新するには、マスターパスワードを入力してください",
 			"action": "更新中",
 			"itemName": "通知設定"
+		},
+		"profile_update": {
+			"title": "プロフィール更新を確認",
+			"description": "プロフィール情報を更新するには、マスターパスワードを入力してください",
+			"action": "更新中",
+			"itemName": "プロフィール"
 		}
 	},
 	"save_confirmation": {
@@ -329,6 +335,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "プロフィールを読み込み中...",
+		"status": "ステータス",
+		"menu": {
+			"profile": "プロフィール",
+			"settings": "設定",
+			"license": "ライセンス",
+			"support": "サポート"
+		},
+		"information": {
+			"title": "プロフィール情報",
+			"name": "名前",
+			"name_placeholder": "お名前を入力してください",
+			"name_required": "名前は必須です",
+			"name_minlength": "名前は2文字以上である必要があります",
+			"company": "会社",
+			"company_placeholder": "会社名を入力してください",
+			"company_required": "会社名は必須です",
+			"email": "メール",
+			"email_placeholder": "メールアドレスを入力してください",
+			"email_required": "メールアドレスは必須です",
+			"email_invalid": "有効なメールアドレスを入力してください",
+			"country": "国",
+			"country_required": "国は必須です",
+			"phone": "電話",
+			"phone_placeholder": "電話番号を入力してください",
+			"phone_required": "電話番号は必須です",
+			"phone_invalid": "有効な電話番号を入力してください"
+		},
+		"account": {
+			"title": "アカウント情報",
+			"created_at": "作成日",
+			"subscription": "サブスクリプション"
+		},
+		"edit": "編集",
+		"save": "保存",
+		"cancel": "キャンセル",
+		"license": {
+			"title": "ライセンス詳細",
+			"type": "ライセンスタイプ",
+			"status": "ステータス",
+			"created": "作成日",
+			"features": "機能",
+			"all_features": "全機能",
+			"included_features": "含まれる機能",
+			"feature_analytics": "高度な分析ダッシュボード",
+			"feature_processing": "リアルタイムデータ処理",
+			"feature_support": "優先サポート",
+			"feature_api": "APIアクセス",
+			"feature_integrations": "カスタム統合",
+			"renew": "ライセンス更新",
+			"download": "ダウンロード"
 		}
 	}
 }

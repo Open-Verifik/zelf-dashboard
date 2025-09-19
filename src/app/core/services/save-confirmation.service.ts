@@ -13,9 +13,18 @@ export interface SaveConfirmationData {
 		itemName: string; // e.g., "domain configuration", "license", "security settings"
 	};
 	securityData?: {
-		currentPassword?: string;
 		newPassword?: string;
+		confirmPassword?: string;
 		operation?: string; // "changePassword" or "loadApiKey"
+		faceBase64: string;
+		masterPassword: string;
+	};
+	profileData?: {
+		name: string;
+		email: string;
+		countryCode: string;
+		phone: string;
+		company: string;
 		faceBase64: string;
 		masterPassword: string;
 	};

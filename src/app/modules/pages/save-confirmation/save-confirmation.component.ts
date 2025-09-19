@@ -130,6 +130,9 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		} else if (this.saveData.license) {
 			// Handle license operation
 			this.handleLicenseOperation(biometricData);
+		} else if (this.saveData.profileData) {
+			// Handle profile operation
+			this.handleProfileOperation(biometricData);
 		} else {
 			this.showError("Invalid operation data");
 			this.isLoading = false;
@@ -178,7 +181,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				this.isLoading = false;
 			}
 		} catch (error) {
-			console.error("Security operation error:", error);
 			const operation = this.saveData?.securityData?.operation === "loadApiKey" ? "load API key" : "change password";
 			this.showError(`Failed to ${operation}. Please try again.`);
 		} finally {
@@ -205,8 +207,49 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 
 			await this.createLicense(licenseData);
 		} catch (error) {
-			console.error("License operation error:", error);
 			this.showError("Failed to save license. Please try again.");
+		} finally {
+			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Handle profile operation
+	 */
+	private async handleProfileOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.profileData) {
+			this.showError("No profile data available");
+			this.isLoading = false;
+			return;
+		}
+
+		try {
+			const profileData = {
+				...this.saveData.profileData,
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
+			await this.updateProfile(profileData);
+		} catch (error) {
+			let errorMessage = "Failed to update profile. Please try again.";
+
+			// Handle specific error cases
+			if (error?.message) {
+				if (error.message.includes("error_decrypting_zelf_account")) {
+					errorMessage = "Biometric verification failed. Please check your face image and master password.";
+				} else if (error.message.includes("zelf_account_not_found")) {
+					errorMessage = "Account not found. Please contact support.";
+				} else if (error.message.includes("404")) {
+					errorMessage = "Account not found. Please contact support.";
+				} else if (error.message.includes("409")) {
+					errorMessage = "Verification failed. Please try again.";
+				} else {
+					errorMessage = error.message;
+				}
+			}
+
+			this.showError(errorMessage);
 		} finally {
 			this.isLoading = false;
 		}
@@ -276,33 +319,31 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 */
 	private async changePassword(securityData: any): Promise<void> {
 		try {
-			// Get account information from zelfAccount
-			const zelfAccount = this.authService.zelfAccount;
-			const accountEmail = zelfAccount?.metadata?.email;
-
 			const requestData = {
 				...securityData,
-				email: accountEmail,
 				identificationMethod: "email",
 			};
 
 			const response = await this.httpWrapper.sendRequest(
-				"post",
+				"put",
 				`${environment.apiUrl}${environment.endpoints.security.changePassword}`,
 				requestData
 			);
 
-			this.showSuccess(
-				this.translocoService.translate("saving_operations.password_changed_successfully", {
-					itemName: this.saveData?.operation?.itemName || "Password",
-				})
-			);
+			console.log({ response: response.data });
 
-			// Redirect after success
-			setTimeout(() => {
-				this.saveConfirmationService.clearSaveData();
-				this.router.navigate([this.redirectUrl]);
-			}, 2000);
+			if (response && response.data) {
+				this.showSuccess(
+					this.translocoService.translate("saving_operations.password_changed_successfully", {
+						itemName: this.saveData?.operation?.itemName || "Password",
+					})
+				);
+				// Redirect after success
+				setTimeout(() => {
+					this.saveConfirmationService.clearSaveData();
+					this.router.navigate([this.redirectUrl]);
+				}, 2000);
+			}
 		} catch (error) {
 			throw error;
 		}
@@ -331,6 +372,53 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				this.saveConfirmationService.clearSaveData();
 				this.router.navigate([this.redirectUrl]);
 			}, 2000);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Update profile
+	 */
+	private async updateProfile(profileData: any): Promise<void> {
+		try {
+			const requestData = {
+				...profileData,
+				// Don't override the email - let the backend handle it
+			};
+
+			const response = await this.httpWrapper.sendRequest("put", `${environment.apiUrl}${environment.endpoints.client.update}`, requestData);
+
+			if (response && response.data) {
+				// Update zelfAccount if provided
+				if (response.data.zelfAccount) {
+					localStorage.setItem("zelfAccount", JSON.stringify(response.data.zelfAccount));
+					// Update the auth service
+					this.authService.setSession({
+						zelfProof: response.data.zelfProof || this.authService.zelfProof,
+						zelfAccount: response.data.zelfAccount,
+					});
+				}
+
+				// Update zelfProof if provided
+				if (response.data.zelfProof) {
+					localStorage.setItem("zelfProof", response.data.zelfProof);
+				}
+
+				this.showSuccess(
+					this.translocoService.translate("saving_operations.updated_successfully", {
+						itemName: this.saveData?.operation?.itemName || "Profile",
+					})
+				);
+
+				// Redirect after success
+				setTimeout(() => {
+					this.saveConfirmationService.clearSaveData();
+					this.router.navigate([this.redirectUrl]);
+				}, 2000);
+			} else {
+				throw new Error("No response data received from server");
+			}
 		} catch (error) {
 			throw error;
 		}

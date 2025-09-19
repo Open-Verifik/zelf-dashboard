@@ -102,6 +102,12 @@
 			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tus preferencias de notificación",
 			"action": "actualizando",
 			"itemName": "preferencias de notificación"
+		},
+		"profile_update": {
+			"title": "Confirmar Actualización de Perfil",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu información de perfil",
+			"action": "actualizando",
+			"itemName": "perfil"
 		}
 	},
 	"save_confirmation": {
@@ -329,6 +335,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "Cargando perfil...",
+		"status": "ESTADO",
+		"menu": {
+			"profile": "Perfil",
+			"settings": "Configuración",
+			"license": "Licencia",
+			"support": "Soporte"
+		},
+		"information": {
+			"title": "Información del Perfil",
+			"name": "Nombre",
+			"name_placeholder": "Ingresa tu nombre",
+			"name_required": "El nombre es requerido",
+			"name_minlength": "El nombre debe tener al menos 2 caracteres",
+			"company": "Empresa",
+			"company_placeholder": "Ingresa tu empresa",
+			"company_required": "La empresa es requerida",
+			"email": "Correo electrónico",
+			"email_placeholder": "Ingresa tu correo electrónico",
+			"email_required": "El correo electrónico es requerido",
+			"email_invalid": "Por favor ingresa un correo electrónico válido",
+			"country": "País",
+			"country_required": "El país es requerido",
+			"phone": "Teléfono",
+			"phone_placeholder": "Ingresa tu número de teléfono",
+			"phone_required": "El número de teléfono es requerido",
+			"phone_invalid": "Por favor ingresa un número de teléfono válido"
+		},
+		"account": {
+			"title": "Información de la Cuenta",
+			"created_at": "Creado el",
+			"subscription": "Suscripción"
+		},
+		"edit": "Editar",
+		"save": "Guardar",
+		"cancel": "Cancelar",
+		"license": {
+			"title": "Detalles de la Licencia",
+			"type": "Tipo de Licencia",
+			"status": "Estado",
+			"created": "Creado",
+			"features": "Características",
+			"all_features": "Todas las Características",
+			"included_features": "Características Incluidas",
+			"feature_analytics": "Panel de Análisis Avanzado",
+			"feature_processing": "Procesamiento de Datos en Tiempo Real",
+			"feature_support": "Soporte Prioritario",
+			"feature_api": "Acceso a API",
+			"feature_integrations": "Integraciones Personalizadas",
+			"renew": "Renovar Licencia",
+			"download": "Descargar"
 		}
 	}
 }

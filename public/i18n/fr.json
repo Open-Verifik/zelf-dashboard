@@ -101,6 +101,12 @@
 			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos préférences de notification",
 			"action": "mise à jour",
 			"itemName": "préférences de notification"
+		},
+		"profile_update": {
+			"title": "Confirmer la mise à jour du profil",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos informations de profil",
+			"action": "mise à jour",
+			"itemName": "profil"
 		}
 	},
 	"save_confirmation": {
@@ -328,6 +334,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "Chargement du profil...",
+		"status": "STATUT",
+		"menu": {
+			"profile": "Profil",
+			"settings": "Paramètres",
+			"license": "Licence",
+			"support": "Support"
+		},
+		"information": {
+			"title": "Informations du Profil",
+			"name": "Nom",
+			"name_placeholder": "Entrez votre nom",
+			"name_required": "Le nom est requis",
+			"name_minlength": "Le nom doit contenir au moins 2 caractères",
+			"company": "Entreprise",
+			"company_placeholder": "Entrez votre entreprise",
+			"company_required": "L'entreprise est requise",
+			"email": "E-mail",
+			"email_placeholder": "Entrez votre e-mail",
+			"email_required": "L'e-mail est requis",
+			"email_invalid": "Veuillez entrer une adresse e-mail valide",
+			"country": "Pays",
+			"country_required": "Le pays est requis",
+			"phone": "Téléphone",
+			"phone_placeholder": "Entrez votre numéro de téléphone",
+			"phone_required": "Le numéro de téléphone est requis",
+			"phone_invalid": "Veuillez entrer un numéro de téléphone valide"
+		},
+		"account": {
+			"title": "Informations du Compte",
+			"created_at": "Créé le",
+			"subscription": "Abonnement"
+		},
+		"edit": "Modifier",
+		"save": "Enregistrer",
+		"cancel": "Annuler",
+		"license": {
+			"title": "Détails de la Licence",
+			"type": "Type de Licence",
+			"status": "Statut",
+			"created": "Créé",
+			"features": "Fonctionnalités",
+			"all_features": "Toutes les Fonctionnalités",
+			"included_features": "Fonctionnalités Incluses",
+			"feature_analytics": "Tableau de Bord Analytique Avancé",
+			"feature_processing": "Traitement de Données en Temps Réel",
+			"feature_support": "Support Prioritaire",
+			"feature_api": "Accès API",
+			"feature_integrations": "Intégrations Personnalisées",
+			"renew": "Renouveler la Licence",
+			"download": "Télécharger"
 		}
 	}
 }

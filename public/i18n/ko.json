@@ -102,6 +102,12 @@
 			"description": "알림 설정을 업데이트하려면 마스터 비밀번호를 입력해주세요",
 			"action": "업데이트 중",
 			"itemName": "알림 설정"
+		},
+		"profile_update": {
+			"title": "프로필 업데이트 확인",
+			"description": "프로필 정보를 업데이트하려면 마스터 비밀번호를 입력해주세요",
+			"action": "업데이트 중",
+			"itemName": "프로필"
 		}
 	},
 	"save_confirmation": {
@@ -329,6 +335,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "프로필 로딩 중...",
+		"status": "상태",
+		"menu": {
+			"profile": "프로필",
+			"settings": "설정",
+			"license": "라이선스",
+			"support": "지원"
+		},
+		"information": {
+			"title": "프로필 정보",
+			"name": "이름",
+			"name_placeholder": "이름을 입력하세요",
+			"name_required": "이름은 필수입니다",
+			"name_minlength": "이름은 최소 2자 이상이어야 합니다",
+			"company": "회사",
+			"company_placeholder": "회사명을 입력하세요",
+			"company_required": "회사명은 필수입니다",
+			"email": "이메일",
+			"email_placeholder": "이메일 주소를 입력하세요",
+			"email_required": "이메일 주소는 필수입니다",
+			"email_invalid": "유효한 이메일 주소를 입력하세요",
+			"country": "국가",
+			"country_required": "국가는 필수입니다",
+			"phone": "전화",
+			"phone_placeholder": "전화번호를 입력하세요",
+			"phone_required": "전화번호는 필수입니다",
+			"phone_invalid": "유효한 전화번호를 입력하세요"
+		},
+		"account": {
+			"title": "계정 정보",
+			"created_at": "생성일",
+			"subscription": "구독"
+		},
+		"edit": "편집",
+		"save": "저장",
+		"cancel": "취소",
+		"license": {
+			"title": "라이선스 세부사항",
+			"type": "라이선스 유형",
+			"status": "상태",
+			"created": "생성일",
+			"features": "기능",
+			"all_features": "모든 기능",
+			"included_features": "포함된 기능",
+			"feature_analytics": "고급 분석 대시보드",
+			"feature_processing": "실시간 데이터 처리",
+			"feature_support": "우선 지원",
+			"feature_api": "API 액세스",
+			"feature_integrations": "사용자 정의 통합",
+			"renew": "라이선스 갱신",
+			"download": "다운로드"
 		}
 	}
 }

@@ -117,6 +117,12 @@
 			"description": "Please enter your master password to proceed with updating your notification preferences",
 			"action": "updating",
 			"itemName": "notification preferences"
+		},
+		"profile_update": {
+			"title": "Confirm Profile Update",
+			"description": "Please enter your master password to proceed with updating your profile information",
+			"action": "updating",
+			"itemName": "profile"
 		}
 	},
 	"save_confirmation": {
@@ -344,6 +350,60 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		}
+	},
+	"profile": {
+		"loading": "Loading profile...",
+		"status": "STATUS",
+		"menu": {
+			"profile": "Profile",
+			"settings": "Settings",
+			"license": "License",
+			"support": "Support"
+		},
+		"information": {
+			"title": "Profile Information",
+			"name": "Name",
+			"name_placeholder": "Enter your name",
+			"name_required": "Name is required",
+			"name_minlength": "Name must be at least 2 characters",
+			"company": "Company",
+			"company_placeholder": "Enter your company",
+			"company_required": "Company is required",
+			"email": "Email",
+			"email_placeholder": "Enter your email",
+			"email_required": "Email is required",
+			"email_invalid": "Please enter a valid email address",
+			"country": "Country",
+			"country_required": "Country is required",
+			"phone": "Phone",
+			"phone_placeholder": "Enter your phone number",
+			"phone_required": "Phone number is required",
+			"phone_invalid": "Please enter a valid phone number"
+		},
+		"account": {
+			"title": "Account Information",
+			"created_at": "Created At",
+			"subscription": "Subscription"
+		},
+		"edit": "Edit",
+		"save": "Save",
+		"cancel": "Cancel",
+		"license": {
+			"title": "License Details",
+			"type": "License Type",
+			"status": "Status",
+			"created": "Created",
+			"features": "Features",
+			"all_features": "All Features",
+			"included_features": "Included Features",
+			"feature_analytics": "Advanced Analytics Dashboard",
+			"feature_processing": "Real-time Data Processing",
+			"feature_support": "Priority Support",
+			"feature_api": "API Access",
+			"feature_integrations": "Custom Integrations",
+			"renew": "Renew License",
+			"download": "Download"
 		}
 	}
 }

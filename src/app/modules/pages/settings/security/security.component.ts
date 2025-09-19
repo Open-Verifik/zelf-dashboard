@@ -70,10 +70,13 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 	 */
 	ngOnInit(): void {
 		// Create the form
-		this.securityForm = this._formBuilder.group({
-			currentPassword: ["", [Validators.required]],
-			newPassword: ["", [Validators.required, Validators.minLength(8)]],
-		});
+		this.securityForm = this._formBuilder.group(
+			{
+				newPassword: ["", [Validators.required, Validators.minLength(8)]],
+				confirmPassword: ["", [Validators.required]],
+			},
+			{ validators: this.passwordMatchValidator }
+		);
 
 		// Load JWT token from localStorage
 		this.loadJwtToken();
@@ -94,6 +97,24 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 	// -----------------------------------------------------------------------------------------------------
 	// @ Public methods
 	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Password match validator
+	 */
+	passwordMatchValidator(form: UntypedFormGroup) {
+		const newPassword = form.get("newPassword");
+		const confirmPassword = form.get("confirmPassword");
+
+		if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
+			confirmPassword.setErrors({ passwordMismatch: true });
+			return { passwordMismatch: true };
+		} else {
+			if (confirmPassword?.hasError("passwordMismatch")) {
+				confirmPassword.setErrors(null);
+			}
+			return null;
+		}
+	}
 
 	/**
 	 * Load JWT token from localStorage
@@ -171,8 +192,8 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 
 		// Create security data object
 		const securityData = {
-			currentPassword: formValue.currentPassword,
 			newPassword: formValue.newPassword,
+			confirmPassword: formValue.confirmPassword,
 			operation: "changePassword",
 			faceBase64: "", // Will be set during biometric verification
 			masterPassword: "", // Will be set during biometric verification
