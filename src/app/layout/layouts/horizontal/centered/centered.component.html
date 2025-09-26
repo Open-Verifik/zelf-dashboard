@@ -49,6 +49,16 @@
 				<languages></languages>
 				<!-- <fuse-fullscreen class="hidden md:block"></fuse-fullscreen> -->
 				<search [appearance]="'bar'"></search>
+				<!-- Documentation Button -->
+				<button
+					mat-icon-button
+					class="hidden md:block"
+					(click)="openDocumentation()"
+					matTooltip="API Documentation"
+					matTooltipPosition="below"
+				>
+					<mat-icon>description</mat-icon>
+				</button>
 				<!-- <shortcuts></shortcuts> -->
 				<!-- <messages></messages> -->
 				<!-- <notifications></notifications> -->

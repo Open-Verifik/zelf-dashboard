@@ -21,6 +21,17 @@
 					</mat-select>
 				</mat-form-field>
 
+				<!-- Storage Filter Dropdown -->
+				<mat-form-field appearance="outline" class="storage-filter-field">
+					<mat-label>Storage</mat-label>
+					<mat-select [(ngModel)]="selectedStorage" name="storage" (selectionChange)="onStorageChange()">
+						<mat-option value="all">All Storage</mat-option>
+						<mat-option *ngFor="let storage of availableStorage" [value]="storage">
+							{{ storage }}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+
 				<!-- Search Type Dropdown -->
 				<mat-form-field appearance="outline" class="search-type-field">
 					<mat-label>Filter by</mat-label>
@@ -39,7 +50,8 @@
 				<mat-form-field appearance="outline" class="search-input-field">
 					<mat-label>Search tags...</mat-label>
 					<input matInput [(ngModel)]="searchQuery" (input)="onSearchChange()" placeholder="Enter search term" />
-					<mat-icon matSuffix>search</mat-icon>
+					<mat-icon matSuffix *ngIf="!isSearching">search</mat-icon>
+					<mat-icon matSuffix *ngIf="isSearching" class="animate-spin">hourglass_empty</mat-icon>
 				</mat-form-field>
 
 				<!-- Clear Filters Button -->
@@ -52,12 +64,16 @@
 			<div class="active-filters" *ngIf="hasActiveFilters()">
 				<span class="filters-label">Active filters:</span>
 				<div class="filter-chips">
-					<mat-chip *ngIf="searchType !== 'all'" class="filter-chip" (click)="removeSearchTypeFilter()">
-						{{ getSearchTypeLabel() }}
-						<mat-icon matChipRemove>close</mat-icon>
-					</mat-chip>
 					<mat-chip *ngIf="selectedDomain !== 'all'" class="filter-chip" (click)="removeDomainFilter()">
 						{{ selectedDomain }}
+						<mat-icon matChipRemove>close</mat-icon>
+					</mat-chip>
+					<mat-chip *ngIf="selectedStorage !== 'all'" class="filter-chip" (click)="removeStorageFilter()">
+						{{ selectedStorage }}
+						<mat-icon matChipRemove>close</mat-icon>
+					</mat-chip>
+					<mat-chip *ngIf="searchType !== 'all'" class="filter-chip" (click)="removeSearchTypeFilter()">
+						{{ getSearchTypeLabel() }}
 						<mat-icon matChipRemove>close</mat-icon>
 					</mat-chip>
 					<mat-chip *ngIf="searchQuery" class="filter-chip" (click)="clearSearchQuery()">
@@ -68,8 +84,47 @@
 			</div>
 		</div>
 
+		<!-- Purchase Message -->
+		<div class="purchase-message" *ngIf="showPurchaseMessage && purchaseData">
+			<div class="purchase-card">
+				<div class="purchase-header">
+					<mat-icon class="purchase-icon">shopping_cart</mat-icon>
+					<h2>Tag Available for Purchase</h2>
+				</div>
+				<div class="purchase-content">
+					<div class="tag-info">
+						<span class="tag-name">{{ purchaseData.tagName }}</span>
+						<span class="domain-badge">{{ selectedDomain }}</span>
+					</div>
+					<div class="price-info">
+						<div class="price-main">
+							<span class="price">${{ purchaseData.price.price }}</span>
+							<span class="currency">{{ purchaseData.price.currency }}</span>
+						</div>
+						<div class="price-details" *ngIf="purchaseData.price.discount > 0">
+							<span class="original-price">${{ purchaseData.price.priceWithoutDiscount }}</span>
+							<span class="discount">{{ purchaseData.price.discount }}% OFF</span>
+						</div>
+						<div class="reward-info">
+							<span class="reward">+${{ purchaseData.price.reward }} reward</span>
+						</div>
+					</div>
+					<div class="purchase-actions">
+						<button mat-raised-button color="primary" class="purchase-btn">
+							<mat-icon>shopping_cart</mat-icon>
+							Purchase Tag
+						</button>
+						<button mat-stroked-button class="cancel-btn" (click)="clearSearchQuery()">
+							<mat-icon>close</mat-icon>
+							Cancel
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Table Container -->
-		<div class="tags-container">
+		<div class="tags-container" *ngIf="!showPurchaseMessage">
 			<div class="table-container">
 				<table mat-table [dataSource]="dataSource" class="mat-mdc-table">
 					<!-- Name Column -->

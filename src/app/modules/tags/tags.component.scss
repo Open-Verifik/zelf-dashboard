@@ -194,6 +194,12 @@
 			}
 		}
 
+		.storage-filter-field {
+			.mat-mdc-form-field {
+				width: 130px;
+			}
+		}
+
 		.search-type-field {
 			.mat-mdc-form-field {
 				width: 160px;
@@ -524,5 +530,182 @@
 
 	.mat-mdc-dialog-surface {
 		border-radius: 12px !important;
+	}
+}
+
+// Spinning animation for search loading indicator
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// Purchase Message styles
+.purchase-message {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 400px;
+	padding: 24px;
+
+	.purchase-card {
+		background: white;
+		border-radius: 16px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		padding: 32px;
+		max-width: 500px;
+		width: 100%;
+		text-align: center;
+
+		.purchase-header {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+			margin-bottom: 24px;
+
+			.purchase-icon {
+				font-size: 32px;
+				width: 32px;
+				height: 32px;
+				color: #4caf50;
+			}
+
+			h2 {
+				margin: 0;
+				font-size: 24px;
+				font-weight: 600;
+				color: #1f2937;
+			}
+		}
+
+		.purchase-content {
+			.tag-info {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 12px;
+				margin-bottom: 24px;
+
+				.tag-name {
+					font-size: 20px;
+					font-weight: 600;
+					color: #1f2937;
+				}
+
+				.domain-badge {
+					background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+					color: white;
+					padding: 4px 12px;
+					border-radius: 20px;
+					font-size: 12px;
+					font-weight: 500;
+					text-transform: uppercase;
+				}
+			}
+
+			.price-info {
+				background: #f8fafc;
+				border-radius: 12px;
+				padding: 20px;
+				margin-bottom: 24px;
+
+				.price-main {
+					display: flex;
+					align-items: baseline;
+					justify-content: center;
+					gap: 8px;
+					margin-bottom: 8px;
+
+					.price {
+						font-size: 36px;
+						font-weight: 700;
+						color: #1f2937;
+					}
+
+					.currency {
+						font-size: 18px;
+						color: #6b7280;
+						font-weight: 500;
+					}
+				}
+
+				.price-details {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: 12px;
+					margin-bottom: 8px;
+
+					.original-price {
+						font-size: 16px;
+						color: #9ca3af;
+						text-decoration: line-through;
+					}
+
+					.discount {
+						background: #ef4444;
+						color: white;
+						padding: 2px 8px;
+						border-radius: 12px;
+						font-size: 12px;
+						font-weight: 600;
+					}
+				}
+
+				.reward-info {
+					.reward {
+						font-size: 14px;
+						color: #059669;
+						font-weight: 500;
+					}
+				}
+			}
+
+			.purchase-actions {
+				display: flex;
+				gap: 12px;
+				justify-content: center;
+
+				.purchase-btn {
+					background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+					color: white;
+					font-weight: 600;
+					padding: 12px 24px;
+					border-radius: 8px;
+					box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+
+					&:hover {
+						background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+						box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+					}
+
+					mat-icon {
+						margin-right: 8px;
+					}
+				}
+
+				.cancel-btn {
+					color: #6b7280;
+					border-color: #d1d5db;
+
+					&:hover {
+						background: #f9fafb;
+						border-color: #9ca3af;
+					}
+
+					mat-icon {
+						margin-right: 8px;
+					}
+				}
+			}
+		}
 	}
 }

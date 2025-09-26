@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { FuseLoadingBarComponent } from "@fuse/components/loading-bar";
 import { FuseHorizontalNavigationComponent, FuseNavigationService, FuseVerticalNavigationComponent } from "@fuse/components/navigation";
@@ -24,6 +25,7 @@ import { Subject, takeUntil } from "rxjs";
 		FuseHorizontalNavigationComponent,
 		MatButtonModule,
 		MatIconModule,
+		MatTooltipModule,
 		LanguagesComponent,
 		SearchComponent,
 		ThemeToggleComponent,
@@ -122,5 +124,13 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 			this.currentScheme === "dark" || (this.currentScheme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 		return isDarkMode ? "images/logo/logo-text-on-dark.svg" : "images/logo/logo-text.svg";
+	}
+
+	/**
+	 * Open API documentation in a new tab
+	 */
+	openDocumentation(): void {
+		// Open the Docusaurus documentation site in a new tab
+		window.open("http://localhost:3000", "_blank");
 	}
 }

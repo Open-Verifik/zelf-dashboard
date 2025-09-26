@@ -1,6 +1,6 @@
 export const environment = {
 	production: true,
-	apiUrl: "https://api.zelf.com/api",
+	apiUrl: "https://v3.zelf.world",
 	appName: "Zelf Dashboard",
 	version: "1.0.0",
 	debug: false,
