@@ -16,6 +16,8 @@ import { Router } from "@angular/router";
 import { License, LicenseData, DomainConfig } from "./license.class";
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
+import { LicenseService } from "./license.service";
+import { HttpWrapperService } from "../../../../http-wrapper.service";
 @Component({
 	selector: "settings-license",
 	templateUrl: "./license.component.html",
@@ -95,7 +97,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		private _router: Router,
 		private _saveConfirmationService: SaveConfirmationService,
 		private _translocoService: TranslocoService,
-		private _cdr: ChangeDetectorRef
+		private _cdr: ChangeDetectorRef,
+		private _licenseService: LicenseService,
+		private _httpWrapper: HttpWrapperService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -108,6 +112,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	ngOnInit(): void {
 		// Initialize arrays first
 		this.initializeWhitelistItems();
+
 		this.initializePricingTable();
 
 		// Create empty form to prevent template errors
@@ -118,8 +123,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * After view init - load license data and populate form
 	 */
 	ngAfterViewInit(): void {
-		this.loadCurrentLicense();
-		this.populateFormFromLicense();
+		this.loadLicense().then(() => {
+			this.populateFormFromLicense();
+		});
 	}
 
 	/**
@@ -129,7 +135,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		this.accountForm = this._formBuilder.group({
 			// Basic Information
 			domain: ["", [Validators.required, Validators.pattern(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/)]],
-			type: ["custom", Validators.required],
 			status: ["active", Validators.required],
 			owner: ["zelf-team", Validators.required],
 			description: ["Official Zelf domain", Validators.required],
@@ -354,7 +359,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		// Check basic domain info
 		if (this.currentLicense.domain !== newDomain) return true;
 		if (currentConfig.name !== newDomain) return true;
-		if (currentConfig.type !== formValue.type) return true;
 		if (currentConfig.holdSuffix !== formValue.holdSuffix) return true;
 		if (currentConfig.status !== formValue.status) return true;
 		if (currentConfig.owner !== formValue.owner) return true;
@@ -426,7 +430,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		// Check basic domain info
 		if (this.currentLicense.domain !== newDomain) changes.push(`Domain: ${this.currentLicense.domain} → ${newDomain}`);
 		if (currentConfig.name !== newDomain) changes.push(`Name: ${currentConfig.name} → ${newDomain}`);
-		if (currentConfig.type !== formValue.type) changes.push(`Type: ${currentConfig.type} → ${formValue.type}`);
 		if (currentConfig.holdSuffix !== formValue.holdSuffix) changes.push(`Hold Suffix: ${currentConfig.holdSuffix} → ${formValue.holdSuffix}`);
 		if (currentConfig.status !== formValue.status) changes.push(`Status: ${currentConfig.status} → ${formValue.status}`);
 		if (currentConfig.owner !== formValue.owner) changes.push(`Owner: ${currentConfig.owner} → ${formValue.owner}`);
@@ -530,7 +533,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		return {
 			name: formValue.domain,
-			type: formValue.type,
 			holdSuffix: formValue.holdSuffix,
 			status: formValue.status,
 			owner: formValue.owner,
@@ -600,6 +602,55 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	}
 
 	/**
+	 * Fetch license from backend API
+	 */
+	async fetchLicenseFromBackend(): Promise<void> {
+		try {
+			this.isLoading = true;
+
+			this._cdr.detectChanges();
+
+			const response = await this._licenseService.getMyLicense(true);
+
+			if (!response || !response.data || !response.data.myLicense) {
+				console.log("No license found for current user");
+				return;
+			}
+
+			// Convert API response to License object
+			console.log("response", response.data);
+
+			this.currentLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
+
+			// Save to localStorage
+			localStorage.setItem("license", JSON.stringify(this.currentLicense.toJSON()));
+
+			console.log("License fetched from backend and saved to localStorage");
+		} catch (error) {
+			console.error("Error fetching license from backend:", error);
+			this.showAlert = true;
+			this.alertMessage = "Failed to fetch license from server";
+			this.alertType = "error";
+		} finally {
+			this.isLoading = false;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Load license from localStorage or fetch from backend if not found
+	 */
+	async loadLicense(): Promise<void> {
+		// First try to load from localStorage
+		this.loadCurrentLicense();
+
+		// If no license in localStorage, fetch from backend
+		if (!this.currentLicense?.domain) {
+			await this.fetchLicenseFromBackend();
+		}
+	}
+
+	/**
 	 * Populate form from license data
 	 */
 	populateFormFromLicense(): void {
@@ -608,7 +659,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (config) {
 			// Set values individually for better control
 			this.accountForm.get("domain")?.setValue(config.name || "");
-			this.accountForm.get("type")?.setValue(this.currentLicense?.type || config.type || "custom");
 			this.accountForm.get("status")?.setValue(config.status || "active");
 			this.accountForm.get("owner")?.setValue(config.owner || "zelf-team");
 			this.accountForm.get("description")?.setValue(config.description || "Official Zelf domain");

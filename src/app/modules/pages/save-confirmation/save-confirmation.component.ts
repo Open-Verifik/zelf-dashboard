@@ -194,7 +194,9 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	private async handleLicenseOperation(biometricData: BiometricData): Promise<void> {
 		if (!this.saveData?.license) {
 			this.showError("No license data available");
+
 			this.isLoading = false;
+
 			return;
 		}
 

@@ -16,6 +16,7 @@ import { DetailsModalComponent } from "./details-modal.component";
 import { EditModalComponent } from "./edit-modal.component";
 import { TagsService, TagSearchParams, DomainSearchParams } from "./tags.service";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
+import { License } from "../pages/settings/license/license.class";
 
 // Interfaces
 export interface TagRecord {
@@ -92,7 +93,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 	selectedDomain: string = "all";
 	selectedStorage: string = "all";
 	searchQuery: string = "";
-	availableDomains: string[] = ["avax", "eth", "btc", "sol"];
+	license: License;
 	availableStorage: string[] = ["IPFS", "Arweave", "Walrus", "NFT"];
 
 	// Debounced search properties
@@ -111,6 +112,14 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 		this.updateVisiblePages();
+
+		// get the license from the localStorage
+		const license = localStorage.getItem("license");
+		if (license) {
+			const licenseData = JSON.parse(license);
+
+			this.selectedDomain = licenseData.domain;
+		}
 
 		// Set up debounced search
 		this.searchSubject

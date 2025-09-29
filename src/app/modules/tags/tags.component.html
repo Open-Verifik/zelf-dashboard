@@ -10,17 +10,6 @@
 		<!-- Search and Filter Bar -->
 		<div class="search-filter-container">
 			<div class="search-controls">
-				<!-- Domain Filter Dropdown -->
-				<mat-form-field appearance="outline" class="domain-filter-field">
-					<mat-label>Domain</mat-label>
-					<mat-select [(ngModel)]="selectedDomain" name="domain" (selectionChange)="onDomainChange()">
-						<mat-option value="all">All Domains</mat-option>
-						<mat-option *ngFor="let domain of availableDomains" [value]="domain">
-							{{ domain }}
-						</mat-option>
-					</mat-select>
-				</mat-form-field>
-
 				<!-- Storage Filter Dropdown -->
 				<mat-form-field appearance="outline" class="storage-filter-field">
 					<mat-label>Storage</mat-label>

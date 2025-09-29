@@ -47,7 +47,7 @@ export interface IPFSData {
 
 export interface DomainConfig {
 	name: string;
-	type: "official" | "custom" | "community" | "enterprise";
+	type?: "official" | "custom" | "community" | "enterprise";
 	holdSuffix: string;
 	status: "active" | "inactive" | "maintenance" | "beta";
 	owner: string;
