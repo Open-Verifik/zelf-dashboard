@@ -24,6 +24,7 @@ export interface ZelfAccount {
 	ipfs_pin_hash: string;
 	size: number;
 	user_id: string;
+	created_at: string;
 	date_pinned: string;
 	date_unpinned: string | null;
 	publicData: ZelfAccountMetadata;
@@ -63,7 +64,7 @@ export class ZelfUser {
 		this.zelfProof = metadata.accountZelfProof || "";
 		this.type = metadata.accountType || "client_account";
 		this.name = metadata.name || this.extractNameFromEmail(this.email);
-		this.createdAt = zelfAccount.date_pinned;
+		this.createdAt = zelfAccount.date_pinned || zelfAccount.created_at;
 		this.ipfsHash = zelfAccount.ipfs_pin_hash;
 		this.userId = zelfAccount.user_id;
 	}

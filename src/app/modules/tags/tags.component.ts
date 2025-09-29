@@ -16,7 +16,8 @@ import { DetailsModalComponent } from "./details-modal.component";
 import { EditModalComponent } from "./edit-modal.component";
 import { TagsService, TagSearchParams, DomainSearchParams } from "./tags.service";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
-import { License } from "../pages/settings/license/license.class";
+import { DomainConfig, License } from "../pages/settings/license/license.class";
+import { LicenseService } from "../pages/settings/license/license.service";
 
 // Interfaces
 export interface TagRecord {
@@ -104,22 +105,18 @@ export class TagsComponent implements OnInit, OnDestroy {
 	// Purchase message properties
 	showPurchaseMessage: boolean = false;
 	purchaseData: PurchaseData | null = null;
+	licenseData: DomainConfig | null = null;
 
 	constructor(
 		private dialog: MatDialog,
-		private tagsService: TagsService
+		private tagsService: TagsService,
+		private _licenseService: LicenseService
 	) {}
 
 	ngOnInit(): void {
 		this.updateVisiblePages();
 
-		// get the license from the localStorage
-		const license = localStorage.getItem("license");
-		if (license) {
-			const licenseData = JSON.parse(license);
-
-			this.selectedDomain = licenseData.domain;
-		}
+		this._getMyLicense();
 
 		// Set up debounced search
 		this.searchSubject
@@ -135,6 +132,27 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 		// Load initial data from API
 		this.performSearch();
+	}
+
+	async _getMyLicense(): Promise<void> {
+		// get the license from the localStorage
+		const license = localStorage.getItem("license");
+
+		if (license) {
+			const licenseData = JSON.parse(license);
+
+			this.selectedDomain = licenseData.domain;
+
+			return;
+		}
+
+		this._licenseService.getMyLicense(true).then((response) => {
+			if (response.data.myLicense) {
+				this.selectedDomain = response.data.myLicense.domainConfig.domain;
+				localStorage.setItem("license", JSON.stringify(response.data.myLicense.domainConfig));
+				this.licenseData = response.data.myLicense.domainConfig;
+			}
+		});
 	}
 
 	ngOnDestroy(): void {

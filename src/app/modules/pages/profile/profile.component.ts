@@ -94,8 +94,6 @@ export class ProfileComponent implements OnInit {
 		try {
 			const zelfAccount = this._authService.zelfAccount;
 
-			console.log({ zelfAccount });
-
 			if (zelfAccount) {
 				this.user = new ZelfUser(zelfAccount);
 				this.populateForm();

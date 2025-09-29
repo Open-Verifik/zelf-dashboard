@@ -1,5 +1,5 @@
 import { BooleanInput } from "@angular/cdk/coercion";
-import { NgClass } from "@angular/common";
+import { CommonModule, NgClass } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDividerModule } from "@angular/material/divider";
@@ -7,7 +7,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { Router, RouterLink } from "@angular/router";
 import { UserService } from "app/core/user/user.service";
-import { User } from "app/core/user/user.types";
+import { User, ZelfUser } from "app/core/user/user.types";
 import { Subject, takeUntil } from "rxjs";
 
 @Component({
@@ -16,7 +16,7 @@ import { Subject, takeUntil } from "rxjs";
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	exportAs: "user",
-	imports: [MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink],
+	imports: [CommonModule, MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink],
 })
 export class UserComponent implements OnInit, OnDestroy {
 	/* eslint-disable @typescript-eslint/naming-convention */
@@ -46,12 +46,15 @@ export class UserComponent implements OnInit, OnDestroy {
 	 */
 	ngOnInit(): void {
 		// Subscribe to user changes
-		this._userService.user$.pipe(takeUntil(this._unsubscribeAll)).subscribe((user: User) => {
-			this.user = user;
+		const zelfAccount = localStorage.getItem("zelfAccount");
 
-			// Mark for check
-			this._changeDetectorRef.markForCheck();
-		});
+		if (zelfAccount) {
+			const _zelfAccount = JSON.parse(zelfAccount);
+
+			this.user = new ZelfUser(_zelfAccount);
+		}
+
+		console.log("user", this.user);
 	}
 
 	/**

@@ -262,7 +262,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 */
 	private async loadApiKey(securityData: any): Promise<void> {
 		try {
-			// Get account information from zelfAccount
 			const zelfAccount = this.authService.zelfAccount;
 			const accountEmail = zelfAccount?.publicData?.accountEmail;
 
