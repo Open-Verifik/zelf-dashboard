@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation, inject, HostListener } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -14,13 +15,14 @@ import { AuthService } from "app/core/auth/auth.service";
 import { DataBiometricsComponent, BiometricData } from "../biometric-verification/biometric-verification.component";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
-
+import { environment } from "environments/environment";
 @Component({
 	selector: "auth-sign-up",
 	templateUrl: "./sign-up.component.html",
 	encapsulation: ViewEncapsulation.None,
 	animations: fuseAnimations,
 	imports: [
+		CommonModule,
 		RouterLink,
 		FuseAlertComponent,
 		FormsModule,
@@ -39,6 +41,8 @@ import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
 export class AuthSignUpComponent implements OnInit {
 	@ViewChild("signUpNgForm") signUpNgForm: NgForm;
 	@ViewChild("biometricVerification") biometricVerification: DataBiometricsComponent;
+
+	production: boolean;
 
 	alert: { type: FuseAlertType; message: string } = {
 		type: "success",
@@ -170,6 +174,9 @@ export class AuthSignUpComponent implements OnInit {
 	 * On init
 	 */
 	ngOnInit(): void {
+		this.production = environment.production;
+
+		console.log("production", this.production);
 		// Create the form
 		this.signUpForm = this._formBuilder.group({
 			name: ["", Validators.required],
