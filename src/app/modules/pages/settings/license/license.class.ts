@@ -20,7 +20,7 @@ export interface LicenseData {
 	expiresAt?: string;
 	subscriptionId?: string;
 	previousDomain?: string;
-	type?: "official" | "custom" | "community" | "enterprise";
+	type?: "official" | "custom" | "zelfBasic" | "zelfStartUp" | "zelfGold" | "zelfBusiness" | "zelfEnterprise";
 }
 
 export interface IPFSData {
@@ -47,7 +47,7 @@ export interface IPFSData {
 
 export interface DomainConfig {
 	name: string;
-	type?: "official" | "custom" | "community" | "enterprise";
+	type?: "official" | "custom" | "zelfBasic" | "zelfStartUp" | "zelfGold" | "zelfBusiness" | "zelfEnterprise"; // Optional - only set during license purchasing
 	holdSuffix: string;
 	status: "active" | "inactive" | "maintenance" | "beta";
 	owner: string;
@@ -71,6 +71,14 @@ export interface DomainConfig {
 			whitelist: { [key: string]: string };
 			pricingTable: { [key: string]: { [key: string]: number } };
 		};
+		storage: {
+			// Moved storage inside tags
+			keyPrefix: string;
+			ipfsEnabled: boolean;
+			arweaveEnabled: boolean;
+			walrusEnabled: boolean;
+			backupEnabled?: boolean;
+		};
 	};
 	zelfkeys: {
 		plans: any[];
@@ -78,22 +86,23 @@ export interface DomainConfig {
 			whitelist: { [key: string]: string };
 			pricingTable: { [key: string]: { [key: string]: number } };
 		};
+		storage: {
+			// Moved storage inside zelfkeys
+			keyPrefix: string;
+			ipfsEnabled: boolean;
+			arweaveEnabled: boolean;
+			walrusEnabled: boolean;
+			backupEnabled?: boolean;
+		};
 	};
-	storage: {
-		keyPrefix: string;
-		ipfsEnabled: boolean;
-		arweaveEnabled: boolean;
-		walrusEnabled: boolean;
-		backupEnabled?: boolean;
-	};
-	stripe: {
+	stripe?: {
 		productId: string;
 		priceId: string;
 		latestInvoiceId: string;
 		amountPaid: number;
 		paidAt: string;
 	};
-	limits: {
+	limits?: {
 		tags: number;
 		zelfkeys: number;
 		zelfProofs?: number;
@@ -160,7 +169,7 @@ export class License {
 	public expiresAt?: string;
 	public subscriptionId?: string;
 	public previousDomain?: string;
-	public type?: "official" | "custom" | "community" | "enterprise";
+	public type?: "official" | "custom" | "zelfBasic" | "zelfStartUp" | "zelfGold" | "zelfBusiness" | "zelfEnterprise";
 
 	constructor(licenseData: LicenseData) {
 		this.domain = licenseData.domain || "";
@@ -213,6 +222,14 @@ export class License {
 					whitelist: configData?.tags?.payment?.whitelist || {},
 					pricingTable: configData?.tags?.payment?.pricingTable || this.getDefaultPricingTable(),
 				},
+				storage: {
+					// Moved storage inside tags
+					keyPrefix: configData?.tags?.storage?.keyPrefix || "tagName",
+					ipfsEnabled: configData?.tags?.storage?.ipfsEnabled || true,
+					arweaveEnabled: configData?.tags?.storage?.arweaveEnabled || true,
+					walrusEnabled: configData?.tags?.storage?.walrusEnabled || true,
+					backupEnabled: configData?.tags?.storage?.backupEnabled || false,
+				},
 			},
 			zelfkeys: {
 				plans: configData?.zelfkeys?.plans || [],
@@ -220,13 +237,14 @@ export class License {
 					whitelist: configData?.zelfkeys?.payment?.whitelist || {},
 					pricingTable: configData?.zelfkeys?.payment?.pricingTable || {},
 				},
-			},
-			storage: {
-				keyPrefix: configData?.storage?.keyPrefix || "tagName",
-				ipfsEnabled: configData?.storage?.ipfsEnabled || true,
-				arweaveEnabled: configData?.storage?.arweaveEnabled || true,
-				walrusEnabled: configData?.storage?.walrusEnabled || true,
-				backupEnabled: configData?.storage?.backupEnabled || false,
+				storage: {
+					// Moved storage inside zelfkeys
+					keyPrefix: configData?.zelfkeys?.storage?.keyPrefix || "tagName",
+					ipfsEnabled: configData?.zelfkeys?.storage?.ipfsEnabled || true,
+					arweaveEnabled: configData?.zelfkeys?.storage?.arweaveEnabled || true,
+					walrusEnabled: configData?.zelfkeys?.storage?.walrusEnabled || true,
+					backupEnabled: configData?.zelfkeys?.storage?.backupEnabled || false,
+				},
 			},
 			stripe: {
 				productId: configData?.stripe?.productId || "",
@@ -344,7 +362,7 @@ export class License {
 	/**
 	 * Get license type
 	 */
-	getLicenseType(): "official" | "custom" | "community" | "enterprise" | undefined {
+	getLicenseType(): "official" | "custom" | "zelfBasic" | "zelfStartUp" | "zelfGold" | "zelfBusiness" | "zelfEnterprise" | undefined {
 		return this.type || this.domainConfig.type;
 	}
 
@@ -502,10 +520,17 @@ export class License {
 	}
 
 	/**
-	 * Get storage configuration
+	 * Get storage configuration for tags
 	 */
 	getStorageConfig(): StorageConfig {
-		return this.domainConfig.storage;
+		return this.domainConfig.tags.storage;
+	}
+
+	/**
+	 * Get storage configuration for zelfkeys
+	 */
+	getZelfkeysStorageConfig(): StorageConfig {
+		return this.domainConfig.zelfkeys.storage;
 	}
 
 	/**
@@ -584,7 +609,6 @@ export class License {
 				endDate: data.endDate,
 				tags: data.tags,
 				zelfkeys: data.zelfkeys,
-				storage: data.storage,
 				stripe: data.stripe,
 				limits: data.limits,
 				metadata: data.metadata,
@@ -642,6 +666,14 @@ export class License {
 						whitelist: {},
 						pricingTable: {},
 					},
+					storage: {
+						// Moved storage inside tags
+						keyPrefix: "tagName",
+						ipfsEnabled: true,
+						arweaveEnabled: true,
+						walrusEnabled: true,
+						backupEnabled: false,
+					},
 				},
 				zelfkeys: {
 					plans: [],
@@ -649,13 +681,14 @@ export class License {
 						whitelist: {},
 						pricingTable: {},
 					},
-				},
-				storage: {
-					keyPrefix: "tagName",
-					ipfsEnabled: true,
-					arweaveEnabled: true,
-					walrusEnabled: true,
-					backupEnabled: false,
+					storage: {
+						// Moved storage inside zelfkeys
+						keyPrefix: "tagName",
+						ipfsEnabled: true,
+						arweaveEnabled: true,
+						walrusEnabled: true,
+						backupEnabled: false,
+					},
 				},
 				stripe: {
 					productId: "",

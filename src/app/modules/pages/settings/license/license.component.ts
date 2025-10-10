@@ -53,9 +53,12 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 	// Domain configuration arrays
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
-	supportedCurrencies: string[] = ["USD", "BTC", "ETH", "SOL"];
+	supportedCurrencies: string[] = ["BTC", "ETH", "SOL", "USDC", "USDT", "BDAG", "AVAX", "ZNS"];
 	whitelistItems: any[] = [];
 	pricingTableRows: any[] = [];
+
+	// Validation constants
+	private readonly ALLOWED_CURRENCIES = ["BTC", "ETH", "SOL", "USDC", "USDT", "BDAG", "AVAX", "ZNS"];
 
 	// Zelfkeys configuration
 	zelfkeysPlans: any[] = [];
@@ -138,8 +141,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		this.accountForm = this._formBuilder.group({
 			// Basic Information
 			domain: ["", [Validators.required, Validators.pattern(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/)]],
-			domainType: ["custom", Validators.required],
-			status: ["active", Validators.required],
+			status: [{ value: "active", disabled: true }],
 			owner: ["zelf-team", Validators.required],
 			description: ["Official Zelf domain", Validators.required],
 
@@ -244,8 +246,12 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * Add currency
 	 */
 	addCurrency(currency: string): void {
-		if (currency && currency.trim() && !this.supportedCurrencies.includes(currency.trim().toUpperCase())) {
-			this.supportedCurrencies.push(currency.trim().toUpperCase());
+		const trimmedCurrency = currency.trim().toUpperCase();
+		if (trimmedCurrency && this.ALLOWED_CURRENCIES.includes(trimmedCurrency) && !this.supportedCurrencies.includes(trimmedCurrency)) {
+			this.supportedCurrencies.push(trimmedCurrency);
+		} else if (trimmedCurrency && !this.ALLOWED_CURRENCIES.includes(trimmedCurrency)) {
+			// Show error for invalid currency
+			this.showError(`Currency "${trimmedCurrency}" is not supported. Allowed currencies: ${this.ALLOWED_CURRENCIES.join(", ")}`);
 		}
 	}
 
@@ -257,6 +263,50 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (index > -1) {
 			this.supportedCurrencies.splice(index, 1);
 		}
+	}
+
+	/**
+	 * Toggle currency selection
+	 */
+	toggleCurrency(currency: string): void {
+		if (this.supportedCurrencies.includes(currency)) {
+			this.removeCurrency(currency);
+		} else {
+			this.supportedCurrencies.push(currency);
+		}
+	}
+
+	/**
+	 * Toggle payment method selection
+	 */
+	togglePaymentMethod(method: string): void {
+		const currentMethods = this.getPaymentMethods();
+		if (currentMethods.includes(method)) {
+			// Remove method
+			if (method === "coinbase") {
+				this.accountForm.get("coinbaseEnabled")?.setValue(false);
+			} else if (method === "crypto") {
+				this.accountForm.get("cryptoEnabled")?.setValue(false);
+			} else if (method === "stripe") {
+				this.accountForm.get("stripeEnabled")?.setValue(false);
+			}
+		} else {
+			// Add method
+			if (method === "coinbase") {
+				this.accountForm.get("coinbaseEnabled")?.setValue(true);
+			} else if (method === "crypto") {
+				this.accountForm.get("cryptoEnabled")?.setValue(true);
+			} else if (method === "stripe") {
+				this.accountForm.get("stripeEnabled")?.setValue(true);
+			}
+		}
+	}
+
+	/**
+	 * Check if payment method is enabled
+	 */
+	isPaymentMethodEnabled(method: string): boolean {
+		return this.getPaymentMethods().includes(method);
 	}
 
 	/**
@@ -381,10 +431,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.tags?.maxLength !== formValue.maxLength) return true;
 
 		// Check storage settings
-		if (currentConfig.storage?.keyPrefix !== formValue.keyPrefix) return true;
-		if (currentConfig.storage?.ipfsEnabled !== formValue.ipfsEnabled) return true;
-		if (currentConfig.storage?.arweaveEnabled !== formValue.arweaveEnabled) return true;
-		if (currentConfig.storage?.walrusEnabled !== formValue.walrusEnabled) return true;
+		if (currentConfig.tags?.storage?.keyPrefix !== formValue.keyPrefix) return true;
+		if (currentConfig.tags?.storage?.ipfsEnabled !== formValue.ipfsEnabled) return true;
+		if (currentConfig.tags?.storage?.arweaveEnabled !== formValue.arweaveEnabled) return true;
+		if (currentConfig.tags?.storage?.walrusEnabled !== formValue.walrusEnabled) return true;
 
 		// Check payment methods
 		const currentMethods = currentConfig.tags?.payment?.methods || [];
@@ -453,14 +503,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			changes.push(`Max Length: ${currentConfig.tags?.maxLength} → ${formValue.maxLength}`);
 
 		// Check storage settings
-		if (currentConfig.storage?.keyPrefix !== formValue.keyPrefix)
-			changes.push(`Key Prefix: ${currentConfig.storage?.keyPrefix} → ${formValue.keyPrefix}`);
-		if (currentConfig.storage?.ipfsEnabled !== formValue.ipfsEnabled)
-			changes.push(`IPFS Enabled: ${currentConfig.storage?.ipfsEnabled} → ${formValue.ipfsEnabled}`);
-		if (currentConfig.storage?.arweaveEnabled !== formValue.arweaveEnabled)
-			changes.push(`Arweave Enabled: ${currentConfig.storage?.arweaveEnabled} → ${formValue.arweaveEnabled}`);
-		if (currentConfig.storage?.walrusEnabled !== formValue.walrusEnabled)
-			changes.push(`Walrus Enabled: ${currentConfig.storage?.walrusEnabled} → ${formValue.walrusEnabled}`);
+		if (currentConfig.tags?.storage?.keyPrefix !== formValue.keyPrefix)
+			changes.push(`Key Prefix: ${currentConfig.tags?.storage?.keyPrefix} → ${formValue.keyPrefix}`);
+		if (currentConfig.tags?.storage?.ipfsEnabled !== formValue.ipfsEnabled)
+			changes.push(`IPFS Enabled: ${currentConfig.tags?.storage?.ipfsEnabled} → ${formValue.ipfsEnabled}`);
+		if (currentConfig.tags?.storage?.arweaveEnabled !== formValue.arweaveEnabled)
+			changes.push(`Arweave Enabled: ${currentConfig.tags?.storage?.arweaveEnabled} → ${formValue.arweaveEnabled}`);
+		if (currentConfig.tags?.storage?.walrusEnabled !== formValue.walrusEnabled)
+			changes.push(`Walrus Enabled: ${currentConfig.tags?.storage?.walrusEnabled} → ${formValue.walrusEnabled}`);
 
 		// Check payment methods
 		const currentMethods = currentConfig.tags?.payment?.methods || [];
@@ -522,22 +572,82 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	}
 
 	/**
+	 * Clean up invalid currencies and payment methods from existing license data
+	 */
+	private cleanupInvalidData(): void {
+		// Clean up invalid currencies
+		const validCurrencies = this.supportedCurrencies.filter((currency) => this.ALLOWED_CURRENCIES.includes(currency));
+		if (validCurrencies.length !== this.supportedCurrencies.length) {
+			const removedCurrencies = this.supportedCurrencies.filter((currency) => !this.ALLOWED_CURRENCIES.includes(currency));
+			this.supportedCurrencies = validCurrencies;
+			if (removedCurrencies.length > 0) {
+				this.showError(`Removed invalid currencies: ${removedCurrencies.join(", ")}. These are no longer supported.`);
+			}
+		}
+
+		// Clean up invalid payment methods (this shouldn't happen with checkboxes, but just in case)
+		const paymentMethods = this.getPaymentMethods();
+		const validMethods = paymentMethods.filter((method) => ["coinbase", "crypto", "stripe"].includes(method));
+		if (validMethods.length !== paymentMethods.length) {
+			const removedMethods = paymentMethods.filter((method) => !["coinbase", "crypto", "stripe"].includes(method));
+			// Reset payment method checkboxes to only valid ones
+			this.accountForm.get("coinbaseEnabled")?.setValue(validMethods.includes("coinbase"));
+			this.accountForm.get("cryptoEnabled")?.setValue(validMethods.includes("crypto"));
+			this.accountForm.get("stripeEnabled")?.setValue(validMethods.includes("stripe"));
+			if (removedMethods.length > 0) {
+				this.showError(`Removed invalid payment methods: ${removedMethods.join(", ")}. These are no longer supported.`);
+			}
+		}
+	}
+
+	/**
+	 * Validate data before sending to backend
+	 */
+	private validateDataBeforeSend(): { valid: boolean; errors: string[] } {
+		const errors: string[] = [];
+
+		// Validate currencies
+		const invalidCurrencies = this.supportedCurrencies.filter((currency) => !this.ALLOWED_CURRENCIES.includes(currency));
+		if (invalidCurrencies.length > 0) {
+			errors.push(`Invalid currencies: ${invalidCurrencies.join(", ")}. Allowed: ${this.ALLOWED_CURRENCIES.join(", ")}`);
+		}
+
+		// Validate payment methods
+		const paymentMethods = this.getPaymentMethods();
+		const invalidMethods = paymentMethods.filter((method) => !["coinbase", "crypto", "stripe"].includes(method));
+		if (invalidMethods.length > 0) {
+			errors.push(`Invalid payment methods: ${invalidMethods.join(", ")}. Allowed: coinbase, crypto, stripe`);
+		}
+
+		return { valid: errors.length === 0, errors };
+	}
+
+	/**
 	 * Build domain configuration object
 	 */
 	buildDomainConfig(): DomainConfig {
 		const formValue = this.accountForm.value;
+
+		// Validate data before building config
+		const validation = this.validateDataBeforeSend();
+		if (!validation.valid) {
+			this.showError(`Validation failed: ${validation.errors.join(", ")}`);
+			throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
+		}
 
 		// Build whitelist object
 		const whitelist = this.buildWhitelistFromForm();
 
 		return {
 			name: formValue.domain,
-			type: "custom",
+			// Note: type is excluded as it's only modified during license purchasing process
 			holdSuffix: formValue.holdSuffix,
-			status: formValue.status,
+			status: this.accountForm.get("status")?.value || "active", // Get disabled field value
 			owner: formValue.owner,
 			description: formValue.description,
 			// Note: startDate and endDate are excluded as they are system-managed
+			// Note: domainType is excluded as it's not sent to backend
+			// Note: status is read-only and determined by license purchase
 			tags: {
 				minLength: formValue.minLength,
 				maxLength: formValue.maxLength,
@@ -555,6 +665,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 					whitelist: whitelist,
 					pricingTable: this.getPricingTableFromRows(),
 				},
+				storage: {
+					// Moved storage inside tags
+					keyPrefix: formValue.keyPrefix,
+					ipfsEnabled: formValue.ipfsEnabled,
+					arweaveEnabled: formValue.arweaveEnabled,
+					walrusEnabled: formValue.walrusEnabled,
+					// Note: backupEnabled is excluded as it's not allowed by backend
+				},
 			},
 			zelfkeys: {
 				plans: this.zelfkeysPlans,
@@ -562,26 +680,16 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 					whitelist: {},
 					pricingTable: {},
 				},
+				storage: {
+					// Moved storage inside zelfkeys
+					keyPrefix: formValue.keyPrefix, // Assuming same keyPrefix for now, might need separate control
+					ipfsEnabled: formValue.ipfsEnabled,
+					arweaveEnabled: formValue.arweaveEnabled,
+					walrusEnabled: formValue.walrusEnabled,
+					// Note: backupEnabled is excluded as it's not allowed by backend
+				},
 			},
-			storage: {
-				keyPrefix: formValue.keyPrefix,
-				ipfsEnabled: formValue.ipfsEnabled,
-				arweaveEnabled: formValue.arweaveEnabled,
-				walrusEnabled: formValue.walrusEnabled,
-				backupEnabled: false,
-			},
-			stripe: {
-				productId: "",
-				priceId: "",
-				latestInvoiceId: "",
-				amountPaid: 0,
-				paidAt: "",
-			},
-			limits: {
-				tags: 100,
-				zelfkeys: 100,
-				zelfProofs: 100,
-			},
+			// Note: stripe object is excluded as it's managed by backend/Stripe webhooks
 			metadata: {
 				launchDate: formValue.launchDate,
 				version: formValue.version,
@@ -675,10 +783,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			this.accountForm.get("minLength")?.setValue(config.tags?.minLength || 3);
 			this.accountForm.get("maxLength")?.setValue(config.tags?.maxLength || 50);
 			this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
-			this.accountForm.get("ipfsEnabled")?.setValue(config.storage?.ipfsEnabled ?? true);
-			this.accountForm.get("arweaveEnabled")?.setValue(config.storage?.arweaveEnabled ?? true);
-			this.accountForm.get("walrusEnabled")?.setValue(config.storage?.walrusEnabled ?? true);
-			this.accountForm.get("keyPrefix")?.setValue(config.storage?.keyPrefix || "tagName");
+			this.accountForm.get("ipfsEnabled")?.setValue(config.tags?.storage?.ipfsEnabled ?? true);
+			this.accountForm.get("arweaveEnabled")?.setValue(config.tags?.storage?.arweaveEnabled ?? true);
+			this.accountForm.get("walrusEnabled")?.setValue(config.tags?.storage?.walrusEnabled ?? true);
+			this.accountForm.get("keyPrefix")?.setValue(config.tags?.storage?.keyPrefix || "tagName");
 			this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
 			this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
 			this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
@@ -730,6 +838,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
 			});
 		}
+
+		// Clean up any invalid data from existing license
+		this.cleanupInvalidData();
 
 		// Trigger change detection
 		this._cdr.detectChanges();
