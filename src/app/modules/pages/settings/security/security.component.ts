@@ -145,7 +145,7 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 
 		// Set save data in service
 		this._saveConfirmationService.setSaveData({
-			license: null, // Not needed for security operations
+			domain: null, // Not needed for security operations
 			domainConfig: null, // Not needed for security operations
 			redirectUrl: "/settings/security",
 			operation: {
@@ -201,7 +201,7 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 
 		// Set save data in service
 		this._saveConfirmationService.setSaveData({
-			license: null, // Not needed for security operations
+			domain: null, // Not needed for security operations
 			domainConfig: null, // Not needed for security operations
 			redirectUrl: "/settings/security",
 			operation: {

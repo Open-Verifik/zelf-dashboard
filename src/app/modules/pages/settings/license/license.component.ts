@@ -59,6 +59,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 	// Validation constants
 	private readonly ALLOWED_CURRENCIES = ["BTC", "ETH", "SOL", "USDC", "USDT", "BDAG", "AVAX", "ZNS"];
+	private readonly MAX_TAG_LENGTH = 27;
 
 	// Zelfkeys configuration
 	zelfkeysPlans: any[] = [];
@@ -151,15 +152,21 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 			// Validation Rules
 			minLength: [3, [Validators.required, Validators.min(1)]],
-			maxLength: [50, [Validators.required, Validators.min(1)]],
+			maxLength: [27, [Validators.required, Validators.min(1), Validators.max(27)]],
 			holdSuffix: [".hold", Validators.required],
 			contentFilterEnabled: [true],
 
-			// Storage Options
+			// Storage Options (ZNS)
 			ipfsEnabled: [true],
 			arweaveEnabled: [true],
 			walrusEnabled: [true],
 			keyPrefix: ["tagName", Validators.required],
+
+			// Storage Options (ZelfKeys)
+			zelfkeysIpfsEnabled: [true],
+			zelfkeysArweaveEnabled: [true],
+			zelfkeysWalrusEnabled: [true],
+			zelfkeysKeyPrefix: ["tagName", Validators.required],
 
 			// Payment Settings
 			coinbaseEnabled: [true],
@@ -430,11 +437,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.tags?.minLength !== formValue.minLength) return true;
 		if (currentConfig.tags?.maxLength !== formValue.maxLength) return true;
 
-		// Check storage settings
+		// Check ZNS storage settings
 		if (currentConfig.tags?.storage?.keyPrefix !== formValue.keyPrefix) return true;
 		if (currentConfig.tags?.storage?.ipfsEnabled !== formValue.ipfsEnabled) return true;
 		if (currentConfig.tags?.storage?.arweaveEnabled !== formValue.arweaveEnabled) return true;
 		if (currentConfig.tags?.storage?.walrusEnabled !== formValue.walrusEnabled) return true;
+
+		// Check ZelfKeys storage settings
+		if (currentConfig.zelfkeys?.storage?.keyPrefix !== formValue.zelfkeysKeyPrefix) return true;
+		if (currentConfig.zelfkeys?.storage?.ipfsEnabled !== formValue.zelfkeysIpfsEnabled) return true;
+		if (currentConfig.zelfkeys?.storage?.arweaveEnabled !== formValue.zelfkeysArweaveEnabled) return true;
+		if (currentConfig.zelfkeys?.storage?.walrusEnabled !== formValue.zelfkeysWalrusEnabled) return true;
 
 		// Check payment methods
 		const currentMethods = currentConfig.tags?.payment?.methods || [];
@@ -502,15 +515,25 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.tags?.maxLength !== formValue.maxLength)
 			changes.push(`Max Length: ${currentConfig.tags?.maxLength} → ${formValue.maxLength}`);
 
-		// Check storage settings
+		// Check ZNS storage settings
 		if (currentConfig.tags?.storage?.keyPrefix !== formValue.keyPrefix)
-			changes.push(`Key Prefix: ${currentConfig.tags?.storage?.keyPrefix} → ${formValue.keyPrefix}`);
+			changes.push(`ZNS Key Prefix: ${currentConfig.tags?.storage?.keyPrefix} → ${formValue.keyPrefix}`);
 		if (currentConfig.tags?.storage?.ipfsEnabled !== formValue.ipfsEnabled)
-			changes.push(`IPFS Enabled: ${currentConfig.tags?.storage?.ipfsEnabled} → ${formValue.ipfsEnabled}`);
+			changes.push(`ZNS IPFS Enabled: ${currentConfig.tags?.storage?.ipfsEnabled} → ${formValue.ipfsEnabled}`);
 		if (currentConfig.tags?.storage?.arweaveEnabled !== formValue.arweaveEnabled)
-			changes.push(`Arweave Enabled: ${currentConfig.tags?.storage?.arweaveEnabled} → ${formValue.arweaveEnabled}`);
+			changes.push(`ZNS Arweave Enabled: ${currentConfig.tags?.storage?.arweaveEnabled} → ${formValue.arweaveEnabled}`);
 		if (currentConfig.tags?.storage?.walrusEnabled !== formValue.walrusEnabled)
-			changes.push(`Walrus Enabled: ${currentConfig.tags?.storage?.walrusEnabled} → ${formValue.walrusEnabled}`);
+			changes.push(`ZNS Walrus Enabled: ${currentConfig.tags?.storage?.walrusEnabled} → ${formValue.walrusEnabled}`);
+
+		// Check ZelfKeys storage settings
+		if (currentConfig.zelfkeys?.storage?.keyPrefix !== formValue.zelfkeysKeyPrefix)
+			changes.push(`ZelfKeys Key Prefix: ${currentConfig.zelfkeys?.storage?.keyPrefix} → ${formValue.zelfkeysKeyPrefix}`);
+		if (currentConfig.zelfkeys?.storage?.ipfsEnabled !== formValue.zelfkeysIpfsEnabled)
+			changes.push(`ZelfKeys IPFS Enabled: ${currentConfig.zelfkeys?.storage?.ipfsEnabled} → ${formValue.zelfkeysIpfsEnabled}`);
+		if (currentConfig.zelfkeys?.storage?.arweaveEnabled !== formValue.zelfkeysArweaveEnabled)
+			changes.push(`ZelfKeys Arweave Enabled: ${currentConfig.zelfkeys?.storage?.arweaveEnabled} → ${formValue.zelfkeysArweaveEnabled}`);
+		if (currentConfig.zelfkeys?.storage?.walrusEnabled !== formValue.zelfkeysWalrusEnabled)
+			changes.push(`ZelfKeys Walrus Enabled: ${currentConfig.zelfkeys?.storage?.walrusEnabled} → ${formValue.zelfkeysWalrusEnabled}`);
 
 		// Check payment methods
 		const currentMethods = currentConfig.tags?.payment?.methods || [];
@@ -630,6 +653,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Validate data before building config
 		const validation = this.validateDataBeforeSend();
+
 		if (!validation.valid) {
 			this.showError(`Validation failed: ${validation.errors.join(", ")}`);
 			throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
@@ -682,10 +706,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				},
 				storage: {
 					// Moved storage inside zelfkeys
-					keyPrefix: formValue.keyPrefix, // Assuming same keyPrefix for now, might need separate control
-					ipfsEnabled: formValue.ipfsEnabled,
-					arweaveEnabled: formValue.arweaveEnabled,
-					walrusEnabled: formValue.walrusEnabled,
+					keyPrefix: formValue.zelfkeysKeyPrefix,
+					ipfsEnabled: formValue.zelfkeysIpfsEnabled,
+					arweaveEnabled: formValue.zelfkeysArweaveEnabled,
+					walrusEnabled: formValue.zelfkeysWalrusEnabled,
 					// Note: backupEnabled is excluded as it's not allowed by backend
 				},
 			},
@@ -732,9 +756,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				console.log("No license found for current user");
 				return;
 			}
-
-			// Convert API response to License object
-			console.log("response", response.data);
 
 			this.currentLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
 
@@ -783,10 +804,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			this.accountForm.get("minLength")?.setValue(config.tags?.minLength || 3);
 			this.accountForm.get("maxLength")?.setValue(config.tags?.maxLength || 50);
 			this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
+			// ZNS Storage Options
 			this.accountForm.get("ipfsEnabled")?.setValue(config.tags?.storage?.ipfsEnabled ?? true);
 			this.accountForm.get("arweaveEnabled")?.setValue(config.tags?.storage?.arweaveEnabled ?? true);
 			this.accountForm.get("walrusEnabled")?.setValue(config.tags?.storage?.walrusEnabled ?? true);
 			this.accountForm.get("keyPrefix")?.setValue(config.tags?.storage?.keyPrefix || "tagName");
+
+			// ZelfKeys Storage Options
+			this.accountForm.get("zelfkeysIpfsEnabled")?.setValue(config.zelfkeys?.storage?.ipfsEnabled ?? true);
+			this.accountForm.get("zelfkeysArweaveEnabled")?.setValue(config.zelfkeys?.storage?.arweaveEnabled ?? true);
+			this.accountForm.get("zelfkeysWalrusEnabled")?.setValue(config.zelfkeys?.storage?.walrusEnabled ?? true);
+			this.accountForm.get("zelfkeysKeyPrefix")?.setValue(config.zelfkeys?.storage?.keyPrefix || "tagName");
 			this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
 			this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
 			this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
@@ -852,10 +880,12 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	saveLicense(): void {
 		if (this.accountForm.invalid) {
 			this.showError("Please fill in all required fields correctly");
+
 			return;
 		}
 
 		const domain = this.accountForm.get("domain")?.value;
+
 		if (!domain) {
 			this.showError("Domain is required");
 			return;
@@ -876,18 +906,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		// Build domain configuration
 		const domainConfig = this.buildDomainConfig();
 
-		// Create license object
-		const licenseData: LicenseData = {
-			domain,
-			domainConfig,
-			faceBase64: "", // Will be set during biometric verification
-			masterPassword: "", // Will be set during biometric verification
-		};
-		const license = new License(licenseData);
-
-		// Set save data in service
+		// Set save data in service - pass domain and domainConfig
 		this._saveConfirmationService.setSaveData({
-			license,
+			domain: domainConfig.name,
 			domainConfig,
 			redirectUrl: "/settings/license",
 			operation: {
@@ -987,23 +1008,41 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Add individual length rows (1-5)
 		for (let i = 1; i <= 5; i++) {
+			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 			this.pricingTableRows.push({
 				length: i.toString(),
-				prices: { ...defaultPricing[i] },
+				oneYear: prices[1] || 0,
+				twoYears: prices[2] || 0,
+				threeYears: prices[3] || 0,
+				fourYears: prices[4] || 0,
+				fiveYears: prices[5] || 0,
+				lifetime: prices.lifetime || 0,
 			});
 		}
 
 		// Add range row (6-15)
+		const rangePrices = defaultPricing["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 		this.pricingTableRows.push({
 			length: "6-15",
-			prices: { ...defaultPricing["6-15"] },
+			oneYear: rangePrices[1] || 0,
+			twoYears: rangePrices[2] || 0,
+			threeYears: rangePrices[3] || 0,
+			fourYears: rangePrices[4] || 0,
+			fiveYears: rangePrices[5] || 0,
+			lifetime: rangePrices.lifetime || 0,
 		});
 
 		// Add individual length rows (16-27)
 		for (let i = 16; i <= 27; i++) {
+			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 			this.pricingTableRows.push({
 				length: i.toString(),
-				prices: { ...defaultPricing[i] },
+				oneYear: prices[1] || 0,
+				twoYears: prices[2] || 0,
+				threeYears: prices[3] || 0,
+				fourYears: prices[4] || 0,
+				fiveYears: prices[5] || 0,
+				lifetime: prices.lifetime || 0,
 			});
 		}
 	}
@@ -1029,7 +1068,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const pricingTable: { [key: string]: { [key: string]: number } } = {};
 
 		this.pricingTableRows.forEach((row) => {
-			pricingTable[row.length] = { ...row.prices };
+			pricingTable[row.length] = {
+				1: row.oneYear || 0,
+				2: row.twoYears || 0,
+				3: row.threeYears || 0,
+				4: row.fourYears || 0,
+				5: row.fiveYears || 0,
+				lifetime: row.lifetime || 0,
+			};
 		});
 
 		return pricingTable;
@@ -1048,23 +1094,41 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Add individual length rows (1-5)
 		for (let i = 1; i <= 5; i++) {
+			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 			this.pricingTableRows.push({
 				length: i.toString(),
-				prices: pricingTable[i] ? { ...pricingTable[i] } : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 },
+				oneYear: prices[1] || 0,
+				twoYears: prices[2] || 0,
+				threeYears: prices[3] || 0,
+				fourYears: prices[4] || 0,
+				fiveYears: prices[5] || 0,
+				lifetime: prices.lifetime || 0,
 			});
 		}
 
 		// Add range row (6-15)
+		const rangePrices = pricingTable["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 		this.pricingTableRows.push({
 			length: "6-15",
-			prices: pricingTable["6-15"] ? { ...pricingTable["6-15"] } : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 },
+			oneYear: rangePrices[1] || 0,
+			twoYears: rangePrices[2] || 0,
+			threeYears: rangePrices[3] || 0,
+			fourYears: rangePrices[4] || 0,
+			fiveYears: rangePrices[5] || 0,
+			lifetime: rangePrices.lifetime || 0,
 		});
 
 		// Add individual length rows (16-27)
 		for (let i = 16; i <= 27; i++) {
+			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
 			this.pricingTableRows.push({
 				length: i.toString(),
-				prices: pricingTable[i] ? { ...pricingTable[i] } : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 },
+				oneYear: prices[1] || 0,
+				twoYears: prices[2] || 0,
+				threeYears: prices[3] || 0,
+				fourYears: prices[4] || 0,
+				fiveYears: prices[5] || 0,
+				lifetime: prices.lifetime || 0,
 			});
 		}
 	}

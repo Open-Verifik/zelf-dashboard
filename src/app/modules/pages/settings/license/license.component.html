@@ -192,8 +192,14 @@
 									[formControlName]="'maxLength'"
 									matInput
 									type="number"
+									min="1"
+									max="27"
 									[placeholder]="'license.validation_rules.max_length_placeholder' | transloco"
 								/>
+								<mat-hint align="end">{{ "license.validation_rules.max_length_hint" | transloco }}</mat-hint>
+								<mat-error *ngIf="accountForm.get('maxLength')?.hasError('max')">
+									{{ "license.validation_rules.max_length_error" | transloco }}
+								</mat-error>
 							</mat-form-field>
 						</div>
 
@@ -601,7 +607,7 @@
 											{{ "license.storage_options.ipfs_title" | transloco }}
 										</h3>
 									</div>
-									<mat-slide-toggle [formControlName]="'ipfsEnabled'"></mat-slide-toggle>
+									<mat-slide-toggle [formControlName]="'zelfkeysIpfsEnabled'"></mat-slide-toggle>
 								</div>
 								<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.storage_options.ipfs_description" | transloco }}</p>
 							</div>
@@ -614,7 +620,7 @@
 											{{ "license.storage_options.arweave_title" | transloco }}
 										</h3>
 									</div>
-									<mat-slide-toggle [formControlName]="'arweaveEnabled'"></mat-slide-toggle>
+									<mat-slide-toggle [formControlName]="'zelfkeysArweaveEnabled'"></mat-slide-toggle>
 								</div>
 								<p class="text-sm text-gray-600 dark:text-gray-300">
 									{{ "license.storage_options.arweave_description" | transloco }}
@@ -629,7 +635,7 @@
 											{{ "license.storage_options.walrus_title" | transloco }}
 										</h3>
 									</div>
-									<mat-slide-toggle [formControlName]="'walrusEnabled'"></mat-slide-toggle>
+									<mat-slide-toggle [formControlName]="'zelfkeysWalrusEnabled'"></mat-slide-toggle>
 								</div>
 								<p class="text-sm text-gray-600 dark:text-gray-300">{{ "license.storage_options.walrus_description" | transloco }}</p>
 							</div>
@@ -640,7 +646,7 @@
 								<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
 									<mat-label>{{ "license.storage_options.key_prefix" | transloco }}</mat-label>
 									<input
-										[formControlName]="'keyPrefix'"
+										[formControlName]="'zelfkeysKeyPrefix'"
 										matInput
 										[placeholder]="'license.storage_options.key_prefix_placeholder' | transloco"
 									/>

@@ -600,7 +600,7 @@ export class License {
 			domain: data.domain,
 			domainConfig: {
 				name: data.name,
-				type: data.type,
+				// Note: type is excluded as it's only set during license purchasing
 				holdSuffix: data.holdSuffix,
 				status: data.status,
 				owner: data.owner,
@@ -642,7 +642,7 @@ export class License {
 			domain,
 			domainConfig: {
 				name: domain,
-				type: "custom",
+				// Note: type is excluded as it's only set during license purchasing
 				holdSuffix: ".hold",
 				status: "inactive",
 				owner: "zelf-team",

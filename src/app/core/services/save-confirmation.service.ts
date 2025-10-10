@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { License, DomainConfig } from "../../modules/pages/settings/license/license.class";
+import { DomainConfig } from "../../modules/pages/settings/license/license.class";
 
 export interface SaveConfirmationData {
-	license: License | null;
+	domain: string | null;
 	domainConfig: DomainConfig | null;
 	redirectUrl: string;
 	operation: {

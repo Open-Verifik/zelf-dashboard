@@ -127,9 +127,12 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		if (this.saveData.securityData) {
 			// Handle security operation (password change)
 			this.handleSecurityOperation(biometricData);
-		} else if (this.saveData.license) {
-			// Handle license operation
+		} else if (this.saveData.domainConfig && !this.saveData.domain) {
+			// Handle license operation (full license creation) - legacy support
 			this.handleLicenseOperation(biometricData);
+		} else if (this.saveData.domainConfig) {
+			// Handle domain config operation (updating existing license)
+			this.handleDomainConfigOperation(biometricData);
 		} else if (this.saveData.profileData) {
 			// Handle profile operation
 			this.handleProfileOperation(biometricData);
@@ -192,7 +195,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 * Handle license operation
 	 */
 	private async handleLicenseOperation(biometricData: BiometricData): Promise<void> {
-		if (!this.saveData?.license) {
+		if (!this.saveData?.domainConfig) {
 			this.showError("No license data available");
 
 			this.isLoading = false;
@@ -202,7 +205,8 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 
 		try {
 			const licenseData = {
-				...this.saveData.license.toJSON(),
+				domain: this.saveData.domainConfig.name,
+				domainConfig: this.saveData.domainConfig,
 				faceBase64: biometricData.faceBase64,
 				masterPassword: biometricData.password || this.masterPassword,
 			};
@@ -210,6 +214,32 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 			await this.createLicense(licenseData);
 		} catch (error) {
 			this.showError("Failed to save license. Please try again.");
+		} finally {
+			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Handle domain config operation (updating existing license)
+	 */
+	private async handleDomainConfigOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.domainConfig) {
+			this.showError("No domain config data available");
+			this.isLoading = false;
+			return;
+		}
+
+		try {
+			const updateData = {
+				domain: this.saveData.domain,
+				domainConfig: this.saveData.domainConfig,
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
+			await this.createLicense(updateData);
+		} catch (error) {
+			this.showError("Failed to update license configuration. Please try again.");
 		} finally {
 			this.isLoading = false;
 		}

@@ -289,7 +289,7 @@ export class ProfileComponent implements OnInit {
 
 		// Set save data in service
 		const saveData: SaveConfirmationData = {
-			license: null, // Not needed for profile operations
+			domain: null, // Not needed for profile operations
 			domainConfig: null, // Not needed for profile operations
 			redirectUrl: "/profile",
 			operation: {
