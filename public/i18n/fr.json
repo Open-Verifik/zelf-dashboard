@@ -140,6 +140,8 @@
 			"status_beta": "Bêta",
 			"owner": "Propriétaire",
 			"owner_placeholder": "équipe-zelf",
+			"start_date": "Date de Début",
+			"end_date": "Date de Fin",
 			"description": "Description",
 			"description_placeholder": "Domaine officiel Zelf"
 		},
@@ -147,6 +149,10 @@
 			"title": "Fonctionnalités",
 			"zns_title": "Système de noms Zelf (ZNS)",
 			"zns_description": "Chiffrements, Déchiffrements, aperçus de ZelfProofs",
+			"zns_enabled": "Activé",
+			"zns_disabled_title": "Configuration ZNS Désactivée",
+			"zns_disabled_description": "Les règles de validation des étiquettes, la configuration des paiements et la configuration des prix ne sont disponibles que lorsque le Système de noms Zelf (ZNS) est activé.",
+			"zns_disabled_enable": "Activez ZNS ci-dessus pour configurer les paramètres liés aux étiquettes.",
 			"zelfkeys_title": "Clés Zelf",
 			"zelfkeys_description": "Mots de passe, Notes, Cartes de crédit, etc."
 		},
@@ -216,7 +222,10 @@
 			"max_tags": "Max Étiquettes",
 			"max_tags_placeholder": "10000",
 			"max_zelfkeys": "Max ZelfKeys",
-			"max_zelfkeys_placeholder": "10000"
+			"max_zelfkeys_placeholder": "10000",
+			"info_title": "Informations sur les Limites",
+			"info_description": "Les limites du domaine sont gérées automatiquement selon votre plan d'abonnement.",
+			"info_subscription": "Pour modifier les limites, veuillez mettre à niveau ou changer votre plan d'abonnement dans la section Plan et Facturation."
 		},
 		"metadata": {
 			"title": "Métadonnées",

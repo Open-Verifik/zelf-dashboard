@@ -215,6 +215,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 				this.apiError = "No face detected. Please look directly at the camera.";
 			} else if (error.message.includes("Face not recognized")) {
 				this.apiError = "Face not recognized. Please try again or contact support.";
+			} else if (error.message.includes("LIVENESS") || error.message.toLowerCase().includes("liveness")) {
+				this.apiError = "Liveness check failed. Please follow the on-screen head turn instructions and try again.";
 			} else {
 				this.apiError = error.message;
 			}
@@ -326,6 +328,19 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 		this.livenessDetection.isActive = false;
 		// Capture the final image and proceed
 		this._captureFinalImage();
+	}
+
+	/**
+	 * Surface a liveness failure in a user-friendly way and allow retry
+	 */
+	private _handleLivenessFailure(reason: string): void {
+		this.hasApiError = true;
+		this.apiError = reason || "Liveness check failed. Please follow the instructions and try again.";
+		this.response.isLoading = false;
+		this.response.base64Image = "";
+		// Ensure detection loop restarts so user can try again without reloading
+		this._startFaceDetectionInterval();
+		this._changeDetectorRef.markForCheck();
 	}
 
 	/**

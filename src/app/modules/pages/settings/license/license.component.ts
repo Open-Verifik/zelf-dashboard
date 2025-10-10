@@ -57,6 +57,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	whitelistItems: any[] = [];
 	pricingTableRows: any[] = [];
 
+	// Zelfkeys configuration
+	zelfkeysPlans: any[] = [];
+
 	// Inappropriate words filter
 	inappropriateWords = [
 		"dick",
@@ -135,6 +138,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		this.accountForm = this._formBuilder.group({
 			// Basic Information
 			domain: ["", [Validators.required, Validators.pattern(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/)]],
+			domainType: ["custom", Validators.required],
 			status: ["active", Validators.required],
 			owner: ["zelf-team", Validators.required],
 			description: ["Official Zelf domain", Validators.required],
@@ -160,9 +164,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			cryptoEnabled: [true],
 			stripeEnabled: [true],
 
-			// Limits
-			maxTags: [10000, [Validators.required, Validators.min(1)]],
-			maxZelfkeys: [10000, [Validators.required, Validators.min(1)]],
+			// Start and End Dates (read-only)
+			startDate: [{ value: "", disabled: true }],
+			endDate: [{ value: "", disabled: true }],
 
 			// Metadata
 			launchDate: ["2023-01-01"],
@@ -364,42 +368,40 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.owner !== formValue.owner) return true;
 		if (currentConfig.description !== formValue.description) return true;
 
-		// Check limits
-		if (currentConfig.limits.tags !== formValue.maxTags) return true;
-		if (currentConfig.limits.zelfkeys !== formValue.maxZelfkeys) return true;
+		// Note: startDate and endDate are read-only and not checked for changes
 
 		// Check features
-		const currentZnsEnabled = currentConfig.features.find((f) => f.code === "zns")?.enabled;
-		const currentZelfkeysEnabled = currentConfig.features.find((f) => f.code === "zelfkeys")?.enabled;
+		const currentZnsEnabled = true; // Default to true
+		const currentZelfkeysEnabled = true; // Default to true
 		if (currentZnsEnabled !== formValue.znsEnabled) return true;
 		if (currentZelfkeysEnabled !== formValue.zelfkeysEnabled) return true;
 
 		// Check validation rules
-		if (currentConfig.validation.minLength !== formValue.minLength) return true;
-		if (currentConfig.validation.maxLength !== formValue.maxLength) return true;
+		if (currentConfig.tags?.minLength !== formValue.minLength) return true;
+		if (currentConfig.tags?.maxLength !== formValue.maxLength) return true;
 
 		// Check storage settings
-		if (currentConfig.storage.keyPrefix !== formValue.keyPrefix) return true;
-		if (currentConfig.storage.ipfsEnabled !== formValue.ipfsEnabled) return true;
-		if (currentConfig.storage.arweaveEnabled !== formValue.arweaveEnabled) return true;
-		if (currentConfig.storage.walrusEnabled !== formValue.walrusEnabled) return true;
+		if (currentConfig.storage?.keyPrefix !== formValue.keyPrefix) return true;
+		if (currentConfig.storage?.ipfsEnabled !== formValue.ipfsEnabled) return true;
+		if (currentConfig.storage?.arweaveEnabled !== formValue.arweaveEnabled) return true;
+		if (currentConfig.storage?.walrusEnabled !== formValue.walrusEnabled) return true;
 
 		// Check payment methods
-		const currentMethods = currentConfig.tagPaymentSettings.methods;
+		const currentMethods = currentConfig.tags?.payment?.methods || [];
 		const newMethods = this.getPaymentMethods();
 		if (JSON.stringify(currentMethods.sort()) !== JSON.stringify(newMethods.sort())) return true;
 
 		// Check currencies
-		const currentCurrencies = currentConfig.tagPaymentSettings.currencies;
+		const currentCurrencies = currentConfig.tags?.payment?.currencies || [];
 		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) return true;
 
 		// Check whitelist
-		const currentWhitelist = currentConfig.tagPaymentSettings.whitelist;
+		const currentWhitelist = currentConfig.tags?.payment?.whitelist || {};
 		const newWhitelist = this.buildWhitelistFromForm();
 		if (JSON.stringify(currentWhitelist) !== JSON.stringify(newWhitelist)) return true;
 
 		// Check pricing table
-		const currentPricingTable = currentConfig.tagPaymentSettings.pricingTable;
+		const currentPricingTable = currentConfig.tags?.payment?.pricingTable || {};
 		const newPricingTable = this.getPricingTableFromRows();
 		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) return true;
 
@@ -435,56 +437,53 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.owner !== formValue.owner) changes.push(`Owner: ${currentConfig.owner} → ${formValue.owner}`);
 		if (currentConfig.description !== formValue.description) changes.push(`Description: ${currentConfig.description} → ${formValue.description}`);
 
-		// Check limits
-		if (currentConfig.limits.tags !== formValue.maxTags) changes.push(`Max Tags: ${currentConfig.limits.tags} → ${formValue.maxTags}`);
-		if (currentConfig.limits.zelfkeys !== formValue.maxZelfkeys)
-			changes.push(`Max Zelfkeys: ${currentConfig.limits.zelfkeys} → ${formValue.maxZelfkeys}`);
+		// Note: startDate and endDate are read-only and not checked for changes
 
 		// Check features
-		const currentZnsEnabled = currentConfig.features.find((f) => f.code === "zns")?.enabled;
-		const currentZelfkeysEnabled = currentConfig.features.find((f) => f.code === "zelfkeys")?.enabled;
+		const currentZnsEnabled = true; // Default to true
+		const currentZelfkeysEnabled = true; // Default to true
 		if (currentZnsEnabled !== formValue.znsEnabled) changes.push(`ZNS Feature: ${currentZnsEnabled} → ${formValue.znsEnabled}`);
 		if (currentZelfkeysEnabled !== formValue.zelfkeysEnabled)
 			changes.push(`Zelfkeys Feature: ${currentZelfkeysEnabled} → ${formValue.zelfkeysEnabled}`);
 
 		// Check validation rules
-		if (currentConfig.validation.minLength !== formValue.minLength)
-			changes.push(`Min Length: ${currentConfig.validation.minLength} → ${formValue.minLength}`);
-		if (currentConfig.validation.maxLength !== formValue.maxLength)
-			changes.push(`Max Length: ${currentConfig.validation.maxLength} → ${formValue.maxLength}`);
+		if (currentConfig.tags?.minLength !== formValue.minLength)
+			changes.push(`Min Length: ${currentConfig.tags?.minLength} → ${formValue.minLength}`);
+		if (currentConfig.tags?.maxLength !== formValue.maxLength)
+			changes.push(`Max Length: ${currentConfig.tags?.maxLength} → ${formValue.maxLength}`);
 
 		// Check storage settings
-		if (currentConfig.storage.keyPrefix !== formValue.keyPrefix)
-			changes.push(`Key Prefix: ${currentConfig.storage.keyPrefix} → ${formValue.keyPrefix}`);
-		if (currentConfig.storage.ipfsEnabled !== formValue.ipfsEnabled)
-			changes.push(`IPFS Enabled: ${currentConfig.storage.ipfsEnabled} → ${formValue.ipfsEnabled}`);
-		if (currentConfig.storage.arweaveEnabled !== formValue.arweaveEnabled)
-			changes.push(`Arweave Enabled: ${currentConfig.storage.arweaveEnabled} → ${formValue.arweaveEnabled}`);
-		if (currentConfig.storage.walrusEnabled !== formValue.walrusEnabled)
-			changes.push(`Walrus Enabled: ${currentConfig.storage.walrusEnabled} → ${formValue.walrusEnabled}`);
+		if (currentConfig.storage?.keyPrefix !== formValue.keyPrefix)
+			changes.push(`Key Prefix: ${currentConfig.storage?.keyPrefix} → ${formValue.keyPrefix}`);
+		if (currentConfig.storage?.ipfsEnabled !== formValue.ipfsEnabled)
+			changes.push(`IPFS Enabled: ${currentConfig.storage?.ipfsEnabled} → ${formValue.ipfsEnabled}`);
+		if (currentConfig.storage?.arweaveEnabled !== formValue.arweaveEnabled)
+			changes.push(`Arweave Enabled: ${currentConfig.storage?.arweaveEnabled} → ${formValue.arweaveEnabled}`);
+		if (currentConfig.storage?.walrusEnabled !== formValue.walrusEnabled)
+			changes.push(`Walrus Enabled: ${currentConfig.storage?.walrusEnabled} → ${formValue.walrusEnabled}`);
 
 		// Check payment methods
-		const currentMethods = currentConfig.tagPaymentSettings.methods;
+		const currentMethods = currentConfig.tags?.payment?.methods || [];
 		const newMethods = this.getPaymentMethods();
 		if (JSON.stringify(currentMethods.sort()) !== JSON.stringify(newMethods.sort())) {
 			changes.push(`Payment Methods: ${currentMethods.join(", ")} → ${newMethods.join(", ")}`);
 		}
 
 		// Check currencies
-		const currentCurrencies = currentConfig.tagPaymentSettings.currencies;
+		const currentCurrencies = currentConfig.tags?.payment?.currencies || [];
 		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) {
 			changes.push(`Currencies: ${currentCurrencies.join(", ")} → ${this.supportedCurrencies.join(", ")}`);
 		}
 
 		// Check whitelist
-		const currentWhitelist = currentConfig.tagPaymentSettings.whitelist;
+		const currentWhitelist = currentConfig.tags?.payment?.whitelist || {};
 		const newWhitelist = this.buildWhitelistFromForm();
 		if (JSON.stringify(currentWhitelist) !== JSON.stringify(newWhitelist)) {
 			changes.push(`Whitelist: ${Object.keys(currentWhitelist).length} → ${Object.keys(newWhitelist).length} entries`);
 		}
 
 		// Check pricing table
-		const currentPricingTable = currentConfig.tagPaymentSettings.pricingTable;
+		const currentPricingTable = currentConfig.tags?.payment?.pricingTable || {};
 		const newPricingTable = this.getPricingTableFromRows();
 		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) {
 			changes.push(`Pricing Table: Updated`);
@@ -533,46 +532,55 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		return {
 			name: formValue.domain,
+			type: "custom",
 			holdSuffix: formValue.holdSuffix,
 			status: formValue.status,
 			owner: formValue.owner,
 			description: formValue.description,
-			limits: {
-				tags: formValue.maxTags,
-				zelfkeys: formValue.maxZelfkeys,
-			},
-			features: [
-				{
-					name: "Zelf Name System",
-					code: "zns",
-					description: "Encryptions, Decryptions, previews of ZelfProofs",
-					enabled: formValue.znsEnabled,
-				},
-				{
-					name: "Zelf Keys",
-					code: "zelfkeys",
-					description: "Zelf Keys: Passwords, Notes, Credit Cards, etc.",
-					enabled: formValue.zelfkeysEnabled,
-				},
-			],
-			validation: {
+			// Note: startDate and endDate are excluded as they are system-managed
+			tags: {
 				minLength: formValue.minLength,
 				maxLength: formValue.maxLength,
 				allowedChars: /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
 				reserved: this.reservedWords,
 				customRules: [],
+				payment: {
+					methods: this.getPaymentMethods(),
+					currencies: this.supportedCurrencies,
+					discounts: {
+						yearly: 0.1,
+						lifetime: 0.2,
+					},
+					rewardPrice: 10,
+					whitelist: whitelist,
+					pricingTable: this.getPricingTableFromRows(),
+				},
+			},
+			zelfkeys: {
+				plans: this.zelfkeysPlans,
+				payment: {
+					whitelist: {},
+					pricingTable: {},
+				},
 			},
 			storage: {
 				keyPrefix: formValue.keyPrefix,
 				ipfsEnabled: formValue.ipfsEnabled,
 				arweaveEnabled: formValue.arweaveEnabled,
 				walrusEnabled: formValue.walrusEnabled,
+				backupEnabled: false,
 			},
-			tagPaymentSettings: {
-				methods: this.getPaymentMethods(),
-				currencies: this.supportedCurrencies,
-				whitelist: whitelist,
-				pricingTable: this.getPricingTableFromRows(),
+			stripe: {
+				productId: "",
+				priceId: "",
+				latestInvoiceId: "",
+				amountPaid: 0,
+				paidAt: "",
+			},
+			limits: {
+				tags: 100,
+				zelfkeys: 100,
+				zelfProofs: 100,
 			},
 			metadata: {
 				launchDate: formValue.launchDate,
@@ -662,20 +670,20 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			this.accountForm.get("status")?.setValue(config.status || "active");
 			this.accountForm.get("owner")?.setValue(config.owner || "zelf-team");
 			this.accountForm.get("description")?.setValue(config.description || "Official Zelf domain");
-			this.accountForm.get("znsEnabled")?.setValue(config.features?.[0]?.enabled ?? true);
-			this.accountForm.get("zelfkeysEnabled")?.setValue(config.features?.[1]?.enabled ?? true);
-			this.accountForm.get("minLength")?.setValue(config.validation?.minLength || 3);
-			this.accountForm.get("maxLength")?.setValue(config.validation?.maxLength || 50);
+			this.accountForm.get("znsEnabled")?.setValue(true); // Default to true
+			this.accountForm.get("zelfkeysEnabled")?.setValue(true); // Default to true
+			this.accountForm.get("minLength")?.setValue(config.tags?.minLength || 3);
+			this.accountForm.get("maxLength")?.setValue(config.tags?.maxLength || 50);
 			this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
 			this.accountForm.get("ipfsEnabled")?.setValue(config.storage?.ipfsEnabled ?? true);
 			this.accountForm.get("arweaveEnabled")?.setValue(config.storage?.arweaveEnabled ?? true);
 			this.accountForm.get("walrusEnabled")?.setValue(config.storage?.walrusEnabled ?? true);
 			this.accountForm.get("keyPrefix")?.setValue(config.storage?.keyPrefix || "tagName");
-			this.accountForm.get("coinbaseEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("coinbase") ?? true);
-			this.accountForm.get("cryptoEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("crypto") ?? true);
-			this.accountForm.get("stripeEnabled")?.setValue(config.tagPaymentSettings?.methods?.includes("stripe") ?? true);
-			this.accountForm.get("maxTags")?.setValue(config.limits?.tags || 10000);
-			this.accountForm.get("maxZelfkeys")?.setValue(config.limits?.zelfkeys || 10000);
+			this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
+			this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
+			this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
+			this.accountForm.get("startDate")?.setValue(config.startDate || "");
+			this.accountForm.get("endDate")?.setValue(config.endDate || "");
 			this.accountForm.get("launchDate")?.setValue(config.metadata?.launchDate || "2023-01-01");
 			this.accountForm.get("version")?.setValue(config.metadata?.version || "1.0.0");
 			this.accountForm.get("documentation")?.setValue(config.metadata?.documentation || "https://docs.zelf.world");
@@ -684,17 +692,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			this.accountForm.get("support")?.setValue(config.metadata?.support || "standard");
 
 			// Populate arrays from license data
-			if (config.validation?.reserved) {
-				this.reservedWords = [...config.validation.reserved];
+			if (config.tags?.reserved) {
+				this.reservedWords = [...config.tags.reserved];
 			}
-			if (config.tagPaymentSettings?.currencies) {
-				this.supportedCurrencies = [...config.tagPaymentSettings.currencies];
+			if (config.tags?.payment?.currencies) {
+				this.supportedCurrencies = [...config.tags.payment.currencies];
 			}
-			if (config.tagPaymentSettings?.pricingTable) {
-				this.loadPricingTableFromConfig(config.tagPaymentSettings.pricingTable);
+			if (config.tags?.payment?.pricingTable) {
+				this.loadPricingTableFromConfig(config.tags.payment.pricingTable);
 			}
-			if (config.tagPaymentSettings?.whitelist) {
-				this.whitelistItems = Object.entries(config.tagPaymentSettings.whitelist).map(([domain, price]) => {
+			if (config.tags?.payment?.whitelist) {
+				this.whitelistItems = Object.entries(config.tags.payment.whitelist).map(([domain, price]) => {
 					const priceStr = price as string;
 					const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
 					if (match) {
@@ -710,6 +718,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 						type: "%",
 					};
 				});
+			}
+			if (config.zelfkeys?.plans) {
+				this.zelfkeysPlans = [...config.zelfkeys.plans];
 			}
 
 			// Populate whitelist form controls

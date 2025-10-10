@@ -52,15 +52,60 @@ export interface DomainConfig {
 	status: "active" | "inactive" | "maintenance" | "beta";
 	owner: string;
 	description: string;
+	startDate?: string;
+	endDate?: string;
+	tags: {
+		minLength: number;
+		maxLength: number;
+		allowedChars: RegExp;
+		reserved: string[];
+		customRules: any[];
+		payment: {
+			methods: string[];
+			currencies: string[];
+			discounts: {
+				yearly: number;
+				lifetime: number;
+			};
+			rewardPrice: number;
+			whitelist: { [key: string]: string };
+			pricingTable: { [key: string]: { [key: string]: number } };
+		};
+	};
+	zelfkeys: {
+		plans: any[];
+		payment: {
+			whitelist: { [key: string]: string };
+			pricingTable: { [key: string]: { [key: string]: number } };
+		};
+	};
+	storage: {
+		keyPrefix: string;
+		ipfsEnabled: boolean;
+		arweaveEnabled: boolean;
+		walrusEnabled: boolean;
+		backupEnabled?: boolean;
+	};
+	stripe: {
+		productId: string;
+		priceId: string;
+		latestInvoiceId: string;
+		amountPaid: number;
+		paidAt: string;
+	};
 	limits: {
 		tags: number;
 		zelfkeys: number;
+		zelfProofs?: number;
 	};
-	features: Feature[];
-	validation: ValidationRules;
-	storage: StorageConfig;
-	tagPaymentSettings: PaymentSettings;
-	metadata: Metadata;
+	metadata: {
+		launchDate: string;
+		version: string;
+		documentation: string;
+		community?: string;
+		enterprise?: string;
+		support: string;
+	};
 }
 
 export interface Feature {
@@ -149,42 +194,51 @@ export class License {
 			status: configData?.status || "inactive",
 			owner: configData?.owner || "",
 			description: configData?.description || "",
-			limits: {
-				tags: configData?.limits?.tags || 10000,
-				zelfkeys: configData?.limits?.zelfkeys || 10000,
+			startDate: configData?.startDate || "",
+			endDate: configData?.endDate || "",
+			tags: {
+				minLength: configData?.tags?.minLength || 3,
+				maxLength: configData?.tags?.maxLength || 50,
+				allowedChars: configData?.tags?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+				reserved: configData?.tags?.reserved || ["www", "api", "admin", "support", "help"],
+				customRules: configData?.tags?.customRules || [],
+				payment: {
+					methods: configData?.tags?.payment?.methods || ["coinbase", "crypto", "stripe"],
+					currencies: configData?.tags?.payment?.currencies || ["USD", "BTC", "ETH", "SOL"],
+					discounts: configData?.tags?.payment?.discounts || {
+						yearly: 0.1,
+						lifetime: 0.2,
+					},
+					rewardPrice: configData?.tags?.payment?.rewardPrice || 10,
+					whitelist: configData?.tags?.payment?.whitelist || {},
+					pricingTable: configData?.tags?.payment?.pricingTable || this.getDefaultPricingTable(),
+				},
 			},
-			features: configData?.features || [
-				{
-					name: "Zelf Name System",
-					code: "zns",
-					description: "Encryptions, Decryptions, previews of ZelfProofs",
-					enabled: true,
+			zelfkeys: {
+				plans: configData?.zelfkeys?.plans || [],
+				payment: {
+					whitelist: configData?.zelfkeys?.payment?.whitelist || {},
+					pricingTable: configData?.zelfkeys?.payment?.pricingTable || {},
 				},
-				{
-					name: "Zelf Keys",
-					code: "zelfkeys",
-					description: "Zelf Keys: Passwords, Notes, Credit Cards, etc.",
-					enabled: true,
-				},
-			],
-			validation: {
-				minLength: configData?.validation?.minLength || 3,
-				maxLength: configData?.validation?.maxLength || 50,
-				allowedChars: configData?.validation?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-				reserved: configData?.validation?.reserved || ["www", "api", "admin", "support", "help"],
-				customRules: configData?.validation?.customRules || [],
 			},
 			storage: {
 				keyPrefix: configData?.storage?.keyPrefix || "tagName",
 				ipfsEnabled: configData?.storage?.ipfsEnabled || true,
 				arweaveEnabled: configData?.storage?.arweaveEnabled || true,
 				walrusEnabled: configData?.storage?.walrusEnabled || true,
+				backupEnabled: configData?.storage?.backupEnabled || false,
 			},
-			tagPaymentSettings: {
-				methods: configData?.tagPaymentSettings?.methods || ["coinbase", "crypto", "stripe"],
-				currencies: configData?.tagPaymentSettings?.currencies || ["USD", "BTC", "ETH", "SOL"],
-				whitelist: configData?.tagPaymentSettings?.whitelist || {},
-				pricingTable: configData?.tagPaymentSettings?.pricingTable || this.getDefaultPricingTable(),
+			stripe: {
+				productId: configData?.stripe?.productId || "",
+				priceId: configData?.stripe?.priceId || "",
+				latestInvoiceId: configData?.stripe?.latestInvoiceId || "",
+				amountPaid: configData?.stripe?.amountPaid || 0,
+				paidAt: configData?.stripe?.paidAt || "",
+			},
+			limits: {
+				tags: configData?.limits?.tags || 100,
+				zelfkeys: configData?.limits?.zelfkeys || 100,
+				zelfProofs: configData?.limits?.zelfProofs || 100,
 			},
 			metadata: {
 				launchDate: configData?.metadata?.launchDate || new Date().toISOString().split("T")[0],
@@ -305,7 +359,9 @@ export class License {
 	 * Check if domain supports a feature
 	 */
 	supportsFeature(featureCode: string): boolean {
-		return this.domainConfig.features.some((feature) => feature.code === featureCode && feature.enabled);
+		// For now, we'll assume all features are enabled by default
+		// This can be extended later if we add feature management
+		return true;
 	}
 
 	/**
@@ -338,7 +394,7 @@ export class License {
 		const cleanReferralTagName = referralTagName.replace(".hold", "");
 		const length = splitTagName[0].length;
 
-		if (!this.domainConfig.tagPaymentSettings.pricingTable) {
+		if (!this.domainConfig.tags.payment.pricingTable) {
 			return {
 				price: 0,
 				currency: "USD",
@@ -356,9 +412,9 @@ export class License {
 		let price = 24;
 
 		if (length >= 6 && length <= 15) {
-			price = this.domainConfig.tagPaymentSettings.pricingTable["6-15"][duration];
-		} else if (this.domainConfig.tagPaymentSettings.pricingTable[length]) {
-			price = this.domainConfig.tagPaymentSettings.pricingTable[length][duration];
+			price = this.domainConfig.tags.payment.pricingTable["6-15"][duration];
+		} else if (this.domainConfig.tags.payment.pricingTable[length]) {
+			price = this.domainConfig.tags.payment.pricingTable[length][duration];
 		} else {
 			throw new Error("Invalid name length. Length must be between 1 and 27.");
 		}
@@ -367,7 +423,7 @@ export class License {
 		let discount = 0;
 		let discountType = "percentage";
 
-		const whitelist = this.domainConfig.tagPaymentSettings.whitelist || {};
+		const whitelist = this.domainConfig.tags.payment.whitelist || {};
 
 		if (Object.keys(whitelist).length && cleanReferralTagName && whitelist[cleanReferralTagName]) {
 			const amount = whitelist[cleanReferralTagName];
@@ -389,7 +445,7 @@ export class License {
 		return {
 			price: Math.max(Math.ceil(price * 100) / 100, 0),
 			currency: "USD",
-			reward: Math.max(Math.ceil((price / 10) * 100) / 100, 0), // Assuming reward price of 10
+			reward: Math.max(Math.ceil((price / this.domainConfig.tags.payment.rewardPrice) * 100) / 100, 0),
 			discount,
 			priceWithoutDiscount,
 			discountType,
@@ -401,31 +457,31 @@ export class License {
 	 */
 	validateTagName(tagName: string): { valid: boolean; error?: string } {
 		// Check minimum length
-		if (tagName.length < this.domainConfig.validation.minLength) {
+		if (tagName.length < this.domainConfig.tags.minLength) {
 			return {
 				valid: false,
-				error: `Tag name must be at least ${this.domainConfig.validation.minLength} characters long`,
+				error: `Tag name must be at least ${this.domainConfig.tags.minLength} characters long`,
 			};
 		}
 
 		// Check maximum length
-		if (tagName.length > this.domainConfig.validation.maxLength) {
+		if (tagName.length > this.domainConfig.tags.maxLength) {
 			return {
 				valid: false,
-				error: `Tag name must be no more than ${this.domainConfig.validation.maxLength} characters long`,
+				error: `Tag name must be no more than ${this.domainConfig.tags.maxLength} characters long`,
 			};
 		}
 
 		// Check allowed characters
-		if (!this.domainConfig.validation.allowedChars.test(tagName)) {
+		if (!this.domainConfig.tags.allowedChars.test(tagName)) {
 			return {
 				valid: false,
-				error: `Tag name contains invalid characters. Allowed pattern: ${this.domainConfig.validation.allowedChars}`,
+				error: `Tag name contains invalid characters. Allowed pattern: ${this.domainConfig.tags.allowedChars}`,
 			};
 		}
 
 		// Check reserved names
-		if (this.domainConfig.validation.reserved.includes(tagName.toLowerCase())) {
+		if (this.domainConfig.tags.reserved.includes(tagName.toLowerCase())) {
 			return {
 				valid: false,
 				error: `Tag name '${tagName}' is reserved`,
@@ -433,7 +489,7 @@ export class License {
 		}
 
 		// Check custom rules
-		for (const rule of this.domainConfig.validation.customRules) {
+		for (const rule of this.domainConfig.tags.customRules) {
 			if (typeof rule === "function") {
 				const result = rule(tagName);
 				if (!result.valid) {
@@ -456,14 +512,14 @@ export class License {
 	 * Get payment methods
 	 */
 	getPaymentMethods(): string[] {
-		return this.domainConfig.tagPaymentSettings.methods;
+		return this.domainConfig.tags.payment.methods;
 	}
 
 	/**
 	 * Get supported currencies
 	 */
 	getSupportedCurrencies(): string[] {
-		return this.domainConfig.tagPaymentSettings.currencies;
+		return this.domainConfig.tags.payment.currencies;
 	}
 
 	/**
@@ -524,11 +580,13 @@ export class License {
 				status: data.status,
 				owner: data.owner,
 				description: data.description,
-				limits: data.limits,
-				features: data.features,
-				validation: data.validation,
+				startDate: data.startDate,
+				endDate: data.endDate,
+				tags: data.tags,
+				zelfkeys: data.zelfkeys,
 				storage: data.storage,
-				tagPaymentSettings: data.tagPaymentSettings,
+				stripe: data.stripe,
+				limits: data.limits,
 				metadata: data.metadata,
 			},
 			ipfs: data.ipfs,
@@ -565,40 +623,48 @@ export class License {
 				status: "inactive",
 				owner: "zelf-team",
 				description: `Custom domain: ${domain}`,
-				limits: { tags: 10000, zelfkeys: 10000 },
-				features: [
-					{
-						name: "Zelf Name System",
-						code: "zns",
-						description: "Encryptions, Decryptions, previews of ZelfProofs",
-						enabled: true,
-					},
-					{
-						name: "Zelf Keys",
-						code: "zelfkeys",
-						description: "Zelf Keys: Passwords, Notes, Credit Cards, etc.",
-						enabled: true,
-					},
-				],
-				validation: {
+				startDate: "",
+				endDate: "",
+				tags: {
 					minLength: 3,
 					maxLength: 50,
 					allowedChars: /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
 					reserved: ["www", "api", "admin", "support", "help"],
 					customRules: [],
+					payment: {
+						methods: ["coinbase", "crypto", "stripe"],
+						currencies: ["USD", "BTC", "ETH", "SOL"],
+						discounts: {
+							yearly: 0.1,
+							lifetime: 0.2,
+						},
+						rewardPrice: 10,
+						whitelist: {},
+						pricingTable: {},
+					},
+				},
+				zelfkeys: {
+					plans: [],
+					payment: {
+						whitelist: {},
+						pricingTable: {},
+					},
 				},
 				storage: {
 					keyPrefix: "tagName",
 					ipfsEnabled: true,
 					arweaveEnabled: true,
 					walrusEnabled: true,
+					backupEnabled: false,
 				},
-				tagPaymentSettings: {
-					methods: ["coinbase", "crypto", "stripe"],
-					currencies: ["USD", "BTC", "ETH", "SOL"],
-					whitelist: {},
-					pricingTable: {},
+				stripe: {
+					productId: "",
+					priceId: "",
+					latestInvoiceId: "",
+					amountPaid: 0,
+					paidAt: "",
 				},
+				limits: { tags: 100, zelfkeys: 100, zelfProofs: 100 },
 				metadata: {
 					launchDate: new Date().toISOString().split("T")[0],
 					version: "1.0.0",

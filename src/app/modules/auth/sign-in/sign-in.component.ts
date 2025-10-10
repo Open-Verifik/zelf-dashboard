@@ -296,7 +296,9 @@ export class AuthSignInComponent implements OnInit {
 						error.message.includes("No face detected") ||
 						error.message.includes("Face not recognized") ||
 						error.message.includes("biometric") ||
-						error.message.includes("face"))
+						error.message.includes("face") ||
+						error.message.includes("LIVENESS") ||
+						error.message.includes("liveness"))
 				) {
 					// Handle biometric-specific errors in the biometric component
 					if (this.biometricVerification) {

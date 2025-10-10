@@ -29,6 +29,7 @@ export const environment = {
 			create: "/api/license",
 			search: "/api/license",
 			delete: "/api/license",
+			myLicense: "/api/license/my-license",
 		},
 		security: {
 			changePassword: "/api/clients/sync/password",
@@ -36,6 +37,11 @@ export const environment = {
 		},
 		client: {
 			update: "/api/clients/sync",
+		},
+		subscriptionPlans: {
+			list: "/api/subscription-plans",
+			getById: "/api/subscription-plans",
+			subscribe: "/api/subscription-plans/subscribe",
 		},
 	},
 	// Feature flags

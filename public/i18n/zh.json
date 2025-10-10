@@ -141,6 +141,8 @@
 			"status_beta": "测试版",
 			"owner": "所有者",
 			"owner_placeholder": "zelf团队",
+			"start_date": "开始日期",
+			"end_date": "结束日期",
 			"description": "描述",
 			"description_placeholder": "官方Zelf域名"
 		},
@@ -148,6 +150,10 @@
 			"title": "功能",
 			"zns_title": "Zelf名称系统 (ZNS)",
 			"zns_description": "加密、解密、ZelfProofs预览",
+			"zns_enabled": "已启用",
+			"zns_disabled_title": "ZNS配置已禁用",
+			"zns_disabled_description": "标签验证规则、支付设置和价格配置仅在启用Zelf名称系统(ZNS)时可用。",
+			"zns_disabled_enable": "请在上方启用ZNS以配置标签相关设置。",
 			"zelfkeys_title": "Zelf密钥",
 			"zelfkeys_description": "密码、笔记、信用卡等"
 		},
@@ -217,7 +223,10 @@
 			"max_tags": "最大标签",
 			"max_tags_placeholder": "10000",
 			"max_zelfkeys": "最大ZelfKeys",
-			"max_zelfkeys_placeholder": "10000"
+			"max_zelfkeys_placeholder": "10000",
+			"info_title": "限制信息",
+			"info_description": "域名限制根据您的订阅计划自动管理。",
+			"info_subscription": "要修改限制，请在计划和计费部分升级或更改您的订阅计划。"
 		},
 		"metadata": {
 			"title": "元数据",

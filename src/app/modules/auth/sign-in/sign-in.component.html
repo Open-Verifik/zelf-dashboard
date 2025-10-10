@@ -16,6 +16,7 @@
 			<app-data-biometrics
 				#biometricVerification
 				[userData]="userData"
+				[isModalContext]="true"
 				(biometricsSuccess)="onBiometricSuccess($event)"
 				(biometricsCancel)="onBiometricCancel()"
 			></app-data-biometrics>

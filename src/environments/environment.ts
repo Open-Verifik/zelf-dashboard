@@ -1,6 +1,6 @@
 export const environment = {
 	production: false,
-	apiUrl: "http://localhost:3003",
+	apiUrl: "http://localhost:3050",
 	appName: "Zelf Dashboard",
 	version: "1.0.0",
 	debug: true,
@@ -38,6 +38,11 @@ export const environment = {
 		},
 		client: {
 			update: "/api/clients/sync",
+		},
+		subscriptionPlans: {
+			list: "/api/subscription-plans",
+			getById: "/api/subscription-plans",
+			subscribe: "/api/subscription-plans/subscribe",
 		},
 	},
 	// Feature flags
