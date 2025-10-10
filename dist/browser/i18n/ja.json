@@ -141,6 +141,8 @@
 			"status_beta": "ベータ",
 			"owner": "所有者",
 			"owner_placeholder": "zelfチーム",
+			"start_date": "開始日",
+			"end_date": "終了日",
 			"description": "説明",
 			"description_placeholder": "公式Zelfドメイン"
 		},
@@ -148,6 +150,10 @@
 			"title": "機能",
 			"zns_title": "Zelfネームシステム（ZNS）",
 			"zns_description": "暗号化、復号化、ZelfProofsのプレビュー",
+			"zns_enabled": "有効",
+			"zns_disabled_title": "ZNS設定が無効",
+			"zns_disabled_description": "タグ検証ルール、支払い設定、価格設定は、Zelfネームシステム（ZNS）が有効な場合のみ利用できます。",
+			"zns_disabled_enable": "上記でZNSを有効にしてタグ関連の設定を構成してください。",
 			"zelfkeys_title": "Zelfキー",
 			"zelfkeys_description": "パスワード、メモ、クレジットカードなど"
 		},
@@ -156,7 +162,9 @@
 			"min_length": "最小長",
 			"min_length_placeholder": "3",
 			"max_length": "最大長",
-			"max_length_placeholder": "50",
+			"max_length_placeholder": "27",
+			"max_length_hint": "最大27文字",
+			"max_length_error": "最大長は27文字を超えることはできません",
 			"hold_suffix": "ホールドサフィックス",
 			"hold_suffix_placeholder": ".hold",
 			"reserved_words": "予約語",
@@ -217,7 +225,10 @@
 			"max_tags": "最大タグ",
 			"max_tags_placeholder": "10000",
 			"max_zelfkeys": "最大ZelfKeys",
-			"max_zelfkeys_placeholder": "10000"
+			"max_zelfkeys_placeholder": "10000",
+			"info_title": "制限情報",
+			"info_description": "ドメインの制限は、サブスクリプションプランに基づいて自動的に管理されます。",
+			"info_subscription": "制限を変更するには、プランと請求セクションでサブスクリプションプランをアップグレードまたは変更してください。"
 		},
 		"metadata": {
 			"title": "メタデータ",

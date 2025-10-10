@@ -1,0 +1,687 @@
+<div class="space-y-8">
+	<!-- Alert Messages -->
+	@if (showAlert) {
+		<div
+			class="rounded-lg p-4"
+			[ngClass]="{
+				'bg-green-50 text-green-800 border border-green-200': alertType === 'success',
+				'bg-red-50 text-red-800 border border-red-200': alertType === 'error',
+			}"
+		>
+			<div class="flex items-center">
+				<mat-icon
+					class="mr-2"
+					[ngClass]="{
+						'text-green-500': alertType === 'success',
+						'text-red-500': alertType === 'error',
+					}"
+				>
+					{{ alertType === "success" ? "check_circle" : "error" }}
+				</mat-icon>
+				{{ alertMessage }}
+			</div>
+		</div>
+	}
+
+	<!-- Theme Settings Form -->
+	<form [formGroup]="themeForm" (ngSubmit)="saveThemeSettings()" class="space-y-8">
+		<!-- Tabs for ZNS and ZelfKeys -->
+		<mat-tab-group class="w-full">
+			<!-- ZNS Wallet Tab -->
+			<mat-tab label="ZNS Wallet">
+				<div class="p-6 space-y-6">
+					<!-- ZNS Header -->
+					<div class="flex items-center justify-between">
+						<div>
+							<h3 class="text-xl font-semibold text-gray-900 dark:text-white">ZNS Wallet Theme</h3>
+							<p class="text-sm text-gray-600 dark:text-gray-400">Customize colors for your ZNS Wallet interface</p>
+						</div>
+						<div class="flex space-x-2">
+							<button type="button" mat-button color="primary" (click)="previewZnsTheme()" class="text-sm">Preview</button>
+							<button type="button" mat-button color="warn" (click)="resetZnsColors()" class="text-sm">Reset</button>
+						</div>
+					</div>
+
+					<!-- Dark Mode Toggle -->
+					<div class="flex items-center space-x-4">
+						<mat-slide-toggle formControlName="znsDarkMode" (change)="toggleZnsDarkMode()"> Dark Mode </mat-slide-toggle>
+						<span class="text-sm text-gray-600 dark:text-gray-400"> Toggle between light and dark themes </span>
+					</div>
+
+					<mat-divider></mat-divider>
+
+					<!-- Color Customization Grid -->
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<!-- Primary Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Primary Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsPrimary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsPrimary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#3B82F6"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#64748B"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Background Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Background Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsBackground"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsBackground"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsBackgroundSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsBackgroundSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#F8FAFC"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Text Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Text Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#1E293B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsTextSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsTextSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#64748B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Muted Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsTextMuted"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsTextMuted"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#94A3B8"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Header Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Header Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsHeader"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsHeader"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#1E293B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsHeaderText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsHeaderText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Button Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Button Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Button</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsButton"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsButton"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#3B82F6"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsButtonText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsButtonText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Hover</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsButtonHover"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsButtonHover"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#2563EB"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Status Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Status Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsSuccess"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsSuccess"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#10B981"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsWarning"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsWarning"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#F59E0B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="znsError"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="znsError"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#EF4444"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+					</div>
+				</div>
+			</mat-tab>
+
+			<!-- ZelfKeys Tab -->
+			<mat-tab label="ZelfKeys">
+				<div class="p-6 space-y-6">
+					<!-- ZelfKeys Header -->
+					<div class="flex items-center justify-between">
+						<div>
+							<h3 class="text-xl font-semibold text-gray-900 dark:text-white">ZelfKeys Theme</h3>
+							<p class="text-sm text-gray-600 dark:text-gray-400">Customize colors for your ZelfKeys password manager interface</p>
+						</div>
+						<div class="flex space-x-2">
+							<button type="button" mat-button color="primary" (click)="previewZelfkeysTheme()" class="text-sm">Preview</button>
+							<button type="button" mat-button color="warn" (click)="resetZelfkeysColors()" class="text-sm">Reset</button>
+						</div>
+					</div>
+
+					<!-- Dark Mode Toggle -->
+					<div class="flex items-center space-x-4">
+						<mat-slide-toggle formControlName="zelfkeysDarkMode" (change)="toggleZelfkeysDarkMode()"> Dark Mode </mat-slide-toggle>
+						<span class="text-sm text-gray-600 dark:text-gray-400"> Toggle between light and dark themes </span>
+					</div>
+
+					<mat-divider></mat-divider>
+
+					<!-- Color Customization Grid -->
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<!-- Primary Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Primary Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysPrimary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysPrimary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#8B5CF6"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#64748B"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Background Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Background Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysBackground"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysBackground"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysBackgroundSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysBackgroundSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#F8FAFC"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Text Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Text Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#1E293B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysTextSecondary"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysTextSecondary"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#64748B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Muted Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysTextMuted"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysTextMuted"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#94A3B8"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Header Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Header Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Background</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysHeader"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysHeader"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#1E293B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysHeaderText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysHeaderText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Button Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Button Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Button</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysButton"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysButton"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#8B5CF6"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Text</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysButtonText"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysButtonText"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#FFFFFF"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Hover</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysButtonHover"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysButtonHover"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#7C3AED"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+
+						<!-- Status Colors -->
+						<mat-card class="p-4">
+							<mat-card-header>
+								<mat-card-title class="text-lg">Status Colors</mat-card-title>
+							</mat-card-header>
+							<mat-card-content class="space-y-4">
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysSuccess"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysSuccess"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#10B981"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysWarning"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysWarning"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#F59E0B"
+										/>
+									</div>
+								</div>
+								<div class="space-y-2">
+									<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error</label>
+									<div class="flex items-center space-x-2">
+										<input
+											type="color"
+											formControlName="zelfkeysError"
+											class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+										/>
+										<input
+											type="text"
+											formControlName="zelfkeysError"
+											class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+											placeholder="#EF4444"
+										/>
+									</div>
+								</div>
+							</mat-card-content>
+						</mat-card>
+					</div>
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+
+		<!-- Save Button -->
+		<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+			<button type="button" mat-button color="primary" class="px-6">Cancel</button>
+			<button type="submit" mat-raised-button color="primary" [disabled]="isLoading" class="px-6">
+				@if (isLoading) {
+					<mat-icon class="animate-spin mr-2">refresh</mat-icon>
+				}
+				Save Theme Settings
+			</button>
+		</div>
+	</form>
+</div>
+

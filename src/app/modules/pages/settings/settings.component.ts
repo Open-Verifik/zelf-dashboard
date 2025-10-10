@@ -49,6 +49,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 				description: "Manage your license",
 			},
 			{
+				id: "theme-styles",
+				icon: "heroicons_outline:paint-brush",
+				title: "Theme & Styles",
+				description: "Customize colors for Zelf Name Service and ZelfKeys",
+			},
+			{
 				id: "security",
 				icon: "heroicons_outline:lock-closed",
 				title: "Security",

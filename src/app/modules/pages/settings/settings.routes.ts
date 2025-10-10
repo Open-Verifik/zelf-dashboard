@@ -16,6 +16,11 @@ export default [
 				loadComponent: () => import("app/modules/pages/settings/license/license.component").then((m) => m.SettingsLicenseComponent),
 			},
 			{
+				path: "theme-styles",
+				loadComponent: () =>
+					import("app/modules/pages/settings/theme-styles/theme-styles.component").then((m) => m.SettingsThemeStylesComponent),
+			},
+			{
 				path: "security",
 				loadComponent: () => import("app/modules/pages/settings/security/security.component").then((m) => m.SettingsSecurityComponent),
 			},

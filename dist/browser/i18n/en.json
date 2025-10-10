@@ -156,13 +156,19 @@
 			"status_beta": "Beta",
 			"owner": "Owner",
 			"owner_placeholder": "zelf-team",
+			"start_date": "Start Date",
+			"end_date": "End Date",
 			"description": "Description",
 			"description_placeholder": "Official Zelf domain"
 		},
 		"features": {
 			"title": "Features",
-			"zns_title": "Zelf Name System (ZNS)",
+			"zns_title": "Zelf Name Service (ZNS)",
 			"zns_description": "Encryptions, Decryptions, previews of ZelfProofs",
+			"zns_enabled": "Enabled",
+			"zns_disabled_title": "ZNS Configuration Disabled",
+			"zns_disabled_description": "Tag validation rules, payment settings, and pricing configuration are only available when Zelf Name Service (ZNS) is enabled.",
+			"zns_disabled_enable": "Enable ZNS above to configure tag-related settings.",
 			"zelfkeys_title": "Zelf Keys",
 			"zelfkeys_description": "Passwords, Notes, Credit Cards, etc."
 		},
@@ -171,7 +177,9 @@
 			"min_length": "Minimum Length",
 			"min_length_placeholder": "3",
 			"max_length": "Maximum Length",
-			"max_length_placeholder": "50",
+			"max_length_placeholder": "27",
+			"max_length_hint": "Maximum 27 characters",
+			"max_length_error": "Maximum length cannot exceed 27 characters",
 			"hold_suffix": "Hold Suffix",
 			"hold_suffix_placeholder": ".hold",
 			"reserved_words": "Reserved Words",
@@ -232,7 +240,10 @@
 			"max_tags": "Max Tags",
 			"max_tags_placeholder": "10000",
 			"max_zelfkeys": "Max ZelfKeys",
-			"max_zelfkeys_placeholder": "10000"
+			"max_zelfkeys_placeholder": "10000",
+			"info_title": "Limits Information",
+			"info_description": "Domain limits are automatically managed based on your subscription plan.",
+			"info_subscription": "To modify limits, please upgrade or change your subscription plan in the Plan & Billing section."
 		},
 		"metadata": {
 			"title": "Metadata",
