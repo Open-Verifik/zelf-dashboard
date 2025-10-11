@@ -123,6 +123,12 @@
 			"description": "Please enter your master password to proceed with updating your profile information",
 			"action": "updating",
 			"itemName": "profile"
+		},
+		"theme_settings": {
+			"title": "Confirm Theme Settings",
+			"description": "Please enter your master password to proceed with updating your theme settings",
+			"action": "updating",
+			"itemName": "theme settings"
 		}
 	},
 	"save_confirmation": {
@@ -415,6 +421,75 @@
 			"feature_integrations": "Custom Integrations",
 			"renew": "Renew License",
 			"download": "Download"
+		}
+	},
+	"theme_settings": {
+		"title": "Theme Settings",
+		"subtitle": "Customize the appearance of your ZNS Wallet and ZelfKeys interfaces",
+		"zns_wallet": {
+			"title": "ZNS Wallet Theme",
+			"description": "Customize colors for your ZNS Wallet interface",
+			"dark_mode": "Dark Mode",
+			"dark_mode_description": "Toggle between light and dark themes",
+			"reset": "Reset",
+			"primary_colors": "Primary Colors",
+			"background_colors": "Background Colors",
+			"text_colors": "Text Colors",
+			"header_colors": "Header Colors",
+			"button_colors": "Button Colors",
+			"status_colors": "Status Colors",
+			"primary": "Primary",
+			"secondary": "Secondary",
+			"background": "Background",
+			"secondary_background": "Secondary Background",
+			"primary_text": "Primary Text",
+			"secondary_text": "Secondary Text",
+			"muted_text": "Muted Text",
+			"header_background": "Header Background",
+			"header_text": "Header Text",
+			"primary_button": "Primary Button",
+			"button_text": "Button Text",
+			"button_hover": "Button Hover",
+			"success": "Success",
+			"warning": "Warning",
+			"error": "Error"
+		},
+		"zelfkeys": {
+			"title": "ZelfKeys Theme",
+			"description": "Customize colors for your ZelfKeys password manager interface",
+			"dark_mode": "Dark Mode",
+			"dark_mode_description": "Toggle between light and dark themes",
+			"reset": "Reset",
+			"primary_colors": "Primary Colors",
+			"background_colors": "Background Colors",
+			"text_colors": "Text Colors",
+			"header_colors": "Header Colors",
+			"button_colors": "Button Colors",
+			"status_colors": "Status Colors",
+			"primary": "Primary",
+			"secondary": "Secondary",
+			"background": "Background",
+			"secondary_background": "Secondary Background",
+			"primary_text": "Primary Text",
+			"secondary_text": "Secondary Text",
+			"muted_text": "Muted Text",
+			"header_background": "Header Background",
+			"header_text": "Header Text",
+			"primary_button": "Primary Button",
+			"button_text": "Button Text",
+			"button_hover": "Button Hover",
+			"success": "Success",
+			"warning": "Warning",
+			"error": "Error"
+		},
+		"actions": {
+			"cancel": "Cancel",
+			"save": "Save Theme Settings",
+			"updating_colors": "Updating colors...",
+			"loading": "Loading theme settings...",
+			"failed_to_load": "Failed to load theme settings",
+			"invalid_settings": "Invalid theme settings. Please check all color values.",
+			"fill_required": "Please fill in all required fields correctly"
 		}
 	}
 }

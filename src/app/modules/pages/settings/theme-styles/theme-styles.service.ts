@@ -186,7 +186,7 @@ export class ThemeStylesService {
 	 * @returns Form data object
 	 */
 	convertThemeSettingsToForm(themeSettings: ThemeSettings): any {
-		return {
+		const formData = {
 			// ZNS Settings
 			znsEnabled: themeSettings.zns.enabled,
 			znsCurrentMode: themeSettings.zns.currentMode,
@@ -303,5 +303,7 @@ export class ThemeStylesService {
 			zelfkeysDarkCardBorder: themeSettings.zelfkeys.darkMode.colors.cardBorder,
 			zelfkeysDarkShadow: themeSettings.zelfkeys.darkMode.colors.shadow,
 		};
+
+		return formData;
 	}
 }

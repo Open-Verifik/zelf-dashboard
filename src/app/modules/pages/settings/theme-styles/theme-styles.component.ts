@@ -42,9 +42,13 @@ import { SaveConfirmationService } from "../../../../core/services/save-confirma
 export class SettingsThemeStylesComponent implements OnInit {
 	themeForm: UntypedFormGroup;
 	isLoading: boolean = false;
+	isLoadingColors: boolean = false;
 	showAlert: boolean = false;
 	alertMessage: string = "";
 	alertType: "success" | "error" = "success";
+
+	// Store the actual API data
+	currentThemeSettings: any = null;
 
 	// ZNS Wallet color settings
 	znsColors = {
@@ -183,6 +187,7 @@ export class SettingsThemeStylesComponent implements OnInit {
 			// ZNS Settings
 			znsEnabled: [true],
 			znsCurrentMode: ["light"],
+			znsDarkMode: [false],
 
 			// ZNS Light Mode Colors
 			znsLightPrimary: [this.znsColors.primary],
@@ -241,6 +246,7 @@ export class SettingsThemeStylesComponent implements OnInit {
 			// ZelfKeys Settings
 			zelfkeysEnabled: [true],
 			zelfkeysCurrentMode: ["light"],
+			zelfkeysDarkMode: [false],
 
 			// ZelfKeys Light Mode Colors
 			zelfkeysLightPrimary: [this.zelfkeysColors.primary],
@@ -306,8 +312,10 @@ export class SettingsThemeStylesComponent implements OnInit {
 
 		try {
 			const response = await this._themeService.getThemeSettings();
-
 			const themeSettings = response.data;
+
+			// Store the actual API data
+			this.currentThemeSettings = themeSettings;
 
 			const formData = this._themeService.convertThemeSettingsToForm(themeSettings);
 
@@ -318,7 +326,7 @@ export class SettingsThemeStylesComponent implements OnInit {
 			this._cdr.detectChanges();
 		} catch (error) {
 			console.error("Error loading theme settings:", error);
-			this.showError("Failed to load theme settings");
+			this.showError(this._translocoService.translate("theme_settings.actions.failed_to_load"));
 			this.isLoading = false;
 			this._cdr.detectChanges();
 		}
@@ -333,30 +341,73 @@ export class SettingsThemeStylesComponent implements OnInit {
 				this.themeForm.get(key)?.setValue(formData[key]);
 			}
 		});
+
+		// Set dark mode toggles based on current mode
+		const znsCurrentMode = formData.znsCurrentMode || "light";
+		this.themeForm.get("znsDarkMode")?.setValue(znsCurrentMode === "dark");
+
+		const zelfkeysCurrentMode = formData.zelfkeysCurrentMode || "light";
+		this.themeForm.get("zelfkeysDarkMode")?.setValue(zelfkeysCurrentMode === "dark");
 	}
 
 	/**
 	 * Toggle dark mode for ZNS
 	 */
 	toggleZnsDarkMode(): void {
-		const currentMode = this.themeForm.get("znsCurrentMode")?.value;
-		if (currentMode === "dark") {
-			this.applyZnsDarkMode();
-		} else {
-			this.applyZnsLightMode();
-		}
+		const isDarkMode = this.themeForm.get("znsDarkMode")?.value;
+		const newMode = isDarkMode ? "dark" : "light";
+
+		this.themeForm.get("znsCurrentMode")?.setValue(newMode);
+
+		// Show loading state
+		this.isLoadingColors = true;
+		this._cdr.detectChanges();
+
+		// Apply colors after a delay
+		setTimeout(() => {
+			if (isDarkMode) {
+				this.applyZnsDarkMode();
+			} else {
+				this.applyZnsLightMode();
+			}
+
+			// Patch the form with updated values
+			this.patchZnsFormValues();
+
+			// Hide loading state
+			this.isLoadingColors = false;
+			this._cdr.detectChanges();
+		}, 1000);
 	}
 
 	/**
 	 * Toggle dark mode for ZelfKeys
 	 */
 	toggleZelfkeysDarkMode(): void {
-		const currentMode = this.themeForm.get("zelfkeysCurrentMode")?.value;
-		if (currentMode === "dark") {
-			this.applyZelfkeysDarkMode();
-		} else {
-			this.applyZelfkeysLightMode();
-		}
+		const isDarkMode = this.themeForm.get("zelfkeysDarkMode")?.value;
+		const newMode = isDarkMode ? "dark" : "light";
+
+		this.themeForm.get("zelfkeysCurrentMode")?.setValue(newMode);
+
+		// Show loading state
+		this.isLoadingColors = true;
+		this._cdr.detectChanges();
+
+		// Apply colors after a delay
+		setTimeout(() => {
+			if (isDarkMode) {
+				this.applyZelfkeysDarkMode();
+			} else {
+				this.applyZelfkeysLightMode();
+			}
+
+			// Patch the form with updated values
+			this.patchZelfkeysFormValues();
+
+			// Hide loading state
+			this.isLoadingColors = false;
+			this._cdr.detectChanges();
+		}, 1000);
 	}
 
 	/**
@@ -367,6 +418,84 @@ export class SettingsThemeStylesComponent implements OnInit {
 			const formKey = `znsDark${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 			this.themeForm.get(formKey)?.setValue(this.darkModeZnsColors[key as keyof typeof this.darkModeZnsColors]);
 		});
+
+		// Force change detection
+		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Patch ZNS form values to update color pickers and inputs
+	 */
+	private patchZnsFormValues(): void {
+		const currentMode = this.themeForm.get("znsCurrentMode")?.value;
+		const isDarkMode = currentMode === "dark";
+
+		// Use actual API data if available, otherwise fall back to defaults
+		const znsData = this.currentThemeSettings?.zns;
+		const lightColors = znsData?.lightMode?.colors || this.znsColors;
+		const darkColors = znsData?.darkMode?.colors || this.darkModeZnsColors;
+
+		if (isDarkMode) {
+			// Patch with dark mode colors from API
+			this.themeForm.patchValue({
+				znsLightPrimary: darkColors.primary,
+				znsLightSecondary: darkColors.secondary,
+				znsLightBackground: darkColors.background,
+				znsLightBackgroundSecondary: darkColors.backgroundSecondary,
+				znsLightText: darkColors.text,
+				znsLightTextSecondary: darkColors.textSecondary,
+				znsLightTextMuted: darkColors.textMuted,
+				znsLightHeader: darkColors.header,
+				znsLightHeaderText: darkColors.headerText,
+				znsLightButton: darkColors.button,
+				znsLightButtonText: darkColors.buttonText,
+				znsLightButtonHover: darkColors.buttonHover,
+				znsLightButtonSecondary: darkColors.buttonSecondary,
+				znsLightButtonSecondaryText: darkColors.buttonSecondaryText,
+				znsLightBorder: darkColors.border,
+				znsLightBorderHover: darkColors.borderHover,
+				znsLightSuccess: darkColors.success,
+				znsLightSuccessText: darkColors.successText,
+				znsLightWarning: darkColors.warning,
+				znsLightWarningText: darkColors.warningText,
+				znsLightError: darkColors.error,
+				znsLightErrorText: darkColors.errorText,
+				znsLightCard: darkColors.card,
+				znsLightCardBorder: darkColors.cardBorder,
+				znsLightShadow: darkColors.shadow,
+			});
+		} else {
+			// Patch with light mode colors from API
+			this.themeForm.patchValue({
+				znsLightPrimary: lightColors.primary,
+				znsLightSecondary: lightColors.secondary,
+				znsLightBackground: lightColors.background,
+				znsLightBackgroundSecondary: lightColors.backgroundSecondary,
+				znsLightText: lightColors.text,
+				znsLightTextSecondary: lightColors.textSecondary,
+				znsLightTextMuted: lightColors.textMuted,
+				znsLightHeader: lightColors.header,
+				znsLightHeaderText: lightColors.headerText,
+				znsLightButton: lightColors.button,
+				znsLightButtonText: lightColors.buttonText,
+				znsLightButtonHover: lightColors.buttonHover,
+				znsLightButtonSecondary: lightColors.buttonSecondary,
+				znsLightButtonSecondaryText: lightColors.buttonSecondaryText,
+				znsLightBorder: lightColors.border,
+				znsLightBorderHover: lightColors.borderHover,
+				znsLightSuccess: lightColors.success,
+				znsLightSuccessText: lightColors.successText,
+				znsLightWarning: lightColors.warning,
+				znsLightWarningText: lightColors.warningText,
+				znsLightError: lightColors.error,
+				znsLightErrorText: lightColors.errorText,
+				znsLightCard: lightColors.card,
+				znsLightCardBorder: lightColors.cardBorder,
+				znsLightShadow: lightColors.shadow,
+			});
+		}
+
+		this._cdr.detectChanges();
 	}
 
 	/**
@@ -377,6 +506,9 @@ export class SettingsThemeStylesComponent implements OnInit {
 			const formKey = `znsLight${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 			this.themeForm.get(formKey)?.setValue(this.znsColors[key as keyof typeof this.znsColors]);
 		});
+
+		// Force change detection
+		this._cdr.detectChanges();
 	}
 
 	/**
@@ -387,6 +519,84 @@ export class SettingsThemeStylesComponent implements OnInit {
 			const formKey = `zelfkeysDark${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 			this.themeForm.get(formKey)?.setValue(this.darkModeZelfkeysColors[key as keyof typeof this.darkModeZelfkeysColors]);
 		});
+
+		// Force change detection
+		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Patch ZelfKeys form values to update color pickers and inputs
+	 */
+	private patchZelfkeysFormValues(): void {
+		const currentMode = this.themeForm.get("zelfkeysCurrentMode")?.value;
+		const isDarkMode = currentMode === "dark";
+
+		// Use actual API data if available, otherwise fall back to defaults
+		const zelfkeysData = this.currentThemeSettings?.zelfkeys;
+		const lightColors = zelfkeysData?.lightMode?.colors || this.zelfkeysColors;
+		const darkColors = zelfkeysData?.darkMode?.colors || this.darkModeZelfkeysColors;
+
+		if (isDarkMode) {
+			// Patch with dark mode colors from API
+			this.themeForm.patchValue({
+				zelfkeysLightPrimary: darkColors.primary,
+				zelfkeysLightSecondary: darkColors.secondary,
+				zelfkeysLightBackground: darkColors.background,
+				zelfkeysLightBackgroundSecondary: darkColors.backgroundSecondary,
+				zelfkeysLightText: darkColors.text,
+				zelfkeysLightTextSecondary: darkColors.textSecondary,
+				zelfkeysLightTextMuted: darkColors.textMuted,
+				zelfkeysLightHeader: darkColors.header,
+				zelfkeysLightHeaderText: darkColors.headerText,
+				zelfkeysLightButton: darkColors.button,
+				zelfkeysLightButtonText: darkColors.buttonText,
+				zelfkeysLightButtonHover: darkColors.buttonHover,
+				zelfkeysLightButtonSecondary: darkColors.buttonSecondary,
+				zelfkeysLightButtonSecondaryText: darkColors.buttonSecondaryText,
+				zelfkeysLightBorder: darkColors.border,
+				zelfkeysLightBorderHover: darkColors.borderHover,
+				zelfkeysLightSuccess: darkColors.success,
+				zelfkeysLightSuccessText: darkColors.successText,
+				zelfkeysLightWarning: darkColors.warning,
+				zelfkeysLightWarningText: darkColors.warningText,
+				zelfkeysLightError: darkColors.error,
+				zelfkeysLightErrorText: darkColors.errorText,
+				zelfkeysLightCard: darkColors.card,
+				zelfkeysLightCardBorder: darkColors.cardBorder,
+				zelfkeysLightShadow: darkColors.shadow,
+			});
+		} else {
+			// Patch with light mode colors from API
+			this.themeForm.patchValue({
+				zelfkeysLightPrimary: lightColors.primary,
+				zelfkeysLightSecondary: lightColors.secondary,
+				zelfkeysLightBackground: lightColors.background,
+				zelfkeysLightBackgroundSecondary: lightColors.backgroundSecondary,
+				zelfkeysLightText: lightColors.text,
+				zelfkeysLightTextSecondary: lightColors.textSecondary,
+				zelfkeysLightTextMuted: lightColors.textMuted,
+				zelfkeysLightHeader: lightColors.header,
+				zelfkeysLightHeaderText: lightColors.headerText,
+				zelfkeysLightButton: lightColors.button,
+				zelfkeysLightButtonText: lightColors.buttonText,
+				zelfkeysLightButtonHover: lightColors.buttonHover,
+				zelfkeysLightButtonSecondary: lightColors.buttonSecondary,
+				zelfkeysLightButtonSecondaryText: lightColors.buttonSecondaryText,
+				zelfkeysLightBorder: lightColors.border,
+				zelfkeysLightBorderHover: lightColors.borderHover,
+				zelfkeysLightSuccess: lightColors.success,
+				zelfkeysLightSuccessText: lightColors.successText,
+				zelfkeysLightWarning: lightColors.warning,
+				zelfkeysLightWarningText: lightColors.warningText,
+				zelfkeysLightError: lightColors.error,
+				zelfkeysLightErrorText: lightColors.errorText,
+				zelfkeysLightCard: lightColors.card,
+				zelfkeysLightCardBorder: lightColors.cardBorder,
+				zelfkeysLightShadow: lightColors.shadow,
+			});
+		}
+
+		this._cdr.detectChanges();
 	}
 
 	/**
@@ -397,24 +607,57 @@ export class SettingsThemeStylesComponent implements OnInit {
 			const formKey = `zelfkeysLight${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 			this.themeForm.get(formKey)?.setValue(this.zelfkeysColors[key as keyof typeof this.zelfkeysColors]);
 		});
+
+		// Force change detection
+		this._cdr.detectChanges();
 	}
 
 	/**
 	 * Reset ZNS to default colors
 	 */
 	resetZnsColors(): void {
+		this.themeForm.get("znsDarkMode")?.setValue(false);
 		this.themeForm.get("znsCurrentMode")?.setValue("light");
 
-		this.applyZnsLightMode();
+		// Show loading state
+		this.isLoadingColors = true;
+		this._cdr.detectChanges();
+
+		// Apply colors after a delay
+		setTimeout(() => {
+			this.applyZnsLightMode();
+
+			// Patch the form with updated values
+			this.patchZnsFormValues();
+
+			// Hide loading state
+			this.isLoadingColors = false;
+			this._cdr.detectChanges();
+		}, 1000);
 	}
 
 	/**
 	 * Reset ZelfKeys to default colors
 	 */
 	resetZelfkeysColors(): void {
+		this.themeForm.get("zelfkeysDarkMode")?.setValue(false);
 		this.themeForm.get("zelfkeysCurrentMode")?.setValue("light");
 
-		this.applyZelfkeysLightMode();
+		// Show loading state
+		this.isLoadingColors = true;
+		this._cdr.detectChanges();
+
+		// Apply colors after a delay
+		setTimeout(() => {
+			this.applyZelfkeysLightMode();
+
+			// Patch the form with updated values
+			this.patchZelfkeysFormValues();
+
+			// Hide loading state
+			this.isLoadingColors = false;
+			this._cdr.detectChanges();
+		}, 1000);
 	}
 
 	/**
@@ -422,7 +665,7 @@ export class SettingsThemeStylesComponent implements OnInit {
 	 */
 	saveThemeSettings(): void {
 		if (this.themeForm.invalid) {
-			this.showError("Please fill in all required fields correctly");
+			this.showError(this._translocoService.translate("theme_settings.actions.fill_required"));
 			return;
 		}
 
@@ -431,7 +674,7 @@ export class SettingsThemeStylesComponent implements OnInit {
 
 		// Validate theme settings
 		if (!this.validateThemeSettings(themeSettings)) {
-			this.showError("Invalid theme settings. Please check all color values.");
+			this.showError(this._translocoService.translate("theme_settings.actions.invalid_settings"));
 			return;
 		}
 

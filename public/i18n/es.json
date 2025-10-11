@@ -108,6 +108,12 @@
 			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu información de perfil",
 			"action": "actualizando",
 			"itemName": "perfil"
+		},
+		"theme_settings": {
+			"title": "Confirmar Configuración de Temas",
+			"description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu configuración de temas",
+			"action": "actualizando",
+			"itemName": "configuración de temas"
 		}
 	},
 	"save_confirmation": {
@@ -400,6 +406,75 @@
 			"feature_integrations": "Integraciones Personalizadas",
 			"renew": "Renovar Licencia",
 			"download": "Descargar"
+		}
+	},
+	"theme_settings": {
+		"title": "Configuración de Temas",
+		"subtitle": "Personaliza la apariencia de tus interfaces ZNS Wallet y ZelfKeys",
+		"zns_wallet": {
+			"title": "Tema ZNS Wallet",
+			"description": "Personaliza los colores para tu interfaz ZNS Wallet",
+			"dark_mode": "Modo Oscuro",
+			"dark_mode_description": "Alternar entre temas claros y oscuros",
+			"reset": "Restablecer",
+			"primary_colors": "Colores Primarios",
+			"background_colors": "Colores de Fondo",
+			"text_colors": "Colores de Texto",
+			"header_colors": "Colores de Encabezado",
+			"button_colors": "Colores de Botón",
+			"status_colors": "Colores de Estado",
+			"primary": "Primario",
+			"secondary": "Secundario",
+			"background": "Fondo",
+			"secondary_background": "Fondo Secundario",
+			"primary_text": "Texto Primario",
+			"secondary_text": "Texto Secundario",
+			"muted_text": "Texto Atenuado",
+			"header_background": "Fondo del Encabezado",
+			"header_text": "Texto del Encabezado",
+			"primary_button": "Botón Primario",
+			"button_text": "Texto del Botón",
+			"button_hover": "Botón al Pasar",
+			"success": "Éxito",
+			"warning": "Advertencia",
+			"error": "Error"
+		},
+		"zelfkeys": {
+			"title": "Tema ZelfKeys",
+			"description": "Personaliza los colores para tu interfaz del gestor de contraseñas ZelfKeys",
+			"dark_mode": "Modo Oscuro",
+			"dark_mode_description": "Alternar entre temas claros y oscuros",
+			"reset": "Restablecer",
+			"primary_colors": "Colores Primarios",
+			"background_colors": "Colores de Fondo",
+			"text_colors": "Colores de Texto",
+			"header_colors": "Colores de Encabezado",
+			"button_colors": "Colores de Botón",
+			"status_colors": "Colores de Estado",
+			"primary": "Primario",
+			"secondary": "Secundario",
+			"background": "Fondo",
+			"secondary_background": "Fondo Secundario",
+			"primary_text": "Texto Primario",
+			"secondary_text": "Texto Secundario",
+			"muted_text": "Texto Atenuado",
+			"header_background": "Fondo del Encabezado",
+			"header_text": "Texto del Encabezado",
+			"primary_button": "Botón Primario",
+			"button_text": "Texto del Botón",
+			"button_hover": "Botón al Pasar",
+			"success": "Éxito",
+			"warning": "Advertencia",
+			"error": "Error"
+		},
+		"actions": {
+			"cancel": "Cancelar",
+			"save": "Guardar Configuración de Temas",
+			"updating_colors": "Actualizando colores...",
+			"loading": "Cargando configuración de temas...",
+			"failed_to_load": "Error al cargar la configuración de temas",
+			"invalid_settings": "Configuración de temas inválida. Por favor verifica todos los valores de color.",
+			"fill_required": "Por favor completa todos los campos requeridos correctamente"
 		}
 	}
 }

@@ -107,6 +107,12 @@
 			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos informations de profil",
 			"action": "mise à jour",
 			"itemName": "profil"
+		},
+		"theme_settings": {
+			"title": "Confirmer les Paramètres de Thème",
+			"description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos paramètres de thème",
+			"action": "mise à jour",
+			"itemName": "paramètres de thème"
 		}
 	},
 	"save_confirmation": {
@@ -399,6 +405,75 @@
 			"feature_integrations": "Intégrations Personnalisées",
 			"renew": "Renouveler la Licence",
 			"download": "Télécharger"
+		}
+	},
+	"theme_settings": {
+		"title": "Paramètres de Thème",
+		"subtitle": "Personnalisez l'apparence de vos interfaces ZNS Wallet et ZelfKeys",
+		"zns_wallet": {
+			"title": "Thème ZNS Wallet",
+			"description": "Personnalisez les couleurs pour votre interface ZNS Wallet",
+			"dark_mode": "Mode Sombre",
+			"dark_mode_description": "Basculer entre les thèmes clairs et sombres",
+			"reset": "Réinitialiser",
+			"primary_colors": "Couleurs Principales",
+			"background_colors": "Couleurs d'Arrière-plan",
+			"text_colors": "Couleurs de Texte",
+			"header_colors": "Couleurs d'En-tête",
+			"button_colors": "Couleurs de Bouton",
+			"status_colors": "Couleurs de Statut",
+			"primary": "Principal",
+			"secondary": "Secondaire",
+			"background": "Arrière-plan",
+			"secondary_background": "Arrière-plan Secondaire",
+			"primary_text": "Texte Principal",
+			"secondary_text": "Texte Secondaire",
+			"muted_text": "Texte Atténué",
+			"header_background": "Arrière-plan de l'En-tête",
+			"header_text": "Texte de l'En-tête",
+			"primary_button": "Bouton Principal",
+			"button_text": "Texte du Bouton",
+			"button_hover": "Bouton au Survol",
+			"success": "Succès",
+			"warning": "Avertissement",
+			"error": "Erreur"
+		},
+		"zelfkeys": {
+			"title": "Thème ZelfKeys",
+			"description": "Personnalisez les couleurs pour votre interface du gestionnaire de mots de passe ZelfKeys",
+			"dark_mode": "Mode Sombre",
+			"dark_mode_description": "Basculer entre les thèmes clairs et sombres",
+			"reset": "Réinitialiser",
+			"primary_colors": "Couleurs Principales",
+			"background_colors": "Couleurs d'Arrière-plan",
+			"text_colors": "Couleurs de Texte",
+			"header_colors": "Couleurs d'En-tête",
+			"button_colors": "Couleurs de Bouton",
+			"status_colors": "Couleurs de Statut",
+			"primary": "Principal",
+			"secondary": "Secondaire",
+			"background": "Arrière-plan",
+			"secondary_background": "Arrière-plan Secondaire",
+			"primary_text": "Texte Principal",
+			"secondary_text": "Texte Secondaire",
+			"muted_text": "Texte Atténué",
+			"header_background": "Arrière-plan de l'En-tête",
+			"header_text": "Texte de l'En-tête",
+			"primary_button": "Bouton Principal",
+			"button_text": "Texte du Bouton",
+			"button_hover": "Bouton au Survol",
+			"success": "Succès",
+			"warning": "Avertissement",
+			"error": "Erreur"
+		},
+		"actions": {
+			"cancel": "Annuler",
+			"save": "Enregistrer les Paramètres de Thème",
+			"updating_colors": "Mise à jour des couleurs...",
+			"loading": "Chargement des paramètres de thème...",
+			"failed_to_load": "Échec du chargement des paramètres de thème",
+			"invalid_settings": "Paramètres de thème invalides. Veuillez vérifier toutes les valeurs de couleur.",
+			"fill_required": "Veuillez remplir tous les champs requis correctement"
 		}
 	}
 }

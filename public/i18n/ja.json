@@ -108,6 +108,12 @@
 			"description": "プロフィール情報を更新するには、マスターパスワードを入力してください",
 			"action": "更新中",
 			"itemName": "プロフィール"
+		},
+		"theme_settings": {
+			"title": "テーマ設定を確認",
+			"description": "テーマ設定を更新するには、マスターパスワードを入力してください",
+			"action": "更新中",
+			"itemName": "テーマ設定"
 		}
 	},
 	"save_confirmation": {
@@ -400,6 +406,75 @@
 			"feature_integrations": "カスタム統合",
 			"renew": "ライセンス更新",
 			"download": "ダウンロード"
+		}
+	},
+	"theme_settings": {
+		"title": "テーマ設定",
+		"subtitle": "ZNS WalletとZelfKeysインターフェースの外観をカスタマイズ",
+		"zns_wallet": {
+			"title": "ZNS Walletテーマ",
+			"description": "ZNS Walletインターフェースの色をカスタマイズ",
+			"dark_mode": "ダークモード",
+			"dark_mode_description": "ライトテーマとダークテーマを切り替え",
+			"reset": "リセット",
+			"primary_colors": "プライマリカラー",
+			"background_colors": "背景色",
+			"text_colors": "テキスト色",
+			"header_colors": "ヘッダー色",
+			"button_colors": "ボタン色",
+			"status_colors": "ステータス色",
+			"primary": "プライマリ",
+			"secondary": "セカンダリ",
+			"background": "背景",
+			"secondary_background": "セカンダリ背景",
+			"primary_text": "プライマリテキスト",
+			"secondary_text": "セカンダリテキスト",
+			"muted_text": "ミュートテキスト",
+			"header_background": "ヘッダー背景",
+			"header_text": "ヘッダーテキスト",
+			"primary_button": "プライマリボタン",
+			"button_text": "ボタンテキスト",
+			"button_hover": "ボタンホバー",
+			"success": "成功",
+			"warning": "警告",
+			"error": "エラー"
+		},
+		"zelfkeys": {
+			"title": "ZelfKeysテーマ",
+			"description": "ZelfKeysパスワードマネージャーインターフェースの色をカスタマイズ",
+			"dark_mode": "ダークモード",
+			"dark_mode_description": "ライトテーマとダークテーマを切り替え",
+			"reset": "リセット",
+			"primary_colors": "プライマリカラー",
+			"background_colors": "背景色",
+			"text_colors": "テキスト色",
+			"header_colors": "ヘッダー色",
+			"button_colors": "ボタン色",
+			"status_colors": "ステータス色",
+			"primary": "プライマリ",
+			"secondary": "セカンダリ",
+			"background": "背景",
+			"secondary_background": "セカンダリ背景",
+			"primary_text": "プライマリテキスト",
+			"secondary_text": "セカンダリテキスト",
+			"muted_text": "ミュートテキスト",
+			"header_background": "ヘッダー背景",
+			"header_text": "ヘッダーテキスト",
+			"primary_button": "プライマリボタン",
+			"button_text": "ボタンテキスト",
+			"button_hover": "ボタンホバー",
+			"success": "成功",
+			"warning": "警告",
+			"error": "エラー"
+		},
+		"actions": {
+			"cancel": "キャンセル",
+			"save": "テーマ設定を保存",
+			"updating_colors": "色を更新中...",
+			"loading": "テーマ設定を読み込み中...",
+			"failed_to_load": "テーマ設定の読み込みに失敗しました",
+			"invalid_settings": "無効なテーマ設定です。すべての色の値を確認してください。",
+			"fill_required": "必要なフィールドをすべて正しく入力してください"
 		}
 	}
 }
