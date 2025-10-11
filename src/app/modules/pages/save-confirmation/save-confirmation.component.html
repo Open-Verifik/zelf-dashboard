@@ -73,7 +73,7 @@
 		<div *ngIf="saveData && !isLoading && !isSuccess" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
 			<div class="flex items-center mb-4">
 				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">
-					{{ saveData.securityData ? "security" : "domain" }}
+					{{ saveData.securityData ? "security" : saveData.themeData ? "palette" : "domain" }}
 				</mat-icon>
 				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
 					{{ saveData.operation?.itemName || ("saving_operations.confirm_changes" | transloco) }}
@@ -111,6 +111,18 @@
 				<div *ngIf="saveData.securityData.operation === 'loadApiKey'" class="flex justify-between">
 					<span class="text-sm text-gray-500 dark:text-gray-400">Security:</span>
 					<span class="text-sm font-medium text-gray-900 dark:text-white">API Key Access</span>
+				</div>
+			</div>
+
+			<!-- Theme Operation Info -->
+			<div *ngIf="saveData.themeData" class="space-y-2">
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Operation:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">Update Theme Settings</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-gray-500 dark:text-gray-400">Type:</span>
+					<span class="text-sm font-medium text-gray-900 dark:text-white">Theme Customization</span>
 				</div>
 			</div>
 		</div>

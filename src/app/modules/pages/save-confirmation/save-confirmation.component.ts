@@ -127,6 +127,9 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		if (this.saveData.securityData) {
 			// Handle security operation (password change)
 			this.handleSecurityOperation(biometricData);
+		} else if (this.saveData.themeData) {
+			// Handle theme operation
+			this.handleThemeOperation(biometricData);
 		} else if (this.saveData.domainConfig && !this.saveData.domain) {
 			// Handle license operation (full license creation) - legacy support
 			this.handleLicenseOperation(biometricData);
@@ -186,6 +189,37 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		} catch (error) {
 			const operation = this.saveData?.securityData?.operation === "loadApiKey" ? "load API key" : "change password";
 			this.showError(`Failed to ${operation}. Please try again.`);
+		} finally {
+			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Handle theme operation (update theme settings)
+	 */
+	private async handleThemeOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.themeData) {
+			this.showError("No theme data available");
+			this.isLoading = false;
+			return;
+		}
+
+		try {
+			const themeData = {
+				...this.saveData.themeData,
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
+			// Check operation type
+			if (themeData.operation === "updateThemeSettings") {
+				await this.updateThemeSettings(themeData);
+			} else {
+				this.showError("Unknown theme operation");
+				this.isLoading = false;
+			}
+		} catch (error) {
+			this.showError("Failed to update theme settings. Please try again.");
 		} finally {
 			this.isLoading = false;
 		}
@@ -367,6 +401,37 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				this.showSuccess(
 					this.translocoService.translate("saving_operations.password_changed_successfully", {
 						itemName: this.saveData?.operation?.itemName || "Password",
+					})
+				);
+				// Redirect after success
+				setTimeout(() => {
+					this.saveConfirmationService.clearSaveData();
+					this.router.navigate([this.redirectUrl]);
+				}, 2000);
+			}
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Update theme settings
+	 */
+	private async updateThemeSettings(themeData: any): Promise<void> {
+		try {
+			const requestData = {
+				...themeData,
+				identificationMethod: "email",
+			};
+
+			const response = await this.httpWrapper.sendRequest("post", `${environment.apiUrl}/api/license/theme`, requestData);
+
+			console.log({ response: response.data });
+
+			if (response && response.data) {
+				this.showSuccess(
+					this.translocoService.translate("saving_operations.theme_settings_updated_successfully", {
+						itemName: this.saveData?.operation?.itemName || "Theme Settings",
 					})
 				);
 				// Redirect after success

@@ -115,6 +115,134 @@ export interface DomainConfig {
 		enterprise?: string;
 		support: string;
 	};
+	themeSettings?: ThemeSettings;
+}
+
+export interface ThemeSettings {
+	zns: {
+		enabled: boolean;
+		currentMode: "light" | "dark";
+		lightMode: {
+			colors: {
+				primary: string;
+				secondary: string;
+				background: string;
+				backgroundSecondary: string;
+				text: string;
+				textSecondary: string;
+				textMuted: string;
+				header: string;
+				headerText: string;
+				button: string;
+				buttonText: string;
+				buttonHover: string;
+				buttonSecondary: string;
+				buttonSecondaryText: string;
+				border: string;
+				borderHover: string;
+				success: string;
+				successText: string;
+				warning: string;
+				warningText: string;
+				error: string;
+				errorText: string;
+				card: string;
+				cardBorder: string;
+				shadow: string;
+			};
+		};
+		darkMode: {
+			colors: {
+				primary: string;
+				secondary: string;
+				background: string;
+				backgroundSecondary: string;
+				text: string;
+				textSecondary: string;
+				textMuted: string;
+				header: string;
+				headerText: string;
+				button: string;
+				buttonText: string;
+				buttonHover: string;
+				buttonSecondary: string;
+				buttonSecondaryText: string;
+				border: string;
+				borderHover: string;
+				success: string;
+				successText: string;
+				warning: string;
+				warningText: string;
+				error: string;
+				errorText: string;
+				card: string;
+				cardBorder: string;
+				shadow: string;
+			};
+		};
+	};
+	zelfkeys: {
+		enabled: boolean;
+		currentMode: "light" | "dark";
+		lightMode: {
+			colors: {
+				primary: string;
+				secondary: string;
+				background: string;
+				backgroundSecondary: string;
+				text: string;
+				textSecondary: string;
+				textMuted: string;
+				header: string;
+				headerText: string;
+				button: string;
+				buttonText: string;
+				buttonHover: string;
+				buttonSecondary: string;
+				buttonSecondaryText: string;
+				border: string;
+				borderHover: string;
+				success: string;
+				successText: string;
+				warning: string;
+				warningText: string;
+				error: string;
+				errorText: string;
+				card: string;
+				cardBorder: string;
+				shadow: string;
+			};
+		};
+		darkMode: {
+			colors: {
+				primary: string;
+				secondary: string;
+				background: string;
+				backgroundSecondary: string;
+				text: string;
+				textSecondary: string;
+				textMuted: string;
+				header: string;
+				headerText: string;
+				button: string;
+				buttonText: string;
+				buttonHover: string;
+				buttonSecondary: string;
+				buttonSecondaryText: string;
+				border: string;
+				borderHover: string;
+				success: string;
+				successText: string;
+				warning: string;
+				warningText: string;
+				error: string;
+				errorText: string;
+				card: string;
+				cardBorder: string;
+				shadow: string;
+			};
+		};
+	};
 }
 
 export interface Feature {
@@ -266,6 +394,7 @@ export class License {
 				enterprise: configData?.metadata?.enterprise,
 				support: configData?.metadata?.support || "standard",
 			},
+			themeSettings: configData?.themeSettings || License.getDefaultThemeSettings(),
 		};
 	}
 
@@ -704,7 +833,140 @@ export class License {
 					documentation: "",
 					support: "standard",
 				},
+				themeSettings: License.getDefaultThemeSettings(),
 			},
 		});
+	}
+
+	/**
+	 * Get default theme settings
+	 */
+	private static getDefaultThemeSettings(): ThemeSettings {
+		return {
+			zns: {
+				enabled: true,
+				currentMode: "light",
+				lightMode: {
+					colors: {
+						primary: "#3B82F6",
+						secondary: "#64748B",
+						background: "#FFFFFF",
+						backgroundSecondary: "#F8FAFC",
+						text: "#1E293B",
+						textSecondary: "#64748B",
+						textMuted: "#94A3B8",
+						header: "#1E293B",
+						headerText: "#FFFFFF",
+						button: "#3B82F6",
+						buttonText: "#FFFFFF",
+						buttonHover: "#2563EB",
+						buttonSecondary: "#E2E8F0",
+						buttonSecondaryText: "#475569",
+						border: "#E2E8F0",
+						borderHover: "#CBD5E1",
+						success: "#10B981",
+						successText: "#FFFFFF",
+						warning: "#F59E0B",
+						warningText: "#FFFFFF",
+						error: "#EF4444",
+						errorText: "#FFFFFF",
+						card: "#FFFFFF",
+						cardBorder: "#E2E8F0",
+						shadow: "rgba(0, 0, 0, 0.1)",
+					},
+				},
+				darkMode: {
+					colors: {
+						primary: "#60A5FA",
+						secondary: "#94A3B8",
+						background: "#0F172A",
+						backgroundSecondary: "#1E293B",
+						text: "#F1F5F9",
+						textSecondary: "#94A3B8",
+						textMuted: "#64748B",
+						header: "#1E293B",
+						headerText: "#F1F5F9",
+						button: "#60A5FA",
+						buttonText: "#0F172A",
+						buttonHover: "#3B82F6",
+						buttonSecondary: "#334155",
+						buttonSecondaryText: "#F1F5F9",
+						border: "#334155",
+						borderHover: "#475569",
+						success: "#34D399",
+						successText: "#0F172A",
+						warning: "#FBBF24",
+						warningText: "#0F172A",
+						error: "#F87171",
+						errorText: "#0F172A",
+						card: "#1E293B",
+						cardBorder: "#334155",
+						shadow: "rgba(0, 0, 0, 0.3)",
+					},
+				},
+			},
+			zelfkeys: {
+				enabled: true,
+				currentMode: "light",
+				lightMode: {
+					colors: {
+						primary: "#8B5CF6",
+						secondary: "#64748B",
+						background: "#FFFFFF",
+						backgroundSecondary: "#F8FAFC",
+						text: "#1E293B",
+						textSecondary: "#64748B",
+						textMuted: "#94A3B8",
+						header: "#1E293B",
+						headerText: "#FFFFFF",
+						button: "#8B5CF6",
+						buttonText: "#FFFFFF",
+						buttonHover: "#7C3AED",
+						buttonSecondary: "#E2E8F0",
+						buttonSecondaryText: "#475569",
+						border: "#E2E8F0",
+						borderHover: "#CBD5E1",
+						success: "#10B981",
+						successText: "#FFFFFF",
+						warning: "#F59E0B",
+						warningText: "#FFFFFF",
+						error: "#EF4444",
+						errorText: "#FFFFFF",
+						card: "#FFFFFF",
+						cardBorder: "#E2E8F0",
+						shadow: "rgba(0, 0, 0, 0.1)",
+					},
+				},
+				darkMode: {
+					colors: {
+						primary: "#A78BFA",
+						secondary: "#94A3B8",
+						background: "#0F172A",
+						backgroundSecondary: "#1E293B",
+						text: "#F1F5F9",
+						textSecondary: "#94A3B8",
+						textMuted: "#64748B",
+						header: "#1E293B",
+						headerText: "#F1F5F9",
+						button: "#A78BFA",
+						buttonText: "#0F172A",
+						buttonHover: "#8B5CF6",
+						buttonSecondary: "#334155",
+						buttonSecondaryText: "#F1F5F9",
+						border: "#334155",
+						borderHover: "#475569",
+						success: "#34D399",
+						successText: "#0F172A",
+						warning: "#FBBF24",
+						warningText: "#0F172A",
+						error: "#F87171",
+						errorText: "#0F172A",
+						card: "#1E293B",
+						cardBorder: "#334155",
+						shadow: "rgba(0, 0, 0, 0.3)",
+					},
+				},
+			},
+		};
 	}
 }

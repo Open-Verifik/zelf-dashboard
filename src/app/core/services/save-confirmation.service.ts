@@ -28,6 +28,12 @@ export interface SaveConfirmationData {
 		faceBase64: string;
 		masterPassword: string;
 	};
+	themeData?: {
+		themeSettings: any;
+		operation: string; // "updateThemeSettings"
+		faceBase64: string;
+		masterPassword: string;
+	};
 }
 
 @Injectable({
