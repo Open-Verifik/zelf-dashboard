@@ -189,14 +189,14 @@
 												type="color"
 												formControlName="znsLightTextSecondary"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsTextSecondary', $event)"
+												(change)="onColorChange('znsLightTextSecondary', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightTextSecondary"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#64748B"
-												(change)="onTextChange('znsTextSecondary', $event)"
+												(change)="onTextChange('znsLightTextSecondary', $event)"
 											/>
 										</div>
 									</div>
@@ -207,14 +207,14 @@
 												type="color"
 												formControlName="znsLightTextMuted"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsTextMuted', $event)"
+												(change)="onColorChange('znsLightTextMuted', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightTextMuted"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#94A3B8"
-												(change)="onTextChange('znsTextMuted', $event)"
+												(change)="onTextChange('znsLightTextMuted', $event)"
 											/>
 										</div>
 									</div>
@@ -234,14 +234,14 @@
 												type="color"
 												formControlName="znsLightHeader"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsHeader', $event)"
+												(change)="onColorChange('znsLightHeader', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightHeader"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#1E293B"
-												(change)="onTextChange('znsHeader', $event)"
+												(change)="onTextChange('znsLightHeader', $event)"
 											/>
 										</div>
 									</div>
@@ -252,14 +252,14 @@
 												type="color"
 												formControlName="znsLightHeaderText"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsHeaderText', $event)"
+												(change)="onColorChange('znsLightHeaderText', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightHeaderText"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#FFFFFF"
-												(change)="onTextChange('znsHeaderText', $event)"
+												(change)="onTextChange('znsLightHeaderText', $event)"
 											/>
 										</div>
 									</div>
@@ -279,14 +279,14 @@
 												type="color"
 												formControlName="znsLightButton"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsButton', $event)"
+												(change)="onColorChange('znsLightButton', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightButton"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#3B82F6"
-												(change)="onTextChange('znsButton', $event)"
+												(change)="onTextChange('znsLightButton', $event)"
 											/>
 										</div>
 									</div>
@@ -297,14 +297,14 @@
 												type="color"
 												formControlName="znsLightButtonText"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsButtonText', $event)"
+												(change)="onColorChange('znsLightButtonText', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightButtonText"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#FFFFFF"
-												(change)="onTextChange('znsButtonText', $event)"
+												(change)="onTextChange('znsLightButtonText', $event)"
 											/>
 										</div>
 									</div>
@@ -315,14 +315,152 @@
 												type="color"
 												formControlName="znsLightButtonHover"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsButtonHover', $event)"
+												(change)="onColorChange('znsLightButtonHover', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightButtonHover"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#2563EB"
-												(change)="onTextChange('znsButtonHover', $event)"
+												(change)="onTextChange('znsLightButtonHover', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightButtonSecondary"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightButtonSecondary', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightButtonSecondary"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('znsLightButtonSecondary', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightButtonSecondaryText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightButtonSecondaryText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightButtonSecondaryText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#475569"
+												(change)="onTextChange('znsLightButtonSecondaryText', $event)"
+											/>
+										</div>
+									</div>
+								</mat-card-content>
+							</mat-card>
+
+							<!-- Border Colors -->
+							<mat-card class="p-4">
+								<mat-card-header>
+									<mat-card-title class="text-lg">Border Colors</mat-card-title>
+								</mat-card-header>
+								<mat-card-content class="space-y-4">
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightBorder"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightBorder', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightBorder"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('znsLightBorder', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border Hover</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightBorderHover"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightBorderHover', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightBorderHover"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#CBD5E1"
+												(change)="onTextChange('znsLightBorderHover', $event)"
+											/>
+										</div>
+									</div>
+								</mat-card-content>
+							</mat-card>
+
+							<!-- Card Colors -->
+							<mat-card class="p-4">
+								<mat-card-header>
+									<mat-card-title class="text-lg">Card Colors</mat-card-title>
+								</mat-card-header>
+								<mat-card-content class="space-y-4">
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Background</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightCard"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightCard', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightCard"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('znsLightCard', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Border</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightCardBorder"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightCardBorder', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightCardBorder"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('znsLightCardBorder', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="text"
+												formControlName="znsLightShadow"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="rgba(0, 0, 0, 0.1)"
+												(change)="onTextChange('znsLightShadow', $event)"
 											/>
 										</div>
 									</div>
@@ -342,14 +480,32 @@
 												type="color"
 												formControlName="znsLightSuccess"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsSuccess', $event)"
+												(change)="onColorChange('znsLightSuccess', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightSuccess"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#10B981"
-												(change)="onTextChange('znsSuccess', $event)"
+												(change)="onTextChange('znsLightSuccess', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightSuccessText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightSuccessText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightSuccessText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('znsLightSuccessText', $event)"
 											/>
 										</div>
 									</div>
@@ -360,14 +516,32 @@
 												type="color"
 												formControlName="znsLightWarning"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsWarning', $event)"
+												(change)="onColorChange('znsLightWarning', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightWarning"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#F59E0B"
-												(change)="onTextChange('znsWarning', $event)"
+												(change)="onTextChange('znsLightWarning', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightWarningText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightWarningText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightWarningText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('znsLightWarningText', $event)"
 											/>
 										</div>
 									</div>
@@ -378,14 +552,32 @@
 												type="color"
 												formControlName="znsLightError"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsError', $event)"
+												(change)="onColorChange('znsLightError', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="znsLightError"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#EF4444"
-												(change)="onTextChange('znsError', $event)"
+												(change)="onTextChange('znsLightError', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="znsLightErrorText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('znsLightErrorText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="znsLightErrorText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('znsLightErrorText', $event)"
 											/>
 										</div>
 									</div>
@@ -540,14 +732,14 @@
 												type="color"
 												formControlName="zelfkeysLightText"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysText', $event)"
+												(change)="onColorChange('zelfkeysLightText', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightText"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#1E293B"
-												(change)="onTextChange('zelfkeysText', $event)"
+												(change)="onTextChange('zelfkeysLightText', $event)"
 											/>
 										</div>
 									</div>
@@ -558,14 +750,14 @@
 												type="color"
 												formControlName="zelfkeysLightTextSecondary"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysTextSecondary', $event)"
+												(change)="onColorChange('zelfkeysLightTextSecondary', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightTextSecondary"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#64748B"
-												(change)="onTextChange('zelfkeysTextSecondary', $event)"
+												(change)="onTextChange('zelfkeysLightTextSecondary', $event)"
 											/>
 										</div>
 									</div>
@@ -576,14 +768,14 @@
 												type="color"
 												formControlName="zelfkeysLightTextMuted"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysTextMuted', $event)"
+												(change)="onColorChange('zelfkeysLightTextMuted', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightTextMuted"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#94A3B8"
-												(change)="onTextChange('zelfkeysTextMuted', $event)"
+												(change)="onTextChange('zelfkeysLightTextMuted', $event)"
 											/>
 										</div>
 									</div>
@@ -603,14 +795,14 @@
 												type="color"
 												formControlName="zelfkeysLightHeader"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysHeader', $event)"
+												(change)="onColorChange('zelfkeysLightHeader', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightHeader"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#1E293B"
-												(change)="onTextChange('zelfkeysHeader', $event)"
+												(change)="onTextChange('zelfkeysLightHeader', $event)"
 											/>
 										</div>
 									</div>
@@ -621,14 +813,14 @@
 												type="color"
 												formControlName="zelfkeysLightHeaderText"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysHeaderText', $event)"
+												(change)="onColorChange('zelfkeysLightHeaderText', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightHeaderText"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysHeaderText', $event)"
+												(change)="onTextChange('zelfkeysLightHeaderText', $event)"
 											/>
 										</div>
 									</div>
@@ -648,14 +840,14 @@
 												type="color"
 												formControlName="zelfkeysLightButton"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysButton', $event)"
+												(change)="onColorChange('zelfkeysLightButton', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightButton"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#8B5CF6"
-												(change)="onTextChange('zelfkeysButton', $event)"
+												(change)="onTextChange('zelfkeysLightButton', $event)"
 											/>
 										</div>
 									</div>
@@ -666,14 +858,14 @@
 												type="color"
 												formControlName="zelfkeysLightButtonText"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysButtonText', $event)"
+												(change)="onColorChange('zelfkeysLightButtonText', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightButtonText"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysButtonText', $event)"
+												(change)="onTextChange('zelfkeysLightButtonText', $event)"
 											/>
 										</div>
 									</div>
@@ -684,14 +876,152 @@
 												type="color"
 												formControlName="zelfkeysLightButtonHover"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysButtonHover', $event)"
+												(change)="onColorChange('zelfkeysLightButtonHover', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightButtonHover"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#7C3AED"
-												(change)="onTextChange('zelfkeysButtonHover', $event)"
+												(change)="onTextChange('zelfkeysLightButtonHover', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightButtonSecondary"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightButtonSecondary', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightButtonSecondary"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('zelfkeysLightButtonSecondary', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightButtonSecondaryText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightButtonSecondaryText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightButtonSecondaryText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#475569"
+												(change)="onTextChange('zelfkeysLightButtonSecondaryText', $event)"
+											/>
+										</div>
+									</div>
+								</mat-card-content>
+							</mat-card>
+
+							<!-- Border Colors -->
+							<mat-card class="p-4">
+								<mat-card-header>
+									<mat-card-title class="text-lg">Border Colors</mat-card-title>
+								</mat-card-header>
+								<mat-card-content class="space-y-4">
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightBorder"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightBorder', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightBorder"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('zelfkeysLightBorder', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border Hover</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightBorderHover"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightBorderHover', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightBorderHover"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#CBD5E1"
+												(change)="onTextChange('zelfkeysLightBorderHover', $event)"
+											/>
+										</div>
+									</div>
+								</mat-card-content>
+							</mat-card>
+
+							<!-- Card Colors -->
+							<mat-card class="p-4">
+								<mat-card-header>
+									<mat-card-title class="text-lg">Card Colors</mat-card-title>
+								</mat-card-header>
+								<mat-card-content class="space-y-4">
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Background</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightCard"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightCard', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightCard"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('zelfkeysLightCard', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Border</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightCardBorder"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightCardBorder', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightCardBorder"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#E2E8F0"
+												(change)="onTextChange('zelfkeysLightCardBorder', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="text"
+												formControlName="zelfkeysLightShadow"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="rgba(0, 0, 0, 0.1)"
+												(change)="onTextChange('zelfkeysLightShadow', $event)"
 											/>
 										</div>
 									</div>
@@ -711,14 +1041,32 @@
 												type="color"
 												formControlName="zelfkeysLightSuccess"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysSuccess', $event)"
+												(change)="onColorChange('zelfkeysLightSuccess', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightSuccess"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#10B981"
-												(change)="onTextChange('zelfkeysSuccess', $event)"
+												(change)="onTextChange('zelfkeysLightSuccess', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightSuccessText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightSuccessText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightSuccessText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('zelfkeysLightSuccessText', $event)"
 											/>
 										</div>
 									</div>
@@ -729,14 +1077,32 @@
 												type="color"
 												formControlName="zelfkeysLightWarning"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysWarning', $event)"
+												(change)="onColorChange('zelfkeysLightWarning', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightWarning"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#F59E0B"
-												(change)="onTextChange('zelfkeysWarning', $event)"
+												(change)="onTextChange('zelfkeysLightWarning', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightWarningText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightWarningText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightWarningText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('zelfkeysLightWarningText', $event)"
 											/>
 										</div>
 									</div>
@@ -747,14 +1113,32 @@
 												type="color"
 												formControlName="zelfkeysLightError"
 												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysError', $event)"
+												(change)="onColorChange('zelfkeysLightError', $event)"
 											/>
 											<input
 												type="text"
 												formControlName="zelfkeysLightError"
 												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
 												placeholder="#EF4444"
-												(change)="onTextChange('zelfkeysError', $event)"
+												(change)="onTextChange('zelfkeysLightError', $event)"
+											/>
+										</div>
+									</div>
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error Text</label>
+										<div class="flex items-center space-x-2">
+											<input
+												type="color"
+												formControlName="zelfkeysLightErrorText"
+												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+												(change)="onColorChange('zelfkeysLightErrorText', $event)"
+											/>
+											<input
+												type="text"
+												formControlName="zelfkeysLightErrorText"
+												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+												placeholder="#FFFFFF"
+												(change)="onTextChange('zelfkeysLightErrorText', $event)"
 											/>
 										</div>
 									</div>
