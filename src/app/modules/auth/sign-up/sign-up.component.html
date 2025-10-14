@@ -1,24 +1,35 @@
 <!-- Biometric Verification Modal Overlay -->
 @if (showBiometricVerification) {
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-		<div class="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-lg bg-white dark:bg-gray-800">
-			<!-- Close button -->
-			<button
-				(click)="onBiometricCancel()"
-				class="absolute top-4 right-4 z-10 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-			>
-				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-				</svg>
-			</button>
+	<div class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+		<div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+			<div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white">Biometric Verification</h2>
+				<button
+					mat-icon-button
+					(click)="onBiometricCancel()"
+					class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+				>
+					<mat-icon>close</mat-icon>
+				</button>
+			</div>
 
-			<!-- Biometric component -->
-			<app-data-biometrics
-				#biometricVerification
-				[userData]="userData"
-				(biometricsSuccess)="onBiometricSuccess($event)"
-				(biometricsCancel)="onBiometricCancel()"
-			></app-data-biometrics>
+			<div class="p-6">
+				<p class="text-sm text-gray-600 dark:text-gray-300 mb-6 text-center">
+					Please verify your identity to complete your account registration
+					<strong class="text-gray-900 dark:text-white block mt-1">
+						{{ userData?.email || userData?.phone || "New Account" }}
+					</strong>
+				</p>
+
+				<!-- Biometric Component -->
+				<app-data-biometrics
+					#biometricVerification
+					[userData]="userData"
+					[isModalContext]="false"
+					(biometricsSuccess)="onBiometricSuccess($event)"
+					(biometricsCancel)="onBiometricCancel()"
+				></app-data-biometrics>
+			</div>
 		</div>
 	</div>
 }
