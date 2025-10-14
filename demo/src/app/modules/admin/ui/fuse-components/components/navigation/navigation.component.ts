@@ -56,7 +56,7 @@ export class NavigationComponent {
         // Get the navigation item
         const navigation = navComponent.navigation;
         const item = this._fuseNavigationService.getItem(itemId, navigation);
-        console.log(item);
+
         return item;
     }
 

@@ -87,9 +87,7 @@ export class LoadingBarComponent {
                     this.apiCallStatus = 'Finished!';
                 })
             )
-            .subscribe((response) => {
-                console.log(response);
-            });
+            .subscribe((response) => {});
     }
 
     /**

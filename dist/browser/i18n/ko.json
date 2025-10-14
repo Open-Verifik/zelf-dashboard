@@ -108,6 +108,12 @@
 			"description": "프로필 정보를 업데이트하려면 마스터 비밀번호를 입력해주세요",
 			"action": "업데이트 중",
 			"itemName": "프로필"
+		},
+		"theme_settings": {
+			"title": "테마 설정 확인",
+			"description": "테마 설정을 업데이트하려면 마스터 비밀번호를 입력해주세요",
+			"action": "업데이트 중",
+			"itemName": "테마 설정"
 		}
 	},
 	"save_confirmation": {
@@ -400,6 +406,75 @@
 			"feature_integrations": "사용자 정의 통합",
 			"renew": "라이선스 갱신",
 			"download": "다운로드"
+		}
+	},
+	"theme_settings": {
+		"title": "테마 설정",
+		"subtitle": "ZNS Wallet과 ZelfKeys 인터페이스의 외관을 사용자 정의",
+		"zns_wallet": {
+			"title": "ZNS Wallet 테마",
+			"description": "ZNS Wallet 인터페이스의 색상을 사용자 정의",
+			"dark_mode": "다크 모드",
+			"dark_mode_description": "라이트 테마와 다크 테마 간 전환",
+			"reset": "재설정",
+			"primary_colors": "주요 색상",
+			"background_colors": "배경 색상",
+			"text_colors": "텍스트 색상",
+			"header_colors": "헤더 색상",
+			"button_colors": "버튼 색상",
+			"status_colors": "상태 색상",
+			"primary": "주요",
+			"secondary": "보조",
+			"background": "배경",
+			"secondary_background": "보조 배경",
+			"primary_text": "주요 텍스트",
+			"secondary_text": "보조 텍스트",
+			"muted_text": "음소거 텍스트",
+			"header_background": "헤더 배경",
+			"header_text": "헤더 텍스트",
+			"primary_button": "주요 버튼",
+			"button_text": "버튼 텍스트",
+			"button_hover": "버튼 호버",
+			"success": "성공",
+			"warning": "경고",
+			"error": "오류"
+		},
+		"zelfkeys": {
+			"title": "ZelfKeys 테마",
+			"description": "ZelfKeys 비밀번호 관리자 인터페이스의 색상을 사용자 정의",
+			"dark_mode": "다크 모드",
+			"dark_mode_description": "라이트 테마와 다크 테마 간 전환",
+			"reset": "재설정",
+			"primary_colors": "주요 색상",
+			"background_colors": "배경 색상",
+			"text_colors": "텍스트 색상",
+			"header_colors": "헤더 색상",
+			"button_colors": "버튼 색상",
+			"status_colors": "상태 색상",
+			"primary": "주요",
+			"secondary": "보조",
+			"background": "배경",
+			"secondary_background": "보조 배경",
+			"primary_text": "주요 텍스트",
+			"secondary_text": "보조 텍스트",
+			"muted_text": "음소거 텍스트",
+			"header_background": "헤더 배경",
+			"header_text": "헤더 텍스트",
+			"primary_button": "주요 버튼",
+			"button_text": "버튼 텍스트",
+			"button_hover": "버튼 호버",
+			"success": "성공",
+			"warning": "경고",
+			"error": "오류"
+		},
+		"actions": {
+			"cancel": "취소",
+			"save": "테마 설정 저장",
+			"updating_colors": "색상 업데이트 중...",
+			"loading": "테마 설정 로딩 중...",
+			"failed_to_load": "테마 설정 로드 실패",
+			"invalid_settings": "유효하지 않은 테마 설정입니다. 모든 색상 값을 확인해 주세요.",
+			"fill_required": "필수 필드를 모두 올바르게 입력해 주세요"
 		}
 	}
 }

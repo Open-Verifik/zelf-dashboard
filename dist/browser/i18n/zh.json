@@ -108,6 +108,12 @@
 			"description": "请输入您的主密码以继续更新您的个人资料信息",
 			"action": "更新",
 			"itemName": "个人资料"
+		},
+		"theme_settings": {
+			"title": "确认主题设置",
+			"description": "请输入您的主密码以继续更新您的主题设置",
+			"action": "更新",
+			"itemName": "主题设置"
 		}
 	},
 	"save_confirmation": {
@@ -400,6 +406,75 @@
 			"feature_integrations": "自定义集成",
 			"renew": "续费许可证",
 			"download": "下载"
+		}
+	},
+	"theme_settings": {
+		"title": "主题设置",
+		"subtitle": "自定义您的ZNS Wallet和ZelfKeys界面外观",
+		"zns_wallet": {
+			"title": "ZNS Wallet主题",
+			"description": "自定义您的ZNS Wallet界面颜色",
+			"dark_mode": "深色模式",
+			"dark_mode_description": "在浅色和深色主题之间切换",
+			"reset": "重置",
+			"primary_colors": "主要颜色",
+			"background_colors": "背景颜色",
+			"text_colors": "文本颜色",
+			"header_colors": "标题颜色",
+			"button_colors": "按钮颜色",
+			"status_colors": "状态颜色",
+			"primary": "主要",
+			"secondary": "次要",
+			"background": "背景",
+			"secondary_background": "次要背景",
+			"primary_text": "主要文本",
+			"secondary_text": "次要文本",
+			"muted_text": "静音文本",
+			"header_background": "标题背景",
+			"header_text": "标题文本",
+			"primary_button": "主要按钮",
+			"button_text": "按钮文本",
+			"button_hover": "按钮悬停",
+			"success": "成功",
+			"warning": "警告",
+			"error": "错误"
+		},
+		"zelfkeys": {
+			"title": "ZelfKeys主题",
+			"description": "自定义您的ZelfKeys密码管理器界面颜色",
+			"dark_mode": "深色模式",
+			"dark_mode_description": "在浅色和深色主题之间切换",
+			"reset": "重置",
+			"primary_colors": "主要颜色",
+			"background_colors": "背景颜色",
+			"text_colors": "文本颜色",
+			"header_colors": "标题颜色",
+			"button_colors": "按钮颜色",
+			"status_colors": "状态颜色",
+			"primary": "主要",
+			"secondary": "次要",
+			"background": "背景",
+			"secondary_background": "次要背景",
+			"primary_text": "主要文本",
+			"secondary_text": "次要文本",
+			"muted_text": "静音文本",
+			"header_background": "标题背景",
+			"header_text": "标题文本",
+			"primary_button": "主要按钮",
+			"button_text": "按钮文本",
+			"button_hover": "按钮悬停",
+			"success": "成功",
+			"warning": "警告",
+			"error": "错误"
+		},
+		"actions": {
+			"cancel": "取消",
+			"save": "保存主题设置",
+			"updating_colors": "正在更新颜色...",
+			"loading": "正在加载主题设置...",
+			"failed_to_load": "加载主题设置失败",
+			"invalid_settings": "无效的主题设置。请检查所有颜色值。",
+			"fill_required": "请正确填写所有必填字段"
 		}
 	}
 }

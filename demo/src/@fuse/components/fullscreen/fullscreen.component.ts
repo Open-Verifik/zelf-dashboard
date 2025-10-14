@@ -39,7 +39,6 @@ export class FuseFullscreenComponent {
      */
     toggleFullscreen(): void {
         if (!this._document.fullscreenEnabled) {
-            console.log('Fullscreen is not available in this browser.');
             return;
         }
 
@@ -50,9 +49,7 @@ export class FuseFullscreenComponent {
         if (fullScreen) {
             this._document.exitFullscreen();
         } else {
-            this._document.documentElement.requestFullscreen().catch(() => {
-                console.error('Entering fullscreen mode failed.');
-            });
+            this._document.documentElement.requestFullscreen().catch(() => {});
         }
     }
 }
