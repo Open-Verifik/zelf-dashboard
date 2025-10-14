@@ -779,7 +779,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	async loadLicense(): Promise<void> {
 		// First try to load from localStorage
-		this.loadCurrentLicense();
+		// this.loadCurrentLicense();
 
 		// If no license in localStorage, fetch from backend
 		if (!this.currentLicense?.domain) {
