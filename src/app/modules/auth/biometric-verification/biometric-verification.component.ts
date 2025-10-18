@@ -101,7 +101,6 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private _changeDetectorRef: ChangeDetectorRef,
-		private _router: Router,
 		private _biometricService: BiometricService
 	) {}
 
