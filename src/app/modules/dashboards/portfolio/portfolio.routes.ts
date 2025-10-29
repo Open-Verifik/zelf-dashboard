@@ -16,15 +16,6 @@ export default [
 				loadComponent: () => import("app/modules/dashboards/portfolio/my-tags/my-tags.component").then((m) => m.PortfolioMyTagsComponent),
 			},
 			{
-				path: "payment",
-				loadComponent: () => import("app/modules/dashboards/portfolio/payment/payment.component").then((m) => m.PortfolioPaymentComponent),
-			},
-			{
-				path: "payment-checkout",
-				loadComponent: () =>
-					import("app/modules/dashboards/portfolio/payment/checkout/checkout.component").then((m) => m.PortfolioPaymentCheckoutComponent),
-			},
-			{
 				path: "discover",
 				loadComponent: () => import("app/modules/dashboards/portfolio/discover/discover.component").then((m) => m.PortfolioDiscoverComponent),
 			},

@@ -4,7 +4,9 @@ import { FormsModule } from "@angular/forms";
 import { MatIconModule } from "@angular/material/icon";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Router, ActivatedRoute } from "@angular/router";
+import { TranslocoModule } from "@jsverse/transloco";
 import { TagsService } from "../../../../tags/tags.service";
+import { SessionService } from "app/core/services/session.service";
 import { FuseConfigService } from "@fuse/services/config";
 import { Subject, takeUntil } from "rxjs";
 
@@ -14,7 +16,7 @@ import { Subject, takeUntil } from "rxjs";
 	styleUrls: ["./checkout.component.scss"],
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule],
+	imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule, TranslocoModule],
 })
 export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 	tagName = signal<string>("");
@@ -46,10 +48,14 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 		private elementRef: ElementRef,
 		private snackBar: MatSnackBar,
 		private tagsService: TagsService,
-		private _fuseConfigService: FuseConfigService
+		private _fuseConfigService: FuseConfigService,
+		private sessionService: SessionService
 	) {}
 
-	ngOnInit(): void {
+	async ngOnInit(): Promise<void> {
+		// Initialize session for API access
+		await this.sessionService.initializePaymentSession();
+
 		this.loadQueryParams();
 
 		// Subscribe to theme changes from Fuse config
@@ -303,13 +309,23 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 	}
 
 	goBack(): void {
-		this.router.navigate(["/portfolio/payment"], {
-			queryParams: {
-				tagname: this.tagName(),
-				domain: this.domain(),
-				duration: this.duration(),
-			},
-		});
+		// If payment is confirmed, clear the localStorage cache and go back without queryParams
+		if (this.isPaymentConfirmed()) {
+			// Clear the payment data from localStorage
+			localStorage.removeItem("signedDataPrice");
+
+			// Navigate back to payment options without any queryParams (fresh state)
+			this.router.navigate(["/portfolio/payment"]);
+		} else {
+			// If payment is not confirmed, go back with queryParams to preserve the state
+			this.router.navigate(["/portfolio/payment"], {
+				queryParams: {
+					tagname: this.tagName(),
+					domain: this.domain(),
+					duration: this.duration(),
+				},
+			});
+		}
 	}
 
 	async sendReceipt(): Promise<void> {

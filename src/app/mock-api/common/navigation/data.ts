@@ -32,6 +32,9 @@ export const portfolioNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:tag",
 		link: "/portfolio/my-tags",
+		hidden(item) {
+			return true;
+		},
 	},
 	{
 		id: "payment",
@@ -80,6 +83,9 @@ export const horizontalPortfolioNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:tag",
 		link: "/portfolio/my-tags",
+		hidden(item) {
+			return true;
+		},
 	},
 	{
 		id: "payment",
@@ -94,5 +100,8 @@ export const horizontalPortfolioNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:globe-alt",
 		link: "/portfolio/discover",
+		hidden(item) {
+			return true;
+		},
 	},
 ];

@@ -164,6 +164,6 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 	 */
 	openDocumentation(): void {
 		// Open the Docusaurus documentation site in a new tab
-		window.open("http://localhost:3000", "_blank");
+		window.open("https://docs.zelf.world", "_blank");
 	}
 }

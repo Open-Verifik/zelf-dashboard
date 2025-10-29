@@ -3,8 +3,9 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatIconModule } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
-import { HttpErrorResponse } from "@angular/common/http";
+import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
 import { TagsService } from "../../../tags/tags.service";
+import { SessionService } from "app/core/services/session.service";
 
 @Component({
 	selector: "portfolio-payment",
@@ -12,7 +13,7 @@ import { TagsService } from "../../../tags/tags.service";
 	styleUrls: ["./payment.component.scss"],
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, MatIconModule, FormsModule],
+	imports: [CommonModule, MatIconModule, FormsModule, TranslocoModule],
 })
 export class PortfolioPaymentComponent implements OnInit {
 	domains = signal<string[]>([".zelf", ".bdag"]); // Initialize with default domains
@@ -47,7 +48,9 @@ export class PortfolioPaymentComponent implements OnInit {
 		private cdr: ChangeDetectorRef,
 		private router: Router,
 		private route: ActivatedRoute,
-		private elementRef: ElementRef
+		private elementRef: ElementRef,
+		private translocoService: TranslocoService,
+		private sessionService: SessionService
 	) {}
 
 	@HostListener("document:click", ["$event"])
@@ -68,6 +71,9 @@ export class PortfolioPaymentComponent implements OnInit {
 	}
 
 	async ngOnInit(): Promise<void> {
+		// Initialize session for API access
+		await this.sessionService.initializePaymentSession();
+
 		await this.loadDomains();
 		await this.checkQueryParams();
 	}
@@ -278,7 +284,7 @@ export class PortfolioPaymentComponent implements OnInit {
 		const duration = this.selectedDuration();
 
 		if (!tagName || tagName.trim() === "") {
-			this.searchError.set("Please enter a tag name");
+			this.searchError.set(this.translocoService.translate("payment.pleaseEnterTagName"));
 
 			return;
 		}

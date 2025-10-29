@@ -67,6 +67,37 @@ export const appRoutes: Route[] = [
 		children: [{ path: "home", loadChildren: () => import("app/modules/landing/home/home.routes") }],
 	},
 
+	// Public payment routes (no authentication required)
+	{
+		path: "",
+		component: LayoutComponent,
+		data: {
+			layout: "centered",
+		},
+		resolve: {
+			initialData: initialDataResolver,
+		},
+		children: [
+			{
+				path: "portfolio",
+				children: [
+					{
+						path: "payment",
+						loadComponent: () =>
+							import("app/modules/dashboards/portfolio/payment/payment.component").then((m) => m.PortfolioPaymentComponent),
+					},
+					{
+						path: "payment-checkout",
+						loadComponent: () =>
+							import("app/modules/dashboards/portfolio/payment/checkout/checkout.component").then(
+								(m) => m.PortfolioPaymentCheckoutComponent
+							),
+					},
+				],
+			},
+		],
+	},
+
 	// Admin routes
 	{
 		path: "",
