@@ -285,8 +285,6 @@ export class ProfileComponent implements OnInit {
 			masterPassword: "", // Will be set during biometric verification
 		};
 
-		console.log("Profile data being sent:", profileData);
-
 		// Set save data in service
 		const saveData: SaveConfirmationData = {
 			domain: null, // Not needed for profile operations

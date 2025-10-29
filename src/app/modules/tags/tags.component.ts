@@ -224,43 +224,24 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result) => {
 			if (result) {
-				console.log("Edit modal closed with result:", result);
 				// Here you would typically make an API call to extend the lease
 				this.handleLeaseExtension(result);
 			}
 		});
 	}
 
-	private handleLeaseExtension(extensionData: any): void {
-		// TODO: Implement actual API call to extend lease
-		console.log("Extending lease:", extensionData);
-		// You would typically:
-		// 1. Make an API call to extend the lease
-		// 2. Update the local data source
-		// 3. Show a success/error message
-		// 4. Refresh the table data
-	}
+	private handleLeaseExtension(extensionData: any): void {}
 
 	deleteRecord(record: TagRecord): void {
 		if (!this.canDelete(record)) {
-			console.warn("Cannot delete record - not a .hold tag");
 			return;
 		}
-
-		// TODO: Implement confirmation dialog and delete functionality
-		console.log("Deleting record:", record);
-		// You would typically:
-		// 1. Show a confirmation dialog
-		// 2. Make an API call to delete the record
-		// 3. Update the local data source
-		// 4. Show a success/error message
 	}
 
 	// Pagination methods
 	goToFirstPage(): void {
 		this.currentPage = 1;
 		this.updateVisiblePages();
-		console.log("Going to first page");
 		this.performSearch();
 	}
 
@@ -268,7 +249,6 @@ export class TagsComponent implements OnInit, OnDestroy {
 		if (this.currentPage > 1) {
 			this.currentPage--;
 			this.updateVisiblePages();
-			console.log("Going to previous page:", this.currentPage);
 			this.performSearch();
 		}
 	}
@@ -277,7 +257,6 @@ export class TagsComponent implements OnInit, OnDestroy {
 		if (this.currentPage < this.totalPages) {
 			this.currentPage++;
 			this.updateVisiblePages();
-			console.log("Going to next page:", this.currentPage);
 			this.performSearch();
 		}
 	}
@@ -293,7 +272,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 		if (typeof page === "number" && page >= 1 && page <= this.totalPages) {
 			this.currentPage = page;
 			this.updateVisiblePages();
-			console.log("Going to page:", page);
+
 			this.performSearch();
 		}
 	}
@@ -302,7 +281,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 		this.currentPage = 1;
 		this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 		this.updateVisiblePages();
-		console.log("Page size changed to:", this.pageSize);
+
 		this.performSearch();
 	}
 

@@ -1,6 +1,6 @@
 <div class="relative flex min-w-0 flex-auto flex-col overflow-hidden">
 	<!-- Header & Cards -->
-	<div class="relative overflow-hidden px-6 pb-12 pt-8 sm:px-16 sm:pb-24 sm:pt-20">
+	<div class="relative overflow-hidden px-2 pb-6 pt-4 sm:px-8 sm:pb-12 sm:pt-10">
 		<!-- Background -->
 		<!-- prettier-ignore -->
 		<svg class="-z-1 absolute inset-0"
@@ -12,20 +12,36 @@
 		</svg>
 
 		<!-- Header -->
-		<div class="flex flex-col items-center">
-			<h2 class="text-xl font-semibold">SUBSCRIPTION PLANS</h2>
-			<div class="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">Choose your perfect plan</div>
-			<div class="text-secondary mt-3 text-center tracking-tight sm:text-2xl">
-				<div>Upgrade or downgrade your current plan.</div>
-				<div>Take control of your productivity.</div>
+		@if (!initialLoading) {
+			<div class="flex flex-col items-center">
+				<h2 class="text-xl font-semibold">SUBSCRIPTION MANAGEMENT</h2>
+				<div class="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
+					@if (hasSubscription) {
+						Your Active Plan
+					} @else {
+						Choose your perfect plan
+					}
+				</div>
+				<div class="text-secondary mt-3 text-center tracking-tight sm:text-2xl">
+					@if (hasSubscription) {
+						<div>Manage your subscription and billing.</div>
+						<div>Take control of your productivity.</div>
+					} @else {
+						<div>Upgrade or downgrade your current plan.</div>
+						<div>Take control of your productivity.</div>
+					}
+				</div>
 			</div>
-		</div>
+		}
 
-		<!-- Loading State -->
-		@if (loading) {
-			<div class="mt-8 flex justify-center">
-				<mat-icon class="animate-spin">refresh</mat-icon>
-				<span class="ml-2">Loading plans...</span>
+		<!-- Initial Loading State -->
+		@if (initialLoading) {
+			<div class="mt-10 flex justify-center sm:mt-20">
+				<div class="text-center">
+					<mat-icon class="animate-spin text-6xl text-primary mb-4">refresh</mat-icon>
+					<div class="text-xl font-semibold">Loading subscription details...</div>
+					<div class="text-secondary mt-2">Please wait while we fetch your plan information</div>
+				</div>
 			</div>
 		}
 
@@ -38,8 +54,246 @@
 			</div>
 		}
 
-		<!-- Plans Grid -->
-		@if (!loading && !error && plans.length > 0) {
+		<!-- Active Subscription Display -->
+		@if (!initialLoading && !error && hasSubscription && getCurrentPlan()) {
+			<div class="mt-10 flex justify-center sm:mt-20">
+				<div class="w-full max-w-4xl">
+					<!-- Current Plan Card -->
+					<fuse-card class="relative overflow-hidden">
+						<div class="bg-gradient-to-r from-primary/10 to-accent/10 p-8">
+							<div class="flex items-center justify-between">
+								<div>
+									<div class="flex items-center gap-3">
+										<h3 class="text-3xl font-bold">{{ getCurrentPlan().name }}</h3>
+										<span
+											class="px-3 py-1 rounded-full text-sm font-medium"
+											[ngClass]="getStatusBadgeColor(getCurrentSubscription().status)"
+										>
+											{{ getCurrentSubscription().status.toUpperCase() }}
+										</span>
+									</div>
+									<p class="text-secondary mt-2">{{ getCurrentPlan().description }}</p>
+								</div>
+								<div class="text-right">
+									<div class="text-4xl font-bold">
+										{{ formatPrice(getCurrentSubscription().plan.amount, getCurrentSubscription().plan.currency) }}
+									</div>
+									<div class="text-secondary">{{ getCurrentSubscription().plan.interval }} billing</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="p-8">
+							<!-- Plan Features -->
+							<div class="mb-8">
+								<h4 class="text-lg font-semibold mb-4">Plan Features</h4>
+								<div class="space-y-3">
+									@if (getCurrentPlan().metadata.zelfPlan === "zelfBasic") {
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>50</b> active users</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>50</b> encryptions/month</span>
+										</div>
+									} @else if (getCurrentPlan().metadata.zelfPlan === "zelfStartUp") {
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>500</b> active users</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>Unlimited</b> encryptions</span>
+										</div>
+									} @else if (getCurrentPlan().metadata.zelfPlan === "zelfBusiness") {
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>1,250</b> active users</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>Unlimited</b> encryptions</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">Priority support</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">Advanced analytics</span>
+										</div>
+									} @else if (getCurrentPlan().metadata.zelfPlan === "zelfGold") {
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>3,000</b> active users</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>Unlimited</b> encryptions</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">Priority support</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">Advanced analytics</span>
+										</div>
+									} @else if (getCurrentPlan().metadata.zelfPlan === "zelfEnterprise") {
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>10,000</b> active users</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>Unlimited</b> encryptions</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2"><b>Dedicated</b> infrastructure</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">24/7 support</span>
+										</div>
+										<div class="flex items-center">
+											<mat-icon class="text-green-600 icon-size-5" [svgIcon]="'heroicons_solid:check'"></mat-icon>
+											<span class="ml-2">Advanced analytics</span>
+										</div>
+									}
+								</div>
+							</div>
+
+							<!-- Action Buttons -->
+							<div class="mt-8">
+								<!-- Primary Actions -->
+								<div class="flex flex-col sm:flex-row gap-3 mb-4">
+									<button
+										mat-flat-button
+										[color]="'accent'"
+										class="flex-1 px-6 py-3 text-base font-medium"
+										(click)="openStripePortal()"
+									>
+										<mat-icon class="mr-2">payment</mat-icon>
+										Manage Billing
+									</button>
+								</div>
+							</div>
+						</div>
+					</fuse-card>
+
+					<!-- Billing Information Card -->
+					<fuse-card class="mt-6">
+						<div class="p-8">
+							<h4 class="text-lg font-semibold mb-6">Billing Information</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div class="bg-gray-50 p-4 rounded-lg">
+									<div class="text-sm text-secondary mb-2">Subscription ID</div>
+									<div class="font-mono text-sm break-all">{{ getCurrentSubscription().id }}</div>
+								</div>
+
+								<div class="bg-gray-50 p-4 rounded-lg">
+									<div class="text-sm text-secondary mb-2">Current Period</div>
+									<div class="text-sm">
+										{{ formatDate(getCurrentSubscription().current_period_start) }} -
+										{{ formatDate(getCurrentSubscription().current_period_end) }}
+									</div>
+								</div>
+								<div class="bg-gray-50 p-4 rounded-lg">
+									<div class="text-sm text-secondary mb-2">Next Billing</div>
+									<div class="text-sm">{{ formatDate(getCurrentSubscription().current_period_end) }}</div>
+								</div>
+							</div>
+						</div>
+					</fuse-card>
+
+					<!-- Upgrade Plans Section -->
+					@if (showPlanComparison && getUpgradePlans().length > 0) {
+						<div class="mt-8">
+							<h3 class="text-2xl font-bold text-center mb-6">Available Upgrades</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+								@for (plan of getUpgradePlans(); track trackByFn($index, plan)) {
+									<fuse-card
+										class="relative overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer border-2 border-primary/20 hover:border-primary/50"
+										(click)="showUpgradeComparison(plan)"
+									>
+										<div class="p-6">
+											<div class="text-center">
+												<h4 class="text-xl font-bold">{{ getPlanDisplayName(plan.metadata.zelfPlan) }}</h4>
+												<p class="text-secondary text-sm mt-2">{{ plan.description }}</p>
+
+												@if (getCheapestPrice(plan)) {
+													<div class="mt-4">
+														<div class="text-3xl font-bold">
+															{{ formatPrice(getCheapestPrice(plan)!.unit_amount, getCheapestPrice(plan)!.currency) }}
+														</div>
+														<div class="text-secondary text-sm">
+															{{ getCheapestPrice(plan)!.recurring.interval }} billing
+														</div>
+													</div>
+												}
+
+												<div class="mt-4">
+													<button mat-flat-button [color]="'primary'" class="w-full" (click)="upgradeToPlan(plan)">
+														Upgrade to {{ getPlanDisplayName(plan.metadata.zelfPlan) }}
+													</button>
+												</div>
+											</div>
+										</div>
+									</fuse-card>
+								}
+							</div>
+						</div>
+					}
+
+					<!-- Billing History Section -->
+					@if (billingHistory && billingHistory.length > 0) {
+						<div class="mt-8">
+							<h3 class="text-2xl font-bold text-center mb-6">Billing History</h3>
+							<fuse-card>
+								<div class="p-6">
+									@if (billingHistory.length > 0) {
+										<div class="space-y-4">
+											@for (invoice of billingHistory; track invoice.id) {
+												<div class="flex items-center justify-between p-4 border rounded-lg">
+													<div class="flex-1">
+														<div class="font-semibold">{{ invoice.description }}</div>
+														<div class="text-sm text-secondary">Invoice ID: {{ invoice.id }}</div>
+														<div class="text-sm text-secondary">
+															{{ formatDate(invoice.date) }}
+														</div>
+													</div>
+													<div class="text-right">
+														<div class="font-bold text-lg">
+															{{ formatPrice(invoice.amount, invoice.currency) }}
+														</div>
+														<span
+															class="px-2 py-1 rounded-full text-xs font-medium"
+															[ngClass]="getStatusBadgeColor(invoice.status)"
+														>
+															{{ invoice.status.toUpperCase() }}
+														</span>
+													</div>
+												</div>
+											}
+										</div>
+									} @else {
+										<div class="text-center text-secondary py-8">
+											<mat-icon class="text-6xl mb-4">receipt_long</mat-icon>
+											<p>No billing history available</p>
+										</div>
+									}
+								</div>
+							</fuse-card>
+						</div>
+					}
+				</div>
+			</div>
+		}
+
+		<!-- No Subscription - Show Plans -->
+		@if (!initialLoading && !error && !hasSubscription && plans.length > 0) {
 			<!-- Cards -->
 			<div class="mt-10 flex justify-center sm:mt-20">
 				<div class="w-full max-w-sm md:max-w-5xl">
@@ -171,22 +425,8 @@
 					</div>
 				</div>
 			</div>
-		}
 
-		<!-- No Plans State -->
-		@if (!loading && !error && plans.length === 0) {
-			<div class="mt-8 text-center text-secondary">No subscription plans available.</div>
-		}
-
-		<!-- Hidden Form for Data Binding -->
-		@if (!loading && !error && plans.length > 0) {
-			<form [formGroup]="planBillingForm" class="hidden">
-				<input [formControlName]="'plan'" type="hidden" />
-			</form>
-		}
-
-		<!-- Actions -->
-		@if (!loading && !error && plans.length > 0) {
+			<!-- Subscribe Button -->
 			<div class="mt-8 flex items-center justify-center">
 				<button
 					mat-flat-button
@@ -199,13 +439,23 @@
 					@if (subscribing) {
 						<mat-icon class="animate-spin mr-2">refresh</mat-icon>
 						Creating Checkout Session...
-					} @else if (hasSubscription) {
-						Save Changes
 					} @else {
 						Subscribe
 					}
 				</button>
 			</div>
+		}
+
+		<!-- No Plans State -->
+		@if (!initialLoading && !error && plans.length === 0) {
+			<div class="mt-8 text-center text-secondary">No subscription plans available.</div>
+		}
+
+		<!-- Hidden Form for Data Binding -->
+		@if (!initialLoading && !error && plans.length > 0) {
+			<form [formGroup]="planBillingForm" class="hidden">
+				<input [formControlName]="'plan'" type="hidden" />
+			</form>
 		}
 	</div>
 </div>

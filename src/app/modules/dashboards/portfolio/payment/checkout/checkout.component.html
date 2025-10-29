@@ -1,0 +1,252 @@
+<div class="w-full">
+	<!-- Back Button -->
+	<div class="mb-6">
+		<button
+			(click)="goBack()"
+			class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition"
+		>
+			<mat-icon class="text-lg">arrow_back</mat-icon>
+			<span>Back to Payment</span>
+		</button>
+	</div>
+
+	<!-- Main Content -->
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+		<!-- Left Side: Order Details -->
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Order details</h2>
+
+			<!-- Domain to purchase -->
+			<div class="mb-6">
+				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Domain to purchase</p>
+				<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ getFullTagName() }}</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300">
+					{{ tagName()?.length }} characters length, {{ getDurationLabel() }} lease, total cost
+					{{ getPriceInUSD() }}
+				</p>
+			</div>
+
+			<!-- Year/Duration Info Box -->
+			<div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+				<div class="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+					<div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+						<mat-icon class="text-blue-600 dark:text-blue-400 text-xs">info</mat-icon>
+					</div>
+					<div class="flex-1">
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">Domain price length</p>
+					</div>
+					<a
+						[href]="getPricingDocsUrl()"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+						>Know more</a
+					>
+				</div>
+			</div>
+
+			<!-- Year/Duration -->
+			<div class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+				<div class="flex items-center justify-between">
+					<span class="text-sm font-medium text-gray-900 dark:text-gray-100">Lease agreement</span>
+					<span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ getDurationLabel() }}</span>
+				</div>
+			</div>
+
+			<!-- Total -->
+			<div class="mb-6">
+				<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Total</p>
+				@if (paymentMethod() === "COINBASE") {
+					<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">${{ price() }}</p>
+				} @else {
+					<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ amountToPay() }} {{ paymentMethod() }}</p>
+				}
+				<div class="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg">
+					{{ getPriceInUSD() }}
+				</div>
+			</div>
+
+			<!-- Purchase Rate or Success Message -->
+			<div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+				@if (!isPaymentConfirmed()) {
+					<div class="flex items-center justify-between">
+						<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Payment method</span>
+						<span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ paymentMethod() }}</span>
+					</div>
+				} @else {
+					<div class="space-y-6">
+						<!-- Congratulations Message -->
+						<div
+							class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800"
+						>
+							<div class="flex items-start gap-4">
+								<div class="flex-shrink-0 w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+									<mat-icon class="text-green-600 dark:text-green-400 text-2xl">celebration</mat-icon>
+								</div>
+								<div class="flex-1">
+									<h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h3>
+									<p class="text-sm text-gray-700 dark:text-gray-300 mb-1">
+										Your new ZNS tag <strong class="uppercase">{{ getFullTagName() }}</strong> is now active.
+									</p>
+									<p class="text-xs text-gray-600 dark:text-gray-400 italic">Enjoy the benefits of ZNS — your face is your key.</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Email Receipt Form -->
+						<div class="space-y-3">
+							<p class="text-sm font-medium text-gray-700 dark:text-gray-300">Would you like to keep a receipt of your payment?</p>
+							<div class="flex gap-2">
+								<input
+									type="email"
+									placeholder="Enter your email"
+									[(ngModel)]="receiptEmail"
+									class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+								/>
+								<button
+									(click)="sendReceipt()"
+									[disabled]="isSendingReceipt()"
+									class="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+								>
+									@if (isSendingReceipt()) {
+										<span class="animate-spin">⏳</span>
+										<span>Sending...</span>
+									} @else {
+										Send receipt
+									}
+								</button>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<!-- Right Side: Payment QR Code and Details -->
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+			<h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">Pay with {{ paymentMethod() }}</h2>
+
+			<!-- QR Code (Styled) -->
+			<div class="mb-6 flex justify-center">
+				<div
+					id="qrContainer"
+					class="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900"
+				></div>
+			</div>
+
+			<!-- Payment Details -->
+			<div class="space-y-4">
+				<h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Payment details</h3>
+
+				<!-- Unique payment address -->
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+						@if (paymentMethod() === "COINBASE") {
+							Coinbase payment URL
+						} @else {
+							Unique payment address
+						}
+						<button
+							(click)="copyAddress()"
+							class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-2 py-1 rounded transition"
+						>
+							COPY
+						</button>
+						@if (paymentMethod() === "COINBASE" && coinbaseUrl()) {
+							<button
+								(click)="openCoinbaseLink()"
+								class="text-xs bg-blue-100 dark:bg-blue-700 hover:bg-blue-200 dark:hover:bg-blue-600 text-blue-700 dark:text-blue-300 px-2 py-1 rounded transition"
+							>
+								↗ Open link
+							</button>
+						}
+					</p>
+					<div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+						<code class="text-xs break-all text-gray-900 dark:text-gray-100 flex-1">{{ getAddressToDisplay() }}</code>
+					</div>
+				</div>
+
+				<!-- Amount to pay -->
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
+						Amount to pay
+						<button
+							(click)="copyAmount()"
+							class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-2 py-1 rounded transition"
+						>
+							COPY
+						</button>
+					</p>
+					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+						@if (paymentMethod() === "COINBASE") {
+							<p class="text-lg font-bold text-gray-900 dark:text-gray-100">${{ price() }}</p>
+						} @else {
+							<p class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ amountToPay() }} {{ paymentMethod() }}</p>
+						}
+					</div>
+				</div>
+
+				<!-- Expires in -->
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Expires in</p>
+					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+						<p class="text-sm text-gray-900 dark:text-gray-100">{{ getExpirationDate() }}</p>
+					</div>
+				</div>
+
+				<!-- Transaction status -->
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Transaction status</p>
+					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+						@if (isPaymentConfirmed()) {
+							<span
+								class="inline-flex px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 text-sm font-medium rounded items-center gap-2"
+							>
+								<mat-icon class="text-xs">check_circle</mat-icon>
+								SUCCESS
+							</span>
+						} @else if (isCheckingPayment()) {
+							<span
+								class="inline-flex px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-sm font-medium rounded items-center gap-2"
+							>
+								<span class="animate-spin">⏳</span>
+								Checking...
+							</span>
+						} @else {
+							<span
+								class="inline-block px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300 text-sm font-medium rounded"
+							>
+								PENDING
+							</span>
+						}
+					</div>
+					@if (isCheckingPayment()) {
+						<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Checking payment status every 5 seconds...</p>
+					} @else if (isPaymentConfirmed()) {
+						<p class="text-xs text-green-600 dark:text-green-400 mt-1">Payment confirmed successfully!</p>
+					}
+				</div>
+
+				<!-- Amount detected -->
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Amount detected</p>
+					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+						@if (isPaymentConfirmed() && amountReceived()) {
+							@if (paymentMethod() === "COINBASE") {
+								<p class="text-lg font-bold text-green-600 dark:text-green-400">${{ amountReceived() }}</p>
+							} @else {
+								<p class="text-lg font-bold text-green-600 dark:text-green-400">{{ amountReceived() }} {{ paymentMethod() }}</p>
+							}
+						} @else {
+							@if (paymentMethod() === "COINBASE") {
+								<p class="text-lg font-bold text-gray-900 dark:text-gray-100">$0.00</p>
+							} @else {
+								<p class="text-lg font-bold text-gray-900 dark:text-gray-100">0 {{ paymentMethod() }}</p>
+							}
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,5 +1,6 @@
 export const environment = {
 	production: false,
+	includeNonPaidDomains: true,
 	apiUrl: "http://localhost:3050",
 	appName: "Zelf Dashboard",
 	version: "1.0.0",
@@ -43,6 +44,10 @@ export const environment = {
 			list: "/api/subscription-plans",
 			getById: "/api/subscription-plans",
 			subscribe: "/api/subscription-plans/subscribe",
+			mySubscription: "/api/subscription-plans/my-subscription",
+			createPortalSession: "/api/subscription-plans/create-portal-session",
+			cancelSubscription: "/api/subscription-plans/cancel-subscription",
+			upgradeSubscription: "/api/subscription-plans/upgrade-subscription",
 		},
 	},
 	// Feature flags

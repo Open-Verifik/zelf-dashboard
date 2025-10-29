@@ -9,7 +9,6 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
 
 	// First check if all required session data is present
 	if (!authService.hasValidSession()) {
-		console.log("AuthGuard: Missing required session data (accessToken, zelfProof, or zelfAccount)");
 		// Redirect to the sign-in page with a redirectUrl param
 		const redirectURL = state.url === "/sign-out" ? "" : `redirectURL=${state.url}`;
 		const urlTree = router.parseUrl(`sign-in?${redirectURL}`);
@@ -21,7 +20,6 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
 		switchMap((authenticated) => {
 			// If the user is not authenticated...
 			if (!authenticated) {
-				console.log("AuthGuard: Authentication check failed");
 				// Redirect to the sign-in page with a redirectUrl param
 				const redirectURL = state.url === "/sign-out" ? "" : `redirectURL=${state.url}`;
 				const urlTree = router.parseUrl(`sign-in?${redirectURL}`);
@@ -29,7 +27,6 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
 				return of(urlTree);
 			}
 
-			console.log("AuthGuard: Access granted");
 			// Allow the access
 			return of(true);
 		})

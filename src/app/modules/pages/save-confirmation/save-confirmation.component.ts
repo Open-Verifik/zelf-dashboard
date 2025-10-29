@@ -395,8 +395,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				requestData
 			);
 
-			console.log({ response: response.data });
-
 			if (response && response.data) {
 				this.showSuccess(
 					this.translocoService.translate("saving_operations.password_changed_successfully", {
@@ -425,8 +423,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 			};
 
 			const response = await this.httpWrapper.sendRequest("post", `${environment.apiUrl}/api/license/theme`, requestData);
-
-			console.log({ response: response.data });
 
 			if (response && response.data) {
 				this.showSuccess(

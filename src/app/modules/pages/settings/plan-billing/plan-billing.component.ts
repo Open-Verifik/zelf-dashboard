@@ -39,6 +39,12 @@ export class SettingsPlanBillingComponent implements OnInit {
 	subscribing: boolean = false;
 	error: string | null = null;
 	hasSubscription: boolean = false;
+	mySubscription: any = null;
+	showPlanComparison: boolean = false;
+	selectedUpgradePlan: SubscriptionPlan | null = null;
+	showBillingHistory: boolean = false;
+	billingHistory: any[] = [];
+	initialLoading: boolean = true;
 
 	/**
 	 * Constructor
@@ -71,8 +77,29 @@ export class SettingsPlanBillingComponent implements OnInit {
 			zip: [""],
 		});
 
-		// Load subscription plans
-		await this.loadSubscriptionPlans();
+		try {
+			// Load subscription data first
+			await this.loadMyPlan();
+			// Then load subscription plans
+			await this.loadSubscriptionPlans();
+		} finally {
+			this.initialLoading = false;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Load my plan from API
+	 */
+	async loadMyPlan(): Promise<void> {
+		try {
+			this.mySubscription = await this._subscriptionPlansService.getMySubscription();
+			this.hasSubscription = this.mySubscription && this.mySubscription.subscription && this.mySubscription.subscription.status === "active";
+			this._cdr.detectChanges();
+		} catch (error) {
+			console.error("Failed to load subscription:", error);
+			this.hasSubscription = false;
+		}
 	}
 
 	/**
@@ -227,5 +254,259 @@ export class SettingsPlanBillingComponent implements OnInit {
 			this.subscribing = false;
 			this._cdr.detectChanges();
 		}
+	}
+
+	/**
+	 * Get current plan details
+	 */
+	getCurrentPlan(): any {
+		if (!this.mySubscription || !this.mySubscription.product) return null;
+		return this.mySubscription.product;
+	}
+
+	/**
+	 * Get current subscription details
+	 */
+	getCurrentSubscription(): any {
+		if (!this.mySubscription || !this.mySubscription.subscription) return null;
+		return this.mySubscription.subscription;
+	}
+
+	/**
+	 * Format date for display
+	 */
+	formatDate(timestamp: number): string {
+		return new Date(timestamp * 1000).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	}
+
+	/**
+	 * Get subscription status color
+	 */
+	getStatusColor(status: string): string {
+		switch (status) {
+			case "active":
+				return "text-green-600";
+			case "canceled":
+				return "text-red-600";
+			case "past_due":
+				return "text-yellow-600";
+			case "unpaid":
+				return "text-red-600";
+			default:
+				return "text-gray-600";
+		}
+	}
+
+	/**
+	 * Get subscription status badge color
+	 */
+	getStatusBadgeColor(status: string): string {
+		switch (status) {
+			case "active":
+				return "bg-green-100 text-green-800";
+			case "canceled":
+				return "bg-red-100 text-red-800";
+			case "past_due":
+				return "bg-yellow-100 text-yellow-800";
+			case "unpaid":
+				return "bg-red-100 text-red-800";
+			default:
+				return "bg-gray-100 text-gray-800";
+		}
+	}
+
+	/**
+	 * Show plan comparison for upgrade
+	 */
+	showUpgradeComparison(plan: SubscriptionPlan): void {
+		this.selectedUpgradePlan = plan;
+		this.showPlanComparison = true;
+		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Hide plan comparison
+	 */
+	hidePlanComparison(): void {
+		this.showPlanComparison = false;
+		this.selectedUpgradePlan = null;
+		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Get available upgrade plans (plans with higher price than current)
+	 */
+	getUpgradePlans(): SubscriptionPlan[] {
+		if (!this.mySubscription || !this.mySubscription.subscription) return this.plans;
+
+		const currentPrice = this.mySubscription.subscription.plan.amount;
+		return this.plans.filter((plan) => {
+			const cheapestPrice = this.getCheapestPrice(plan);
+			return cheapestPrice && cheapestPrice.unit_amount > currentPrice;
+		});
+	}
+
+	/**
+	 * Open Stripe customer portal for subscription management
+	 */
+	async openStripePortal(): Promise<void> {
+		try {
+			const response = await this._subscriptionPlansService.createStripePortalSession();
+
+			if (response && response.success && response.url) {
+				// Redirect to Stripe customer portal
+				window.location.href = response.url;
+				return;
+			}
+
+			throw new Error("Failed to create portal session");
+		} catch (error) {
+			this.error = `Failed to open billing portal: ${error.message || "Unknown error"}`;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Cancel subscription
+	 */
+	async cancelSubscription(): Promise<void> {
+		if (!confirm("Are you sure you want to cancel your subscription? This action cannot be undone.")) {
+			return;
+		}
+
+		try {
+			const subscription = this.getCurrentSubscription();
+			if (!subscription) {
+				throw new Error("No active subscription found");
+			}
+
+			const response = await this._subscriptionPlansService.cancelSubscription(subscription.id);
+
+			if (response && response.success) {
+				// Reload subscription data
+				await this.loadMyPlan();
+				alert("Subscription cancelled successfully.");
+			} else {
+				throw new Error(response?.message || "Failed to cancel subscription");
+			}
+		} catch (error) {
+			this.error = `Failed to cancel subscription: ${error.message || "Unknown error"}`;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Upgrade to a specific plan
+	 */
+	async upgradeToPlan(plan: SubscriptionPlan): Promise<void> {
+		try {
+			const subscription = this.getCurrentSubscription();
+			if (!subscription) {
+				throw new Error("No active subscription found");
+			}
+
+			const cheapestPrice = this.getCheapestPrice(plan);
+			if (!cheapestPrice) {
+				throw new Error("No valid price found for this plan");
+			}
+
+			const response = await this._subscriptionPlansService.upgradeSubscription(subscription.id, cheapestPrice.id);
+
+			if (response && response.success && response.url) {
+				// Redirect to Stripe checkout for upgrade
+				window.location.href = response.url;
+				return;
+			}
+
+			throw new Error("Failed to create upgrade session");
+		} catch (error) {
+			this.error = `Failed to upgrade plan: ${error.message || "Unknown error"}`;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Toggle billing history visibility
+	 */
+	toggleBillingHistory(): void {
+		this.showBillingHistory = !this.showBillingHistory;
+		if (this.showBillingHistory && this.billingHistory.length === 0) {
+			this.loadBillingHistory();
+		}
+		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Load billing history (mock data for now)
+	 */
+	async loadBillingHistory(): Promise<void> {
+		try {
+			// Mock billing history data - replace with actual API call
+			this.billingHistory = [
+				{
+					id: "in_1SIBhPFO6i3ofqGHMzmmHGNA",
+					amount: 99900,
+					currency: "usd",
+					status: "paid",
+					date: 1760461667,
+					description: "Zelf Business - Monthly subscription",
+				},
+			];
+			this._cdr.detectChanges();
+		} catch (error) {
+			console.error("Failed to load billing history:", error);
+		}
+	}
+
+	/**
+	 * Get plan usage information
+	 */
+	getPlanUsage(): any {
+		if (!this.mySubscription || !this.mySubscription.domainConfig) return null;
+
+		const config = this.mySubscription.domainConfig;
+		return {
+			activeUsers: this.getActiveUserLimit(),
+			encryptions: this.getEncryptionLimit(),
+			storage: config.storage || {},
+			features: config.features || [],
+		};
+	}
+
+	/**
+	 * Get active user limit based on plan
+	 */
+	getActiveUserLimit(): number {
+		const plan = this.getCurrentPlan();
+		if (!plan) return 0;
+
+		switch (plan.metadata.zelfPlan) {
+			case "zelfBasic":
+				return 50;
+			case "zelfStartUp":
+				return 500;
+			case "zelfBusiness":
+				return 1250;
+			case "zelfGold":
+				return 3000;
+			case "zelfEnterprise":
+				return 10000;
+			default:
+				return 0;
+		}
+	}
+
+	/**
+	 * Get encryption limit based on plan
+	 */
+	getEncryptionLimit(): number | string {
+		const plan = this.getCurrentPlan();
+		if (!plan) return 0;
+
+		return plan.metadata.zelfPlan === "zelfBasic" ? 50 : "Unlimited";
 	}
 }

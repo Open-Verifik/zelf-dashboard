@@ -271,7 +271,6 @@ export class DetailsModalComponent {
 		const dataString = JSON.stringify(this.data, null, 2);
 		try {
 			await navigator.clipboard.writeText(dataString);
-			console.log("All data copied to clipboard");
 		} catch (err) {
 			console.error("Failed to copy data: ", err);
 		}

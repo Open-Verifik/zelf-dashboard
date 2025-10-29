@@ -72,6 +72,16 @@ export interface SubscribeResponse {
 	success: boolean;
 }
 
+export interface StripePortalResponse {
+	url: string;
+	success: boolean;
+}
+
+export interface CancelSubscriptionResponse {
+	success: boolean;
+	message: string;
+}
+
 @Injectable({
 	providedIn: "root",
 })
@@ -128,6 +138,68 @@ export class SubscriptionPlansService {
 			} else {
 				return response;
 			}
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Get my plan from API
+	 */
+	async getMySubscription(): Promise<any> {
+		try {
+			const response = await this._httpWrapper.sendRequest(
+				"get",
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.mySubscription}`
+			);
+			return response.data;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Create Stripe customer portal session
+	 */
+	async createStripePortalSession(): Promise<StripePortalResponse> {
+		try {
+			const response = await this._httpWrapper.sendRequest(
+				"post",
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.createPortalSession}`
+			);
+			return response.data || response;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Cancel subscription
+	 */
+	async cancelSubscription(subscriptionId: string): Promise<CancelSubscriptionResponse> {
+		try {
+			const response = await this._httpWrapper.sendRequest(
+				"post",
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.cancelSubscription}`,
+				{ subscriptionId }
+			);
+			return response.data || response;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Upgrade subscription to a new plan
+	 */
+	async upgradeSubscription(subscriptionId: string, newPriceId: string): Promise<SubscribeResponse> {
+		try {
+			const response = await this._httpWrapper.sendRequest(
+				"post",
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.upgradeSubscription}`,
+				{ subscriptionId, newPriceId }
+			);
+			return response.data || response;
 		} catch (error) {
 			throw error;
 		}

@@ -36,7 +36,7 @@
 					<img class="flex h-8 w-auto lg:hidden" [src]="getLogoSrc()" alt="Logo image" />
 				</div>
 				<!-- Horizontal navigation -->
-				<fuse-horizontal-navigation class="mr-2" [name]="'mainNavigation'" [navigation]="navigation.horizontal"></fuse-horizontal-navigation>
+				<fuse-horizontal-navigation class="mr-2" [name]="'mainNavigation'" [navigation]="activeNavigation"></fuse-horizontal-navigation>
 			}
 			<!-- Navigation toggle button -->
 			@if (isScreenSmall) {

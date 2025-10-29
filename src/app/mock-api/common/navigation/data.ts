@@ -25,6 +25,30 @@ export const defaultNavigation: FuseNavigationItem[] = [
 	},
 ];
 
+export const portfolioNavigation: FuseNavigationItem[] = [
+	{
+		id: "my-tags",
+		title: "My Tags",
+		type: "basic",
+		icon: "heroicons_outline:tag",
+		link: "/portfolio/my-tags",
+	},
+	{
+		id: "payment",
+		title: "Payment",
+		type: "basic",
+		icon: "heroicons_outline:credit-card",
+		link: "/portfolio/payment",
+	},
+	{
+		id: "discover",
+		title: "Discover",
+		type: "basic",
+		icon: "heroicons_outline:globe-alt",
+		link: "/portfolio/discover",
+	},
+];
+
 export const horizontalNavigation: FuseNavigationItem[] = [
 	{
 		id: "analytics",
@@ -46,5 +70,29 @@ export const horizontalNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:key",
 		link: "/zelfkeys",
+	},
+];
+
+export const horizontalPortfolioNavigation: FuseNavigationItem[] = [
+	{
+		id: "my-tags",
+		title: "My Tags",
+		type: "basic",
+		icon: "heroicons_outline:tag",
+		link: "/portfolio/my-tags",
+	},
+	{
+		id: "payment",
+		title: "Payment",
+		type: "basic",
+		icon: "heroicons_outline:credit-card",
+		link: "/portfolio/payment",
+	},
+	{
+		id: "discover",
+		title: "Discover",
+		type: "basic",
+		icon: "heroicons_outline:globe-alt",
+		link: "/portfolio/discover",
 	},
 ];

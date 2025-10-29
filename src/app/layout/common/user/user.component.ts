@@ -53,8 +53,6 @@ export class UserComponent implements OnInit, OnDestroy {
 
 			this.user = new ZelfUser(_zelfAccount);
 		}
-
-		console.log("user", this.user);
 	}
 
 	/**

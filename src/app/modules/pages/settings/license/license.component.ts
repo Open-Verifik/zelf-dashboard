@@ -753,7 +753,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			const response = await this._licenseService.getMyLicense(true);
 
 			if (!response || !response.data || !response.data.myLicense) {
-				console.log("No license found for current user");
 				return;
 			}
 
@@ -761,8 +760,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 			// Save to localStorage
 			localStorage.setItem("license", JSON.stringify(this.currentLicense.toJSON()));
-
-			console.log("License fetched from backend and saved to localStorage");
 		} catch (error) {
 			console.error("Error fetching license from backend:", error);
 			this.showAlert = true;

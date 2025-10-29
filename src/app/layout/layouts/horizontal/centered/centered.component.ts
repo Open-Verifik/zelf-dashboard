@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
-import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
 import { FuseLoadingBarComponent } from "@fuse/components/loading-bar";
 import { FuseHorizontalNavigationComponent, FuseNavigationService, FuseVerticalNavigationComponent } from "@fuse/components/navigation";
 import { FuseConfigService } from "@fuse/services/config";
@@ -13,7 +13,7 @@ import { LanguagesComponent } from "app/layout/common/languages/languages.compon
 import { SearchComponent } from "app/layout/common/search/search.component";
 import { ThemeToggleComponent } from "app/layout/common/theme-toggle/theme-toggle.component";
 import { UserComponent } from "app/layout/common/user/user.component";
-import { Subject, takeUntil } from "rxjs";
+import { filter, Subject, takeUntil } from "rxjs";
 
 @Component({
 	selector: "centered-layout",
@@ -35,6 +35,8 @@ import { Subject, takeUntil } from "rxjs";
 })
 export class CenteredLayoutComponent implements OnInit, OnDestroy {
 	navigation: Navigation;
+	activeNavigation: any[];
+	isPortfolioMode: boolean = false;
 	isScreenSmall: boolean;
 	currentScheme: string = "light";
 	private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -73,7 +75,21 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 		// Subscribe to navigation data
 		this._navigationService.navigation$.pipe(takeUntil(this._unsubscribeAll)).subscribe((navigation: Navigation) => {
 			this.navigation = navigation;
+			this._updateNavigation();
 		});
+
+		// Subscribe to router events to update navigation based on route
+		this._router.events
+			.pipe(
+				filter((event) => event instanceof NavigationEnd),
+				takeUntil(this._unsubscribeAll)
+			)
+			.subscribe(() => {
+				this._updateNavigation();
+			});
+
+		// Initial check
+		this._updateNavigation();
 
 		// Subscribe to media changes
 		this._fuseMediaWatcherService.onMediaChange$.pipe(takeUntil(this._unsubscribeAll)).subscribe(({ matchingAliases }) => {
@@ -94,6 +110,23 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy {
 		// Unsubscribe from all subscriptions
 		this._unsubscribeAll.next(null);
 		this._unsubscribeAll.complete();
+	}
+
+	// -----------------------------------------------------------------------------------------------------
+	// @ Private methods
+	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Update navigation based on current route
+	 */
+	private _updateNavigation(): void {
+		if (!this.navigation) return;
+
+		// Check if we're on portfolio routes
+		const isPortfolio = this._router.url.includes("/portfolio");
+
+		this.isPortfolioMode = isPortfolio;
+		this.activeNavigation = isPortfolio ? this.navigation.horizontalPortfolio : this.navigation.horizontal;
 	}
 
 	// -----------------------------------------------------------------------------------------------------

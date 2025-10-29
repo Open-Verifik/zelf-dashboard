@@ -1,156 +1,167 @@
-<div class="w-full max-w-3xl">
-    <!-- Form -->
-    <form [formGroup]="notificationsForm">
-        <!-- Section -->
-        <div class="w-full text-xl">Alerts</div>
-        <div class="mt-8 grid w-full grid-cols-1 gap-6">
-            <!-- Communication -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer"
-                    (click)="communication.toggle()"
-                >
-                    <div class="font-medium leading-6">Communication</div>
-                    <div class="text-secondary text-md">
-                        Get news, announcements, and product updates.
-                    </div>
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'communication'"
-                    #communication
-                >
-                </mat-slide-toggle>
-            </div>
-            <!-- Security -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer"
-                    (click)="securityToggle.toggle()"
-                >
-                    <div class="font-medium leading-6">Security</div>
-                    <div class="text-secondary text-md">
-                        Get important notifications about your account security.
-                    </div>
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'security'"
-                    #securityToggle
-                >
-                </mat-slide-toggle>
-            </div>
-            <!-- Meetups -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer"
-                    (click)="meetupsToggle.toggle()"
-                >
-                    <div class="font-medium leading-6">Meetups</div>
-                    <div class="text-secondary text-md">
-                        Get an email when a Meetup is posted close to my
-                        location.
-                    </div>
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'meetups'"
-                    #meetupsToggle
-                >
-                </mat-slide-toggle>
-            </div>
-        </div>
+<div class="w-full max-w-6xl">
+	<!-- Header -->
+	<div class="mb-8">
+		<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Domain Notifications</h2>
+		<p class="mt-2 text-gray-600 dark:text-gray-400">
+			Configure notifications for domain registrations, expirations, subscriptions, and customer interactions.
+		</p>
+	</div>
 
-        <!-- Divider -->
-        <div class="my-10 border-t"></div>
+	<!-- Loading State -->
+	@if (isLoading) {
+		<div class="flex items-center justify-center py-12">
+			<mat-icon class="animate-spin">refresh</mat-icon>
+			<span class="ml-2">Loading notification settings...</span>
+		</div>
+	} @else {
+		<!-- Form -->
+		<form [formGroup]="notificationsForm" class="space-y-8">
+			<!-- Notification Channels Section -->
+			<mat-card class="p-6">
+				<div class="mb-6">
+					<h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Notification Channels</h3>
+					<p class="text-gray-600 dark:text-gray-400">Choose how you want to receive notifications</p>
+				</div>
 
-        <!-- Section -->
-        <div class="w-full text-xl">Account Activity</div>
-        <div class="mt-8 w-full font-medium">Email me when:</div>
-        <div class="mt-4 grid w-full grid-cols-1 gap-4">
-            <!-- Comments -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer leading-6"
-                    (click)="comments.toggle()"
-                >
-                    someone comments on one of my items
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'comments'"
-                    #comments
-                >
-                </mat-slide-toggle>
-            </div>
-            <!-- Mention -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer leading-6"
-                    (click)="mention.toggle()"
-                >
-                    someone mentions me
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'mention'"
-                    #mention
-                >
-                </mat-slide-toggle>
-            </div>
-            <!-- Follow -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer leading-6"
-                    (click)="follow.toggle()"
-                >
-                    someone follows me
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'follow'"
-                    #follow
-                >
-                </mat-slide-toggle>
-            </div>
-            <!-- Inquiry -->
-            <div class="flex items-center justify-between">
-                <div
-                    class="flex-auto cursor-pointer leading-6"
-                    (click)="inquiry.toggle()"
-                >
-                    someone replies to my job posting
-                </div>
-                <mat-slide-toggle
-                    class="ml-2"
-                    [color]="'primary'"
-                    [formControlName]="'inquiry'"
-                    #inquiry
-                >
-                </mat-slide-toggle>
-            </div>
-        </div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					@for (channel of notificationChannels; track channel.key) {
+						<div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+							<div class="flex items-center space-x-3">
+								<mat-icon [svgIcon]="channel.icon" class="text-gray-500"></mat-icon>
+								<div>
+									<div class="font-medium text-gray-900 dark:text-white">
+										{{ channel.label }}
+									</div>
+									<div class="text-sm text-gray-600 dark:text-gray-400">
+										{{ channel.description }}
+									</div>
+								</div>
+							</div>
+							<mat-slide-toggle [color]="'primary'" [formControlName]="channel.key"> </mat-slide-toggle>
+						</div>
+					}
+				</div>
+			</mat-card>
 
-        <!-- Divider -->
-        <div class="my-10 border-t"></div>
+			<!-- Notification Categories -->
+			@for (category of notificationCategories; track category.id) {
+				<mat-card class="p-6">
+					<!-- Category Header -->
+					<div class="flex items-center justify-between mb-6">
+						<div class="flex items-center space-x-3">
+							<mat-icon
+								[svgIcon]="category.icon"
+								[ngClass]="{
+									'text-primary': category.color === 'primary',
+									'text-warn': category.color === 'warn',
+									'text-accent': category.color === 'accent',
+								}"
+							></mat-icon>
+							<div>
+								<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+									{{ category.title }}
+								</h3>
+								<p class="text-gray-600 dark:text-gray-400">
+									{{ category.description }}
+								</p>
+							</div>
+						</div>
 
-        <!-- Actions -->
-        <div class="flex items-center justify-end">
-            <button mat-stroked-button type="button">Cancel</button>
-            <button
-                class="ml-4"
-                mat-flat-button
-                type="button"
-                [color]="'primary'"
-            >
-                Save
-            </button>
-        </div>
-    </form>
+						<!-- Category Actions -->
+						<div class="flex items-center space-x-2">
+							@if (isCategoryFullyEnabled(category.id)) {
+								<mat-chip [color]="'primary'" [selected]="true" (click)="disableCategory(category.id)" class="cursor-pointer">
+									All Enabled
+								</mat-chip>
+							} @else if (isCategoryPartiallyEnabled(category.id)) {
+								<mat-chip [color]="'accent'" [selected]="true" class="cursor-pointer"> Partial </mat-chip>
+							} @else {
+								<mat-chip [color]="'warn'" [selected]="true" class="cursor-pointer"> Disabled </mat-chip>
+							}
+
+							<button
+								mat-icon-button
+								[matTooltip]="'Enable all notifications in this category'"
+								(click)="enableCategory(category.id)"
+								class="text-green-600 hover:text-green-700"
+							>
+								<mat-icon>check_circle</mat-icon>
+							</button>
+
+							<button
+								mat-icon-button
+								[matTooltip]="'Disable all notifications in this category'"
+								(click)="disableCategory(category.id)"
+								class="text-red-600 hover:text-red-700"
+							>
+								<mat-icon>cancel</mat-icon>
+							</button>
+						</div>
+					</div>
+
+					<!-- Category Settings -->
+					<div class="space-y-4">
+						@for (setting of category.settings; track setting.key) {
+							<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+								<div
+									class="flex-1 cursor-pointer"
+									(click)="notificationsForm.get(setting.key)?.setValue(!notificationsForm.get(setting.key)?.value)"
+								>
+									<div class="font-medium text-gray-900 dark:text-white">
+										{{ setting.label }}
+									</div>
+									<div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+										{{ setting.description }}
+									</div>
+								</div>
+								<mat-slide-toggle [color]="category.color" [formControlName]="setting.key"> </mat-slide-toggle>
+							</div>
+						}
+					</div>
+				</mat-card>
+			}
+
+			<!-- Actions -->
+			<div class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+				<div class="flex items-center space-x-4">
+					<button mat-stroked-button type="button" (click)="resetToDefaults()" [disabled]="isSaving">Reset to Defaults</button>
+				</div>
+
+				<div class="flex items-center space-x-4">
+					<button mat-stroked-button type="button" [disabled]="isSaving">Cancel</button>
+					<button
+						mat-flat-button
+						type="button"
+						[color]="'primary'"
+						[disabled]="isSaving || notificationsForm.invalid"
+						(click)="saveSettings()"
+					>
+						@if (isSaving) {
+							<mat-icon class="animate-spin mr-2">refresh</mat-icon>
+							Saving...
+						} @else {
+							Save Settings
+						}
+					</button>
+				</div>
+			</div>
+		</form>
+	}
+
+	<!-- Additional Information -->
+	<mat-card class="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+		<div class="flex items-start space-x-3">
+			<mat-icon class="text-blue-600 dark:text-blue-400 mt-1">info</mat-icon>
+			<div>
+				<h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">Notification Preferences</h4>
+				<div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+					<p>• Email notifications are sent to your registered email address</p>
+					<p>• In-app notifications appear in the dashboard notification panel</p>
+					<p>• Push notifications require browser permission and work when the dashboard is open</p>
+					<p>• SMS notifications are available for premium plans only</p>
+					<p>• Critical notifications (expiration warnings, payment failures) are always sent via email</p>
+				</div>
+			</div>
+		</div>
+	</mat-card>
 </div>
