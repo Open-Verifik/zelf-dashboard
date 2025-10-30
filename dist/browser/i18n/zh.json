@@ -1,0 +1,549 @@
+{
+	"welcome-back": "欢迎回来",
+	"Project": "项目",
+	"Analytics": "分析",
+	"signUp": {
+		"title": "注册",
+		"alreadyHaveAccount": "已有账户？",
+		"signIn": "登录",
+		"fullName": "全名",
+		"emailAddress": "电子邮件地址",
+		"country": "国家",
+		"phoneNumber": "电话号码",
+		"password": "密码",
+		"masterPassword": "主密码",
+		"companyName": "公司名称",
+		"agreements": "我同意",
+		"terms": "条款",
+		"and": "和",
+		"privacyPolicy": "隐私政策",
+		"createAccount": "创建免费账户",
+		"phoneRequired": "需要电话号码",
+		"phonePattern": "请输入有效的电话号码（8-12位）",
+		"nameRequired": "需要全名",
+		"emailRequired": "需要电子邮件地址",
+		"emailInvalid": "请输入有效的电子邮件地址",
+		"passwordRequired": "需要密码",
+		"masterPasswordRequired": "需要主密码",
+		"companyRequired": "需要公司名称",
+		"countryRequired": "需要国家代码"
+	},
+	"signIn": {
+		"title": "登录",
+		"dontHaveAccount": "没有账户？",
+		"signUp": "注册",
+		"email": "邮箱",
+		"phone": "电话",
+		"emailAddress": "邮箱地址",
+		"emailRequired": "邮箱地址是必需的",
+		"emailInvalid": "请输入有效的邮箱地址",
+		"country": "国家",
+		"countryRequired": "需要国家",
+		"phoneNumber": "电话号码",
+		"phoneRequired": "电话号码是必需的",
+		"phonePattern": "请输入有效的电话号码",
+		"masterPassword": "主密码",
+		"masterPasswordRequired": "需要主密码",
+		"rememberMe": "记住我的凭据",
+		"signInButton": "登录",
+		"termsAgreement": "登录即表示您同意我们的",
+		"termsOfUse": "使用条款",
+		"and": "和",
+		"privacyPolicy": "隐私政策"
+	},
+	"errors": {
+		"phone_already_exists": "此电话号码已注册。请使用不同的电话号码或尝试登录。",
+		"email_already_exists": "此电子邮件地址已注册。请使用不同的电子邮件或尝试登录。",
+		"client_not_found": "未找到使用提供的凭据的账户。请检查您的信息并重试。",
+		"client_invalid_api_key": "无效的API密钥。请联系支持。",
+		"unknown_error": "出现错误，请重试。",
+		"network_error": "网络错误。请检查您的连接并重试。",
+		"validation_error": "请检查您的信息并重试。",
+		"incomplete_auth_data": "收到不完整的认证数据。请重试。"
+	},
+	"saving_operations": {
+		"confirm_changes": "确认更改",
+		"enter_password_proceed": "请输入您的主密码以继续",
+		"password_encrypt_data": "此密码将用于加密您的{{itemName}}数据。",
+		"verify_identity": "请验证您的身份以{{action}}{{itemName}}：",
+		"created_successfully": "{{itemName}}创建成功！",
+		"updated_successfully": "{{itemName}}更新成功！",
+		"processing": "处理中...",
+		"please_wait": "请等待我们处理您的请求",
+		"continue": "继续",
+		"success": "成功！",
+		"redirecting": "正在重定向...",
+		"license_configuration": {
+			"title": "确认许可证配置",
+			"description": "请输入您的主密码以继续保存许可证配置",
+			"action": "保存",
+			"itemName": "许可证配置"
+		},
+		"security_settings": {
+			"title": "确认安全设置更改",
+			"description": "请输入您的主密码以继续更新您的安全设置",
+			"action": "更新",
+			"itemName": "安全设置"
+		},
+		"team_permissions": {
+			"title": "确认团队权限更改",
+			"description": "请输入您的主密码以继续修改团队权限",
+			"action": "修改",
+			"itemName": "团队权限"
+		},
+		"plan_billing": {
+			"title": "确认计划和计费更改",
+			"description": "请输入您的主密码以继续更新您的订阅计划",
+			"action": "更新",
+			"itemName": "订阅计划"
+		},
+		"notifications": {
+			"title": "确认通知设置",
+			"description": "请输入您的主密码以继续更新您的通知偏好",
+			"action": "更新",
+			"itemName": "通知偏好"
+		},
+		"profile_update": {
+			"title": "确认个人资料更新",
+			"description": "请输入您的主密码以继续更新您的个人资料信息",
+			"action": "更新",
+			"itemName": "个人资料"
+		},
+		"theme_settings": {
+			"title": "确认主题设置",
+			"description": "请输入您的主密码以继续更新您的主题设置",
+			"action": "更新",
+			"itemName": "主题设置"
+		}
+	},
+	"save_confirmation": {
+		"master_password": "主密码",
+		"master_password_placeholder": "请输入您的主密码",
+		"toggle_password_visibility": "切换密码可见性",
+		"cancel": "取消",
+		"processing": "处理中...",
+		"continue": "继续",
+		"biometric_verification": "生物识别验证"
+	},
+	"license": {
+		"title": "域名配置",
+		"subtitle": "为Zelf生态系统配置您的自定义域名设置",
+		"basic_information": {
+			"title": "基本信息",
+			"domain_name": "域名",
+			"domain_prefix": "域名.",
+			"domain_placeholder": "我的公司",
+			"domain_required": "域名是必需的",
+			"domain_pattern_error": "域名只能包含字母、数字和连字符",
+			"domain_type": "域名类型",
+			"domain_type_official": "官方",
+			"domain_type_custom": "自定义",
+			"domain_type_community": "社区",
+			"domain_type_enterprise": "企业",
+			"status": "状态",
+			"status_active": "活跃",
+			"status_inactive": "非活跃",
+			"status_maintenance": "维护",
+			"status_beta": "测试版",
+			"owner": "所有者",
+			"owner_placeholder": "zelf团队",
+			"start_date": "开始日期",
+			"end_date": "结束日期",
+			"description": "描述",
+			"description_placeholder": "官方Zelf域名"
+		},
+		"features": {
+			"title": "功能",
+			"zns_title": "Zelf名称系统 (ZNS)",
+			"zns_description": "加密、解密、ZelfProofs预览",
+			"zns_enabled": "已启用",
+			"zns_disabled_title": "ZNS配置已禁用",
+			"zns_disabled_description": "标签验证规则、支付设置和价格配置仅在启用Zelf名称系统(ZNS)时可用。",
+			"zns_disabled_enable": "请在上方启用ZNS以配置标签相关设置。",
+			"zelfkeys_title": "Zelf密钥",
+			"zelfkeys_description": "密码、笔记、信用卡等"
+		},
+		"validation_rules": {
+			"title": "验证规则",
+			"min_length": "最小长度",
+			"min_length_placeholder": "3",
+			"max_length": "最大长度",
+			"max_length_placeholder": "27",
+			"max_length_hint": "最多27个字符",
+			"max_length_error": "最大长度不能超过27个字符",
+			"hold_suffix": "保留后缀",
+			"hold_suffix_placeholder": ".hold",
+			"reserved_words": "保留词",
+			"add_reserved_word": "添加保留词",
+			"content_filter": "内容过滤器",
+			"content_filter_description": "自动阻止不当词汇，如\"dick\"、\"vagina\"等"
+		},
+		"storage_options": {
+			"title": "存储选项",
+			"ipfs_title": "IPFS",
+			"ipfs_description": "用于.hold后缀标签域名",
+			"arweave_title": "Arweave",
+			"arweave_description": "用于已购买的域名",
+			"walrus_title": "Walrus",
+			"walrus_description": "替代存储选项",
+			"key_prefix": "键前缀",
+			"key_prefix_placeholder": "标签名"
+		},
+		"payment_settings": {
+			"title": "支付设置",
+			"payment_methods": "支付方式",
+			"coinbase": "Coinbase",
+			"crypto_payments": "加密货币支付",
+			"stripe": "Stripe",
+			"supported_currencies": "支持的货币",
+			"add_currency": "添加货币",
+			"whitelist_title": "白名单（特殊定价）",
+			"add_item": "添加项目",
+			"tag_name": "标签名称",
+			"discount": "折扣",
+			"type": "类型",
+			"percentage": "百分比 (%)",
+			"fixed_amount": "固定金额 ($)",
+			"no_items": "还没有白名单项目。点击\"添加项目\"开始。",
+			"examples": "示例：",
+			"example_1": "miguel.zelf 25 和 % = 25% 折扣",
+			"example_2": "vip.avax 50 和 $ = $50 折扣"
+		},
+		"pricing_table": {
+			"title": "价格表",
+			"reset_default": "重置为默认",
+			"description": "为不同的标签长度和订阅期限配置价格。价格以分为单位（例如：240 = $2.40）。",
+			"length": "长度",
+			"one_year": "1年",
+			"two_years": "2年",
+			"three_years": "3年",
+			"four_years": "4年",
+			"five_years": "5年",
+			"lifetime": "终身",
+			"pricing_info": "价格信息",
+			"pricing_info_1": "• 价格以美元显示",
+			"pricing_info_2": "• \"6-15\"行适用于6-15个字符的标签名称",
+			"pricing_info_3": "• 个别长度行（16-27）覆盖范围定价",
+			"pricing_info_4": "• 更新表单时更改会自动保存"
+		},
+		"limits": {
+			"title": "限制",
+			"max_tags": "最大标签",
+			"max_tags_placeholder": "10000",
+			"max_zelfkeys": "最大ZelfKeys",
+			"max_zelfkeys_placeholder": "10000",
+			"info_title": "限制信息",
+			"info_description": "域名限制根据您的订阅计划自动管理。",
+			"info_subscription": "要修改限制，请在计划和计费部分升级或更改您的订阅计划。"
+		},
+		"metadata": {
+			"title": "元数据",
+			"launch_date": "发布日期",
+			"version": "版本",
+			"version_placeholder": "1.0.0",
+			"documentation_url": "文档URL",
+			"documentation_placeholder": "https://docs.example.com",
+			"community": "社区",
+			"community_placeholder": "avalanche",
+			"enterprise": "企业",
+			"enterprise_placeholder": "blockDAG",
+			"support_level": "支持级别",
+			"support_standard": "标准",
+			"support_premium": "高级",
+			"support_enterprise": "企业"
+		},
+		"current_license": {
+			"title": "当前许可证",
+			"domain": "域名：",
+			"created": "创建：",
+			"ipfs_hash": "IPFS哈希："
+		},
+		"actions": {
+			"cancel": "取消",
+			"save": "保存域名配置",
+			"save_configuration": "保存配置",
+			"processing": "处理中..."
+		}
+	},
+	"analytics": {
+		"title": "分析仪表板",
+		"description": "监控标签域名创建、订阅和活动指标",
+		"tagDomainsOverview": {
+			"title": "标签域名概览",
+			"subtitle": "创建的标签域名数量（免费和高级）",
+			"thisMonth": "本月",
+			"previousMonth": "上月"
+		},
+		"paidTags": {
+			"title": "付费标签",
+			"subtitle": "创建的高级标签域名数量"
+		},
+		"zelfkeySubscriptions": {
+			"title": "ZelfKey订阅",
+			"subtitle": "ZelfKey订阅数量"
+		},
+		"activeTags": {
+			"title": "活跃标签",
+			"subtitle": "当前活跃的标签域名数量"
+		},
+		"allTagsVsPaidTags": {
+			"title": "所有标签 vs. 付费标签",
+			"subtitle": "总标签域名与付费标签域名比较"
+		},
+		"metrics": {
+			"conversionRate": {
+				"title": "转化率",
+				"description": "转化率显示总标签注册中转化为付费/高级标签的百分比。越高越好。"
+			},
+			"premiumAdoption": {
+				"title": "高级采用率",
+				"description": "高级采用率显示升级到付费标签功能的用户百分比。越高表示变现越好。"
+			},
+			"revenuePotential": {
+				"title": "收入潜力",
+				"description": "收入潜力显示基于当前趋势和用户行为模式的预测转化率。"
+			}
+		},
+		"zelfUsers": {
+			"title": "Zelf用户",
+			"subtitle": "Zelf平台用户的人口统计特性"
+		},
+		"tagLeaseLengths": {
+			"title": "标签租期长度",
+			"subtitle": "标签域名租期长度分布"
+		},
+		"domainLength": {
+			"title": "域名长度",
+			"subtitle": "标签域名字符长度分布"
+		},
+		"origin": {
+			"title": "来源",
+			"subtitle": "Zelf用户的平台分布"
+		},
+		"timePeriods": {
+			"30days": "30天",
+			"3months": "3个月",
+			"9months": "9个月"
+		},
+		"chart": {
+			"dateFormat": "yyyy年MM月dd日",
+			"tooltip": {
+				"colon": "：",
+				"percentage": "%"
+			}
+		},
+		"chartLabels": {
+			"tagLeaseLengths": {
+				"1year": "1年",
+				"2years": "2年",
+				"3years": "3年",
+				"4years": "4年",
+				"5years": "5年",
+				"lifetime": "终身"
+			},
+			"domainLength": {
+				"1to3": "1-3",
+				"4to10": "4-10",
+				"11to20": "11-20",
+				"21to27": "21-27"
+			},
+			"origin": {
+				"extension": "扩展程序",
+				"android": "Android",
+				"ios": "iOS"
+			}
+		}
+	},
+	"profile": {
+		"loading": "正在加载个人资料...",
+		"status": "状态",
+		"menu": {
+			"profile": "个人资料",
+			"settings": "设置",
+			"license": "许可证",
+			"support": "支持"
+		},
+		"information": {
+			"title": "个人资料信息",
+			"name": "姓名",
+			"name_placeholder": "请输入您的姓名",
+			"name_required": "姓名是必填项",
+			"name_minlength": "姓名至少需要2个字符",
+			"company": "公司",
+			"company_placeholder": "请输入您的公司",
+			"company_required": "公司是必填项",
+			"email": "邮箱",
+			"email_placeholder": "请输入您的邮箱",
+			"email_required": "邮箱是必填项",
+			"email_invalid": "请输入有效的邮箱地址",
+			"country": "国家",
+			"country_required": "国家是必填项",
+			"phone": "电话",
+			"phone_placeholder": "请输入您的电话号码",
+			"phone_required": "电话号码是必填项",
+			"phone_invalid": "请输入有效的电话号码"
+		},
+		"account": {
+			"title": "账户信息",
+			"created_at": "创建时间",
+			"subscription": "订阅"
+		},
+		"edit": "编辑",
+		"save": "保存",
+		"cancel": "取消",
+		"license": {
+			"title": "许可证详情",
+			"type": "许可证类型",
+			"status": "状态",
+			"created": "创建时间",
+			"features": "功能",
+			"all_features": "所有功能",
+			"included_features": "包含的功能",
+			"feature_analytics": "高级分析仪表板",
+			"feature_processing": "实时数据处理",
+			"feature_support": "优先支持",
+			"feature_api": "API访问",
+			"feature_integrations": "自定义集成",
+			"renew": "续费许可证",
+			"download": "下载"
+		}
+	},
+	"theme_settings": {
+		"title": "主题设置",
+		"subtitle": "自定义您的ZNS Wallet和ZelfKeys界面外观",
+		"zns_wallet": {
+			"title": "ZNS Wallet主题",
+			"description": "自定义您的ZNS Wallet界面颜色",
+			"dark_mode": "深色模式",
+			"dark_mode_description": "在浅色和深色主题之间切换",
+			"reset": "重置",
+			"primary_colors": "主要颜色",
+			"background_colors": "背景颜色",
+			"text_colors": "文本颜色",
+			"header_colors": "标题颜色",
+			"button_colors": "按钮颜色",
+			"status_colors": "状态颜色",
+			"primary": "主要",
+			"secondary": "次要",
+			"background": "背景",
+			"secondary_background": "次要背景",
+			"primary_text": "主要文本",
+			"secondary_text": "次要文本",
+			"muted_text": "静音文本",
+			"header_background": "标题背景",
+			"header_text": "标题文本",
+			"primary_button": "主要按钮",
+			"button_text": "按钮文本",
+			"button_hover": "按钮悬停",
+			"success": "成功",
+			"warning": "警告",
+			"error": "错误"
+		},
+		"zelfkeys": {
+			"title": "ZelfKeys主题",
+			"description": "自定义您的ZelfKeys密码管理器界面颜色",
+			"dark_mode": "深色模式",
+			"dark_mode_description": "在浅色和深色主题之间切换",
+			"reset": "重置",
+			"primary_colors": "主要颜色",
+			"background_colors": "背景颜色",
+			"text_colors": "文本颜色",
+			"header_colors": "标题颜色",
+			"button_colors": "按钮颜色",
+			"status_colors": "状态颜色",
+			"primary": "主要",
+			"secondary": "次要",
+			"background": "背景",
+			"secondary_background": "次要背景",
+			"primary_text": "主要文本",
+			"secondary_text": "次要文本",
+			"muted_text": "静音文本",
+			"header_background": "标题背景",
+			"header_text": "标题文本",
+			"primary_button": "主要按钮",
+			"button_text": "按钮文本",
+			"button_hover": "按钮悬停",
+			"success": "成功",
+			"warning": "警告",
+			"error": "错误"
+		},
+		"actions": {
+			"cancel": "取消",
+			"save": "保存主题设置",
+			"updating_colors": "正在更新颜色...",
+			"loading": "正在加载主题设置...",
+			"failed_to_load": "加载主题设置失败",
+			"invalid_settings": "无效的主题设置。请检查所有颜色值。",
+			"fill_required": "请正确填写所有必填字段"
+		}
+	},
+	"payment": {
+		"title": "购买新标签名称",
+		"searchTag": "搜索标签",
+		"searching": "搜索中...",
+		"greatNews": "好消息，此标签名称可用！",
+		"tagAvailable": "标签名称",
+		"isAvailable": "可用，现在就可以在我们的应用或扩展程序中领取！",
+		"installExtension": "安装扩展程序",
+		"downloadApp": "下载应用",
+		"orderDetails": "订单详情",
+		"domainToPurchase": "购买的域名",
+		"charactersLength": "字符长度",
+		"lease": "租期",
+		"totalCost": "总费用",
+		"totalCostUSD": "美元",
+		"domainPriceLength": "域名长度价格",
+		"knowMore": "了解更多",
+		"leaseAgreement": "租约协议",
+		"year": "年",
+		"years": "年",
+		"lifetime": "终身",
+		"total": "总计",
+		"ourPurchaseRate": "我们的购买率",
+		"payWithCoinbase": "使用Coinbase支付",
+		"choosePaymentMethod": "选择支付方式",
+		"lowFees": "低费用",
+		"purchaseNow": "立即购买",
+		"howToRegister": "如何注册您的域名",
+		"step1Title": "从浏览器扩展登录Zelf或下载移动应用。",
+		"step2Title": "搜索您想要使用所需域名注册的标签。",
+		"step3Title": "完成所有安全步骤和生物识别身份验证。",
+		"step4Title": "最后，返回此页面完成域名购买。",
+		"pleaseEnterTagName": "请输入标签名称"
+	},
+	"checkout": {
+		"backToPaymentOptions": "返回支付选项",
+		"orderDetails": "订单详情",
+		"domainToPurchase": "购买的域名",
+		"charactersLength": "字符长度",
+		"lease": "租期",
+		"totalCost": "总费用",
+		"domainPriceLength": "域名长度价格",
+		"knowMore": "了解更多",
+		"leaseAgreement": "租约协议",
+		"total": "总计",
+		"paymentMethod": "支付方式",
+		"congratulations": "恭喜！",
+		"tagActive": "您的新ZNS标签",
+		"isNowActive": "现已激活。",
+		"enjoyBenefits": "享受ZNS的优势 — 您的脸就是您的钥匙。",
+		"keepReceipt": "您想保留支付收据吗？",
+		"enterYourEmail": "输入您的邮箱",
+		"sendReceipt": "发送收据",
+		"sending": "发送中...",
+		"payWith": "使用",
+		"coinbasePaymentUrl": "Coinbase支付链接",
+		"uniquePaymentAddress": "唯一支付地址",
+		"copy": "复制",
+		"openLink": "打开链接",
+		"amountToPay": "支付金额",
+		"expiresIn": "过期时间",
+		"transactionStatus": "交易状态",
+		"success": "成功",
+		"checking": "检查中...",
+		"pending": "待处理",
+		"checkingPaymentStatus": "每10秒检查一次支付状态...",
+		"paymentConfirmed": "支付确认成功！",
+		"amountDetected": "已检测金额"
+	}
+}
