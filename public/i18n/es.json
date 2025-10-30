@@ -542,7 +542,7 @@
 		"success": "ÉXITO",
 		"checking": "Verificando...",
 		"pending": "PENDIENTE",
-		"checkingPaymentStatus": "Verificando estado de pago cada 5 segundos...",
+		"checkingPaymentStatus": "Verificando estado de pago cada 10 segundos...",
 		"paymentConfirmed": "¡Pago confirmado exitosamente!",
 		"amountDetected": "Cantidad detectada"
 	}

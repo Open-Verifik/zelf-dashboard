@@ -557,7 +557,7 @@
 		"success": "SUCCESS",
 		"checking": "Checking...",
 		"pending": "PENDING",
-		"checkingPaymentStatus": "Checking payment status every 5 seconds...",
+		"checkingPaymentStatus": "Checking payment status every 10 seconds...",
 		"paymentConfirmed": "Payment confirmed successfully!",
 		"amountDetected": "Amount detected"
 	}

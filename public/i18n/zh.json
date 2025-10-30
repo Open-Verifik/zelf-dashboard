@@ -542,7 +542,7 @@
 		"success": "成功",
 		"checking": "检查中...",
 		"pending": "待处理",
-		"checkingPaymentStatus": "每5秒检查一次支付状态...",
+		"checkingPaymentStatus": "每10秒检查一次支付状态...",
 		"paymentConfirmed": "支付确认成功！",
 		"amountDetected": "已检测金额"
 	}

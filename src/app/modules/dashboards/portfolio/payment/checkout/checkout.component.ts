@@ -39,6 +39,7 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 	private qrCodeInstance: any | null = null;
 	private qrContainerEl: HTMLElement | null = null;
 	private paymentCheckInterval: any = null;
+	private isCheckInProgress = false; // Flag to prevent overlapping payment checks
 	private _unsubscribeAll = new Subject<void>();
 
 	constructor(
@@ -96,21 +97,30 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 			clearInterval(this.paymentCheckInterval);
 		}
 
-		// Start checking every 5 seconds
+		// Start checking every 10 seconds
 		this.paymentCheckInterval = setInterval(() => {
 			void this.checkPaymentStatus();
-		}, 5000);
+		}, 10000);
 
 		// Do an initial check immediately
 		void this.checkPaymentStatus();
 	}
 
 	async checkPaymentStatus(): Promise<void> {
+		// Prevent overlapping calls - if a check is already in progress, skip this one
+		if (this.isCheckInProgress) {
+			console.log("Payment check already in progress, skipping...");
+			return;
+		}
+
 		const signedDataPrice = localStorage.getItem("signedDataPrice");
+
 		if (!signedDataPrice) {
 			return;
 		}
 
+		// Set flag to indicate check is in progress
+		this.isCheckInProgress = true;
 		this.isCheckingPayment.set(true);
 		this.lastCheckTime.set(new Date());
 
@@ -149,6 +159,8 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 		} catch (error) {
 			console.error("Error checking payment status:", error);
 		} finally {
+			// Reset flag when check completes
+			this.isCheckInProgress = false;
 			this.isCheckingPayment.set(false);
 			this.cdr.markForCheck();
 		}
@@ -157,19 +169,13 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 	getNetworkFromPaymentMethod(): string {
 		const method = this.paymentMethod();
 
+		// Backend accepts: [coinbase, CB, ETH, SOL, BTC, AVAX]
+		// Only COINBASE needs special handling, others pass through
 		if (method === "COINBASE") {
 			return "coinbase";
-		} else if (method === "ETH") {
-			return "ethereum";
-		} else if (method === "BTC") {
-			return "bitcoin";
-		} else if (method === "SOL") {
-			return "solana";
-		} else if (method === "AVAX") {
-			return "avalanche";
 		}
 
-		return "ethereum"; // default
+		return method || "ETH"; // Return method as-is, default to ETH
 	}
 
 	ngOnDestroy(): void {
@@ -313,6 +319,12 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 		if (this.isPaymentConfirmed()) {
 			// Clear the payment data from localStorage
 			localStorage.removeItem("signedDataPrice");
+			//delete the  payment options from localStorage
+			const key = `payment_options_${this.tagName()}_.${this.domain()}_${this.duration()}`;
+
+			localStorage.removeItem(key);
+
+			console.log("Deleted payment options from localStorage:", key);
 
 			// Navigate back to payment options without any queryParams (fresh state)
 			this.router.navigate(["/portfolio/payment"]);

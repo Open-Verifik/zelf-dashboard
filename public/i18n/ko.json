@@ -542,7 +542,7 @@
 		"success": "성공",
 		"checking": "확인 중...",
 		"pending": "대기 중",
-		"checkingPaymentStatus": "5초마다 결제 상태 확인 중...",
+		"checkingPaymentStatus": "10초마다 결제 상태 확인 중...",
 		"paymentConfirmed": "결제가 성공적으로 확인되었습니다!",
 		"amountDetected": "감지된 금액"
 	}

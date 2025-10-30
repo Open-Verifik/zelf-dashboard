@@ -542,7 +542,7 @@
 		"success": "成功",
 		"checking": "確認中...",
 		"pending": "保留中",
-		"checkingPaymentStatus": "5秒ごとに支払いステータスを確認中...",
+		"checkingPaymentStatus": "10秒ごとに支払いステータスを確認中...",
 		"paymentConfirmed": "支払いが正常に確認されました！",
 		"amountDetected": "検出された金額"
 	}

@@ -503,7 +503,7 @@
 		"choosePaymentMethod": "Choisir le mode de paiement",
 		"lowFees": "FAIBLES FRAIS",
 		"purchaseNow": "Acheter maintenant",
-		"howToRegisterProcess": "Comment enregistrer votre domaine",
+		"howToRegister": "Comment enregistrer votre domaine",
 		"step1Title": "Connectez-vous à Zelf depuis notre extension dans votre navigateur ou téléchargez l'application mobile.",
 		"step2Title": "Recherchez le tag que vous souhaitez enregistrer avec le domaine souhaité.",
 		"step3Title": "Terminez toutes les étapes de sécurité et l'authentification biométrique.",
@@ -541,7 +541,7 @@
 		"success": "SUCCÈS",
 		"checking": "Vérification...",
 		"pending": "EN ATTENTE",
-		"checkingPaymentStatus": "Vérification du statut de paiement toutes les 5 secondes...",
+		"checkingPaymentStatus": "Vérification du statut de paiement toutes les 10 secondes...",
 		"paymentConfirmed": "Paiement confirmé avec succès !",
 		"amountDetected": "Montant détecté"
 	}
