@@ -63,7 +63,9 @@
 				<!-- <messages></messages> -->
 				<!-- <notifications></notifications> -->
 				<theme-toggle></theme-toggle>
-				<user></user>
+				@if (!isPortfolioMode) {
+					<user></user>
+				}
 			</div>
 		</div>
 

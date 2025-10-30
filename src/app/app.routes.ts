@@ -1,4 +1,5 @@
 import { Route } from "@angular/router";
+import { environment } from "environments/environment";
 import { initialDataResolver } from "app/app.resolvers";
 import { AuthGuard } from "app/core/auth/guards/auth.guard";
 import { NoAuthGuard } from "app/core/auth/guards/noAuth.guard";
@@ -8,8 +9,12 @@ import { LayoutComponent } from "app/layout/layout.component";
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
-	// Redirect empty path to '/analytics'
-	{ path: "", pathMatch: "full", redirectTo: "analytics" },
+	// Conditional root redirect based on host/environment via component
+	{
+		path: "",
+		pathMatch: "full",
+		loadComponent: () => import("app/root-redirect.component").then((m) => m.RootRedirectComponent),
+	},
 
 	// Redirect signed-in user to the '/analytics'
 	//

@@ -4,6 +4,13 @@ export const environment = {
 	appName: "Zelf Dashboard",
 	version: "1.0.0",
 	debug: false,
+	// Root redirect behavior for hosting variations
+	rootRedirect: {
+		enabled: true,
+		host: "payment.zelf.world",
+		path: "/portfolio/payment",
+		fallbackPath: "/analytics",
+	},
 	// Production specific settings
 	enableLogging: false,
 	enableMockData: false,
