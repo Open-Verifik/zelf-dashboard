@@ -71,8 +71,10 @@
 		"processing": "処理中...",
 		"please_wait": "リクエストを処理中です。お待ちください",
 		"continue": "続行",
+		"cancel": "キャンセル",
 		"success": "成功！",
 		"redirecting": "リダイレクト中...",
+		"theme_settings_updated_successfully": "テーマ設定が正常に更新されました！",
 		"license_configuration": {
 			"title": "ライセンス設定を確認",
 			"description": "ライセンス設定を保存するには、マスターパスワードを入力してください",

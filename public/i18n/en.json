@@ -74,6 +74,7 @@
 		"cancel": "Cancel",
 		"success": "Success!",
 		"redirecting": "Redirecting you back...",
+		"theme_settings_updated_successfully": "Theme settings updated successfully!",
 		"license_configuration": {
 			"title": "Confirm License Configuration",
 			"description": "Please enter your master password to proceed with saving the license configuration",

@@ -70,8 +70,10 @@
 		"processing": "Traitement...",
 		"please_wait": "Veuillez patienter pendant que nous traitons votre demande",
 		"continue": "Continuer",
+		"cancel": "Annuler",
 		"success": "Succès !",
 		"redirecting": "Redirection en cours...",
+		"theme_settings_updated_successfully": "Paramètres de thème mis à jour avec succès !",
 		"license_configuration": {
 			"title": "Confirmer la configuration de licence",
 			"description": "Veuillez entrer votre mot de passe maître pour procéder à la sauvegarde de la configuration de licence",

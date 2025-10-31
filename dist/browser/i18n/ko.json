@@ -71,8 +71,10 @@
 		"processing": "처리 중...",
 		"please_wait": "요청을 처리하는 동안 잠시 기다려주세요",
 		"continue": "계속",
+		"cancel": "취소",
 		"success": "성공!",
 		"redirecting": "리디렉션 중...",
+		"theme_settings_updated_successfully": "테마 설정이 성공적으로 업데이트되었습니다!",
 		"license_configuration": {
 			"title": "라이선스 설정 확인",
 			"description": "라이선스 설정을 저장하려면 마스터 비밀번호를 입력해주세요",

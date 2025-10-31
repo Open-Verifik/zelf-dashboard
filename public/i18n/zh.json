@@ -71,8 +71,10 @@
 		"processing": "处理中...",
 		"please_wait": "请等待我们处理您的请求",
 		"continue": "继续",
+		"cancel": "取消",
 		"success": "成功！",
 		"redirecting": "正在重定向...",
+		"theme_settings_updated_successfully": "主题设置更新成功！",
 		"license_configuration": {
 			"title": "确认许可证配置",
 			"description": "请输入您的主密码以继续保存许可证配置",

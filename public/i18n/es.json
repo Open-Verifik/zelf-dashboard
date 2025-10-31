@@ -71,8 +71,10 @@
 		"processing": "Procesando...",
 		"please_wait": "Por favor espera mientras procesamos tu solicitud",
 		"continue": "Continuar",
+		"cancel": "Cancelar",
 		"success": "¡Éxito!",
 		"redirecting": "Redirigiendo...",
+		"theme_settings_updated_successfully": "¡Configuración de temas actualizada exitosamente!",
 		"license_configuration": {
 			"title": "Confirmar Configuración de Licencia",
 			"description": "Por favor ingresa tu contraseña maestra para proceder con el guardado de la configuración de licencia",
