@@ -37,6 +37,26 @@ export class PortfolioPaymentComponent implements OnInit {
 		{ value: 999, label: "Lifetime" },
 	];
 
+	/**
+	 * Return supported domains in canonical format with leading dot and lower-case
+	 */
+	private getSupportedDomains(): string[] {
+		const loaded = this.domains();
+		if (!loaded || loaded.length === 0) return [".zelf"]; // sensible default
+		return loaded.map((d) => (d?.startsWith(".") ? d.toLowerCase() : `.${d.toLowerCase()}`));
+	}
+
+	/**
+	 * Validate an incoming domain param (without leading dot expected) and
+	 * return a canonical domain with leading dot. Defaults to .zelf if unsupported.
+	 */
+	private validateIncomingDomain(domainParam: string | null | undefined): string {
+		const param = (domainParam || "").toString().trim().toLowerCase().replace(/^\./, "");
+		const supported = this.getSupportedDomains();
+		const withDot = param ? `.${param}` : ".zelf";
+		return supported.includes(withDot) ? withDot : ".zelf";
+	}
+
 	getPricingDocsUrl(): string {
 		const language = (navigator?.language || "en").toLowerCase();
 		const isSpanish = language.startsWith("es");
@@ -82,7 +102,7 @@ export class PortfolioPaymentComponent implements OnInit {
 		// Check initial query params from snapshot
 		const initialParams = this.route.snapshot.queryParams;
 		if (initialParams["domain"]) {
-			this.selectedDomain = `.${initialParams["domain"]}`;
+			this.selectedDomain = this.validateIncomingDomain(initialParams["domain"]);
 		} else {
 			// No query param domain, use first available
 			const availableDomains = this.domains();
@@ -94,7 +114,7 @@ export class PortfolioPaymentComponent implements OnInit {
 		// Check if we should trigger search based on initial params
 		if (initialParams["tagname"] && initialParams["domain"]) {
 			const tagName = initialParams["tagname"];
-			const domain = initialParams["domain"];
+			const domain = this.validateIncomingDomain(initialParams["domain"]).replace(".", "");
 			const duration = initialParams["duration"] ? parseInt(initialParams["duration"], 10) : 1;
 
 			// Set the form values
@@ -110,7 +130,7 @@ export class PortfolioPaymentComponent implements OnInit {
 		this.route.queryParams.subscribe(async (params) => {
 			if (params["tagname"] && params["domain"]) {
 				const tagName = params["tagname"];
-				const domain = params["domain"];
+				const domain = this.validateIncomingDomain(params["domain"]).replace(".", "");
 				const duration = params["duration"] ? parseInt(params["duration"], 10) : 1;
 
 				// Set the form values

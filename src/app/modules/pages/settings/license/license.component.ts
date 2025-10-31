@@ -198,7 +198,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * Initialize whitelist items
 	 */
 	initializeWhitelistItems(): void {
-		this.whitelistItems = [{ domain: "", discount: "", type: "%" }];
+		this.whitelistItems = [{ domain: "", discount: "", type: "percentage" }];
 	}
 
 	/**
@@ -321,14 +321,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	addWhitelistItem(): void {
 		// Add new item to array
-		const newItem = { domain: "", discount: "", type: "%" };
+		const newItem = { domain: "", discount: "", type: "percentage" };
 		this.whitelistItems.push(newItem);
 
-		// Add form controls for the new item
+		// Add form controls for the new item (for compatibility, though template uses ngModel)
 		const newIndex = this.whitelistItems.length - 1;
 		this.accountForm.addControl(`whitelistDomain_${newIndex}`, new FormControl(""));
 		this.accountForm.addControl(`whitelistDiscount_${newIndex}`, new FormControl(""));
-		this.accountForm.addControl(`whitelistType_${newIndex}`, new FormControl("%"));
+		this.accountForm.addControl(`whitelistType_${newIndex}`, new FormControl("percentage"));
 	}
 
 	/**
@@ -582,13 +582,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	private buildWhitelistFromForm(): any {
 		const whitelist: any = {};
-		this.whitelistItems.forEach((_, index) => {
-			const domain = this.accountForm.get(`whitelistDomain_${index}`)?.value;
-			const discount = this.accountForm.get(`whitelistDiscount_${index}`)?.value;
-			const type = this.accountForm.get(`whitelistType_${index}`)?.value;
+		this.whitelistItems.forEach((item) => {
+			const domain = item.domain?.trim();
+			const discount = item.discount?.toString().trim();
+			const type = item.type?.trim();
 
+			// Skip empty items
 			if (domain && discount && type) {
-				whitelist[domain] = `${discount}${type}`;
+				// Format: "discount%type" where type is either "%" or "$"
+				// The template uses "percentage" or "fixed" but we need "%" or "$"
+				const typeSymbol = type === "percentage" ? "%" : type === "fixed" ? "$" : type;
+				whitelist[domain] = `${discount}${typeSymbol}`;
 			}
 		});
 		return whitelist;
@@ -839,16 +843,19 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 					const priceStr = price as string;
 					const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
 					if (match) {
+						// Convert "%" to "percentage" and "$" to "fixed" to match template dropdown values
+						const typeSymbol = match[2];
+						const typeValue = typeSymbol === "%" ? "percentage" : typeSymbol === "$" ? "fixed" : typeSymbol;
 						return {
 							domain,
 							discount: match[1],
-							type: match[2],
+							type: typeValue,
 						};
 					}
 					return {
 						domain,
 						discount: priceStr,
-						type: "%",
+						type: "percentage",
 					};
 				});
 			}
