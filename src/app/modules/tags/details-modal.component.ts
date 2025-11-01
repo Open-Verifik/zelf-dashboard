@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
@@ -12,7 +12,7 @@ import { TagRecord } from "./tags.component";
 	standalone: true,
 	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatCardModule, MatChipsModule],
 	template: `
-		<div class="details-modal">
+		<div class="details-modal" [ngClass]="{ 'dark-mode': isDarkMode }">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2>Tag Details</h2>
@@ -88,16 +88,16 @@ import { TagRecord } from "./tags.component";
 						</div>
 					</div>
 				</div>
-				<div class="flex justify-end gap-3 p-6 bg-gray-50 -mx-6 -mb-6">
-					<button mat-button (click)="copyAllData()" class="text-blue-700">
+				<div class="modal-footer">
+					<button mat-button (click)="copyAllData()" class="footer-btn copy-btn">
 						<mat-icon>content_copy</mat-icon>
 						Copy All Data
 					</button>
-					<button mat-button (click)="openQRCode()" class="text-emerald-700">
+					<button mat-button (click)="openQRCode()" class="footer-btn qr-btn">
 						<mat-icon>qr_code</mat-icon>
 						View QR Code
 					</button>
-					<button mat-button (click)="close()" class="text-gray-700">Close</button>
+					<button mat-button (click)="close()" class="footer-btn close-btn">Close</button>
 				</div>
 			</div>
 		</div>
@@ -105,28 +105,56 @@ import { TagRecord } from "./tags.component";
 	styles: [
 		`
 			.details-modal {
+				--modal-bg: #ffffff;
+				--modal-text: #1f2937;
+				--modal-header-bg: #f1f5f9;
+				--modal-header-text: #1f2937;
+				--modal-footer-bg: #f8fafc;
+				--modal-address-bg: #f8fafc;
+				--modal-address-text: #1f2937;
+				--modal-secondary-text: #6b7280;
+				--modal-border: #e2e8f0;
+
+				&.dark-mode {
+					--modal-bg: #1e293b;
+					--modal-text: #f1f5f9;
+					--modal-header-bg: #334155;
+					--modal-header-text: #f1f5f9;
+					--modal-footer-bg: #334155;
+					--modal-address-bg: #334155;
+					--modal-address-text: #f1f5f9;
+					--modal-secondary-text: #94a3b8;
+					--modal-border: #475569;
+				}
+
 				.modal-content {
 					max-width: 700px;
 					width: 100%;
 					max-height: 80vh;
 					overflow-y: auto;
+					background: var(--modal-bg);
+					color: var(--modal-text);
 
 					.modal-header {
-						background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-						color: white;
+						background: var(--modal-header-bg);
+						color: var(--modal-header-text);
 						padding: 20px 24px;
 						margin: -24px -24px 24px -24px;
 						border-radius: 8px 8px 0 0;
+						border-bottom: 2px solid var(--modal-border);
 
 						h2 {
 							margin: 0;
 							font-size: 20px;
 							font-weight: 600;
+							color: var(--modal-header-text);
 						}
 					}
 
 					.modal-body {
 						padding: 0 24px 24px 24px;
+						background: var(--modal-bg);
+						color: var(--modal-text);
 					}
 
 					.detail-section {
@@ -135,10 +163,10 @@ import { TagRecord } from "./tags.component";
 						.section-title {
 							font-size: 18px;
 							font-weight: 600;
-							color: #2d3748;
+							color: var(--modal-text);
 							margin-bottom: 16px;
 							padding-bottom: 8px;
-							border-bottom: 2px solid #e2e8f0;
+							border-bottom: 2px solid var(--modal-border);
 						}
 					}
 
@@ -147,7 +175,7 @@ import { TagRecord } from "./tags.component";
 						justify-content: space-between;
 						align-items: flex-start;
 						padding: 12px 0;
-						border-bottom: 1px solid #f1f5f9;
+						border-bottom: 1px solid var(--modal-border);
 
 						&:last-child {
 							border-bottom: none;
@@ -155,14 +183,14 @@ import { TagRecord } from "./tags.component";
 
 						.label {
 							font-weight: 600;
-							color: #4a5568;
+							color: var(--modal-secondary-text);
 							font-size: 14px;
 							min-width: 140px;
 							flex-shrink: 0;
 						}
 
 						.value {
-							color: #2d3748;
+							color: var(--modal-text);
 							font-size: 14px;
 							word-break: break-all;
 							text-align: right;
@@ -170,8 +198,8 @@ import { TagRecord } from "./tags.component";
 						}
 
 						.domain-chip {
-							background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
-							color: white;
+							background: var(--fuse-primary, #3b82f6);
+							color: var(--fuse-on-primary, #ffffff);
 							font-size: 12px;
 							font-weight: 500;
 							padding: 4px 12px;
@@ -182,10 +210,11 @@ import { TagRecord } from "./tags.component";
 						.address-value {
 							font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
 							font-size: 12px;
-							background: #f7fafc;
+							background: var(--modal-address-bg);
+							color: var(--modal-address-text);
 							padding: 8px 12px;
 							border-radius: 6px;
-							border: 1px solid #e2e8f0;
+							border: 1px solid var(--modal-border);
 							word-break: break-all;
 							text-align: right;
 							flex: 1;
@@ -193,17 +222,17 @@ import { TagRecord } from "./tags.component";
 					}
 
 					.extra-params {
-						background: #f8fafc;
+						background: var(--modal-address-bg);
 						border-radius: 8px;
 						padding: 16px;
-						border: 1px solid #e2e8f0;
+						border: 1px solid var(--modal-border);
 
 						.param-item {
 							display: flex;
 							justify-content: space-between;
 							align-items: center;
 							padding: 8px 0;
-							border-bottom: 1px solid #e2e8f0;
+							border-bottom: 1px solid var(--modal-border);
 
 							&:last-child {
 								border-bottom: none;
@@ -211,17 +240,65 @@ import { TagRecord } from "./tags.component";
 
 							.param-label {
 								font-weight: 600;
-								color: #4a5568;
+								color: var(--modal-secondary-text);
 								font-size: 13px;
 								min-width: 120px;
 							}
 
 							.param-value {
-								color: #2d3748;
+								color: var(--modal-text);
 								font-size: 13px;
 								word-break: break-all;
 								text-align: right;
 								flex: 1;
+							}
+						}
+					}
+
+					.modal-footer {
+						display: flex;
+						justify-content: flex-end;
+						gap: 12px;
+						padding: 20px 24px;
+						background: var(--modal-footer-bg);
+						margin: 0 -24px -24px -24px;
+						border-radius: 0 0 8px 8px;
+						border-top: 1px solid var(--modal-border);
+
+						.footer-btn {
+							color: var(--modal-text);
+							border: 1px solid var(--modal-border);
+							background: transparent;
+							font-weight: 500;
+
+							mat-icon {
+								color: inherit;
+							}
+
+							&.copy-btn {
+								color: var(--fuse-primary);
+
+								&:hover {
+									background: var(--fuse-primary-50);
+								}
+							}
+
+							&.qr-btn {
+								color: var(--fuse-success);
+
+								&:hover {
+									background: var(--fuse-success-50);
+								}
+							}
+
+							&.close-btn {
+								color: var(--modal-text);
+								opacity: 0.8;
+
+								&:hover {
+									opacity: 1;
+									background: var(--modal-footer-bg);
+								}
 							}
 						}
 					}
@@ -232,12 +309,37 @@ import { TagRecord } from "./tags.component";
 })
 export class DetailsModalComponent {
 	extraParams: any = null;
+	isDarkMode: boolean = false;
 
 	constructor(
 		public dialogRef: MatDialogRef<DetailsModalComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: TagRecord
+		@Inject(MAT_DIALOG_DATA) public data: TagRecord,
+		private _cdr: ChangeDetectorRef
 	) {
 		this.parseExtraParams();
+		this._checkDarkMode();
+		this._watchDarkMode();
+	}
+
+	private _checkDarkMode(): void {
+		this.isDarkMode = document.body.classList.contains("dark") || document.documentElement.classList.contains("dark");
+		this._cdr.markForCheck();
+	}
+
+	private _watchDarkMode(): void {
+		const observer = new MutationObserver(() => {
+			this._checkDarkMode();
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
 	}
 
 	private parseExtraParams(): void {

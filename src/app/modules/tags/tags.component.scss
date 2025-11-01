@@ -823,6 +823,115 @@
 	animation: spin 1s linear infinite;
 }
 
+// Global dark mode styles for modals in overlay
+::ng-deep html.dark .cdk-overlay-container,
+::ng-deep body.dark .cdk-overlay-container {
+	.qr-modal,
+	.details-modal,
+	.edit-modal {
+		.modal-content {
+			background: #1e293b !important;
+			color: #f1f5f9 !important;
+		}
+
+		p,
+		span,
+		div,
+		h2,
+		h3,
+		strong {
+			color: #f1f5f9 !important;
+		}
+
+		.modal-header {
+			background: #334155 !important;
+			color: #f1f5f9 !important;
+
+			h2 {
+				color: #f1f5f9 !important;
+			}
+		}
+
+		.modal-body {
+			background: #1e293b !important;
+			color: #f1f5f9 !important;
+		}
+
+		.modal-footer,
+		.action-buttons {
+			background: #334155 !important;
+			color: #f1f5f9 !important;
+		}
+
+		.qr-container {
+			background: #1e293b !important;
+			color: #f1f5f9 !important;
+		}
+
+		.qr-url,
+		.address-value {
+			color: #f1f5f9 !important;
+			background: #334155 !important;
+		}
+
+		.qr-tag-name,
+		.tag-name,
+		.label,
+		.param-label,
+		.cost-header {
+			color: #94a3b8 !important;
+		}
+
+		.qr-tag-name strong,
+		.value,
+		.param-value,
+		.cost-amount,
+		.tag-name {
+			color: #f1f5f9 !important;
+		}
+
+		.qr-hint,
+		.tag-description,
+		.cost-breakdown {
+			color: #94a3b8 !important;
+		}
+
+		.footer-btn,
+		.cancel-btn {
+			color: #f1f5f9 !important;
+
+			&.open-btn {
+				color: #60a5fa !important;
+			}
+
+			&.copy-btn {
+				color: #34d399 !important;
+			}
+
+			&.qr-btn {
+				color: #34d399 !important;
+			}
+
+			mat-icon {
+				color: inherit !important;
+			}
+		}
+
+		.confirm-btn {
+			background: #34d399 !important;
+			color: #0f172a !important;
+		}
+
+		.warning-text {
+			color: #f1f5f9 !important;
+		}
+
+		.section-title {
+			color: #f1f5f9 !important;
+		}
+	}
+}
+
 @keyframes spin {
 	from {
 		transform: rotate(0deg);

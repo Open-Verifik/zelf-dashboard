@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
@@ -11,7 +11,7 @@ import { TagRecord } from "./tags.component";
 	standalone: true,
 	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatCardModule],
 	template: `
-		<div class="qr-modal">
+		<div class="qr-modal" [ngClass]="{ 'dark-mode': isDarkMode }">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2>QR Code Preview</h2>
@@ -20,24 +20,24 @@ import { TagRecord } from "./tags.component";
 					<div class="qr-container">
 						<img [src]="data.url" [alt]="'QR Code for ' + data.name" class="qr-image" (error)="onImageError($event)" />
 						<div class="qr-url">{{ data.url }}</div>
-						<div class="mt-4 text-center">
-							<p class="text-sm text-gray-600 mb-2">
+						<div class="qr-info">
+							<p class="qr-tag-name">
 								Tag: <strong>{{ data.name }}</strong>
 							</p>
-							<p class="text-xs text-gray-500">Click the image to open in new tab</p>
+							<p class="qr-hint">Click the image to open in new tab</p>
 						</div>
 					</div>
 				</div>
-				<div class="flex justify-end gap-3 p-6 bg-gray-50 -mx-6 -mb-6">
-					<button mat-button (click)="openInNewTab()" class="text-blue-700">
+				<div class="modal-footer">
+					<button mat-button (click)="openInNewTab()" class="footer-btn open-btn">
 						<mat-icon>open_in_new</mat-icon>
 						Open in New Tab
 					</button>
-					<button mat-button (click)="copyToClipboard()" class="text-emerald-700">
+					<button mat-button (click)="copyToClipboard()" class="footer-btn copy-btn">
 						<mat-icon>content_copy</mat-icon>
 						Copy URL
 					</button>
-					<button mat-button (click)="close()" class="text-gray-700">Close</button>
+					<button mat-button (click)="close()" class="footer-btn close-btn">Close</button>
 				</div>
 			</div>
 		</div>
@@ -45,22 +45,53 @@ import { TagRecord } from "./tags.component";
 	styles: [
 		`
 			.qr-modal {
+				--modal-bg: #ffffff;
+				--modal-text: #1f2937;
+				--modal-header-bg: #f1f5f9;
+				--modal-header-text: #1f2937;
+				--modal-footer-bg: #f8fafc;
+				--modal-url-bg: #f8fafc;
+				--modal-url-text: #1f2937;
+				--modal-secondary-text: #6b7280;
+				--modal-border: #e2e8f0;
+
+				&.dark-mode {
+					--modal-bg: #1e293b;
+					--modal-text: #f1f5f9;
+					--modal-header-bg: #334155;
+					--modal-header-text: #f1f5f9;
+					--modal-footer-bg: #334155;
+					--modal-url-bg: #334155;
+					--modal-url-text: #f1f5f9;
+					--modal-secondary-text: #94a3b8;
+					--modal-border: #475569;
+				}
+
 				.modal-content {
 					max-width: 500px;
 					width: 100%;
+					background: var(--modal-bg);
+					color: var(--modal-text);
 
 					.modal-header {
-						background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-						color: white;
+						background: var(--modal-header-bg);
+						color: var(--modal-header-text);
 						padding: 20px 24px;
 						margin: -24px -24px 24px -24px;
 						border-radius: 8px 8px 0 0;
+						border-bottom: 2px solid var(--modal-border);
 
 						h2 {
 							margin: 0;
 							font-size: 20px;
 							font-weight: 600;
+							color: var(--modal-header-text);
 						}
+					}
+
+					.modal-body {
+						background: var(--modal-bg);
+						color: var(--modal-text);
 					}
 
 					.qr-container {
@@ -68,34 +99,106 @@ import { TagRecord } from "./tags.component";
 						flex-direction: column;
 						align-items: center;
 						padding: 24px;
+						background: var(--modal-bg);
+						color: var(--modal-text);
 
 						.qr-image {
 							width: 300px;
 							height: 300px;
 							border-radius: 12px;
-							border: 2px solid #e2e8f0;
+							border: 2px solid var(--modal-border);
 							margin-bottom: 20px;
 							cursor: pointer;
 							transition: all 0.2s ease-in-out;
+							background: var(--modal-bg);
 
 							&:hover {
 								transform: scale(1.02);
-								border-color: #4299e1;
-								box-shadow: 0 8px 25px rgba(66, 153, 225, 0.15);
+								border-color: var(--fuse-primary);
+								box-shadow: var(--fuse-elevation-4);
 							}
 						}
 
 						.qr-url {
 							font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
 							font-size: 12px;
-							color: #4a5568;
-							background: #f7fafc;
+							color: var(--modal-url-text);
+							background: var(--modal-url-bg);
 							padding: 12px 16px;
 							border-radius: 8px;
-							border: 1px solid #e2e8f0;
+							border: 1px solid var(--modal-border);
 							word-break: break-all;
 							max-width: 100%;
 							text-align: center;
+						}
+
+						.qr-info {
+							margin-top: 16px;
+							text-align: center;
+
+							.qr-tag-name {
+								font-size: 14px;
+								color: var(--modal-secondary-text);
+								margin-bottom: 8px;
+
+								strong {
+									color: var(--modal-text);
+									font-weight: 600;
+								}
+							}
+
+							.qr-hint {
+								font-size: 12px;
+								color: var(--modal-secondary-text);
+							}
+						}
+					}
+
+					.modal-footer {
+						display: flex;
+						justify-content: flex-end;
+						gap: 12px;
+						padding: 20px 24px;
+						background: var(--modal-footer-bg);
+						margin: 0 -24px -24px -24px;
+						border-radius: 0 0 8px 8px;
+						border-top: 1px solid var(--modal-border);
+
+						.footer-btn {
+							color: var(--modal-text);
+							border: 1px solid var(--modal-border);
+							background: transparent;
+							font-weight: 500;
+
+							mat-icon {
+								color: inherit;
+							}
+
+							&.open-btn {
+								color: var(--fuse-primary);
+
+								&:hover {
+									background: var(--fuse-primary-50);
+								}
+							}
+
+							&.copy-btn {
+								color: var(--fuse-success);
+
+								&:hover {
+									background: var(--fuse-success-50);
+								}
+							}
+
+							&.close-btn {
+								color: var(--modal-text);
+								opacity: 0.8;
+
+								&:hover {
+									opacity: 1;
+									background: var(--modal-footer-bg);
+								}
+							}
 						}
 					}
 				}
@@ -104,10 +207,38 @@ import { TagRecord } from "./tags.component";
 	],
 })
 export class QRCodeModalComponent {
+	isDarkMode: boolean = false;
+
 	constructor(
 		public dialogRef: MatDialogRef<QRCodeModalComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: TagRecord
-	) {}
+		@Inject(MAT_DIALOG_DATA) public data: TagRecord,
+		private _cdr: ChangeDetectorRef
+	) {
+		this._checkDarkMode();
+		this._watchDarkMode();
+	}
+
+	private _checkDarkMode(): void {
+		this.isDarkMode = document.body.classList.contains("dark") || 
+		                 document.documentElement.classList.contains("dark");
+		this._cdr.markForCheck();
+	}
+
+	private _watchDarkMode(): void {
+		const observer = new MutationObserver(() => {
+			this._checkDarkMode();
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+	}
 
 	onImageError(event: any): void {
 		event.target.src =

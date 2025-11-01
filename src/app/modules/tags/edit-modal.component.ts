@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
@@ -25,7 +25,7 @@ import { TagRecord } from "./tags.component";
 		FormsModule,
 	],
 	template: `
-		<div class="edit-modal">
+		<div class="edit-modal" [ngClass]="{ 'dark-mode': isDarkMode }">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h2>Extend Lease</h2>
@@ -97,22 +97,51 @@ import { TagRecord } from "./tags.component";
 	styles: [
 		`
 			.edit-modal {
+				--modal-bg: #ffffff;
+				--modal-text: #1f2937;
+				--modal-header-bg: #f1f5f9;
+				--modal-header-text: #1f2937;
+				--modal-footer-bg: #f8fafc;
+				--modal-card-bg: #f8fafc;
+				--modal-secondary-text: #6b7280;
+				--modal-border: #e2e8f0;
+
+				&.dark-mode {
+					--modal-bg: #1e293b;
+					--modal-text: #f1f5f9;
+					--modal-header-bg: #334155;
+					--modal-header-text: #f1f5f9;
+					--modal-footer-bg: #334155;
+					--modal-card-bg: #334155;
+					--modal-secondary-text: #94a3b8;
+					--modal-border: #475569;
+				}
+
 				.modal-content {
 					max-width: 500px;
 					width: 100%;
+					background: var(--modal-bg);
+					color: var(--modal-text);
 
 					.modal-header {
-						background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-						color: white;
+						background: var(--modal-header-bg);
+						color: var(--modal-header-text);
 						padding: 20px 24px;
 						margin: -24px -24px 24px -24px;
 						border-radius: 8px 8px 0 0;
+						border-bottom: 2px solid var(--modal-border);
 
 						h2 {
 							margin: 0;
 							font-size: 20px;
 							font-weight: 600;
+							color: var(--modal-header-text);
 						}
+					}
+
+					.modal-body {
+						background: var(--modal-bg);
+						color: var(--modal-text);
 					}
 
 					.form-container {
@@ -122,19 +151,19 @@ import { TagRecord } from "./tags.component";
 							text-align: center;
 							margin-bottom: 24px;
 							padding: 16px;
-							background: #f8fafc;
+							background: var(--modal-card-bg);
 							border-radius: 8px;
-							border: 1px solid #e2e8f0;
+							border: 1px solid var(--modal-border);
 
 							.tag-name {
 								font-size: 18px;
 								font-weight: 600;
-								color: #2d3748;
+								color: var(--modal-text);
 								margin: 0 0 8px 0;
 							}
 
 							.tag-description {
-								color: #718096;
+								color: var(--modal-secondary-text);
 								font-size: 14px;
 								margin: 0;
 							}
@@ -158,8 +187,8 @@ import { TagRecord } from "./tags.component";
 							margin: 24px 0;
 
 							.cost-card {
-								background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-								border: 1px solid #e2e8f0;
+								background: var(--fuse-accent-50);
+								border: 1px solid var(--fuse-border);
 								border-radius: 12px;
 								padding: 20px;
 								text-align: center;
@@ -170,7 +199,7 @@ import { TagRecord } from "./tags.component";
 									justify-content: center;
 									gap: 8px;
 									margin-bottom: 12px;
-									color: #374151;
+									color: var(--fuse-text);
 									font-weight: 600;
 									font-size: 16px;
 								}
@@ -178,12 +207,12 @@ import { TagRecord } from "./tags.component";
 								.cost-amount {
 									font-size: 32px;
 									font-weight: 700;
-									color: #1f2937;
+									color: var(--fuse-text);
 									margin-bottom: 8px;
 								}
 
 								.cost-breakdown {
-									color: #6b7280;
+									color: var(--fuse-text-secondary);
 									font-size: 14px;
 								}
 							}
@@ -194,20 +223,24 @@ import { TagRecord } from "./tags.component";
 							align-items: flex-start;
 							gap: 12px;
 							padding: 16px;
-							background: #fef3c7;
-							border: 1px solid #fbbf24;
+							background: var(--fuse-warn-50);
+							border: 1px solid var(--fuse-warn);
 							border-radius: 8px;
 							margin-top: 20px;
 
 							mat-icon {
-								color: #d97706;
+								color: var(--fuse-warn);
 								margin-top: 2px;
 							}
 
 							.warning-text {
-								color: #92400e;
+								color: var(--fuse-text);
 								font-size: 14px;
 								line-height: 1.5;
+
+								strong {
+									color: var(--fuse-warn);
+								}
 							}
 						}
 					}
@@ -217,25 +250,187 @@ import { TagRecord } from "./tags.component";
 						justify-content: flex-end;
 						gap: 12px;
 						padding: 20px 24px;
-						background: #f8fafc;
+						background: var(--fuse-accent-50);
 						margin: 0 -24px -24px -24px;
 						border-radius: 0 0 8px 8px;
+						border-top: 1px solid var(--fuse-border);
 
 						.cancel-btn {
-							color: #6b7280;
+							color: var(--fuse-text);
+							border: 1px solid var(--fuse-border);
+							background: transparent;
+							font-weight: 500;
+							opacity: 0.8;
+
+							&:hover {
+								opacity: 1;
+								background: var(--fuse-accent-100);
+							}
 						}
 
 						.confirm-btn {
-							background: linear-gradient(135deg, #059669 0%, #047857 100%);
-							color: white;
+							background: var(--fuse-success);
+							color: var(--fuse-on-success);
+							font-weight: 500;
+
+							&:hover {
+								background: var(--fuse-success-600);
+							}
 
 							&:disabled {
-								background: #e5e7eb;
-								color: #9ca3af;
+								background: var(--fuse-accent-200);
+								color: var(--fuse-text-secondary);
+								opacity: 0.6;
 							}
 						}
 					}
 				}
+			}
+
+			// Dark mode specific overrides
+			::ng-deep .dark .edit-modal,
+			::ng-deep body.dark .edit-modal {
+				.modal-content {
+					background: var(--fuse-card, #1e293b);
+					color: var(--fuse-text, #f1f5f9);
+
+					.modal-header {
+						background: var(--fuse-accent-100, #334155);
+						color: var(--fuse-text, #f1f5f9);
+
+						h2 {
+							color: var(--fuse-text, #f1f5f9);
+						}
+					}
+
+					.modal-body {
+						background: var(--fuse-card, #1e293b);
+						color: var(--fuse-text, #f1f5f9);
+					}
+
+					.form-container {
+						.tag-info {
+							background: var(--fuse-accent-50, #334155);
+							border-color: var(--fuse-border, #475569);
+
+							.tag-name {
+								color: var(--fuse-text, #f1f5f9);
+							}
+
+							.tag-description {
+								color: var(--fuse-text-secondary, #94a3b8);
+							}
+						}
+
+						.cost-info {
+							.cost-card {
+								background: var(--fuse-accent-50, #334155);
+								border-color: var(--fuse-border, #475569);
+
+								.cost-header {
+									color: var(--fuse-text, #f1f5f9);
+								}
+
+								.cost-amount {
+									color: var(--fuse-text, #f1f5f9);
+								}
+
+								.cost-breakdown {
+									color: var(--fuse-text-secondary, #94a3b8);
+								}
+							}
+						}
+
+						.warning-info {
+							background: var(--fuse-warn-50, rgba(251, 191, 36, 0.1));
+							border-color: var(--fuse-warn, #fbbf24);
+
+							mat-icon {
+								color: var(--fuse-warn, #fbbf24);
+							}
+
+							.warning-text {
+								color: var(--fuse-text, #f1f5f9);
+
+								strong {
+									color: var(--fuse-warn, #fbbf24);
+								}
+							}
+						}
+					}
+
+					.action-buttons {
+						background: var(--fuse-accent-50, #334155);
+						border-top-color: var(--fuse-border, #475569);
+
+						.cancel-btn {
+							color: var(--fuse-text, #f1f5f9);
+							border-color: var(--fuse-border, #475569);
+						}
+
+						.confirm-btn {
+							background: var(--fuse-success, #34d399);
+							color: var(--fuse-on-success, #0f172a);
+						}
+					}
+				}
+			}
+		`,
+
+		// Global dark mode overrides for dialog overlay
+		`
+			html.dark .cdk-overlay-container .edit-modal .modal-content,
+			body.dark .cdk-overlay-container .edit-modal .modal-content,
+			html.dark .mat-mdc-dialog-container .edit-modal .modal-content,
+			body.dark .mat-mdc-dialog-container .edit-modal .modal-content {
+				background: #1e293b !important;
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .modal-header,
+			body.dark .cdk-overlay-container .edit-modal .modal-header {
+				background: #334155 !important;
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .modal-header h2,
+			body.dark .cdk-overlay-container .edit-modal .modal-header h2 {
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .tag-name,
+			body.dark .cdk-overlay-container .edit-modal .tag-name {
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .tag-description,
+			body.dark .cdk-overlay-container .edit-modal .tag-description {
+				color: #94a3b8 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .cost-header,
+			body.dark .cdk-overlay-container .edit-modal .cost-header {
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .cost-amount,
+			body.dark .cdk-overlay-container .edit-modal .cost-amount {
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .cost-breakdown,
+			body.dark .cdk-overlay-container .edit-modal .cost-breakdown {
+				color: #94a3b8 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .warning-text,
+			body.dark .cdk-overlay-container .edit-modal .warning-text {
+				color: #f1f5f9 !important;
+			}
+
+			html.dark .cdk-overlay-container .edit-modal .cancel-btn,
+			body.dark .cdk-overlay-container .edit-modal .cancel-btn {
+				color: #f1f5f9 !important;
 			}
 		`,
 	],
@@ -249,10 +444,36 @@ export class EditModalComponent {
 
 	constructor(
 		public dialogRef: MatDialogRef<EditModalComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: TagRecord
+		@Inject(MAT_DIALOG_DATA) public data: TagRecord,
+		private _cdr: ChangeDetectorRef
 	) {
 		this.parseCurrentExpiration();
 		this.updateNewExpiration();
+		this._checkDarkMode();
+		this._watchDarkMode();
+	}
+
+	isDarkMode: boolean = false;
+
+	private _checkDarkMode(): void {
+		this.isDarkMode = document.body.classList.contains("dark") || document.documentElement.classList.contains("dark");
+		this._cdr.markForCheck();
+	}
+
+	private _watchDarkMode(): void {
+		const observer = new MutationObserver(() => {
+			this._checkDarkMode();
+		});
+
+		observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
 	}
 
 	private parseCurrentExpiration(): void {
