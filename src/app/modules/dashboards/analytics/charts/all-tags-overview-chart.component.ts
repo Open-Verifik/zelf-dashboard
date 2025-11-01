@@ -57,7 +57,8 @@ export class AllTagsOverviewChartComponent implements OnInit, OnChanges {
 		const series = this._buildSeries();
 
 		// Get the selected series - ensure we always have at least an empty array
-		const selectedSeries = series[this.selectedPeriod] || series["this-month"] || [{ name: "Total", data: [] }];
+		const totalLabel = this._translocoService.translate("analytics.chart.total");
+		const selectedSeries = series[this.selectedPeriod] || series["this-month"] || [{ name: totalLabel, data: [] }];
 
 		// Calculate y-axis range
 		if (selectedSeries?.[0]?.data && Array.isArray(selectedSeries[0].data)) {
@@ -288,9 +289,10 @@ export class AllTagsOverviewChartComponent implements OnInit, OnChanges {
 			return [t, isNaN(newValue) ? 0 : newValue];
 		});
 
+		const totalLabel = this._translocoService.translate("analytics.chart.total");
 		return {
-			"this-month": [{ name: "Total", data: validThisMonth }],
-			"previous-month": [{ name: "Total", data: previousMonth }],
+			"this-month": [{ name: totalLabel, data: validThisMonth }],
+			"previous-month": [{ name: totalLabel, data: previousMonth }],
 		};
 	}
 

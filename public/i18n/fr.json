@@ -353,6 +353,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "Pic",
+			"low": "Bas",
+			"total": "Total",
+			"tags": "étiquettes",
+			"records": "enregistrements",
+			"on": "le",
+			"belowTarget": "sous l'objectif",
+			"comingSoon": "bientôt disponible",
+			"unknown": "Inconnu"
+		},
+		"chart": {
+			"total": "Total",
+			"allTags": "Toutes les Étiquettes",
+			"paidTags": "Étiquettes Payantes",
+			"tag": "étiquettes",
+			"tags": "étiquettes",
+			"chars": "caractères"
 		}
 	},
 	"profile": {
@@ -546,5 +565,56 @@
 		"checkingPaymentStatus": "Vérification du statut de paiement toutes les 10 secondes...",
 		"paymentConfirmed": "Paiement confirmé avec succès !",
 		"amountDetected": "Montant détecté"
+	},
+	"tags": {
+		"title": "Gestion des Étiquettes",
+		"subtitle": "Gérez vos étiquettes blockchain et codes QR",
+		"licenseWarning": {
+			"title": "Licence Non Configurée",
+			"message": "Veuillez configurer votre licence dans la section Paramètres pour voir et gérer vos étiquettes."
+		},
+		"filters": {
+			"storage": "Stockage",
+			"filterBy": "Filtrer par",
+			"all": "Tout",
+			"tagName": "Nom d'Étiquettes",
+			"blockdagAddress": "Adresse BlockDAG",
+			"ethAddress": "Adresse ETH",
+			"solanaAddress": "Adresse Solana",
+			"bitcoinAddress": "Adresse Bitcoin",
+			"suiAddress": "Adresse SUI",
+			"searchPlaceholder": "Rechercher des étiquettes...",
+			"searchInputPlaceholder": "Entrez un terme de recherche",
+			"clearAll": "Effacer tous les filtres",
+			"activeFilters": "Filtres actifs:"
+		},
+		"purchase": {
+			"title": "Étiquette Disponible à l'Achat",
+			"off": "DE RÉDUCTION",
+			"reward": "récompense",
+			"purchaseButton": "Acheter l'Étiquette",
+			"cancelButton": "Annuler"
+		},
+		"table": {
+			"tagName": "Nom d'Étiquette",
+			"domain": "Domaine",
+			"created": "Créé",
+			"size": "Taille",
+			"actions": "Actions"
+		},
+		"actions": {
+			"previewQR": "Aperçu du Code QR",
+			"viewDetails": "Voir les Détails"
+		},
+		"pagination": {
+			"showing": "Affichage",
+			"of": "de",
+			"results": "résultats",
+			"rowsPerPage": "Lignes par page",
+			"firstPage": "Première page",
+			"previousPage": "Page précédente",
+			"nextPage": "Page suivante",
+			"lastPage": "Dernière page"
+		}
 	}
 }

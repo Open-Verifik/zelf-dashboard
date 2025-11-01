@@ -3,18 +3,28 @@
 	<div class="flex-auto p-6 sm:p-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<h1 class="text-3xl font-bold text-gray-900 mb-2">Tags Management</h1>
-			<p class="text-gray-600">Manage your blockchain tags and QR codes</p>
+			<h1 class="text-3xl font-bold mb-2" style="color: var(--fuse-text)">{{ "tags.title" | transloco }}</h1>
+			<p style="color: var(--fuse-text-secondary)">{{ "tags.subtitle" | transloco }}</p>
+		</div>
+
+		<!-- License Not Configured Message -->
+		<div class="license-warning" *ngIf="!isLoadingLicense && !isLicenseConfigured">
+			<div class="warning-card">
+				<mat-icon class="warning-icon">warning</mat-icon>
+				<div class="warning-content">
+					<h2>{{ "tags.licenseWarning.title" | transloco }}</h2>
+					<p>{{ "tags.licenseWarning.message" | transloco }}</p>
+				</div>
+			</div>
 		</div>
 
 		<!-- Search and Filter Bar -->
-		<div class="search-filter-container">
+		<div class="search-filter-container" *ngIf="isLicenseConfigured && !isLoadingLicense">
 			<div class="search-controls">
 				<!-- Storage Filter Dropdown -->
 				<mat-form-field appearance="outline" class="storage-filter-field">
-					<mat-label>Storage</mat-label>
+					<mat-label>{{ "tags.filters.storage" | transloco }}</mat-label>
 					<mat-select [(ngModel)]="selectedStorage" name="storage" (selectionChange)="onStorageChange()">
-						<mat-option value="all">All Storage</mat-option>
 						<mat-option *ngFor="let storage of availableStorage" [value]="storage">
 							{{ storage }}
 						</mat-option>
@@ -23,46 +33,47 @@
 
 				<!-- Search Type Dropdown -->
 				<mat-form-field appearance="outline" class="search-type-field">
-					<mat-label>Filter by</mat-label>
+					<mat-label>{{ "tags.filters.filterBy" | transloco }}</mat-label>
 					<mat-select [(ngModel)]="searchType" name="searchType">
-						<mat-option value="all">All</mat-option>
-						<mat-option value="name">Tag Name</mat-option>
-						<mat-option value="blockdag">BlockDAG Address</mat-option>
-						<mat-option value="eth">ETH Address</mat-option>
-						<mat-option value="solana">Solana Address</mat-option>
-						<mat-option value="bitcoin">Bitcoin Address</mat-option>
-						<mat-option value="sui">SUI Address</mat-option>
+						<mat-option value="all">{{ "tags.filters.all" | transloco }}</mat-option>
+						<mat-option value="name">{{ "tags.filters.tagName" | transloco }}</mat-option>
+						<mat-option value="blockdag">{{ "tags.filters.blockdagAddress" | transloco }}</mat-option>
+						<mat-option value="eth">{{ "tags.filters.ethAddress" | transloco }}</mat-option>
+						<mat-option value="solana">{{ "tags.filters.solanaAddress" | transloco }}</mat-option>
+						<mat-option value="bitcoin">{{ "tags.filters.bitcoinAddress" | transloco }}</mat-option>
+						<mat-option value="sui">{{ "tags.filters.suiAddress" | transloco }}</mat-option>
 					</mat-select>
 				</mat-form-field>
 
 				<!-- Search Input -->
 				<mat-form-field appearance="outline" class="search-input-field">
-					<mat-label>Search tags...</mat-label>
-					<input matInput [(ngModel)]="searchQuery" (input)="onSearchChange()" placeholder="Enter search term" />
+					<mat-label>{{ "tags.filters.searchPlaceholder" | transloco }}</mat-label>
+					<input
+						matInput
+						[(ngModel)]="searchQuery"
+						(input)="onSearchChange()"
+						[placeholder]="'tags.filters.searchInputPlaceholder' | transloco"
+					/>
 					<mat-icon matSuffix *ngIf="!isSearching">search</mat-icon>
 					<mat-icon matSuffix *ngIf="isSearching" class="animate-spin">hourglass_empty</mat-icon>
 				</mat-form-field>
 
 				<!-- Clear Filters Button -->
-				<button mat-icon-button class="clear-filters-btn" (click)="clearFilters()" matTooltip="Clear all filters">
+				<button mat-icon-button class="clear-filters-btn" (click)="clearFilters()" [matTooltip]="'tags.filters.clearAll' | transloco">
 					<mat-icon>clear</mat-icon>
 				</button>
 			</div>
 
 			<!-- Active Filters Display -->
 			<div class="active-filters" *ngIf="hasActiveFilters()">
-				<span class="filters-label">Active filters:</span>
+				<span class="filters-label">{{ "tags.filters.activeFilters" | transloco }}</span>
 				<div class="filter-chips">
-					<mat-chip *ngIf="selectedDomain !== 'all'" class="filter-chip" (click)="removeDomainFilter()">
-						{{ selectedDomain }}
-						<mat-icon matChipRemove>close</mat-icon>
-					</mat-chip>
-					<mat-chip *ngIf="selectedStorage !== 'all'" class="filter-chip" (click)="removeStorageFilter()">
+					<mat-chip *ngIf="selectedStorage !== 'IPFS'" class="filter-chip" (click)="removeStorageFilter()">
 						{{ selectedStorage }}
 						<mat-icon matChipRemove>close</mat-icon>
 					</mat-chip>
 					<mat-chip *ngIf="searchType !== 'all'" class="filter-chip" (click)="removeSearchTypeFilter()">
-						{{ getSearchTypeLabel() }}
+						{{ getSearchTypeLabel() | transloco }}
 						<mat-icon matChipRemove>close</mat-icon>
 					</mat-chip>
 					<mat-chip *ngIf="searchQuery" class="filter-chip" (click)="clearSearchQuery()">
@@ -78,7 +89,7 @@
 			<div class="purchase-card">
 				<div class="purchase-header">
 					<mat-icon class="purchase-icon">shopping_cart</mat-icon>
-					<h2>Tag Available for Purchase</h2>
+					<h2>{{ "tags.purchase.title" | transloco }}</h2>
 				</div>
 				<div class="purchase-content">
 					<div class="tag-info">
@@ -92,20 +103,20 @@
 						</div>
 						<div class="price-details" *ngIf="purchaseData.price.discount > 0">
 							<span class="original-price">${{ purchaseData.price.priceWithoutDiscount }}</span>
-							<span class="discount">{{ purchaseData.price.discount }}% OFF</span>
+							<span class="discount">{{ purchaseData.price.discount }}% {{ "tags.purchase.off" | transloco }}</span>
 						</div>
 						<div class="reward-info">
-							<span class="reward">+${{ purchaseData.price.reward }} reward</span>
+							<span class="reward">+${{ purchaseData.price.reward }} {{ "tags.purchase.reward" | transloco }}</span>
 						</div>
 					</div>
 					<div class="purchase-actions">
 						<button mat-raised-button color="primary" class="purchase-btn">
 							<mat-icon>shopping_cart</mat-icon>
-							Purchase Tag
+							{{ "tags.purchase.purchaseButton" | transloco }}
 						</button>
 						<button mat-stroked-button class="cancel-btn" (click)="clearSearchQuery()">
 							<mat-icon>close</mat-icon>
-							Cancel
+							{{ "tags.purchase.cancelButton" | transloco }}
 						</button>
 					</div>
 				</div>
@@ -113,12 +124,12 @@
 		</div>
 
 		<!-- Table Container -->
-		<div class="tags-container" *ngIf="!showPurchaseMessage">
+		<div class="tags-container" [ngClass]="{ 'dark-mode': isDarkMode }" *ngIf="isLicenseConfigured && !showPurchaseMessage && !isLoadingLicense">
 			<div class="table-container">
 				<table mat-table [dataSource]="dataSource" class="mat-mdc-table">
 					<!-- Name Column -->
 					<ng-container matColumnDef="name">
-						<th mat-header-cell *matHeaderCellDef>Tag Name</th>
+						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.tagName" | transloco }}</th>
 						<td mat-cell *matCellDef="let record">
 							<div class="flex items-center">
 								<span
@@ -133,15 +144,15 @@
 
 					<!-- Domain Column -->
 					<ng-container matColumnDef="domain">
-						<th mat-header-cell *matHeaderCellDef>Domain</th>
+						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.domain" | transloco }}</th>
 						<td mat-cell *matCellDef="let record">
-							<span class="domain-chip">{{ record.publicData.domain }}</span>
+							<span class="domain-chip">{{ licenseDomain || record.publicData?.domain }}</span>
 						</td>
 					</ng-container>
 
 					<!-- Created Date Column -->
 					<ng-container matColumnDef="created_at">
-						<th mat-header-cell *matHeaderCellDef>Created</th>
+						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.created" | transloco }}</th>
 						<td mat-cell *matCellDef="let record">
 							<span class="date-text">{{ formatDate(record.created_at) }}</span>
 						</td>
@@ -149,7 +160,7 @@
 
 					<!-- Size Column -->
 					<ng-container matColumnDef="size">
-						<th mat-header-cell *matHeaderCellDef>Size</th>
+						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.size" | transloco }}</th>
 						<td mat-cell *matCellDef="let record">
 							<span class="size-text">{{ formatFileSize(record.size) }}</span>
 						</td>
@@ -157,26 +168,36 @@
 
 					<!-- Actions Column -->
 					<ng-container matColumnDef="actions">
-						<th mat-header-cell *matHeaderCellDef>Actions</th>
+						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.actions" | transloco }}</th>
 						<td mat-cell *matCellDef="let record">
 							<div class="action-buttons">
 								<!-- QR Code Button -->
-								<button mat-icon-button class="action-btn qr-btn" matTooltip="Preview QR Code" (click)="openQRCodeModal(record)">
+								<button
+									mat-icon-button
+									class="action-btn qr-btn"
+									[matTooltip]="'tags.actions.previewQR' | transloco"
+									(click)="openQRCodeModal(record)"
+								>
 									<mat-icon>qr_code</mat-icon>
 								</button>
 
 								<!-- Details Button -->
-								<button mat-icon-button class="action-btn details-btn" matTooltip="View Details" (click)="openDetailsModal(record)">
+								<button
+									mat-icon-button
+									class="action-btn details-btn"
+									[matTooltip]="'tags.actions.viewDetails' | transloco"
+									(click)="openDetailsModal(record)"
+								>
 									<mat-icon>visibility</mat-icon>
 								</button>
 
 								<!-- Edit Button -->
-								<button mat-icon-button class="action-btn edit-btn" matTooltip="Edit Lease" (click)="openEditModal(record)">
+								<!-- <button mat-icon-button class="action-btn edit-btn" matTooltip="Edit Lease" (click)="openEditModal(record)">
 									<mat-icon>edit</mat-icon>
-								</button>
+								</button> -->
 
 								<!-- Delete Button -->
-								<button
+								<!-- <button
 									mat-icon-button
 									class="action-btn"
 									[class.delete-btn]="canDelete(record)"
@@ -186,7 +207,7 @@
 									(click)="deleteRecord(record)"
 								>
 									<mat-icon>delete</mat-icon>
-								</button>
+								</button> -->
 							</div>
 						</td>
 					</ng-container>
@@ -199,13 +220,28 @@
 			<!-- Pagination -->
 			<div class="pagination-container">
 				<div class="pagination-info">
-					<span class="pagination-text">Showing {{ getStartItem() }}-{{ getEndItem() }} of {{ totalItems }} results</span>
+					<span class="pagination-text"
+						>{{ "tags.pagination.showing" | transloco }} {{ getStartItem() }}-{{ getEndItem() }} {{ "tags.pagination.of" | transloco }}
+						{{ totalItems }} {{ "tags.pagination.results" | transloco }}</span
+					>
 				</div>
 				<div class="pagination-controls">
-					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === 1" (click)="goToFirstPage()">
+					<button
+						mat-icon-button
+						class="pagination-btn"
+						[disabled]="currentPage === 1"
+						(click)="goToFirstPage()"
+						[matTooltip]="'tags.pagination.firstPage' | transloco"
+					>
 						<mat-icon>first_page</mat-icon>
 					</button>
-					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === 1" (click)="goToPreviousPage()">
+					<button
+						mat-icon-button
+						class="pagination-btn"
+						[disabled]="currentPage === 1"
+						(click)="goToPreviousPage()"
+						[matTooltip]="'tags.pagination.previousPage' | transloco"
+					>
 						<mat-icon>chevron_left</mat-icon>
 					</button>
 
@@ -222,16 +258,28 @@
 						</button>
 					</div>
 
-					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="goToNextPage()">
+					<button
+						mat-icon-button
+						class="pagination-btn"
+						[disabled]="currentPage === totalPages"
+						(click)="goToNextPage()"
+						[matTooltip]="'tags.pagination.nextPage' | transloco"
+					>
 						<mat-icon>chevron_right</mat-icon>
 					</button>
-					<button mat-icon-button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="goToLastPage()">
+					<button
+						mat-icon-button
+						class="pagination-btn"
+						[disabled]="currentPage === totalPages"
+						(click)="goToLastPage()"
+						[matTooltip]="'tags.pagination.lastPage' | transloco"
+					>
 						<mat-icon>last_page</mat-icon>
 					</button>
 				</div>
 				<div class="pagination-size">
 					<mat-form-field appearance="outline" class="page-size-selector">
-						<mat-label>Rows per page</mat-label>
+						<mat-label>{{ "tags.pagination.rowsPerPage" | transloco }}</mat-label>
 						<mat-select [(ngModel)]="pageSize" (selectionChange)="onPageSizeChange()">
 							<mat-option *ngFor="let size of pageSizeOptions" [value]="size">
 								{{ size }}

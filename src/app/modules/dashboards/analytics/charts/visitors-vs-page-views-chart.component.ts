@@ -243,9 +243,11 @@ export class VisitorsVsPageViewsChartComponent implements OnInit, OnChanges {
 			validPaidTags.push([Date.now(), 0]);
 		}
 
+		const allTagsLabel = this._translocoService.translate("analytics.chart.allTags");
+		const paidTagsLabel = this._translocoService.translate("analytics.chart.paidTags");
 		return [
-			{ name: "All Tags", data: validAllTags },
-			{ name: "Paid Tags", data: validPaidTags },
+			{ name: allTagsLabel, data: validAllTags },
+			{ name: paidTagsLabel, data: validPaidTags },
 		];
 	}
 

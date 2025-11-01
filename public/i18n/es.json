@@ -354,6 +354,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "Pico",
+			"low": "Bajo",
+			"total": "Total",
+			"tags": "etiquetas",
+			"records": "registros",
+			"on": "el",
+			"belowTarget": "por debajo del objetivo",
+			"comingSoon": "próximamente",
+			"unknown": "Desconocido"
+		},
+		"chart": {
+			"total": "Total",
+			"allTags": "Todas las Etiquetas",
+			"paidTags": "Etiquetas Pagadas",
+			"tag": "etiqueta",
+			"tags": "etiquetas",
+			"chars": "caracteres"
 		}
 	},
 	"profile": {
@@ -547,5 +566,56 @@
 		"checkingPaymentStatus": "Verificando estado de pago cada 10 segundos...",
 		"paymentConfirmed": "¡Pago confirmado exitosamente!",
 		"amountDetected": "Cantidad detectada"
+	},
+	"tags": {
+		"title": "Gestión de Etiquetas",
+		"subtitle": "Gestiona tus etiquetas blockchain y códigos QR",
+		"licenseWarning": {
+			"title": "Licencia No Configurada",
+			"message": "Por favor configura tu licencia en la sección de Configuración para ver y gestionar tus etiquetas."
+		},
+		"filters": {
+			"storage": "Almacenamiento",
+			"filterBy": "Filtrar por",
+			"all": "Todo",
+			"tagName": "Nombre de Etiqueta",
+			"blockdagAddress": "Dirección BlockDAG",
+			"ethAddress": "Dirección ETH",
+			"solanaAddress": "Dirección Solana",
+			"bitcoinAddress": "Dirección Bitcoin",
+			"suiAddress": "Dirección SUI",
+			"searchPlaceholder": "Buscar etiquetas...",
+			"searchInputPlaceholder": "Ingresa término de búsqueda",
+			"clearAll": "Limpiar todos los filtros",
+			"activeFilters": "Filtros activos:"
+		},
+		"purchase": {
+			"title": "Etiqueta Disponible para Compra",
+			"off": "DESCUENTO",
+			"reward": "recompensa",
+			"purchaseButton": "Comprar Etiqueta",
+			"cancelButton": "Cancelar"
+		},
+		"table": {
+			"tagName": "Nombre de Etiqueta",
+			"domain": "Dominio",
+			"created": "Creado",
+			"size": "Tamaño",
+			"actions": "Acciones"
+		},
+		"actions": {
+			"previewQR": "Vista Previa del Código QR",
+			"viewDetails": "Ver Detalles"
+		},
+		"pagination": {
+			"showing": "Mostrando",
+			"of": "de",
+			"results": "resultados",
+			"rowsPerPage": "Filas por página",
+			"firstPage": "Primera página",
+			"previousPage": "Página anterior",
+			"nextPage": "Página siguiente",
+			"lastPage": "Última página"
+		}
 	}
 }

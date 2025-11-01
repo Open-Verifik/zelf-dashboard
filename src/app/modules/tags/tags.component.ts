@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnInit, OnDestroy } from "@angular/core";
+import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatTableModule } from "@angular/material/table";
 import { MatButtonModule } from "@angular/material/button";
@@ -11,6 +11,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { FormsModule } from "@angular/forms";
+import { TranslocoModule } from "@jsverse/transloco";
 import { QRCodeModalComponent } from "./qr-code-modal.component";
 import { DetailsModalComponent } from "./details-modal.component";
 import { EditModalComponent } from "./edit-modal.component";
@@ -75,6 +76,7 @@ export interface PurchaseData {
 		MatInputModule,
 		MatSelectModule,
 		FormsModule,
+		TranslocoModule,
 	],
 })
 export class TagsComponent implements OnInit, OnDestroy {
@@ -84,18 +86,20 @@ export class TagsComponent implements OnInit, OnDestroy {
 	// Pagination properties
 	currentPage: number = 1;
 	pageSize: number = 10;
-	totalPages: number = 5;
-	totalItems: number = 50;
-	pageSizeOptions: number[] = [5, 10, 25, 50];
-	visiblePages: (number | string)[] = [1, 2, 3, 4, 5];
+	totalPages: number = 1;
+	totalItems: number = 0;
+	pageSizeOptions: number[] = [10, 25, 50, 100];
+	visiblePages: (number | string)[] = [1];
 
 	// Search and Filter properties
 	searchType: string = "all";
-	selectedDomain: string = "all";
-	selectedStorage: string = "all";
+	selectedStorage: string = "IPFS";
 	searchQuery: string = "";
-	license: License;
+	license: License | null = null;
 	availableStorage: string[] = ["IPFS", "Arweave", "Walrus", "NFT"];
+	licenseDomain: string | null = null;
+	isLicenseConfigured: boolean = false;
+	isLoadingLicense: boolean = true;
 
 	// Debounced search properties
 	private searchSubject = new Subject<string>();
@@ -107,17 +111,121 @@ export class TagsComponent implements OnInit, OnDestroy {
 	purchaseData: PurchaseData | null = null;
 	licenseData: DomainConfig | null = null;
 
+	// Dark mode detection
+	isDarkMode: boolean = false;
+	private darkModeObserver?: MutationObserver;
+
 	constructor(
 		private dialog: MatDialog,
 		private tagsService: TagsService,
-		private _licenseService: LicenseService
+		private _licenseService: LicenseService,
+		private _cdr: ChangeDetectorRef
 	) {}
 
 	ngOnInit(): void {
-		this.updateVisiblePages();
+		// Check for dark mode
+		this._checkDarkMode();
 
+		// Watch for dark mode changes
+		this._watchDarkMode();
+
+		// Fetch license first, then load tags
 		this._getMyLicense();
+	}
 
+	private _checkDarkMode(): void {
+		const wasDarkMode = this.isDarkMode;
+		this.isDarkMode = document.body.classList.contains("dark") || document.documentElement.classList.contains("dark");
+
+		// Trigger change detection if mode changed
+		if (wasDarkMode !== this.isDarkMode) {
+			this._cdr.markForCheck();
+		}
+	}
+
+	private _watchDarkMode(): void {
+		// Watch for class changes on body/html
+		this.darkModeObserver = new MutationObserver(() => {
+			this._checkDarkMode();
+		});
+
+		this.darkModeObserver.observe(document.body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		this.darkModeObserver.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+	}
+
+	async _getMyLicense(): Promise<void> {
+		this.isLoadingLicense = true;
+
+		try {
+			// Get the license from localStorage first
+			const licenseStr = localStorage.getItem("license");
+
+			if (licenseStr) {
+				const licenseData = JSON.parse(licenseStr);
+
+				// Extract domain from licenseData - same logic as analytics component
+				// Use domainConfig.name (not domainConfig.domain)
+				const domainCfg = licenseData?.domainConfig || licenseData;
+				this.licenseDomain = domainCfg?.name || licenseData?.domain || null;
+
+				if (!this.licenseDomain || this.licenseDomain.trim() === "") {
+					this.isLicenseConfigured = false;
+					this.isLoadingLicense = false;
+					return;
+				}
+
+				this.licenseData = domainCfg;
+				this.license = domainCfg;
+				this.isLicenseConfigured = true;
+				this.isLoadingLicense = false;
+
+				// Set up debounced search after license is loaded
+				this._setupSearch();
+				// Load initial tags
+				this.performSearch();
+				return;
+			}
+
+			// If not in localStorage, fetch from API
+			const response = await this._licenseService.getMyLicense(true);
+
+			if (response.data?.myLicense) {
+				const domainCfg = response.data.myLicense.domainConfig;
+				this.licenseDomain = domainCfg?.name || null;
+
+				if (!this.licenseDomain || this.licenseDomain.trim() === "") {
+					this.isLicenseConfigured = false;
+				} else {
+					this.licenseData = domainCfg;
+					this.license = domainCfg;
+					this.isLicenseConfigured = true;
+					localStorage.setItem("license", JSON.stringify({ ...(licenseStr ? JSON.parse(licenseStr) : {}), domainConfig: domainCfg }));
+				}
+			} else {
+				this.isLicenseConfigured = false;
+			}
+		} catch (error) {
+			this.isLicenseConfigured = false;
+		} finally {
+			this.isLoadingLicense = false;
+
+			// Set up debounced search after license check is complete
+			if (this.isLicenseConfigured) {
+				this._setupSearch();
+				// Load initial tags only if license is configured
+				this.performSearch();
+			}
+		}
+	}
+
+	private _setupSearch(): void {
 		// Set up debounced search
 		this.searchSubject
 			.pipe(
@@ -129,35 +237,16 @@ export class TagsComponent implements OnInit, OnDestroy {
 				this.searchQuery = searchQuery;
 				this.performSearch();
 			});
-
-		// Load initial data from API
-		this.performSearch();
-	}
-
-	async _getMyLicense(): Promise<void> {
-		// get the license from the localStorage
-		const license = localStorage.getItem("license");
-
-		if (license) {
-			const licenseData = JSON.parse(license);
-
-			this.selectedDomain = licenseData.domain;
-
-			return;
-		}
-
-		this._licenseService.getMyLicense(true).then((response) => {
-			if (response.data.myLicense) {
-				this.selectedDomain = response.data.myLicense.domainConfig.domain;
-				localStorage.setItem("license", JSON.stringify(response.data.myLicense.domainConfig));
-				this.licenseData = response.data.myLicense.domainConfig;
-			}
-		});
 	}
 
 	ngOnDestroy(): void {
 		this.destroy$.next();
 		this.destroy$.complete();
+
+		// Clean up dark mode observer
+		if (this.darkModeObserver) {
+			this.darkModeObserver.disconnect();
+		}
 	}
 
 	formatFileSize(bytes: number): string {
@@ -192,7 +281,6 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result) => {
 			if (result) {
-				console.log("QR Code modal closed with result:", result);
 			}
 		});
 	}
@@ -264,7 +352,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 	goToLastPage(): void {
 		this.currentPage = this.totalPages;
 		this.updateVisiblePages();
-		console.log("Going to last page");
+
 		this.performSearch();
 	}
 
@@ -337,30 +425,22 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 	// Search and Filter methods
 	onSearchChange(): void {
-		console.log("Search query changed:", this.searchQuery);
 		// Set loading state when user starts typing
 		this.isSearching = true;
 		// Emit to debounced search subject instead of calling performSearch directly
 		this.searchSubject.next(this.searchQuery);
 	}
 
-	onDomainChange(): void {
-		console.log("Domain filter changed:", this.selectedDomain);
-		this.performSearch();
-	}
-
 	onStorageChange(): void {
-		console.log("Storage filter changed:", this.selectedStorage);
+		this.currentPage = 1; // Reset to first page when storage changes
 		this.performSearch();
 	}
 
 	performSearch(): void {
-		console.log("Performing search with:", {
-			searchType: this.searchType,
-			selectedDomain: this.selectedDomain,
-			selectedStorage: this.selectedStorage,
-			searchQuery: this.searchQuery,
-		});
+		// Don't perform search if license is not configured or domain is missing/empty
+		if (!this.isLicenseConfigured || !this.licenseDomain || this.licenseDomain.trim() === "") {
+			return;
+		}
 
 		// Clear loading state
 		this.isSearching = false;
@@ -377,14 +457,13 @@ export class TagsComponent implements OnInit, OnDestroy {
 	private searchByTagName(): void {
 		const searchParams: TagSearchParams = {
 			tagName: this.searchQuery.trim(),
-			domain: this.selectedDomain !== "all" ? this.selectedDomain : undefined,
+			domain: this.licenseDomain || undefined,
 			os: "DESKTOP",
 		};
 
 		this.tagsService
 			.searchTag(searchParams)
 			.then((response) => {
-				console.log("Tag search response:", response);
 				// Handle single tag search response
 				if (response.data) {
 					// Check if tag is available for purchase
@@ -416,7 +495,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 								publicData: {
 									avaxName: response.data.tagObject?.publicData?.avaxName || response.data.tagName,
 									btcAddress: response.data.tagObject?.publicData?.btcAddress || "",
-									domain: response.data.tagObject?.publicData?.domain || this.selectedDomain,
+									domain: response.data.tagObject?.publicData?.domain || this.licenseDomain,
 									ethAddress: response.data.tagObject?.publicData?.ethAddress || "",
 									extraParams: response.data.tagObject?.publicData?.extraParams || "",
 									solanaAddress: response.data.tagObject?.publicData?.solanaAddress || "",
@@ -436,9 +515,13 @@ export class TagsComponent implements OnInit, OnDestroy {
 	}
 
 	private searchByDomain(): void {
+		if (!this.licenseDomain) {
+			return;
+		}
+
 		const domainParams: DomainSearchParams = {
-			domain: this.selectedDomain !== "all" ? this.selectedDomain : "avax",
-			storage: this.selectedStorage !== "all" ? this.selectedStorage : "IPFS",
+			domain: this.licenseDomain,
+			storage: this.selectedStorage,
 			limit: this.pageSize,
 			offset: (this.currentPage - 1) * this.pageSize,
 		};
@@ -446,50 +529,64 @@ export class TagsComponent implements OnInit, OnDestroy {
 		this.tagsService
 			.searchByDomain(domainParams)
 			.then((response) => {
-				console.log("Domain search response:", response);
 				if (response.data && Array.isArray(response.data)) {
 					this.dataSource = response.data;
+
 					// Update pagination info if provided
-					if (response.total) {
+					if (response.total !== undefined) {
 						this.totalItems = response.total;
 						this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 						this.updateVisiblePages();
+					} else {
+						// If total is not provided, estimate from data length
+						if (response.data.length < this.pageSize) {
+							this.totalItems = (this.currentPage - 1) * this.pageSize + response.data.length;
+							this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+							this.updateVisiblePages();
+						}
 					}
+				} else {
+					this.dataSource = [];
+					this.totalItems = 0;
+					this.totalPages = 1;
+					this.updateVisiblePages();
 				}
 			})
 			.catch((error) => {
-				console.error("Domain search error:", error);
 				// Clear data on error
 				this.dataSource = [];
+				this.totalItems = 0;
+				this.totalPages = 1;
+				this.updateVisiblePages();
 			});
 	}
 
 	hasActiveFilters(): boolean {
-		return this.searchType !== "all" || this.selectedDomain !== "all" || this.selectedStorage !== "all" || this.searchQuery.trim() !== "";
+		return this.searchType !== "all" || this.selectedStorage !== "IPFS" || this.searchQuery.trim() !== "";
 	}
 
 	getSearchTypeLabel(): string {
 		const labels: { [key: string]: string } = {
-			all: "All",
-			name: "Tag Name",
-			blockdag: "BlockDAG Address",
-			eth: "ETH Address",
-			solana: "Solana Address",
-			bitcoin: "Bitcoin Address",
-			sui: "SUI Address",
+			all: "tags.filters.all",
+			name: "tags.filters.tagName",
+			blockdag: "tags.filters.blockdagAddress",
+			eth: "tags.filters.ethAddress",
+			solana: "tags.filters.solanaAddress",
+			bitcoin: "tags.filters.bitcoinAddress",
+			sui: "tags.filters.suiAddress",
 		};
-		return labels[this.searchType] || "All";
+		// This will be handled by the template using transloco pipe
+		return labels[this.searchType] || "tags.filters.all";
 	}
 
 	clearFilters(): void {
 		this.searchType = "all";
-		this.selectedDomain = "all";
-		this.selectedStorage = "all";
+		this.selectedStorage = "IPFS";
 		this.searchQuery = "";
+		this.currentPage = 1;
 		this.showPurchaseMessage = false;
 		this.purchaseData = null;
 		this.performSearch();
-		console.log("All filters cleared");
 	}
 
 	removeSearchTypeFilter(): void {
@@ -499,15 +596,11 @@ export class TagsComponent implements OnInit, OnDestroy {
 		this.performSearch();
 	}
 
-	removeDomainFilter(): void {
-		this.selectedDomain = "all";
-		this.showPurchaseMessage = false;
-		this.purchaseData = null;
-		this.performSearch();
-	}
+	// Removed removeDomainFilter - domain is always from license
 
 	removeStorageFilter(): void {
-		this.selectedStorage = "all";
+		this.selectedStorage = "IPFS";
+		this.currentPage = 1;
 		this.showPurchaseMessage = false;
 		this.purchaseData = null;
 		this.performSearch();

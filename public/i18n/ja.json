@@ -354,6 +354,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "ピーク",
+			"low": "最低",
+			"total": "合計",
+			"tags": "タグ",
+			"records": "記録",
+			"on": "の",
+			"belowTarget": "目標未達成",
+			"comingSoon": "近日公開",
+			"unknown": "不明"
+		},
+		"chart": {
+			"total": "合計",
+			"allTags": "すべてのタグ",
+			"paidTags": "有料タグ",
+			"tag": "タグ",
+			"tags": "タグ",
+			"chars": "文字"
 		}
 	},
 	"profile": {
@@ -547,5 +566,56 @@
 		"checkingPaymentStatus": "10秒ごとに支払いステータスを確認中...",
 		"paymentConfirmed": "支払いが正常に確認されました！",
 		"amountDetected": "検出された金額"
+	},
+	"tags": {
+		"title": "タグ管理",
+		"subtitle": "ブロックチェーンタグとQRコードを管理",
+		"licenseWarning": {
+			"title": "ライセンスが設定されていません",
+			"message": "タグを表示および管理するには、設定セクションでライセンスを設定してください。"
+		},
+		"filters": {
+			"storage": "ストレージ",
+			"filterBy": "フィルター条件",
+			"all": "すべて",
+			"tagName": "タグ名",
+			"blockdagAddress": "BlockDAGアドレス",
+			"ethAddress": "ETHアドレス",
+			"solanaAddress": "Solanaアドレス",
+			"bitcoinAddress": "Bitcoinアドレス",
+			"suiAddress": "SUIアドレス",
+			"searchPlaceholder": "タグを検索...",
+			"searchInputPlaceholder": "検索語を入力",
+			"clearAll": "すべてのフィルターをクリア",
+			"activeFilters": "アクティブなフィルター:"
+		},
+		"purchase": {
+			"title": "購入可能なタグ",
+			"off": "オフ",
+			"reward": "報酬",
+			"purchaseButton": "タグを購入",
+			"cancelButton": "キャンセル"
+		},
+		"table": {
+			"tagName": "タグ名",
+			"domain": "ドメイン",
+			"created": "作成日",
+			"size": "サイズ",
+			"actions": "アクション"
+		},
+		"actions": {
+			"previewQR": "QRコードをプレビュー",
+			"viewDetails": "詳細を表示"
+		},
+		"pagination": {
+			"showing": "表示中",
+			"of": "/",
+			"results": "件の結果",
+			"rowsPerPage": "ページあたりの行数",
+			"firstPage": "最初のページ",
+			"previousPage": "前のページ",
+			"nextPage": "次のページ",
+			"lastPage": "最後のページ"
+		}
 	}
 }

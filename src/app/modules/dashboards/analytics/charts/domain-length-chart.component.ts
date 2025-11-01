@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnChanges, SimpleChanges, ViewEncapsulation } from "@angular/core";
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
+import { TranslocoService } from "@jsverse/transloco";
 
 interface TagRecord {
 	name: string;
@@ -30,7 +31,10 @@ export class DomainLengthChartComponent implements OnInit, OnChanges {
 	series: number[] = [];
 	counts: number[] = []; // Actual counts for each bucket
 
-	constructor(private _cdr: ChangeDetectorRef) {}
+	constructor(
+		private _cdr: ChangeDetectorRef,
+		private _translocoService: TranslocoService
+	) {}
 
 	ngOnInit(): void {
 		this._updateChart();
@@ -96,12 +100,16 @@ export class DomainLengthChartComponent implements OnInit, OnChanges {
 				custom: ({ seriesIndex, w }): string => {
 					const count = this.counts[seriesIndex] || 0;
 					const percentage = w.config.series[seriesIndex] || 0;
+					const charsLabel = this._translocoService.translate("analytics.chart.chars");
+					const tagLabel = count === 1 
+						? this._translocoService.translate("analytics.chart.tag") 
+						: this._translocoService.translate("analytics.chart.tags");
 					return `<div class="flex flex-col px-3 py-2">
                                                      <div class="flex items-center">
                                                          <div class="w-3 h-3 rounded-full" style="background-color: ${w.config.colors[seriesIndex]};"></div>
-                                                         <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]} chars</div>
+                                                         <div class="ml-2 text-md leading-none">${w.config.labels[seriesIndex]} ${charsLabel}</div>
                                                      </div>
-                                                     <div class="ml-5 mt-1 text-sm text-gray-400">${count} ${count === 1 ? "tag" : "tags"} • ${percentage}%</div>
+                                                     <div class="ml-5 mt-1 text-sm text-gray-400">${count} ${tagLabel} • ${percentage}%</div>
                                                  </div>`;
 				},
 			},

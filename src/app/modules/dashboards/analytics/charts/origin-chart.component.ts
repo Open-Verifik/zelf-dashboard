@@ -100,12 +100,15 @@ export class OriginChartComponent implements OnInit, OnChanges {
 					const count = this.counts[seriesIndex] || 0;
 					const percentage = w.config.series[seriesIndex] || 0;
 					const label = this._formatOriginLabel(w.config.labels[seriesIndex] || "");
+					const tagLabel = count === 1 
+						? this._translocoService.translate("analytics.chart.tag") 
+						: this._translocoService.translate("analytics.chart.tags");
 					return `<div class="flex flex-col px-3 py-2">
                                                     <div class="flex items-center">
                                                         <div class="w-3 h-3 rounded-full" style="background-color: ${w.config.colors[seriesIndex]};"></div>
                                                         <div class="ml-2 text-md leading-none">${label}</div>
                                                     </div>
-                                                    <div class="ml-5 mt-1 text-sm text-gray-400">${count} ${count === 1 ? "tag" : "tags"} • ${percentage}%</div>
+                                                    <div class="ml-5 mt-1 text-sm text-gray-400">${count} ${tagLabel} • ${percentage}%</div>
                                                 </div>`;
 				},
 			},
@@ -115,7 +118,7 @@ export class OriginChartComponent implements OnInit, OnChanges {
 	}
 
 	private _formatOriginLabel(origin: string): string {
-		if (!origin || origin === "unknown") return "Unknown";
+		if (!origin || origin === "unknown") return this._translocoService.translate("analytics.stats.unknown");
 		// Capitalize first letter and format nicely
 		return origin.charAt(0).toUpperCase() + origin.slice(1).toLowerCase();
 	}

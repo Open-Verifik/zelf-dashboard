@@ -42,18 +42,18 @@
 						@if (dailyStats && dailyStats.highestDay && dailyStats.lowestDay) {
 							<div class="mt-3 flex flex-wrap gap-4 text-sm">
 								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">Peak:</span>
-									<span class="font-semibold text-green-500">{{ dailyStats.highestDay.count }} tags</span>
-									<span class="text-secondary">on {{ dailyStats.highestDay.date }}</span>
+									<span class="text-secondary">{{ "analytics.stats.peak" | transloco }}:</span>
+									<span class="font-semibold text-green-500">{{ dailyStats.highestDay.count }} {{ "analytics.stats.tags" | transloco }}</span>
+									<span class="text-secondary">{{ "analytics.stats.on" | transloco }} {{ dailyStats.highestDay.date }}</span>
 								</div>
 								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">Low:</span>
-									<span class="font-semibold text-red-500">{{ dailyStats.lowestDay.count }} tags</span>
-									<span class="text-secondary">on {{ dailyStats.lowestDay.date }}</span>
+									<span class="text-secondary">{{ "analytics.stats.low" | transloco }}:</span>
+									<span class="font-semibold text-red-500">{{ dailyStats.lowestDay.count }} {{ "analytics.stats.tags" | transloco }}</span>
+									<span class="text-secondary">{{ "analytics.stats.on" | transloco }} {{ dailyStats.lowestDay.date }}</span>
 								</div>
 								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">Total:</span>
-									<span class="font-semibold">{{ dailyStats.totalRecords }} records</span>
+									<span class="text-secondary">{{ "analytics.stats.total" | transloco }}:</span>
+									<span class="font-semibold">{{ dailyStats.totalRecords }} {{ "analytics.stats.records" | transloco }}</span>
 								</div>
 							</div>
 						}
@@ -112,7 +112,7 @@
 						<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
 						<div class="text-secondary ml-1 flex items-center whitespace-nowrap text-md leading-none lg:ml-0 lg:mt-0.5">
 							<span class="font-medium text-red-500">2%</span>
-							<span class="ml-1">below target</span>
+							<span class="ml-1">{{ "analytics.stats.belowTarget" | transloco }}</span>
 						</div>
 					</div>
 				</div>
@@ -135,7 +135,7 @@
 						</mat-menu>
 					</div>
 				</div>
-				<div class="mx-6 mt-6 flex h-20 items-center justify-center text-secondary">coming soon</div>
+				<div class="mx-6 mt-6 flex h-20 items-center justify-center text-secondary">{{ "analytics.stats.comingSoon" | transloco }}</div>
 			</div>
 			<!-- Visits -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
@@ -160,7 +160,7 @@
 						<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
 						<div class="text-secondary ml-1 flex items-center whitespace-nowrap text-md leading-none lg:ml-0 lg:mt-0.5">
 							<span class="font-medium text-red-500">4%</span>
-							<span class="ml-1">below target</span>
+							<span class="ml-1">{{ "analytics.stats.belowTarget" | transloco }}</span>
 						</div>
 					</div>
 				</div>
@@ -407,7 +407,7 @@
 										@if (originChart.labels[i]) {
 											{{ originChart.labels[i].charAt(0).toUpperCase() + originChart.labels[i].slice(1).toLowerCase() }}
 										} @else {
-											Unknown
+											{{ "analytics.stats.unknown" | transloco }}
 										}
 									</div>
 								</div>
