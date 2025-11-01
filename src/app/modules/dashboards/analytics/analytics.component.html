@@ -7,17 +7,17 @@
 				<div class="text-secondary font-medium tracking-tight">{{ "analytics.description" | transloco }}</div>
 			</div>
 			<div class="ml-6 flex items-center">
-				<button class="hidden sm:inline-flex" mat-stroked-button>
+				<!-- <button class="hidden sm:inline-flex" mat-stroked-button>
 					<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
 					<span class="ml-2">Settings</span>
 				</button>
 				<button class="ml-3 hidden sm:inline-flex" mat-flat-button [color]="'primary'">
 					<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:arrow-up-tray'"></mat-icon>
 					<span class="ml-2">Export</span>
-				</button>
+				</button> -->
 
 				<!-- Actions menu (visible on xs) -->
-				<div class="sm:hidden">
+				<!-- <div class="sm:hidden">
 					<button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
 						<mat-icon [svgIcon]="'heroicons_outline:ellipsis-vertical'"></mat-icon>
 					</button>
@@ -25,7 +25,7 @@
 						<button mat-menu-item>Export</button>
 						<button mat-menu-item>Settings</button>
 					</mat-menu>
-				</div>
+				</div> -->
 			</div>
 		</div>
 
@@ -38,6 +38,25 @@
 							{{ "analytics.tagDomainsOverview.title" | transloco }}
 						</div>
 						<div class="text-secondary font-medium">{{ "analytics.tagDomainsOverview.subtitle" | transloco }}</div>
+						<!-- Daily Stats -->
+						@if (dailyStats && dailyStats.highestDay && dailyStats.lowestDay) {
+							<div class="mt-3 flex flex-wrap gap-4 text-sm">
+								<div class="flex items-center gap-1.5">
+									<span class="text-secondary">Peak:</span>
+									<span class="font-semibold text-green-500">{{ dailyStats.highestDay.count }} tags</span>
+									<span class="text-secondary">on {{ dailyStats.highestDay.date }}</span>
+								</div>
+								<div class="flex items-center gap-1.5">
+									<span class="text-secondary">Low:</span>
+									<span class="font-semibold text-red-500">{{ dailyStats.lowestDay.count }} tags</span>
+									<span class="text-secondary">on {{ dailyStats.lowestDay.date }}</span>
+								</div>
+								<div class="flex items-center gap-1.5">
+									<span class="text-secondary">Total:</span>
+									<span class="font-semibold">{{ dailyStats.totalRecords }} records</span>
+								</div>
+							</div>
+						}
 					</div>
 					<div class="ml-2">
 						<mat-button-toggle-group
@@ -64,19 +83,10 @@
 					</div>
 				</div>
 				<div class="flex h-80 flex-auto flex-col">
-					<apx-chart
-						class="h-full w-full flex-auto"
-						[chart]="chartVisitors.chart"
-						[colors]="chartVisitors.colors"
-						[dataLabels]="chartVisitors.dataLabels"
-						[fill]="chartVisitors.fill"
-						[grid]="chartVisitors.grid"
-						[series]="chartVisitors.series[visitorsYearSelector.value]"
-						[stroke]="chartVisitors.stroke"
-						[tooltip]="chartVisitors.tooltip"
-						[xaxis]="chartVisitors.xaxis"
-						[yaxis]="chartVisitors.yaxis"
-					></apx-chart>
+					<app-all-tags-overview-chart
+						[records]="records"
+						[selectedPeriod]="visitorsYearSelector.value || 'this-month'"
+					></app-all-tags-overview-chart>
 				</div>
 			</div>
 			<!-- Conversions -->
@@ -107,16 +117,7 @@
 					</div>
 				</div>
 				<div class="flex h-20 flex-auto flex-col">
-					<apx-chart
-						class="h-full w-full flex-auto"
-						[chart]="chartConversions.chart"
-						[colors]="chartConversions.colors"
-						[series]="chartConversions.series"
-						[stroke]="chartConversions.stroke"
-						[tooltip]="chartConversions.tooltip"
-						[xaxis]="chartConversions.xaxis"
-						[yaxis]="chartConversions.yaxis"
-					></apx-chart>
+					<app-conversions-chart [records]="records"></app-conversions-chart>
 				</div>
 			</div>
 			<!-- Impressions -->
@@ -134,30 +135,7 @@
 						</mat-menu>
 					</div>
 				</div>
-				<div class="mx-6 mt-3 flex flex-col lg:flex-row lg:items-center">
-					<div class="text-7xl font-bold leading-tight tracking-tighter">
-						{{ data.impressions.amount | number: "1.0-0" }}
-					</div>
-					<div class="flex lg:ml-3 lg:flex-col">
-						<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
-						<div class="text-secondary ml-1 flex items-center whitespace-nowrap text-md leading-none lg:ml-0 lg:mt-0.5">
-							<span class="font-medium text-red-500">4%</span>
-							<span class="ml-1">below target</span>
-						</div>
-					</div>
-				</div>
-				<div class="flex h-20 flex-auto flex-col">
-					<apx-chart
-						class="h-full w-full flex-auto"
-						[chart]="chartImpressions.chart"
-						[colors]="chartImpressions.colors"
-						[series]="chartImpressions.series"
-						[stroke]="chartImpressions.stroke"
-						[tooltip]="chartImpressions.tooltip"
-						[xaxis]="chartImpressions.xaxis"
-						[yaxis]="chartImpressions.yaxis"
-					></apx-chart>
-				</div>
+				<div class="mx-6 mt-6 flex h-20 items-center justify-center text-secondary">coming soon</div>
 			</div>
 			<!-- Visits -->
 			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
@@ -187,16 +165,7 @@
 					</div>
 				</div>
 				<div class="flex h-20 flex-auto flex-col">
-					<apx-chart
-						class="h-full w-full flex-auto"
-						[chart]="chartVisits.chart"
-						[colors]="chartVisits.colors"
-						[series]="chartVisits.series"
-						[stroke]="chartVisits.stroke"
-						[tooltip]="chartVisits.tooltip"
-						[xaxis]="chartVisits.xaxis"
-						[yaxis]="chartVisits.yaxis"
-					></apx-chart>
+					<app-visits-chart [records]="records"></app-visits-chart>
 				</div>
 			</div>
 		</div>
@@ -231,10 +200,18 @@
 							<div class="text-4xl font-bold leading-none tracking-tight">
 								{{ data.visitorsVsPageViews.overallScore }}
 							</div>
-							<div class="ml-2 flex items-center">
-								<mat-icon class="text-green-500 icon-size-5" [svgIcon]="'heroicons_solid:arrow-up-circle'"></mat-icon>
-								<div class="ml-1 text-md font-medium text-green-500">42.9%</div>
-							</div>
+							@if (conversionRateTrend !== 0) {
+								<div class="ml-2 flex items-center">
+									<mat-icon
+										class="icon-size-5"
+										[ngClass]="conversionRateTrend > 0 ? 'text-green-500' : 'text-red-500'"
+										[svgIcon]="conversionRateTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'"
+									></mat-icon>
+									<div class="ml-1 text-md font-medium" [ngClass]="conversionRateTrend > 0 ? 'text-green-500' : 'text-red-500'">
+										{{ conversionRateTrend > 0 ? "+" : "" }}{{ conversionRateTrend | number: "1.1-1" }}%
+									</div>
+								</div>
+							}
 						</div>
 					</div>
 					<div class="flex flex-col">
@@ -250,10 +227,18 @@
 							<div class="text-4xl font-bold leading-none tracking-tight">
 								{{ data.visitorsVsPageViews.averageRatio | number: "1.0-0" }}%
 							</div>
-							<div class="ml-2 flex items-center">
-								<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_solid:arrow-down-circle'"></mat-icon>
-								<div class="ml-1 text-md font-medium text-red-500">13.1%</div>
-							</div>
+							@if (premiumAdoptionTrend !== 0) {
+								<div class="ml-2 flex items-center">
+									<mat-icon
+										class="icon-size-5"
+										[ngClass]="premiumAdoptionTrend > 0 ? 'text-green-500' : 'text-red-500'"
+										[svgIcon]="premiumAdoptionTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'"
+									></mat-icon>
+									<div class="ml-1 text-md font-medium" [ngClass]="premiumAdoptionTrend > 0 ? 'text-green-500' : 'text-red-500'">
+										{{ premiumAdoptionTrend > 0 ? "+" : "" }}{{ premiumAdoptionTrend | number: "1.1-1" }}%
+									</div>
+								</div>
+							}
 						</div>
 					</div>
 					<div class="flex flex-col">
@@ -269,28 +254,26 @@
 							<div class="text-4xl font-bold leading-none tracking-tight">
 								{{ data.visitorsVsPageViews.predictedRatio | number: "1.0-0" }}%
 							</div>
-							<div class="ml-2 flex items-center">
-								<mat-icon class="text-green-500 icon-size-5" [svgIcon]="'heroicons_solid:arrow-up-circle'"></mat-icon>
-								<div class="ml-1 text-md font-medium text-green-500">22.2%</div>
-							</div>
+							@if (revenuePotentialTrend !== 0) {
+								<div class="ml-2 flex items-center">
+									<mat-icon
+										class="icon-size-5"
+										[ngClass]="revenuePotentialTrend > 0 ? 'text-green-500' : 'text-red-500'"
+										[svgIcon]="
+											revenuePotentialTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'
+										"
+									></mat-icon>
+									<div class="ml-1 text-md font-medium" [ngClass]="revenuePotentialTrend > 0 ? 'text-green-500' : 'text-red-500'">
+										{{ revenuePotentialTrend > 0 ? "+" : "" }}{{ revenuePotentialTrend | number: "1.1-1" }}%
+									</div>
+								</div>
+							}
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="mt-3 flex h-80 flex-auto flex-col">
-				<apx-chart
-					class="h-full w-full flex-auto"
-					[chart]="chartVisitorsVsPageViews.chart"
-					[colors]="chartVisitorsVsPageViews.colors"
-					[dataLabels]="chartVisitorsVsPageViews.dataLabels"
-					[grid]="chartVisitorsVsPageViews.grid"
-					[legend]="chartVisitorsVsPageViews.legend"
-					[series]="chartVisitorsVsPageViews.series"
-					[stroke]="chartVisitorsVsPageViews.stroke"
-					[tooltip]="chartVisitorsVsPageViews.tooltip"
-					[xaxis]="chartVisitorsVsPageViews.xaxis"
-					[yaxis]="chartVisitorsVsPageViews.yaxis"
-				></apx-chart>
+				<app-visitors-vs-page-views-chart [records]="records"></app-visitors-vs-page-views-chart>
 			</div>
 		</div>
 
@@ -316,42 +299,33 @@
 					</div>
 				</div>
 				<div class="mt-6 flex h-44 flex-auto flex-col">
-					<apx-chart
-						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartTagLeaseLengths.chart"
-						[colors]="chartTagLeaseLengths.colors"
-						[labels]="chartTagLeaseLengths.labels"
-						[plotOptions]="chartTagLeaseLengths.plotOptions"
-						[series]="chartTagLeaseLengths.series"
-						[states]="chartTagLeaseLengths.states"
-						[tooltip]="chartTagLeaseLengths.tooltip"
-					></apx-chart>
+					<app-tag-lease-lengths-chart [records]="records" #tagLeaseChart></app-tag-lease-lengths-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.tagLeaseLengths.series; track dataset; let i = $index) {
+						@for (dataset of tagLeaseChart.series; track i; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartTagLeaseLengths.colors[i]"></div>
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="tagLeaseLengthsColors[i]"></div>
 									<div class="ml-3 truncate">
 										{{
 											"analytics.chartLabels.tagLeaseLengths." +
-												(data.tagLeaseLengths.labels[i] === "1 Year"
+												(tagLeaseChart.labels[i] === "1 Year"
 													? "1year"
-													: data.tagLeaseLengths.labels[i] === "2 Years"
+													: tagLeaseChart.labels[i] === "2 Years"
 														? "2years"
-														: data.tagLeaseLengths.labels[i] === "3 Years"
+														: tagLeaseChart.labels[i] === "3 Years"
 															? "3years"
-															: data.tagLeaseLengths.labels[i] === "4 Years"
+															: tagLeaseChart.labels[i] === "4 Years"
 																? "4years"
-																: data.tagLeaseLengths.labels[i] === "5 Years"
+																: tagLeaseChart.labels[i] === "5 Years"
 																	? "5years"
 																	: "lifetime") | transloco
 										}}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.tagLeaseLengths.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ tagLeaseChart.counts[i] || 0 }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
@@ -375,38 +349,29 @@
 					</div>
 				</div>
 				<div class="mt-6 flex h-44 flex-auto flex-col">
-					<apx-chart
-						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartDomainLength.chart"
-						[colors]="chartDomainLength.colors"
-						[labels]="chartDomainLength.labels"
-						[plotOptions]="chartDomainLength.plotOptions"
-						[series]="chartDomainLength.series"
-						[states]="chartDomainLength.states"
-						[tooltip]="chartDomainLength.tooltip"
-					></apx-chart>
+					<app-domain-length-chart [records]="records" [currentDomain]="currentDomain" #domainLengthChart></app-domain-length-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.domainLength.series; track dataset; let i = $index) {
+						@for (dataset of domainLengthChart.series; track i; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartDomainLength.colors[i]"></div>
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="domainLengthColors[i]"></div>
 									<div class="ml-3 truncate">
 										{{
 											"analytics.chartLabels.domainLength." +
-												(data.domainLength.labels[i] === "1-3"
+												(domainLengthChart.labels[i] === "1-3"
 													? "1to3"
-													: data.domainLength.labels[i] === "4-10"
+													: domainLengthChart.labels[i] === "4-10"
 														? "4to10"
-														: data.domainLength.labels[i] === "11-20"
+														: domainLengthChart.labels[i] === "11-20"
 															? "11to20"
 															: "21to27") | transloco
 										}}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.domainLength.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ domainLengthChart.counts[i] || 0 }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
@@ -430,29 +395,24 @@
 					</div>
 				</div>
 				<div class="mt-6 flex h-44 flex-auto flex-col">
-					<apx-chart
-						class="flex h-full w-full flex-auto items-center justify-center"
-						[chart]="chartOrigin.chart"
-						[colors]="chartOrigin.colors"
-						[labels]="chartOrigin.labels"
-						[plotOptions]="chartOrigin.plotOptions"
-						[series]="chartOrigin.series"
-						[states]="chartOrigin.states"
-						[tooltip]="chartOrigin.tooltip"
-					></apx-chart>
+					<app-origin-chart [records]="records" #originChart></app-origin-chart>
 				</div>
 				<div class="mt-8">
 					<div class="-my-3 divide-y">
-						@for (dataset of data.origin.series; track dataset; let i = $index) {
+						@for (dataset of originChart.series; track i; let i = $index) {
 							<div class="grid grid-cols-3 py-3">
 								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="chartOrigin.colors[i]"></div>
-									<div class="ml-3 truncate">
-										{{ "analytics.chartLabels.origin." + data.origin.labels[i].toLowerCase() | transloco }}
+									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="originColors[i]"></div>
+									<div class="ml-3 break-words" [title]="originChart.labels[i]">
+										@if (originChart.labels[i]) {
+											{{ originChart.labels[i].charAt(0).toUpperCase() + originChart.labels[i].slice(1).toLowerCase() }}
+										} @else {
+											Unknown
+										}
 									</div>
 								</div>
 								<div class="text-right font-medium">
-									{{ (data.origin.uniqueVisitors * dataset) / 100 | number: "1.0-0" }}
+									{{ originChart.counts[i] || 0 }}
 								</div>
 								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
