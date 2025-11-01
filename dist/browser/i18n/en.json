@@ -368,6 +368,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "Peak",
+			"low": "Low",
+			"total": "Total",
+			"tags": "tags",
+			"records": "records",
+			"on": "on",
+			"belowTarget": "below target",
+			"comingSoon": "coming soon",
+			"unknown": "Unknown"
+		},
+		"chart": {
+			"total": "Total",
+			"allTags": "All Tags",
+			"paidTags": "Paid Tags",
+			"tag": "tag",
+			"tags": "tags",
+			"chars": "chars"
 		}
 	},
 	"profile": {
@@ -561,5 +580,56 @@
 		"checkingPaymentStatus": "Checking payment status every 10 seconds...",
 		"paymentConfirmed": "Payment confirmed successfully!",
 		"amountDetected": "Amount detected"
+	},
+	"tags": {
+		"title": "Tags Management",
+		"subtitle": "Manage your blockchain tags and QR codes",
+		"licenseWarning": {
+			"title": "License Not Configured",
+			"message": "Please configure your license in the Settings section to view and manage your tags."
+		},
+		"filters": {
+			"storage": "Storage",
+			"filterBy": "Filter by",
+			"all": "All",
+			"tagName": "Tag Name",
+			"blockdagAddress": "BlockDAG Address",
+			"ethAddress": "ETH Address",
+			"solanaAddress": "Solana Address",
+			"bitcoinAddress": "Bitcoin Address",
+			"suiAddress": "SUI Address",
+			"searchPlaceholder": "Search tags...",
+			"searchInputPlaceholder": "Enter search term",
+			"clearAll": "Clear all filters",
+			"activeFilters": "Active filters:"
+		},
+		"purchase": {
+			"title": "Tag Available for Purchase",
+			"off": "OFF",
+			"reward": "reward",
+			"purchaseButton": "Purchase Tag",
+			"cancelButton": "Cancel"
+		},
+		"table": {
+			"tagName": "Tag Name",
+			"domain": "Domain",
+			"created": "Created",
+			"size": "Size",
+			"actions": "Actions"
+		},
+		"actions": {
+			"previewQR": "Preview QR Code",
+			"viewDetails": "View Details"
+		},
+		"pagination": {
+			"showing": "Showing",
+			"of": "of",
+			"results": "results",
+			"rowsPerPage": "Rows per page",
+			"firstPage": "First page",
+			"previousPage": "Previous page",
+			"nextPage": "Next page",
+			"lastPage": "Last page"
+		}
 	}
 }

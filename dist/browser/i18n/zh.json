@@ -354,6 +354,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "峰值",
+			"low": "最低",
+			"total": "总计",
+			"tags": "标签",
+			"records": "记录",
+			"on": "于",
+			"belowTarget": "低于目标",
+			"comingSoon": "即将推出",
+			"unknown": "未知"
+		},
+		"chart": {
+			"total": "总计",
+			"allTags": "所有标签",
+			"paidTags": "付费标签",
+			"tag": "标签",
+			"tags": "标签",
+			"chars": "字符"
 		}
 	},
 	"profile": {
@@ -547,5 +566,56 @@
 		"checkingPaymentStatus": "每10秒检查一次支付状态...",
 		"paymentConfirmed": "支付确认成功！",
 		"amountDetected": "已检测金额"
+	},
+	"tags": {
+		"title": "标签管理",
+		"subtitle": "管理您的区块链标签和二维码",
+		"licenseWarning": {
+			"title": "未配置许可证",
+			"message": "请在设置部分配置您的许可证以查看和管理您的标签。"
+		},
+		"filters": {
+			"storage": "存储",
+			"filterBy": "按筛选",
+			"all": "全部",
+			"tagName": "标签名称",
+			"blockdagAddress": "BlockDAG地址",
+			"ethAddress": "ETH地址",
+			"solanaAddress": "Solana地址",
+			"bitcoinAddress": "Bitcoin地址",
+			"suiAddress": "SUI地址",
+			"searchPlaceholder": "搜索标签...",
+			"searchInputPlaceholder": "输入搜索词",
+			"clearAll": "清除所有筛选",
+			"activeFilters": "活动筛选:"
+		},
+		"purchase": {
+			"title": "标签可供购买",
+			"off": "折扣",
+			"reward": "奖励",
+			"purchaseButton": "购买标签",
+			"cancelButton": "取消"
+		},
+		"table": {
+			"tagName": "标签名称",
+			"domain": "域名",
+			"created": "创建时间",
+			"size": "大小",
+			"actions": "操作"
+		},
+		"actions": {
+			"previewQR": "预览二维码",
+			"viewDetails": "查看详情"
+		},
+		"pagination": {
+			"showing": "显示",
+			"of": "共",
+			"results": "个结果",
+			"rowsPerPage": "每页行数",
+			"firstPage": "首页",
+			"previousPage": "上一页",
+			"nextPage": "下一页",
+			"lastPage": "末页"
+		}
 	}
 }

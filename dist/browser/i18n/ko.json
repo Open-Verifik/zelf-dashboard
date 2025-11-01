@@ -354,6 +354,25 @@
 				"android": "Android",
 				"ios": "iOS"
 			}
+		},
+		"stats": {
+			"peak": "피크",
+			"low": "최저",
+			"total": "총계",
+			"tags": "태그",
+			"records": "기록",
+			"on": "의",
+			"belowTarget": "목표 미달",
+			"comingSoon": "출시 예정",
+			"unknown": "알 수 없음"
+		},
+		"chart": {
+			"total": "총계",
+			"allTags": "모든 태그",
+			"paidTags": "유료 태그",
+			"tag": "태그",
+			"tags": "태그",
+			"chars": "문자"
 		}
 	},
 	"profile": {
@@ -547,5 +566,56 @@
 		"checkingPaymentStatus": "10초마다 결제 상태 확인 중...",
 		"paymentConfirmed": "결제가 성공적으로 확인되었습니다!",
 		"amountDetected": "감지된 금액"
+	},
+	"tags": {
+		"title": "태그 관리",
+		"subtitle": "블록체인 태그 및 QR 코드 관리",
+		"licenseWarning": {
+			"title": "라이선스가 구성되지 않음",
+			"message": "태그를 보고 관리하려면 설정 섹션에서 라이선스를 구성하세요."
+		},
+		"filters": {
+			"storage": "스토리지",
+			"filterBy": "필터 기준",
+			"all": "전체",
+			"tagName": "태그 이름",
+			"blockdagAddress": "BlockDAG 주소",
+			"ethAddress": "ETH 주소",
+			"solanaAddress": "Solana 주소",
+			"bitcoinAddress": "Bitcoin 주소",
+			"suiAddress": "SUI 주소",
+			"searchPlaceholder": "태그 검색...",
+			"searchInputPlaceholder": "검색어 입력",
+			"clearAll": "모든 필터 지우기",
+			"activeFilters": "활성 필터:"
+		},
+		"purchase": {
+			"title": "구매 가능한 태그",
+			"off": "할인",
+			"reward": "보상",
+			"purchaseButton": "태그 구매",
+			"cancelButton": "취소"
+		},
+		"table": {
+			"tagName": "태그 이름",
+			"domain": "도메인",
+			"created": "생성됨",
+			"size": "크기",
+			"actions": "작업"
+		},
+		"actions": {
+			"previewQR": "QR 코드 미리보기",
+			"viewDetails": "세부정보 보기"
+		},
+		"pagination": {
+			"showing": "표시 중",
+			"of": "/",
+			"results": "개 결과",
+			"rowsPerPage": "페이지당 행 수",
+			"firstPage": "첫 페이지",
+			"previousPage": "이전 페이지",
+			"nextPage": "다음 페이지",
+			"lastPage": "마지막 페이지"
+		}
 	}
 }
