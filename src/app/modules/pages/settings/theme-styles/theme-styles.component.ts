@@ -11,7 +11,7 @@ import { MatOptionModule } from "@angular/material/core";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatDividerModule } from "@angular/material/divider";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { ThemeStylesService } from "./theme-styles.service";
 import { ThemeSettings } from "../license/license.class";
@@ -171,10 +171,18 @@ export class SettingsThemeStylesComponent implements OnInit {
 		private _cdr: ChangeDetectorRef,
 		private _themeService: ThemeStylesService,
 		private _router: Router,
+		private _activatedRoute: ActivatedRoute,
 		private _saveConfirmationService: SaveConfirmationService
 	) {}
 
 	ngOnInit(): void {
+		// Check if license exists before loading theme settings
+		if (!this.hasLicense()) {
+			this.showError("License is required to access theme settings. Please configure your license first.");
+			this._router.navigate(["../license"], { relativeTo: this._activatedRoute.parent });
+			return;
+		}
+
 		this.createForm();
 		this.loadCurrentThemeSettings();
 	}
@@ -785,6 +793,28 @@ export class SettingsThemeStylesComponent implements OnInit {
 		// Validate hex color format
 		if (this._themeService.validateColor(textValue)) {
 			this.themeForm.get(fieldName)?.setValue(textValue);
+		}
+	}
+
+	/**
+	 * Check if license exists in localStorage
+	 *
+	 * @returns boolean
+	 */
+	private hasLicense(): boolean {
+		try {
+			const licenseStr = localStorage.getItem("license");
+			if (!licenseStr) {
+				return false;
+			}
+
+			const licenseData = JSON.parse(licenseStr);
+			const domainCfg = licenseData?.domainConfig || licenseData;
+			const domain = domainCfg?.name || domainCfg?.domain || licenseData?.domain;
+
+			return !!(domain && domain.trim() !== "");
+		} catch (error) {
+			return false;
 		}
 	}
 }

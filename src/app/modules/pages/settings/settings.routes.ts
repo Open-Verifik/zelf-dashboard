@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { SettingsComponent } from "app/modules/pages/settings/settings.component";
+import { LicenseGuard } from "app/core/auth/guards/license.guard";
 
 export default [
 	{
@@ -17,6 +18,7 @@ export default [
 			},
 			{
 				path: "theme-styles",
+				canActivate: [LicenseGuard],
 				loadComponent: () =>
 					import("app/modules/pages/settings/theme-styles/theme-styles.component").then((m) => m.SettingsThemeStylesComponent),
 			},

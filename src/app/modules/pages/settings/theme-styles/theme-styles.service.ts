@@ -20,7 +20,34 @@ export class ThemeStylesService {
 	 * @returns Promise of theme response
 	 */
 	getThemeSettings(): Promise<ThemeResponse> {
+		// Check if license exists before making API call
+		if (!this.hasLicense()) {
+			return Promise.reject(new Error("License is required to access theme settings"));
+		}
+
 		return this.httpWrapper.sendRequest("get", this.baseUrl);
+	}
+
+	/**
+	 * Check if license exists in localStorage
+	 *
+	 * @returns boolean
+	 */
+	private hasLicense(): boolean {
+		try {
+			const licenseStr = localStorage.getItem("license");
+			if (!licenseStr) {
+				return false;
+			}
+
+			const licenseData = JSON.parse(licenseStr);
+			const domainCfg = licenseData?.domainConfig || licenseData;
+			const domain = domainCfg?.name || domainCfg?.domain || licenseData?.domain;
+
+			return !!(domain && domain.trim() !== "");
+		} catch (error) {
+			return false;
+		}
 	}
 
 	/**

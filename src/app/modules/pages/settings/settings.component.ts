@@ -80,6 +80,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
 			},
 		];
 
+		// Filter out theme-styles panel if no license is set
+		this.panels = this.getFilteredPanels();
+
+		// Check initial route and redirect if needed
+		const currentUrl = this._router.url;
+		const urlSegments = currentUrl.split("/");
+		const currentPanel = urlSegments[urlSegments.length - 1];
+		if (currentPanel === "theme-styles" && !this.hasLicense()) {
+			this._router.navigate(["license"], { relativeTo: this._activatedRoute });
+			this.selectedPanel = "license";
+		} else if (this.panels.find((p) => p.id === currentPanel)) {
+			this.selectedPanel = currentPanel;
+		}
+
 		// Subscribe to router events to update selected panel
 		this._router.events
 			.pipe(
@@ -90,6 +104,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
 				// Extract the panel from the URL
 				const urlSegments = event.url.split("/");
 				const panel = urlSegments[urlSegments.length - 1];
+
+				// Redirect to license if trying to access theme-styles without a license
+				if (panel === "theme-styles" && !this.hasLicense()) {
+					this._router.navigate(["license"], { relativeTo: this._activatedRoute });
+					this.selectedPanel = "license";
+					this._changeDetectorRef.markForCheck();
+					return;
+				}
 
 				// Update selected panel if it's a valid panel
 				if (this.panels.find((p) => p.id === panel)) {
@@ -159,5 +181,80 @@ export class SettingsComponent implements OnInit, OnDestroy {
 	 */
 	trackByFn(index: number, item: any): any {
 		return item.id || index;
+	}
+
+	/**
+	 * Check if license exists in localStorage
+	 *
+	 * @returns boolean
+	 */
+	hasLicense(): boolean {
+		try {
+			const licenseStr = localStorage.getItem("license");
+			if (!licenseStr) {
+				return false;
+			}
+
+			const licenseData = JSON.parse(licenseStr);
+			const domainCfg = licenseData?.domainConfig || licenseData;
+			const domain = domainCfg?.name || domainCfg?.domain || licenseData?.domain;
+
+			return !!(domain && domain.trim() !== "");
+		} catch (error) {
+			return false;
+		}
+	}
+
+	/**
+	 * Get filtered panels based on license availability
+	 *
+	 * @returns array of panels
+	 */
+	getFilteredPanels(): any[] {
+		const allPanels = [
+			{
+				id: "license",
+				icon: "heroicons_outline:user-circle",
+				title: "License",
+				description: "Manage your license",
+			},
+			{
+				id: "theme-styles",
+				icon: "heroicons_outline:paint-brush",
+				title: "Theme & Styles",
+				description: "Customize colors for Zelf Name Service and ZelfKeys",
+			},
+			{
+				id: "security",
+				icon: "heroicons_outline:lock-closed",
+				title: "Security",
+				description: "Manage your password and 2-step verification preferences",
+			},
+			{
+				id: "plan-billing",
+				icon: "heroicons_outline:credit-card",
+				title: "Plan & Billing",
+				description: "Manage your subscription plan, payment method and billing information",
+			},
+			{
+				id: "notifications",
+				icon: "heroicons_outline:bell",
+				title: "Notifications",
+				description: "Manage when you'll be notified on which channels",
+			},
+			{
+				id: "team",
+				icon: "heroicons_outline:user-group",
+				title: "Team",
+				description: "Manage your existing team and change roles/permissions",
+			},
+		];
+
+		// Filter out theme-styles if no license is set
+		if (!this.hasLicense()) {
+			return allPanels.filter((panel) => panel.id !== "theme-styles");
+		}
+
+		return allPanels;
 	}
 }

@@ -80,6 +80,12 @@ export class AuthService {
 		localStorage.removeItem("zelfAccount");
 		localStorage.removeItem("license");
 
+		// Remove session and account-related data
+		localStorage.removeItem("sessionToken");
+		localStorage.removeItem("subscription");
+		localStorage.removeItem("domainNotificationSettings");
+		localStorage.removeItem("signedDataPrice");
+
 		// Set the authenticated flag to false
 		this._authenticated = false;
 
