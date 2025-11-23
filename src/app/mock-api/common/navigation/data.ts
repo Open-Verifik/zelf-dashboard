@@ -23,6 +23,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
 		icon: "heroicons_outline:key",
 		link: "/zelfkeys",
 	},
+	{
+		id: "settings",
+		title: "Settings",
+		type: "basic",
+		icon: "heroicons_outline:cog",
+		link: "/settings",
+	},
 ];
 
 export const portfolioNavigation: FuseNavigationItem[] = [
@@ -73,6 +80,13 @@ export const horizontalNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:key",
 		link: "/zelfkeys",
+	},
+	{
+		id: "settings",
+		title: "Settings",
+		type: "basic",
+		icon: "heroicons_outline:cog",
+		link: "/settings",
 	},
 ];
 

@@ -1,4 +1,4 @@
-<div class="space-y-8 w-full">
+<div class="space-y-8 w-full" *transloco="let t">
 	<!-- Alert Messages -->
 	@if (showAlert) {
 		<div
@@ -25,1140 +25,596 @@
 
 	<!-- Theme Settings Form -->
 	<form [formGroup]="themeForm" (ngSubmit)="saveThemeSettings()" class="space-y-8">
-		<!-- Tabs for ZNS and ZelfKeys -->
-		<mat-tab-group class="w-full">
-			<!-- ZNS Wallet Tab -->
-			<mat-tab label="ZNS Wallet">
-				<div class="p-6 space-y-6">
-					<!-- ZNS Header -->
-					<div class="flex items-center justify-between">
-						<div>
-							<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ "theme_settings.zns_wallet.title" | transloco }}</h3>
-							<p class="text-sm text-gray-600 dark:text-gray-400">{{ "theme_settings.zns_wallet.description" | transloco }}</p>
-						</div>
-						<div class="flex space-x-2">
-							<button type="button" mat-button color="warn" (click)="resetZnsColors()" class="text-sm">
-								{{ "theme_settings.zns_wallet.reset" | transloco }}
-							</button>
-						</div>
+		<div class="p-6 space-y-6">
+			<!-- Section Header -->
+			<div class="flex items-center justify-between">
+				<div>
+					<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ t(getTranslationPrefix() + ".title") }}</h3>
+					<p class="text-sm text-gray-600 dark:text-gray-400">{{ t(getTranslationPrefix() + ".description") }}</p>
+				</div>
+				<div class="flex space-x-2">
+					<button type="button" mat-button color="warn" (click)="resetColors()" class="text-sm">
+						{{ t(getTranslationPrefix() + ".reset") }}
+					</button>
+				</div>
+			</div>
+
+			<!-- Dark Mode Toggle -->
+			<div class="flex items-center space-x-4">
+				<mat-slide-toggle [checked]="isDarkMode()" (change)="toggleDarkMode()">
+					{{ t(getTranslationPrefix() + ".dark_mode") }}
+				</mat-slide-toggle>
+				<span class="text-sm text-gray-600 dark:text-gray-400">
+					{{ t(getTranslationPrefix() + ".dark_mode_description") }}
+				</span>
+			</div>
+
+			<mat-divider></mat-divider>
+
+			<!-- Loading State -->
+			@if (isLoadingColors) {
+				<div class="flex items-center justify-center py-12">
+					<div class="text-center">
+						<mat-icon class="animate-spin text-blue-600 text-4xl mb-4">refresh</mat-icon>
+						<p class="text-gray-600 dark:text-gray-400">{{ t("theme_settings.actions.updating_colors") }}</p>
 					</div>
+				</div>
+			}
 
-					<!-- Dark Mode Toggle -->
-					<div class="flex items-center space-x-4">
-						<mat-slide-toggle formControlName="znsDarkMode" (change)="toggleZnsDarkMode()">
-							{{ "theme_settings.zns_wallet.dark_mode" | transloco }}
-						</mat-slide-toggle>
-						<span class="text-sm text-gray-600 dark:text-gray-400">
-							{{ "theme_settings.zns_wallet.dark_mode_description" | transloco }}
-						</span>
-					</div>
+			<!-- Color Customization Grid -->
+			@if (!isLoadingColors) {
+				<ng-container *ngTemplateOutlet="colorGridTemplate"></ng-container>
+			}
+		</div>
 
-					<mat-divider></mat-divider>
-
-					<!-- Loading State -->
-					@if (isLoadingColors) {
-						<div class="flex items-center justify-center py-12">
-							<div class="text-center">
-								<mat-icon class="animate-spin text-blue-600 text-4xl mb-4">refresh</mat-icon>
-								<p class="text-gray-600 dark:text-gray-400">{{ "theme_settings.actions.updating_colors" | transloco }}</p>
+		<!-- Color Grid Template -->
+		<ng-template #colorGridTemplate>
+			<div [formGroup]="getColorsFormGroup()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<!-- Primary Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Primary Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="primary"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'primary', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="primary"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#3B82F6"
+									(change)="onTextChange(getColorsFormGroup(), 'primary', $event)"
+								/>
 							</div>
 						</div>
-					}
-
-					<!-- Color Customization Grid -->
-					@if (!isLoadingColors) {
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							<!-- Primary Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Primary Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightPrimary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightPrimary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightPrimary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#3B82F6"
-												(change)="onTextChange('znsLightPrimary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#64748B"
-												(change)="onTextChange('znsLightSecondary', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Background Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Background Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightBackground"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightBackground', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightBackground"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightBackground', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightBackgroundSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightBackgroundSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightBackgroundSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#F8FAFC"
-												(change)="onTextChange('znsLightBackgroundSecondary', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Text Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Text Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#1E293B"
-												(change)="onTextChange('znsLightText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightTextSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightTextSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightTextSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#64748B"
-												(change)="onTextChange('znsLightTextSecondary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Muted Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightTextMuted"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightTextMuted', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightTextMuted"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#94A3B8"
-												(change)="onTextChange('znsLightTextMuted', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Header Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Header Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightHeader"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightHeader', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightHeader"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#1E293B"
-												(change)="onTextChange('znsLightHeader', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightHeaderText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightHeaderText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightHeaderText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightHeaderText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Button Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Button Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Button</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightButton"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightButton', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightButton"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#3B82F6"
-												(change)="onTextChange('znsLightButton', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightButtonText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightButtonText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightButtonText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightButtonText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Hover</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightButtonHover"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightButtonHover', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightButtonHover"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#2563EB"
-												(change)="onTextChange('znsLightButtonHover', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightButtonSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightButtonSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightButtonSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('znsLightButtonSecondary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightButtonSecondaryText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightButtonSecondaryText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightButtonSecondaryText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#475569"
-												(change)="onTextChange('znsLightButtonSecondaryText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Border Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Border Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightBorder"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightBorder', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightBorder"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('znsLightBorder', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border Hover</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightBorderHover"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightBorderHover', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightBorderHover"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#CBD5E1"
-												(change)="onTextChange('znsLightBorderHover', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Card Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Card Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightCard"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightCard', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightCard"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightCard', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Border</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightCardBorder"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightCardBorder', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightCardBorder"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('znsLightCardBorder', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="text"
-												formControlName="znsLightShadow"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="rgba(0, 0, 0, 0.1)"
-												(change)="onTextChange('znsLightShadow', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Status Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Status Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightSuccess"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightSuccess', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightSuccess"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#10B981"
-												(change)="onTextChange('znsLightSuccess', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightSuccessText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightSuccessText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightSuccessText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightSuccessText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightWarning"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightWarning', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightWarning"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#F59E0B"
-												(change)="onTextChange('znsLightWarning', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightWarningText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightWarningText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightWarningText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightWarningText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightError"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightError', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightError"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#EF4444"
-												(change)="onTextChange('znsLightError', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="znsLightErrorText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('znsLightErrorText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="znsLightErrorText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('znsLightErrorText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-						</div>
-					}
-				</div>
-			</mat-tab>
-
-			<!-- ZelfKeys Tab -->
-			<mat-tab label="ZelfKeys">
-				<div class="p-6 space-y-6">
-					<!-- ZelfKeys Header -->
-					<div class="flex items-center justify-between">
-						<div>
-							<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ "theme_settings.zelfkeys.title" | transloco }}</h3>
-							<p class="text-sm text-gray-600 dark:text-gray-400">{{ "theme_settings.zelfkeys.description" | transloco }}</p>
-						</div>
-						<div class="flex space-x-2">
-							<button type="button" mat-button color="warn" (click)="resetZelfkeysColors()" class="text-sm">
-								{{ "theme_settings.zelfkeys.reset" | transloco }}
-							</button>
-						</div>
-					</div>
-
-					<!-- Dark Mode Toggle -->
-					<div class="flex items-center space-x-4">
-						<mat-slide-toggle formControlName="zelfkeysDarkMode" (change)="toggleZelfkeysDarkMode()">
-							{{ "theme_settings.zelfkeys.dark_mode" | transloco }}
-						</mat-slide-toggle>
-						<span class="text-sm text-gray-600 dark:text-gray-400">
-							{{ "theme_settings.zelfkeys.dark_mode_description" | transloco }}
-						</span>
-					</div>
-
-					<mat-divider></mat-divider>
-
-					<!-- Loading State -->
-					@if (isLoadingColors) {
-						<div class="flex items-center justify-center py-12">
-							<div class="text-center">
-								<mat-icon class="animate-spin text-blue-600 text-4xl mb-4">refresh</mat-icon>
-								<p class="text-gray-600 dark:text-gray-400">{{ "theme_settings.actions.updating_colors" | transloco }}</p>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="secondary"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'secondary', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="secondary"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#64748B"
+									(change)="onTextChange(getColorsFormGroup(), 'secondary', $event)"
+								/>
 							</div>
 						</div>
-					}
+					</mat-card-content>
+				</mat-card>
 
-					<!-- Color Customization Grid -->
-					@if (!isLoadingColors) {
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							<!-- Primary Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Primary Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightPrimary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysPrimary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightPrimary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#8B5CF6"
-												(change)="onTextChange('zelfkeysPrimary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#64748B"
-												(change)="onTextChange('zelfkeysSecondary', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Background Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Background Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightBackground"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysBackground', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightBackground"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysBackground', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightBackgroundSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysBackgroundSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightBackgroundSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#F8FAFC"
-												(change)="onTextChange('zelfkeysBackgroundSecondary', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Text Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Text Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#1E293B"
-												(change)="onTextChange('zelfkeysLightText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightTextSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightTextSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightTextSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#64748B"
-												(change)="onTextChange('zelfkeysLightTextSecondary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Muted Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightTextMuted"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightTextMuted', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightTextMuted"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#94A3B8"
-												(change)="onTextChange('zelfkeysLightTextMuted', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Header Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Header Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightHeader"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightHeader', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightHeader"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#1E293B"
-												(change)="onTextChange('zelfkeysLightHeader', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightHeaderText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightHeaderText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightHeaderText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightHeaderText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Button Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Button Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Button</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightButton"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightButton', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightButton"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#8B5CF6"
-												(change)="onTextChange('zelfkeysLightButton', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightButtonText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightButtonText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightButtonText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightButtonText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Hover</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightButtonHover"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightButtonHover', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightButtonHover"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#7C3AED"
-												(change)="onTextChange('zelfkeysLightButtonHover', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightButtonSecondary"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightButtonSecondary', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightButtonSecondary"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('zelfkeysLightButtonSecondary', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightButtonSecondaryText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightButtonSecondaryText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightButtonSecondaryText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#475569"
-												(change)="onTextChange('zelfkeysLightButtonSecondaryText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Border Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Border Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightBorder"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightBorder', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightBorder"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('zelfkeysLightBorder', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border Hover</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightBorderHover"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightBorderHover', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightBorderHover"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#CBD5E1"
-												(change)="onTextChange('zelfkeysLightBorderHover', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Card Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Card Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Background</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightCard"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightCard', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightCard"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightCard', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Border</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightCardBorder"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightCardBorder', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightCardBorder"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#E2E8F0"
-												(change)="onTextChange('zelfkeysLightCardBorder', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="text"
-												formControlName="zelfkeysLightShadow"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="rgba(0, 0, 0, 0.1)"
-												(change)="onTextChange('zelfkeysLightShadow', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
-
-							<!-- Status Colors -->
-							<mat-card class="p-4">
-								<mat-card-header>
-									<mat-card-title class="text-lg">Status Colors</mat-card-title>
-								</mat-card-header>
-								<mat-card-content class="space-y-4">
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightSuccess"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightSuccess', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightSuccess"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#10B981"
-												(change)="onTextChange('zelfkeysLightSuccess', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightSuccessText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightSuccessText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightSuccessText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightSuccessText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightWarning"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightWarning', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightWarning"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#F59E0B"
-												(change)="onTextChange('zelfkeysLightWarning', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightWarningText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightWarningText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightWarningText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightWarningText', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightError"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightError', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightError"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#EF4444"
-												(change)="onTextChange('zelfkeysLightError', $event)"
-											/>
-										</div>
-									</div>
-									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error Text</label>
-										<div class="flex items-center space-x-2">
-											<input
-												type="color"
-												formControlName="zelfkeysLightErrorText"
-												class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
-												(change)="onColorChange('zelfkeysLightErrorText', $event)"
-											/>
-											<input
-												type="text"
-												formControlName="zelfkeysLightErrorText"
-												class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-												placeholder="#FFFFFF"
-												(change)="onTextChange('zelfkeysLightErrorText', $event)"
-											/>
-										</div>
-									</div>
-								</mat-card-content>
-							</mat-card>
+				<!-- Background Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Background Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Background</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="background"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'background', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="background"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'background', $event)"
+								/>
+							</div>
 						</div>
-					}
-				</div>
-			</mat-tab>
-		</mat-tab-group>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Background</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="backgroundSecondary"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'backgroundSecondary', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="backgroundSecondary"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#F8FAFC"
+									(change)="onTextChange(getColorsFormGroup(), 'backgroundSecondary', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Text Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Text Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="text"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'text', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="text"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#1E293B"
+									(change)="onTextChange(getColorsFormGroup(), 'text', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="textSecondary"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'textSecondary', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="textSecondary"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#64748B"
+									(change)="onTextChange(getColorsFormGroup(), 'textSecondary', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Muted Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="textMuted"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'textMuted', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="textMuted"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#94A3B8"
+									(change)="onTextChange(getColorsFormGroup(), 'textMuted', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Header Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Header Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Background</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="header"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'header', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="header"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#1E293B"
+									(change)="onTextChange(getColorsFormGroup(), 'header', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Header Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="headerText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'headerText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="headerText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'headerText', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Button Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Button Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Button</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="button"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'button', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="button"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#3B82F6"
+									(change)="onTextChange(getColorsFormGroup(), 'button', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="buttonText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'buttonText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="buttonText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'buttonText', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Button Hover</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="buttonHover"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'buttonHover', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="buttonHover"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#2563EB"
+									(change)="onTextChange(getColorsFormGroup(), 'buttonHover', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="buttonSecondary"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'buttonSecondary', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="buttonSecondary"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#E2E8F0"
+									(change)="onTextChange(getColorsFormGroup(), 'buttonSecondary', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="buttonSecondaryText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'buttonSecondaryText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="buttonSecondaryText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#475569"
+									(change)="onTextChange(getColorsFormGroup(), 'buttonSecondaryText', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Secondary Button Hover</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="buttonSecondaryHover"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'buttonSecondaryHover', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="buttonSecondaryHover"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#475569"
+									(change)="onTextChange(getColorsFormGroup(), 'buttonSecondaryHover', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Border Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Border Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="border"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'border', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="border"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#E2E8F0"
+									(change)="onTextChange(getColorsFormGroup(), 'border', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Border Hover</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="borderHover"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'borderHover', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="borderHover"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#CBD5E1"
+									(change)="onTextChange(getColorsFormGroup(), 'borderHover', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Card Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Card Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Background</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="card"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'card', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="card"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'card', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Card Border</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="cardBorder"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'cardBorder', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="cardBorder"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#E2E8F0"
+									(change)="onTextChange(getColorsFormGroup(), 'cardBorder', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Shadow</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="text"
+									formControlName="shadow"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="rgba(0, 0, 0, 0.1)"
+									(change)="onTextChange(getColorsFormGroup(), 'shadow', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+
+				<!-- Status Colors -->
+				<mat-card class="p-4">
+					<mat-card-header>
+						<mat-card-title class="text-lg">Status Colors</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-4">
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="success"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'success', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="success"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#10B981"
+									(change)="onTextChange(getColorsFormGroup(), 'success', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Success Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="successText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'successText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="successText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'successText', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="warning"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'warning', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="warning"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#F59E0B"
+									(change)="onTextChange(getColorsFormGroup(), 'warning', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Warning Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="warningText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'warningText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="warningText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'warningText', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="error"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'error', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="error"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#EF4444"
+									(change)="onTextChange(getColorsFormGroup(), 'error', $event)"
+								/>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Error Text</label>
+							<div class="flex items-center space-x-2">
+								<input
+									type="color"
+									formControlName="errorText"
+									class="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+									(change)="onColorChange(getColorsFormGroup(), 'errorText', $event)"
+								/>
+								<input
+									type="text"
+									formControlName="errorText"
+									class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+									placeholder="#FFFFFF"
+									(change)="onTextChange(getColorsFormGroup(), 'errorText', $event)"
+								/>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+			</div>
+		</ng-template>
 
 		<!-- Save Button -->
 		<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-			<button type="button" mat-button color="primary" class="px-6">{{ "theme_settings.actions.cancel" | transloco }}</button>
+			<button type="button" mat-button color="primary" class="px-6">{{ t("theme_settings.actions.cancel") }}</button>
 
 			<button type="submit" mat-raised-button color="primary" [disabled]="isLoading" class="px-6">
 				@if (isLoading) {
 					<mat-icon class="animate-spin mr-2">refresh</mat-icon>
 				}
-				{{ "theme_settings.actions.save" | transloco }}
+				{{ t("theme_settings.actions.save") }}
 			</button>
 		</div>
 	</form>
