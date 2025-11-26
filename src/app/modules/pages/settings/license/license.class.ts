@@ -62,7 +62,7 @@ export interface DomainConfig {
 		customRules: any[];
 		payment: {
 			methods: string[];
-			currencies: string[];
+			networks: { [key: string]: NetworkConfig };
 			discounts: {
 				yearly: number;
 				lifetime: number;
@@ -205,9 +205,21 @@ export interface StorageConfig {
 	walrusEnabled: boolean;
 }
 
+export interface NetworkConfig {
+	enabled: boolean;
+	nativeCurrency: {
+		enabled: boolean;
+		code: string;
+	};
+	altCoins: {
+		enabled: boolean;
+		standard: string | null;
+	};
+}
+
 export interface PaymentSettings {
 	methods: string[];
-	currencies: string[];
+	networks: { [key: string]: NetworkConfig };
 	whitelist: { [key: string]: string };
 	pricingTable: { [key: string]: { [key: string]: number } };
 }
@@ -262,6 +274,19 @@ export class License {
 		// Handle both nested domainConfig and flat structure from API response
 		const configData = config?.domainConfig || config;
 
+		// Helper to get networks configuration
+		const getNetworksConfig = () => {
+			if (configData?.tags?.payment?.networks) {
+				return configData.tags.payment.networks;
+			}
+			// Migration: Check for old currencies array
+			if (configData?.tags?.payment?.currencies && Array.isArray(configData.tags.payment.currencies)) {
+				return this.migrateCurrenciesToNetworks(configData.tags.payment.currencies);
+			}
+			// Default
+			return this.getDefaultNetworks();
+		};
+
 		return {
 			name: configData?.name || "",
 			type: configData?.type || "custom",
@@ -279,7 +304,7 @@ export class License {
 				customRules: configData?.tags?.customRules || [],
 				payment: {
 					methods: configData?.tags?.payment?.methods || ["coinbase", "crypto", "stripe"],
-					currencies: configData?.tags?.payment?.currencies || ["USD", "BTC", "ETH", "SOL"],
+					networks: getNetworksConfig(),
 					discounts: configData?.tags?.payment?.discounts || {
 						yearly: 0.1,
 						lifetime: 0.2,
@@ -334,6 +359,104 @@ export class License {
 			},
 			themeSettings: configData?.themeSettings || License.getDefaultThemeSettings(),
 		};
+	}
+
+	/**
+	 * Get default networks configuration
+	 */
+	private getDefaultNetworks(): { [key: string]: NetworkConfig } {
+		return {
+			ethereum: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "ETH" },
+				altCoins: { enabled: true, standard: "ERC-20" },
+			},
+			solana: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "SOL" },
+				altCoins: { enabled: true, standard: "SPL" },
+			},
+			bitcoin: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "BTC" },
+				altCoins: { enabled: false, standard: null },
+			},
+			blockdag: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "BDAG" },
+				altCoins: { enabled: false, standard: null },
+			},
+			avalanche: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "AVAX" },
+				altCoins: { enabled: true, standard: "ERC-20" },
+			},
+			binance: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "BNB" },
+				altCoins: { enabled: true, standard: "BEP-20" },
+			},
+			polygon: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "MATIC" },
+				altCoins: { enabled: true, standard: "ERC-20" },
+			},
+			sui: {
+				enabled: true,
+				nativeCurrency: { enabled: true, code: "SUI" },
+				altCoins: { enabled: false, standard: null },
+			},
+		};
+	}
+
+	/**
+	 * Migrate flat currencies array to networks configuration
+	 */
+	private migrateCurrenciesToNetworks(currencies: string[]): { [key: string]: NetworkConfig } {
+		const networks = this.getDefaultNetworks();
+
+		// Reset all to disabled first
+		Object.keys(networks).forEach((key) => {
+			networks[key].enabled = false;
+			networks[key].nativeCurrency.enabled = false;
+			if (networks[key].altCoins) networks[key].altCoins.enabled = false;
+		});
+
+		if (!currencies || currencies.length === 0) return networks;
+
+		currencies.forEach((currency) => {
+			const code = currency.toUpperCase();
+			if (code === "ETH") {
+				networks["ethereum"].enabled = true;
+				networks["ethereum"].nativeCurrency.enabled = true;
+			} else if (code === "SOL") {
+				networks["solana"].enabled = true;
+				networks["solana"].nativeCurrency.enabled = true;
+			} else if (code === "BTC") {
+				networks["bitcoin"].enabled = true;
+				networks["bitcoin"].nativeCurrency.enabled = true;
+			} else if (code === "BDAG") {
+				networks["blockdag"].enabled = true;
+				networks["blockdag"].nativeCurrency.enabled = true;
+			} else if (code === "AVAX") {
+				networks["avalanche"].enabled = true;
+				networks["avalanche"].nativeCurrency.enabled = true;
+			} else if (code === "SUI") {
+				networks["sui"].enabled = true;
+				networks["sui"].nativeCurrency.enabled = true;
+			} else if (code === "USDC" || code === "USDT") {
+				// Enable alt coins for compatible networks if the network is already enabled or if we should just enable it
+				// Here assuming if they had USDC/USDT, they probably want it on all capable networks that are active?
+				// Or just enable alt coins on all capable networks?
+				// Let's enable alt coins on Ethereum, Solana, Avalanche
+				["ethereum", "solana", "avalanche"].forEach((net) => {
+					networks[net].enabled = true; // Enable network if it has alt coins
+					networks[net].altCoins.enabled = true;
+				});
+			}
+		});
+
+		return networks;
 	}
 
 	/**
@@ -608,10 +731,10 @@ export class License {
 	}
 
 	/**
-	 * Get supported currencies
+	 * Get supported networks
 	 */
-	getSupportedCurrencies(): string[] {
-		return this.domainConfig.tags.payment.currencies;
+	getNetworks(): { [key: string]: NetworkConfig } {
+		return this.domainConfig.tags.payment.networks;
 	}
 
 	/**
@@ -724,7 +847,48 @@ export class License {
 					customRules: [],
 					payment: {
 						methods: ["coinbase", "crypto", "stripe"],
-						currencies: ["USD", "BTC", "ETH", "SOL"],
+						networks: {
+							ethereum: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "ETH" },
+								altCoins: { enabled: true, standard: "ERC-20" },
+							},
+							solana: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "SOL" },
+								altCoins: { enabled: true, standard: "SPL" },
+							},
+							bitcoin: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "BTC" },
+								altCoins: { enabled: false, standard: null },
+							},
+							blockdag: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "BDAG" },
+								altCoins: { enabled: false, standard: null },
+							},
+							avalanche: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "AVAX" },
+								altCoins: { enabled: true, standard: "ERC-20" },
+							},
+							binance: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "BNB" },
+								altCoins: { enabled: true, standard: "BEP-20" },
+							},
+							polygon: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "MATIC" },
+								altCoins: { enabled: true, standard: "ERC-20" },
+							},
+							sui: {
+								enabled: true,
+								nativeCurrency: { enabled: true, code: "SUI" },
+								altCoins: { enabled: false, standard: null },
+							},
+						},
 						discounts: {
 							yearly: 0.1,
 							lifetime: 0.2,

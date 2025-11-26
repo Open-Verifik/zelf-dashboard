@@ -163,7 +163,8 @@
 			"zns_disabled_description": "标签验证规则、支付设置和价格配置仅在启用Zelf名称系统(ZNS)时可用。",
 			"zns_disabled_enable": "请在上方启用ZNS以配置标签相关设置。",
 			"zelfkeys_title": "Zelf密钥",
-			"zelfkeys_description": "密码、笔记、信用卡等"
+			"zelfkeys_description": "密码、笔记、信用卡等",
+			"zelfkeys_enabled": "已启用"
 		},
 		"validation_rules": {
 			"title": "验证规则",

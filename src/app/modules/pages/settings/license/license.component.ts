@@ -1,28 +1,47 @@
 import { TextFieldModule } from "@angular/cdk/text-field";
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, AfterViewInit, ViewEncapsulation } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators, FormControl } from "@angular/forms";
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { FormControl, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatOptionModule } from "@angular/material/core";
+import { MatDialogModule } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
-import { MatSelectModule } from "@angular/material/select";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { MatCheckboxModule } from "@angular/material/checkbox";
 import { Router } from "@angular/router";
-import { License, LicenseData, DomainConfig } from "./license.class";
+import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
+
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
-import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
-import { LicenseService } from "./license.service";
 import { HttpWrapperService } from "../../../../http-wrapper.service";
+import { DomainConfig, License, NetworkConfig } from "./license.class";
+import { LicenseService } from "./license.service";
+import { NetworksConfigComponent } from "./networks-config/networks-config.component";
+
+export interface PricingRow {
+	length: string;
+	oneYear: number;
+	twoYears: number;
+	threeYears: number;
+	fourYears: number;
+	fiveYears: number;
+	lifetime: number;
+}
+
+export interface WhitelistItem {
+	domain: string;
+	discount: string | number;
+	type: string;
+}
+
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	encapsulation: ViewEncapsulation.None,
 	selector: "settings-license",
 	templateUrl: "./license.component.html",
-	encapsulation: ViewEncapsulation.None,
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
 		FormsModule,
@@ -39,32 +58,22 @@ import { HttpWrapperService } from "../../../../http-wrapper.service";
 		MatSlideToggleModule,
 		MatCheckboxModule,
 		TranslocoModule,
+		NetworksConfigComponent,
 	],
 })
 export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	accountForm: UntypedFormGroup;
-	isLoading: boolean = false;
-	showAlert: boolean = false;
 	alertMessage: string = "";
 	alertType: "success" | "error" = "success";
-
-	// License data
 	currentLicense: License | null = null;
-
-	// Domain configuration arrays
+	isLoading: boolean = false;
+	pricingTableRows: PricingRow[] = [];
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
-	supportedCurrencies: string[] = ["BTC", "ETH", "SOL", "USDC", "USDT", "BDAG", "AVAX", "ZNS"];
-	whitelistItems: any[] = [];
-	pricingTableRows: any[] = [];
+	showAlert: boolean = false;
+	whitelistItems: WhitelistItem[] = [];
 
-	// Validation constants
-	private readonly ALLOWED_CURRENCIES = ["BTC", "ETH", "SOL", "USDC", "USDT", "BDAG", "AVAX", "ZNS"];
-	private readonly MAX_TAG_LENGTH = 27;
-
-	// Zelfkeys configuration
 	zelfkeysPlans: any[] = [];
 
-	// Inappropriate words filter
 	inappropriateWords = [
 		"dick",
 		"vagina",
@@ -96,9 +105,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		"suicide",
 	];
 
-	/**
-	 * Constructor
-	 */
 	constructor(
 		private _formBuilder: UntypedFormBuilder,
 		private _router: Router,
@@ -109,20 +115,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		private _httpWrapper: HttpWrapperService
 	) {}
 
-	// -----------------------------------------------------------------------------------------------------
-	// @ Lifecycle hooks
-	// -----------------------------------------------------------------------------------------------------
+	get networksFormGroup(): UntypedFormGroup {
+		return this.accountForm.get("networks") as UntypedFormGroup;
+	}
 
-	/**
-	 * On init
-	 */
 	ngOnInit(): void {
-		// Initialize arrays first
 		this.initializeWhitelistItems();
-
 		this.initializePricingTable();
 
-		// Create empty form to prevent template errors
 		this.createEmptyForm();
 	}
 
@@ -172,6 +172,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			coinbaseEnabled: [true],
 			cryptoEnabled: [true],
 			stripeEnabled: [true],
+			networks: this.createNetworksFormGroup(),
 
 			// Start and End Dates (read-only)
 			startDate: [{ value: "", disabled: true }],
@@ -188,6 +189,40 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Add whitelist form controls immediately
 		this.addWhitelistFormControls();
+	}
+
+	/**
+	 * Create networks form group
+	 */
+	private createNetworksFormGroup(networks: { [key: string]: NetworkConfig } | null = null): UntypedFormGroup {
+		const group = this._formBuilder.group({});
+
+		const defaultLicense = License.createEmpty("temp");
+		const defaultNetworks = networks || defaultLicense.getNetworks();
+
+		Object.keys(defaultNetworks).forEach((key) => {
+			const net = defaultNetworks[key];
+			// Skip custom networks if they exist in data but we don't support them in UI anymore
+			if (!key.startsWith("other_")) {
+				group.addControl(
+					key,
+					this._formBuilder.group({
+						enabled: [net.enabled],
+						nativeCurrency: this._formBuilder.group({
+							enabled: [net.nativeCurrency.enabled],
+							code: [net.nativeCurrency.code],
+						}),
+						altCoins: net.altCoins
+							? this._formBuilder.group({
+									enabled: [net.altCoins.enabled],
+									standard: [net.altCoins.standard],
+								})
+							: null,
+					})
+				);
+			}
+		});
+		return group;
 	}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -246,40 +281,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const index = this.reservedWords.indexOf(word);
 		if (index > -1) {
 			this.reservedWords.splice(index, 1);
-		}
-	}
-
-	/**
-	 * Add currency
-	 */
-	addCurrency(currency: string): void {
-		const trimmedCurrency = currency.trim().toUpperCase();
-		if (trimmedCurrency && this.ALLOWED_CURRENCIES.includes(trimmedCurrency) && !this.supportedCurrencies.includes(trimmedCurrency)) {
-			this.supportedCurrencies.push(trimmedCurrency);
-		} else if (trimmedCurrency && !this.ALLOWED_CURRENCIES.includes(trimmedCurrency)) {
-			// Show error for invalid currency
-			this.showError(`Currency "${trimmedCurrency}" is not supported. Allowed currencies: ${this.ALLOWED_CURRENCIES.join(", ")}`);
-		}
-	}
-
-	/**
-	 * Remove currency
-	 */
-	removeCurrency(currency: string): void {
-		const index = this.supportedCurrencies.indexOf(currency);
-		if (index > -1) {
-			this.supportedCurrencies.splice(index, 1);
-		}
-	}
-
-	/**
-	 * Toggle currency selection
-	 */
-	toggleCurrency(currency: string): void {
-		if (this.supportedCurrencies.includes(currency)) {
-			this.removeCurrency(currency);
-		} else {
-			this.supportedCurrencies.push(currency);
 		}
 	}
 
@@ -454,9 +455,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const newMethods = this.getPaymentMethods();
 		if (JSON.stringify(currentMethods.sort()) !== JSON.stringify(newMethods.sort())) return true;
 
-		// Check currencies
-		const currentCurrencies = currentConfig.tags?.payment?.currencies || [];
-		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) return true;
+		// Check networks
+		const currentNetworks = currentConfig.tags?.payment?.networks || this.currentLicense.getNetworks();
+		const newNetworks = formValue.networks;
+		if (JSON.stringify(currentNetworks) !== JSON.stringify(newNetworks)) return true;
 
 		// Check whitelist
 		const currentWhitelist = currentConfig.tags?.payment?.whitelist || {};
@@ -492,29 +494,41 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const formValue = this.accountForm.value;
 		const currentConfig = this.currentLicense.domainConfig;
 
-		// Check basic domain info
-		if (this.currentLicense.domain !== newDomain) changes.push(`Domain: ${this.currentLicense.domain} → ${newDomain}`);
+		this.getBasicInfoChanges(currentConfig, newDomain, formValue, changes);
+		this.getFeatureChanges(formValue, changes);
+		this.getValidationChanges(currentConfig, formValue, changes);
+		this.getStorageChanges(currentConfig, formValue, changes);
+		this.getPaymentChanges(currentConfig, formValue, changes);
+		this.getMetadataChanges(currentConfig, formValue, changes);
+
+		return changes;
+	}
+
+	private getBasicInfoChanges(currentConfig: DomainConfig, newDomain: string, formValue: any, changes: string[]): void {
+		if (this.currentLicense?.domain !== newDomain) changes.push(`Domain: ${this.currentLicense?.domain} → ${newDomain}`);
 		if (currentConfig.name !== newDomain) changes.push(`Name: ${currentConfig.name} → ${newDomain}`);
 		if (currentConfig.holdSuffix !== formValue.holdSuffix) changes.push(`Hold Suffix: ${currentConfig.holdSuffix} → ${formValue.holdSuffix}`);
 		if (currentConfig.status !== formValue.status) changes.push(`Status: ${currentConfig.status} → ${formValue.status}`);
 		if (currentConfig.owner !== formValue.owner) changes.push(`Owner: ${currentConfig.owner} → ${formValue.owner}`);
 		if (currentConfig.description !== formValue.description) changes.push(`Description: ${currentConfig.description} → ${formValue.description}`);
+	}
 
-		// Note: startDate and endDate are read-only and not checked for changes
-
-		// Check features
+	private getFeatureChanges(formValue: any, changes: string[]): void {
 		const currentZnsEnabled = true; // Default to true
 		const currentZelfkeysEnabled = true; // Default to true
 		if (currentZnsEnabled !== formValue.znsEnabled) changes.push(`ZNS Feature: ${currentZnsEnabled} → ${formValue.znsEnabled}`);
 		if (currentZelfkeysEnabled !== formValue.zelfkeysEnabled)
 			changes.push(`Zelfkeys Feature: ${currentZelfkeysEnabled} → ${formValue.zelfkeysEnabled}`);
+	}
 
-		// Check validation rules
+	private getValidationChanges(currentConfig: DomainConfig, formValue: any, changes: string[]): void {
 		if (currentConfig.tags?.minLength !== formValue.minLength)
 			changes.push(`Min Length: ${currentConfig.tags?.minLength} → ${formValue.minLength}`);
 		if (currentConfig.tags?.maxLength !== formValue.maxLength)
 			changes.push(`Max Length: ${currentConfig.tags?.maxLength} → ${formValue.maxLength}`);
+	}
 
+	private getStorageChanges(currentConfig: DomainConfig, formValue: any, changes: string[]): void {
 		// Check ZNS storage settings
 		if (currentConfig.tags?.storage?.keyPrefix !== formValue.keyPrefix)
 			changes.push(`ZNS Key Prefix: ${currentConfig.tags?.storage?.keyPrefix} → ${formValue.keyPrefix}`);
@@ -534,7 +548,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			changes.push(`ZelfKeys Arweave Enabled: ${currentConfig.zelfkeys?.storage?.arweaveEnabled} → ${formValue.zelfkeysArweaveEnabled}`);
 		if (currentConfig.zelfkeys?.storage?.walrusEnabled !== formValue.zelfkeysWalrusEnabled)
 			changes.push(`ZelfKeys Walrus Enabled: ${currentConfig.zelfkeys?.storage?.walrusEnabled} → ${formValue.zelfkeysWalrusEnabled}`);
+	}
 
+	private getPaymentChanges(currentConfig: DomainConfig, formValue: any, changes: string[]): void {
 		// Check payment methods
 		const currentMethods = currentConfig.tags?.payment?.methods || [];
 		const newMethods = this.getPaymentMethods();
@@ -542,10 +558,11 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			changes.push(`Payment Methods: ${currentMethods.join(", ")} → ${newMethods.join(", ")}`);
 		}
 
-		// Check currencies
-		const currentCurrencies = currentConfig.tags?.payment?.currencies || [];
-		if (JSON.stringify(currentCurrencies.sort()) !== JSON.stringify(this.supportedCurrencies.sort())) {
-			changes.push(`Currencies: ${currentCurrencies.join(", ")} → ${this.supportedCurrencies.join(", ")}`);
+		// Check networks
+		const currentNetworks = currentConfig.tags?.payment?.networks || this.currentLicense?.getNetworks();
+		const newNetworks = formValue.networks;
+		if (JSON.stringify(currentNetworks) !== JSON.stringify(newNetworks)) {
+			changes.push(`Networks configuration updated`);
 		}
 
 		// Check whitelist
@@ -561,8 +578,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) {
 			changes.push(`Pricing Table: Updated`);
 		}
+	}
 
-		// Check metadata
+	private getMetadataChanges(currentConfig: DomainConfig, formValue: any, changes: string[]): void {
 		if (currentConfig.metadata.launchDate !== formValue.launchDate)
 			changes.push(`Launch Date: ${currentConfig.metadata.launchDate} → ${formValue.launchDate}`);
 		if (currentConfig.metadata.version !== formValue.version) changes.push(`Version: ${currentConfig.metadata.version} → ${formValue.version}`);
@@ -573,8 +591,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.metadata.enterprise !== formValue.enterprise)
 			changes.push(`Enterprise: ${currentConfig.metadata.enterprise} → ${formValue.enterprise}`);
 		if (currentConfig.metadata.support !== formValue.support) changes.push(`Support: ${currentConfig.metadata.support} → ${formValue.support}`);
-
-		return changes;
 	}
 
 	/**
@@ -602,16 +618,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * Clean up invalid currencies and payment methods from existing license data
 	 */
 	private cleanupInvalidData(): void {
-		// Clean up invalid currencies
-		const validCurrencies = this.supportedCurrencies.filter((currency) => this.ALLOWED_CURRENCIES.includes(currency));
-		if (validCurrencies.length !== this.supportedCurrencies.length) {
-			const removedCurrencies = this.supportedCurrencies.filter((currency) => !this.ALLOWED_CURRENCIES.includes(currency));
-			this.supportedCurrencies = validCurrencies;
-			if (removedCurrencies.length > 0) {
-				this.showError(`Removed invalid currencies: ${removedCurrencies.join(", ")}. These are no longer supported.`);
-			}
-		}
-
 		// Clean up invalid payment methods (this shouldn't happen with checkboxes, but just in case)
 		const paymentMethods = this.getPaymentMethods();
 		const validMethods = paymentMethods.filter((method) => ["coinbase", "crypto", "stripe"].includes(method));
@@ -632,12 +638,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	private validateDataBeforeSend(): { valid: boolean; errors: string[] } {
 		const errors: string[] = [];
-
-		// Validate currencies
-		const invalidCurrencies = this.supportedCurrencies.filter((currency) => !this.ALLOWED_CURRENCIES.includes(currency));
-		if (invalidCurrencies.length > 0) {
-			errors.push(`Invalid currencies: ${invalidCurrencies.join(", ")}. Allowed: ${this.ALLOWED_CURRENCIES.join(", ")}`);
-		}
 
 		// Validate payment methods
 		const paymentMethods = this.getPaymentMethods();
@@ -684,7 +684,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				customRules: [],
 				payment: {
 					methods: this.getPaymentMethods(),
-					currencies: this.supportedCurrencies,
+					networks: formValue.networks,
 					discounts: {
 						yearly: 0.1,
 						lifetime: 0.2,
@@ -795,80 +795,12 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const config = this.currentLicense?.domainConfig;
 
 		if (config) {
-			// Set values individually for better control
-			this.accountForm.get("domain")?.setValue(config.name || "");
-			this.accountForm.get("status")?.setValue(config.status || "active");
-			this.accountForm.get("owner")?.setValue(config.owner || "zelf-team");
-			this.accountForm.get("description")?.setValue(config.description || "Official Zelf domain");
-			this.accountForm.get("znsEnabled")?.setValue(true); // Default to true
-			this.accountForm.get("zelfkeysEnabled")?.setValue(true); // Default to true
-			this.accountForm.get("minLength")?.setValue(config.tags?.minLength || 3);
-			this.accountForm.get("maxLength")?.setValue(config.tags?.maxLength || 50);
-			this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
-			// ZNS Storage Options
-			this.accountForm.get("ipfsEnabled")?.setValue(config.tags?.storage?.ipfsEnabled ?? true);
-			this.accountForm.get("arweaveEnabled")?.setValue(config.tags?.storage?.arweaveEnabled ?? true);
-			this.accountForm.get("walrusEnabled")?.setValue(config.tags?.storage?.walrusEnabled ?? true);
-			this.accountForm.get("keyPrefix")?.setValue(config.tags?.storage?.keyPrefix || "tagName");
-
-			// ZelfKeys Storage Options
-			this.accountForm.get("zelfkeysIpfsEnabled")?.setValue(config.zelfkeys?.storage?.ipfsEnabled ?? true);
-			this.accountForm.get("zelfkeysArweaveEnabled")?.setValue(config.zelfkeys?.storage?.arweaveEnabled ?? true);
-			this.accountForm.get("zelfkeysWalrusEnabled")?.setValue(config.zelfkeys?.storage?.walrusEnabled ?? true);
-			this.accountForm.get("zelfkeysKeyPrefix")?.setValue(config.zelfkeys?.storage?.keyPrefix || "tagName");
-			this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
-			this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
-			this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
-			this.accountForm.get("startDate")?.setValue(config.startDate || "");
-			this.accountForm.get("endDate")?.setValue(config.endDate || "");
-			this.accountForm.get("launchDate")?.setValue(config.metadata?.launchDate || "2023-01-01");
-			this.accountForm.get("version")?.setValue(config.metadata?.version || "1.0.0");
-			this.accountForm.get("documentation")?.setValue(config.metadata?.documentation || "https://docs.zelf.world");
-			this.accountForm.get("community")?.setValue(config.metadata?.community || "");
-			this.accountForm.get("enterprise")?.setValue(config.metadata?.enterprise || "");
-			this.accountForm.get("support")?.setValue(config.metadata?.support || "standard");
-
-			// Populate arrays from license data
-			if (config.tags?.reserved) {
-				this.reservedWords = [...config.tags.reserved];
-			}
-			if (config.tags?.payment?.currencies) {
-				this.supportedCurrencies = [...config.tags.payment.currencies];
-			}
-			if (config.tags?.payment?.pricingTable) {
-				this.loadPricingTableFromConfig(config.tags.payment.pricingTable);
-			}
-			if (config.tags?.payment?.whitelist) {
-				this.whitelistItems = Object.entries(config.tags.payment.whitelist).map(([domain, price]) => {
-					const priceStr = price as string;
-					const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
-					if (match) {
-						// Convert "%" to "percentage" and "$" to "fixed" to match template dropdown values
-						const typeSymbol = match[2];
-						const typeValue = typeSymbol === "%" ? "percentage" : typeSymbol === "$" ? "fixed" : typeSymbol;
-						return {
-							domain,
-							discount: match[1],
-							type: typeValue,
-						};
-					}
-					return {
-						domain,
-						discount: priceStr,
-						type: "percentage",
-					};
-				});
-			}
-			if (config.zelfkeys?.plans) {
-				this.zelfkeysPlans = [...config.zelfkeys.plans];
-			}
-
-			// Populate whitelist form controls
-			this.whitelistItems.forEach((item, index) => {
-				this.accountForm.get(`whitelistDomain_${index}`)?.setValue(item.domain);
-				this.accountForm.get(`whitelistDiscount_${index}`)?.setValue(item.discount);
-				this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
-			});
+			this.populateBasicInfo(config);
+			this.populateFeatures(config);
+			this.populateValidationRules(config);
+			this.populateStorageOptions(config);
+			this.populatePaymentSettings(config);
+			this.populateMetadata(config);
 		}
 
 		// Clean up any invalid data from existing license
@@ -876,6 +808,105 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Trigger change detection
 		this._cdr.detectChanges();
+	}
+
+	private populateBasicInfo(config: DomainConfig): void {
+		this.accountForm.get("domain")?.setValue(config.name || "");
+		this.accountForm.get("status")?.setValue(config.status || "active");
+		this.accountForm.get("owner")?.setValue(config.owner || "zelf-team");
+		this.accountForm.get("description")?.setValue(config.description || "Official Zelf domain");
+		this.accountForm.get("startDate")?.setValue(config.startDate || "");
+		this.accountForm.get("endDate")?.setValue(config.endDate || "");
+	}
+
+	private populateFeatures(config: DomainConfig): void {
+		this.accountForm.get("znsEnabled")?.setValue(true); // Default to true
+		this.accountForm.get("zelfkeysEnabled")?.setValue(true); // Default to true
+	}
+
+	private populateValidationRules(config: DomainConfig): void {
+		this.accountForm.get("minLength")?.setValue(config.tags?.minLength || 3);
+		this.accountForm.get("maxLength")?.setValue(config.tags?.maxLength || 50);
+		this.accountForm.get("holdSuffix")?.setValue(config.holdSuffix || ".hold");
+
+		if (config.tags?.reserved) {
+			this.reservedWords = [...config.tags.reserved];
+		}
+	}
+
+	private populateStorageOptions(config: DomainConfig): void {
+		// ZNS Storage Options
+		this.accountForm.get("ipfsEnabled")?.setValue(config.tags?.storage?.ipfsEnabled ?? true);
+		this.accountForm.get("arweaveEnabled")?.setValue(config.tags?.storage?.arweaveEnabled ?? true);
+		this.accountForm.get("walrusEnabled")?.setValue(config.tags?.storage?.walrusEnabled ?? true);
+		this.accountForm.get("keyPrefix")?.setValue(config.tags?.storage?.keyPrefix || "tagName");
+
+		// ZelfKeys Storage Options
+		this.accountForm.get("zelfkeysIpfsEnabled")?.setValue(config.zelfkeys?.storage?.ipfsEnabled ?? true);
+		this.accountForm.get("zelfkeysArweaveEnabled")?.setValue(config.zelfkeys?.storage?.arweaveEnabled ?? true);
+		this.accountForm.get("zelfkeysWalrusEnabled")?.setValue(config.zelfkeys?.storage?.walrusEnabled ?? true);
+		this.accountForm.get("zelfkeysKeyPrefix")?.setValue(config.zelfkeys?.storage?.keyPrefix || "tagName");
+	}
+
+	private populatePaymentSettings(config: DomainConfig): void {
+		this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
+		this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
+		this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
+
+		// Populate networks
+		if (this.currentLicense) {
+			const networks = this.currentLicense.getNetworks();
+			this.accountForm.setControl("networks", this.createNetworksFormGroup(networks));
+		}
+
+		if (config.tags?.payment?.pricingTable) {
+			this.loadPricingTableFromConfig(config.tags.payment.pricingTable);
+		}
+
+		this.populateWhitelist(config);
+
+		if (config.zelfkeys?.plans) {
+			this.zelfkeysPlans = [...config.zelfkeys.plans];
+		}
+	}
+
+	private populateWhitelist(config: DomainConfig): void {
+		if (config.tags?.payment?.whitelist) {
+			this.whitelistItems = Object.entries(config.tags.payment.whitelist).map(([domain, price]) => {
+				const priceStr = price as string;
+				const match = priceStr.match(/^(\d+(?:\.\d+)?)([%$])$/);
+				if (match) {
+					const typeSymbol = match[2];
+					const typeValue = typeSymbol === "%" ? "percentage" : typeSymbol === "$" ? "fixed" : typeSymbol;
+					return {
+						domain,
+						discount: match[1],
+						type: typeValue,
+					};
+				}
+				return {
+					domain,
+					discount: priceStr,
+					type: "percentage",
+				};
+			});
+		}
+
+		// Populate whitelist form controls
+		this.whitelistItems.forEach((item, index) => {
+			this.accountForm.get(`whitelistDomain_${index}`)?.setValue(item.domain);
+			this.accountForm.get(`whitelistDiscount_${index}`)?.setValue(item.discount);
+			this.accountForm.get(`whitelistType_${index}`)?.setValue(item.type);
+		});
+	}
+
+	private populateMetadata(config: DomainConfig): void {
+		this.accountForm.get("launchDate")?.setValue(config.metadata?.launchDate || "2023-01-01");
+		this.accountForm.get("version")?.setValue(config.metadata?.version || "1.0.0");
+		this.accountForm.get("documentation")?.setValue(config.metadata?.documentation || "https://docs.zelf.world");
+		this.accountForm.get("community")?.setValue(config.metadata?.community || "");
+		this.accountForm.get("enterprise")?.setValue(config.metadata?.enterprise || "");
+		this.accountForm.get("support")?.setValue(config.metadata?.support || "standard");
 	}
 
 	/**

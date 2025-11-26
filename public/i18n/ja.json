@@ -163,7 +163,8 @@
 			"zns_disabled_description": "タグ検証ルール、支払い設定、価格設定は、Zelfネームシステム（ZNS）が有効な場合のみ利用できます。",
 			"zns_disabled_enable": "上記でZNSを有効にしてタグ関連の設定を構成してください。",
 			"zelfkeys_title": "Zelfキー",
-			"zelfkeys_description": "パスワード、メモ、クレジットカードなど"
+			"zelfkeys_description": "パスワード、メモ、クレジットカードなど",
+			"zelfkeys_enabled": "有効"
 		},
 		"validation_rules": {
 			"title": "検証ルール",
