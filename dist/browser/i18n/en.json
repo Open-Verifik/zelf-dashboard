@@ -177,7 +177,8 @@
 			"zns_disabled_description": "Tag validation rules, payment settings, and pricing configuration are only available when Zelf Name Service (ZNS) is enabled.",
 			"zns_disabled_enable": "Enable ZNS above to configure tag-related settings.",
 			"zelfkeys_title": "Zelf Keys",
-			"zelfkeys_description": "Passwords, Notes, Credit Cards, etc."
+			"zelfkeys_description": "Passwords, Notes, Credit Cards, etc.",
+			"zelfkeys_enabled": "Enabled"
 		},
 		"validation_rules": {
 			"title": "Validation Rules",

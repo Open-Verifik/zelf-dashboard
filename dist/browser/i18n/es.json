@@ -163,7 +163,8 @@
 			"zns_disabled_description": "Las reglas de validación de etiquetas, configuración de pagos y configuración de precios solo están disponibles cuando el Sistema de Nombres Zelf (ZNS) está habilitado.",
 			"zns_disabled_enable": "Habilita ZNS arriba para configurar las opciones relacionadas con etiquetas.",
 			"zelfkeys_title": "Claves Zelf",
-			"zelfkeys_description": "Contraseñas, Notas, Tarjetas de Crédito, etc."
+			"zelfkeys_description": "Contraseñas, Notas, Tarjetas de Crédito, etc.",
+			"zelfkeys_enabled": "Habilitado"
 		},
 		"validation_rules": {
 			"title": "Reglas de Validación",
