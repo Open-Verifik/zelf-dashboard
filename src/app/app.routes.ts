@@ -103,6 +103,25 @@ export const appRoutes: Route[] = [
 		],
 	},
 
+	// Public ZelfKeys routes (no authentication required)
+	{
+		path: "zelfkeys",
+		component: LayoutComponent,
+		data: {
+			layout: "empty",
+		},
+		children: [
+			{
+				path: "success",
+				loadComponent: () => import("app/modules/zelfkeys/success/success.component").then((m) => m.ZelfKeysSuccessComponent),
+			},
+			{
+				path: "cancel",
+				loadComponent: () => import("app/modules/zelfkeys/cancel/cancel.component").then((m) => m.ZelfKeysCancelComponent),
+			},
+		],
+	},
+
 	// Admin routes
 	{
 		path: "",

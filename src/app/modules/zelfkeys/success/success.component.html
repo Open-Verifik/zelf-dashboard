@@ -1,0 +1,30 @@
+<div class="fixed inset-0 z-50 flex h-full w-full flex-col items-center justify-center overflow-auto bg-gray-50 dark:bg-gray-900">
+	<div class="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+		<div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+			<mat-icon class="text-6xl text-green-600 dark:text-green-400" [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+		</div>
+
+		<h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white">Payment Successful!</h1>
+
+		<p class="mb-8 text-lg text-gray-600 dark:text-gray-300">
+			Your subscription to Zelf Keys has been confirmed. You now have full access to create and manage your portfolio keys.
+		</p>
+
+		<div class="space-y-4">
+			<button
+				mat-flat-button
+				[color]="'primary'"
+				[routerLink]="['/zelfkeys']"
+				(click)="openExtension()"
+				class="w-full rounded-full py-6 text-lg font-semibold shadow-md transition-transform hover:scale-105"
+			>
+				Go to Zelf Keys
+			</button>
+			<!-- Optional secondary button or link
+            <a routerLink="/settings/plan-billing" class="block text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                View Billing Details
+            </a>
+            -->
+		</div>
+	</div>
+</div>

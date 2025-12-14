@@ -1,0 +1,24 @@
+<div class="fixed inset-0 z-50 flex h-full w-full flex-col items-center justify-center overflow-auto bg-gray-50 dark:bg-gray-900">
+	<div class="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+		<div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+			<mat-icon class="text-6xl text-red-600 dark:text-red-400" [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
+		</div>
+
+		<h1 class="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white">Payment Canceled</h1>
+
+		<p class="mb-8 text-lg text-gray-600 dark:text-gray-300">The subscription process was canceled. No charges were made to your account.</p>
+
+		<div class="space-y-4">
+			<button
+				mat-flat-button
+				[color]="'primary'"
+				[routerLink]="['/zelfkeys']"
+				(click)="openExtension()"
+				class="w-full rounded-full py-6 text-lg font-semibold shadow-md transition-transform hover:scale-105"
+			>
+				Return to Zelf Keys
+			</button>
+			<p class="text-sm text-gray-500 dark:text-gray-400">If you encountered an issue, please try again or contact support.</p>
+		</div>
+	</div>
+</div>
