@@ -12,10 +12,12 @@ import { Router, RouterLink } from "@angular/router";
 import { fuseAnimations } from "@fuse/animations";
 import { FuseAlertComponent, FuseAlertType } from "@fuse/components/alert";
 import { AuthService } from "app/core/auth/auth.service";
+import { PasskeyService } from "app/core/services/passkey.service";
 import { DataBiometricsComponent, BiometricData } from "../biometric-verification/biometric-verification.component";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
 import { environment } from "environments/environment";
+import { PasskeyPromptModalComponent } from "../passkey-prompt-modal/passkey-prompt-modal.component";
 @Component({
 	selector: "auth-sign-up",
 	templateUrl: "./sign-up.component.html",
@@ -36,6 +38,7 @@ import { environment } from "environments/environment";
 		MatSelectModule,
 		DataBiometricsComponent,
 		TranslocoModule,
+		PasskeyPromptModalComponent,
 	],
 })
 export class AuthSignUpComponent implements OnInit {
@@ -51,6 +54,7 @@ export class AuthSignUpComponent implements OnInit {
 	signUpForm: UntypedFormGroup;
 	showAlert: boolean = false;
 	showBiometricVerification: boolean = false;
+	showPasskeyPrompt: boolean = false;
 	userData: any = {};
 
 	// Language picker
@@ -163,7 +167,8 @@ export class AuthSignUpComponent implements OnInit {
 	constructor(
 		private _authService: AuthService,
 		private _formBuilder: UntypedFormBuilder,
-		private _router: Router
+		private _router: Router,
+		private _passkeyService: PasskeyService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -295,8 +300,11 @@ export class AuthSignUpComponent implements OnInit {
 					// Set access token
 					this._authService.setAccessToken(response.data.token);
 
-					// Navigate to dashboard
-					this._router.navigateByUrl("/analytics");
+					// POC: Prompt to save with Passkey
+					const email = this.signUpForm.get("email")?.value;
+					const password = this.signUpForm.get("masterPassword")?.value;
+
+					this.showPasskeyPrompt = true;
 				} else {
 					// Handle case where required data is missing
 					console.error("Sign up response missing required authentication data:", response);
@@ -353,6 +361,91 @@ export class AuthSignUpComponent implements OnInit {
 				// Show the alert
 				this.showAlert = true;
 			});
+	}
+
+	/**
+	 * Handle Passkey Save
+	 */
+	/**
+	 * Handle Passkey Save
+	 */
+	/**
+	 * Handle Passkey Save
+	 */
+	onPasskeySave(): void {
+		console.log("🔑 [DEBUG] onPasskeySave called");
+		console.log("🔑 [DEBUG] userData state:", this.userData);
+
+		const email = this.userData.email;
+		const password = this.userData.masterPassword;
+		const countryCode = this.userData.countryCode;
+		const phone = this.userData.phone;
+
+		console.log("🔑 [DEBUG] Extracted values:", { email, hasPassword: !!password, countryCode, phone });
+
+		if (email && password) {
+			console.log("🔑 [DEBUG] Proceeding to register passkey...");
+			// Register using email as the primary credential username
+			this._passkeyService
+				.register(email)
+				.then(async (regResult) => {
+					console.log("🔑 [DEBUG] Register result:", regResult);
+					if (regResult) {
+						try {
+							const encrypted = await this._passkeyService.encryptPassword(password, regResult.key);
+							console.log("🔑 [DEBUG] Password encrypted successfully. Saving metadata...");
+
+							// 1. Save for Email
+							this._passkeyService.savePasskeyMetadata(email, {
+								credentialId: regResult.credentialId,
+								salt: this._passkeyService.bufferToBase64(regResult.salt),
+								iv: encrypted.iv,
+								ciphertext: encrypted.ciphertext,
+							});
+							console.log("🔑 [DEBUG] Metadata saved for EMAIL:", email);
+
+							// 2. Save for Phone (if available)
+							if (countryCode && phone) {
+								const phoneIdentifier = `${countryCode}${phone}`;
+								this._passkeyService.savePasskeyMetadata(phoneIdentifier, {
+									credentialId: regResult.credentialId,
+									salt: this._passkeyService.bufferToBase64(regResult.salt),
+									iv: encrypted.iv,
+									ciphertext: encrypted.ciphertext,
+								});
+								console.log("🔑 [DEBUG] Metadata saved for PHONE:", phoneIdentifier);
+							}
+
+							// Verify storage
+							const check = localStorage.getItem("zelf_passkeys");
+							console.log("🔑 [DEBUG] Final localStorage 'zelf_passkeys' check:", check);
+						} catch (err) {
+							console.error("❌ [DEBUG] Error encrypting/saving passkey:", err);
+						}
+					} else {
+						console.warn("⚠️ [DEBUG] Registration returned null/undefined result");
+					}
+					this.showPasskeyPrompt = false;
+					this._router.navigateByUrl("/analytics");
+				})
+				.catch((error) => {
+					console.error("❌ [DEBUG] Passkey registration failed:", error);
+					this.showPasskeyPrompt = false;
+					this._router.navigateByUrl("/analytics");
+				});
+		} else {
+			console.error("❌ [DEBUG] Missing email or password for passkey registration");
+			this.showPasskeyPrompt = false;
+			this._router.navigateByUrl("/analytics");
+		}
+	}
+
+	/**
+	 * Handle Passkey Cancel
+	 */
+	onPasskeyCancel(): void {
+		this.showPasskeyPrompt = false;
+		this._router.navigateByUrl("/analytics");
 	}
 
 	/**
@@ -461,6 +554,16 @@ export class AuthSignUpComponent implements OnInit {
 			(country) => country.country.toLowerCase().includes(searchTerm) || country.code.includes(searchTerm) || country.flag.includes(searchTerm)
 		);
 		this.showCountryDropdown = this.filteredCountryCodes.length > 0;
+	}
+
+	/**
+	 * Handle country input blur
+	 */
+	onCountryBlur(): void {
+		// Delay hiding to allow click event to fire on the dropdown options
+		setTimeout(() => {
+			this.showCountryDropdown = false;
+		}, 200);
 	}
 
 	/**

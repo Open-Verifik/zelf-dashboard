@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation, inject } from "@angular/core";
+import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -12,6 +13,8 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { fuseAnimations } from "@fuse/animations";
 import { FuseAlertComponent, FuseAlertType } from "@fuse/components/alert";
 import { AuthService } from "app/core/auth/auth.service";
+import { PasskeyService } from "app/core/services/passkey.service";
+import { PasskeyPromptModalComponent } from "../passkey-prompt-modal/passkey-prompt-modal.component";
 import { DataBiometricsComponent, BiometricData } from "../biometric-verification/biometric-verification.component";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
@@ -36,6 +39,7 @@ import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
 		MatSelectModule,
 		DataBiometricsComponent,
 		TranslocoModule,
+		PasskeyPromptModalComponent,
 	],
 })
 export class AuthSignInComponent implements OnInit {
@@ -49,6 +53,8 @@ export class AuthSignInComponent implements OnInit {
 	signInForm: UntypedFormGroup;
 	showAlert: boolean = false;
 	showBiometricVerification: boolean = false;
+	showPasskeyLogin: boolean = false;
+	showPasskeyPrompt: boolean = false;
 	userData: any = {};
 
 	// Language picker
@@ -74,7 +80,8 @@ export class AuthSignInComponent implements OnInit {
 		private _activatedRoute: ActivatedRoute,
 		private _authService: AuthService,
 		private _formBuilder: UntypedFormBuilder,
-		private _router: Router
+		private _router: Router,
+		private _passkeyService: PasskeyService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -98,7 +105,25 @@ export class AuthSignInComponent implements OnInit {
 		// Watch for identification method changes to update validation
 		this.signInForm.get("identificationMethod")?.valueChanges.subscribe((method) => {
 			this.updateValidation(method);
+			// Also check passkey when method changes
+			setTimeout(() => this.checkPasskey(), 100);
 		});
+
+		// Monitor Email changes for Passkey
+		this.signInForm
+			.get("email")
+			?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+			.subscribe(() => {
+				this.checkPasskey();
+			});
+
+		// Monitor Phone changes for Passkey
+		this.signInForm
+			.get("phone")
+			?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+			.subscribe(() => {
+				this.checkPasskey();
+			});
 
 		// Set initial validation
 		this.updateValidation("email");
@@ -139,6 +164,68 @@ export class AuthSignInComponent implements OnInit {
 	// -----------------------------------------------------------------------------------------------------
 	// @ Public methods
 	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Get current identifier based on method
+	 */
+	private _getCurrentIdentifier(): string | null {
+		const method = this.signInForm.get("identificationMethod")?.value;
+		if (method === "email") {
+			return this.signInForm.get("email")?.value;
+		} else if (method === "phone") {
+			const country = this.signInForm.get("countryCode")?.value;
+			const phone = this.signInForm.get("phone")?.value;
+			if (country && phone) {
+				return `${country}${phone}`;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Check if there is a passkey for the entered identifier
+	 */
+	checkPasskey(): void {
+		const identifier = this._getCurrentIdentifier();
+		if (identifier) {
+			const metadata = this._passkeyService.getPasskeyMetadata(identifier);
+			this.showPasskeyLogin = !!metadata;
+		} else {
+			this.showPasskeyLogin = false;
+		}
+	}
+
+	/**
+	 * Login with Passkey
+	 */
+	async loginWithPasskey(): Promise<void> {
+		const identifier = this._getCurrentIdentifier();
+		if (!identifier) return;
+
+		const metadata = this._passkeyService.getPasskeyMetadata(identifier);
+		if (!metadata) return;
+
+		try {
+			// Authenticate and derive key
+			const key = await this._passkeyService.authenticate(metadata.credentialId, this._passkeyService.base64ToBuffer(metadata.salt));
+
+			if (key) {
+				// Decrypt password
+				const password = await this._passkeyService.decryptPassword(metadata.ciphertext, metadata.iv, key);
+
+				// Fill form and submit
+				this.signInForm.patchValue({ masterPassword: password });
+				this.signIn();
+			}
+		} catch (error) {
+			console.error("Passkey login failed:", error);
+			this.alert = {
+				type: "error",
+				message: "Passkey login failed. Please use your password.",
+			};
+			this.showAlert = true;
+		}
+	}
 
 	/**
 	 * Sign in
@@ -268,8 +355,22 @@ export class AuthSignInComponent implements OnInit {
 					// Set access token
 					this._authService.setAccessToken(response.data.token);
 
-					// Navigate to dashboard
-					this._router.navigateByUrl("/analytics");
+					// POC: Prompt to save with Passkey
+					const identifier = this._getCurrentIdentifier();
+					const password = this.signInForm.get("masterPassword")?.value;
+
+					if (identifier && password) {
+						const hasPasskey = this._passkeyService.getPasskeyMetadata(identifier);
+
+						if (!hasPasskey) {
+							this.showPasskeyPrompt = true;
+						} else {
+							this._router.navigateByUrl("/analytics");
+						}
+					} else {
+						// Navigate to dashboard
+						this._router.navigateByUrl("/analytics");
+					}
 				} else {
 					// Handle case where required data is missing
 					console.error("Sign in response missing required authentication data:", response);
@@ -329,6 +430,39 @@ export class AuthSignInComponent implements OnInit {
 				this.showAlert = true;
 			}
 		);
+	}
+
+	/**
+	 * Handle Passkey Save
+	 */
+	onPasskeySave(): void {
+		const identifier = this._getCurrentIdentifier();
+		const password = this.signInForm.get("masterPassword")?.value;
+
+		if (identifier && password) {
+			this._passkeyService.register(identifier).then(async (regResult) => {
+				if (regResult) {
+					const encrypted = await this._passkeyService.encryptPassword(password, regResult.key);
+					this._passkeyService.savePasskeyMetadata(identifier, {
+						credentialId: regResult.credentialId,
+						salt: this._passkeyService.bufferToBase64(regResult.salt),
+						iv: encrypted.iv,
+						ciphertext: encrypted.ciphertext,
+					});
+					// We can show a toast here if we had one, for now just close
+				}
+				this.showPasskeyPrompt = false;
+				this._router.navigateByUrl("/analytics");
+			});
+		}
+	}
+
+	/**
+	 * Handle Passkey Cancel
+	 */
+	onPasskeyCancel(): void {
+		this.showPasskeyPrompt = false;
+		this._router.navigateByUrl("/analytics");
 	}
 
 	/**

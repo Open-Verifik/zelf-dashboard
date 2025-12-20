@@ -66,13 +66,22 @@
 		</div>
 
 		<div
-			class="loading-container"
-			fxLayout="column"
-			fxLayoutAlign="center center"
+			class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300"
 			*ngIf="(response.base64Image || camera.isLoading) && !hasApiError"
+			[@fadeIn]="true"
 		>
-			<mat-spinner [diameter]="120"></mat-spinner>
-			<div *ngIf="response.isLoading" class="processing-message">Processing your biometric data...</div>
+			<div class="relative">
+				<!-- Outer Ring -->
+				<div class="absolute inset-0 rounded-full border-4 border-gray-100 dark:border-gray-800"></div>
+				<!-- Spinner -->
+				<mat-spinner [diameter]="64" [strokeWidth]="4"></mat-spinner>
+			</div>
+			<div *ngIf="response.isLoading" class="mt-8 text-lg font-medium text-gray-800 dark:text-gray-100 animate-pulse">
+				Processing your biometric data...
+			</div>
+			<div *ngIf="camera.isLoading && !response.isLoading" class="mt-8 text-lg font-medium text-gray-600 dark:text-gray-300">
+				Initializing safe camera...
+			</div>
 		</div>
 
 		<div class="error-container" fxLayout="column" fxLayoutAlign="center center" *ngIf="!camera.isLoading && camera.isLowQuality && !hasApiError">

@@ -15,12 +15,15 @@ export interface BiometricData {
 	password?: string;
 }
 
+import { fadeIn } from "@fuse/animations";
+
 @Component({
 	selector: "app-data-biometrics",
 	standalone: true,
 	imports: [CommonModule, FormsModule, MatButtonModule, MatProgressSpinnerModule, MatIconModule, WebcamModule, RouterModule],
 	templateUrl: "./biometric-verification.component.html",
 	styleUrls: ["./biometric-verification.component.scss"],
+	animations: [fadeIn],
 })
 export class DataBiometricsComponent implements OnInit, OnDestroy {
 	@ViewChild("maskResult", { static: false }) public maskResultCanvasRef: ElementRef | undefined;

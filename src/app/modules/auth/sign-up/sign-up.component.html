@@ -1,25 +1,34 @@
 <!-- Biometric Verification Modal Overlay -->
 @if (showBiometricVerification) {
-	<div class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-		<div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl">
-			<div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-				<h2 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Biometric Verification</h2>
+	<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300">
+		<div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all scale-100">
+			<!-- Header -->
+			<div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Verify Identity</h2>
 				<button
 					mat-icon-button
 					(click)="onBiometricCancel()"
-					class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+					class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
 				>
-					<mat-icon>close</mat-icon>
+					<mat-icon class="icon-size-5">close</mat-icon>
 				</button>
 			</div>
 
-			<div class="p-4 sm:p-6 overflow-y-auto max-h-[calc(95vh-80px)]">
-				<p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 text-center">
-					Please verify your identity to complete your account registration
-					<strong class="text-gray-900 dark:text-white block mt-1">
-						{{ userData?.email || userData?.phone || "New Account" }}
-					</strong>
-				</p>
+			<div class="p-6">
+				<!-- User Identifier Display -->
+				<div class="flex flex-col items-center mb-6">
+					<div
+						class="w-12 h-12 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-3 text-primary-600 dark:text-primary-400"
+					>
+						<mat-icon class="icon-size-6">face</mat-icon>
+					</div>
+					<p class="text-sm text-gray-500 dark:text-gray-400 text-center">
+						Verify your identity to complete registration for generic
+						<span class="font-medium text-gray-900 dark:text-white text-base block mt-1">
+							{{ userData?.email || userData?.phone || "New Account" }}
+						</span>
+					</p>
+				</div>
 
 				<!-- Biometric Component -->
 				<app-data-biometrics
@@ -34,329 +43,256 @@
 	</div>
 }
 
-<!-- Sign Up Form -->
-<div class="flex min-w-0 flex-auto flex-col items-center sm:flex-row sm:justify-center md:items-start md:justify-start">
-	<div
-		class="w-full px-4 py-8 sm:bg-card sm:w-auto sm:rounded-2xl sm:p-12 sm:shadow md:flex md:h-full md:w-1/2 md:items-center md:justify-end md:rounded-none md:p-16 md:shadow-none"
-	>
-		<div class="mx-auto w-full max-w-80 sm:mx-0 sm:w-80">
-			<!-- Logo -->
-			<div class="w-12">
-				<img src="images/logo/logo.svg" />
-			</div>
+<!-- Passkey Prompt Modal -->
+@if (showPasskeyPrompt) {
+	<app-passkey-prompt-modal (onSave)="onPasskeySave()" (onCancel)="onPasskeyCancel()"> </app-passkey-prompt-modal>
+}
 
-			<!-- Title -->
-			<div class="mt-8 flex items-center justify-between">
-				<div>
-					<div class="text-4xl font-extrabold leading-tight tracking-tight">{{ "signUp.title" | transloco }}</div>
-					<div class="mt-0.5 flex items-baseline font-medium">
-						<div>{{ "signUp.alreadyHaveAccount" | transloco }}</div>
-						<a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-in']">{{ "signUp.signIn" | transloco }} </a>
-					</div>
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 w-full px-4 sm:px-6 py-8">
+	<!-- Main Card -->
+	<div
+		class="w-full max-w-[480px] bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-visible border border-gray-100 dark:border-gray-700 relative"
+	>
+		<div class="p-8 sm:p-10">
+			<!-- Logo & Header -->
+			<div class="flex flex-col items-center mb-8">
+				<div class="w-12 h-12 mb-6">
+					<img src="images/logo/logo.svg" alt="Logo" class="w-full h-full" />
+				</div>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ "signUp.title" | transloco }}</h1>
+				<div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+					{{ "signUp.alreadyHaveAccount" | transloco }}
+					<a class="font-medium text-primary-600 hover:text-primary-500 ml-1 transition-colors" [routerLink]="['/sign-in']">
+						{{ "signUp.signIn" | transloco }}
+					</a>
 				</div>
 			</div>
 
 			<!-- Alert -->
 			@if (showAlert) {
-				<fuse-alert class="mt-8" [appearance]="'outline'" [showIcon]="false" [type]="alert.type" [@shake]="alert.type === 'error'">
+				<fuse-alert class="mb-6" [appearance]="'soft'" [showIcon]="true" [type]="alert.type" [@shake]="alert.type === 'error'">
 					{{ alert.message }}
 				</fuse-alert>
 			}
 
-			<!-- Sign Up form -->
-			<form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm">
-				<!-- Name field -->
-				<mat-form-field class="w-full">
-					<mat-label>{{ "signUp.fullName" | transloco }}</mat-label>
-					<input id="name" matInput [formControlName]="'name'" />
-					@if (signUpForm.get("name").hasError("required")) {
-						<mat-error>{{ "signUp.nameRequired" | transloco }}</mat-error>
+			<!-- Sign Up Form -->
+			<form [formGroup]="signUpForm" #signUpNgForm="ngForm" class="space-y-4">
+				<!-- Name -->
+				<div>
+					<label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{{
+						"signUp.fullName" | transloco
+					}}</label>
+					<input
+						id="name"
+						[formControlName]="'name'"
+						class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
+						placeholder="John Doe"
+					/>
+					@if (signUpForm.get("name").touched && signUpForm.get("name").hasError("required")) {
+						<div class="text-red-500 text-xs mt-1 ml-1">{{ "signUp.nameRequired" | transloco }}</div>
 					}
-				</mat-form-field>
+				</div>
 
-				<!-- Email field -->
-				<mat-form-field class="w-full">
-					<mat-label>{{ "signUp.emailAddress" | transloco }}</mat-label>
-					<input id="email" matInput [formControlName]="'email'" />
-					@if (signUpForm.get("email").hasError("required")) {
-						<mat-error>{{ "signUp.emailRequired" | transloco }}</mat-error>
-					}
-					@if (signUpForm.get("email").hasError("email")) {
-						<mat-error>{{ "signUp.emailInvalid" | transloco }}</mat-error>
-					}
-				</mat-form-field>
-
-				<!-- Phone number fields -->
-				<div class="flex w-full gap-2 relative">
-					<!-- Country code field -->
-					<mat-form-field class="w-40 country-code-field">
-						<mat-label>{{ "signUp.country" | transloco }}</mat-label>
-						<!-- Searchable country code input -->
-						<input
-							matInput
-							[formControlName]="'countryCode'"
-							[(ngModel)]="countryCodeSearchTerm"
-							(input)="filterCountryCodes()"
-							placeholder="Search countries..."
-							class="text-sm"
-						/>
-						<!-- Clear search button -->
-						@if (countryCodeSearchTerm) {
-							<button
-								mat-icon-button
-								matSuffix
-								type="button"
-								(click)="clearCountryCodeSearch()"
-								class="text-gray-400 hover:text-gray-600"
-							>
-								<mat-icon class="icon-size-4">clear</mat-icon>
-							</button>
-						}
-						<!-- Dropdown arrow -->
-						<button mat-icon-button matSuffix type="button" (click)="toggleCountryDropdown()" class="text-gray-400 hover:text-gray-600">
-							<mat-icon class="icon-size-4">keyboard_arrow_down</mat-icon>
-						</button>
-						@if (signUpForm.get("countryCode").hasError("required")) {
-							<mat-error>{{ "signUp.countryRequired" | transloco }}</mat-error>
-						}
-					</mat-form-field>
-
-					<!-- Country code dropdown (shown when searching) -->
-					@if (showCountryDropdown && filteredCountryCodes.length > 0) {
-						<div
-							class="absolute z-50 w-40 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
-						>
-							@for (country of filteredCountryCodes; track country.code + country.country) {
-								<button
-									type="button"
-									(click)="selectCountryCode(country)"
-									class="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
-								>
-									<span>{{ country.flag }}</span>
-									<span class="text-sm">{{ country.code }}</span>
-									<span class="text-xs text-gray-500">{{ country.country }}</span>
-								</button>
+				<!-- Email -->
+				<div>
+					<label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{{
+						"signUp.emailAddress" | transloco
+					}}</label>
+					<input
+						id="email"
+						[formControlName]="'email'"
+						class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
+						placeholder="name@company.com"
+					/>
+					@if (signUpForm.get("email").touched && signUpForm.get("email").invalid) {
+						<div class="text-red-500 text-xs mt-1 ml-1">
+							@if (signUpForm.get("email").hasError("required")) {
+								{{ "signUp.emailRequired" | transloco }}
+							}
+							@if (signUpForm.get("email").hasError("email")) {
+								{{ "signUp.emailInvalid" | transloco }}
 							}
 						</div>
 					}
-
-					<!-- Phone number field -->
-					<mat-form-field class="flex-1">
-						<mat-label>{{ "signUp.phoneNumber" | transloco }}</mat-label>
-						<input id="phone" matInput type="tel" [formControlName]="'phone'" placeholder="1234567890" />
-						@if (signUpForm.get("phone").hasError("required")) {
-							<mat-error>{{ "signUp.phoneRequired" | transloco }}</mat-error>
-						}
-						@if (signUpForm.get("phone").hasError("pattern")) {
-							<mat-error>{{ "signUp.phonePattern" | transloco }}</mat-error>
-						}
-					</mat-form-field>
 				</div>
 
-				<!-- Master Password field -->
-				<mat-form-field class="w-full">
-					<mat-label>{{ "signUp.masterPassword" | transloco }}</mat-label>
-					<input id="masterPassword" matInput type="password" [formControlName]="'masterPassword'" #masterPasswordField />
-					<button
-						mat-icon-button
-						type="button"
-						(click)="
-							masterPasswordField.type === 'password' ? (masterPasswordField.type = 'text') : (masterPasswordField.type = 'password')
-						"
-						matSuffix
-					>
-						@if (masterPasswordField.type === "password") {
-							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye'"></mat-icon>
-						}
-						@if (masterPasswordField.type === "text") {
-							<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
-						}
-					</button>
-					@if (signUpForm.get("masterPassword").hasError("required")) {
-						<mat-error>{{ "signUp.masterPasswordRequired" | transloco }}</mat-error>
-					}
-				</mat-form-field>
+				<!-- Phone -->
+				<div>
+					<label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{{
+						"signUp.phoneNumber" | transloco
+					}}</label>
+					<div class="flex gap-3 relative">
+						<!-- Country Code -->
+						<div class="w-36 relative">
+							<div class="relative">
+								<input
+									[formControlName]="'countryCode'"
+									[(ngModel)]="countryCodeSearchTerm"
+									(input)="filterCountryCodes()"
+									(focus)="showCountryDropdown = true"
+									(blur)="onCountryBlur()"
+									placeholder="Search..."
+									class="w-full pl-3 pr-8 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white text-sm"
+								/>
+								<div class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+									<mat-icon class="icon-size-4">keyboard_arrow_down</mat-icon>
+								</div>
+							</div>
 
-				<!-- Company field -->
-				<mat-form-field class="w-full">
-					<mat-label>{{ "signUp.companyName" | transloco }}</mat-label>
-					<input id="company" matInput [formControlName]="'company'" placeholder="Your company name" />
-					@if (signUpForm.get("company").hasError("required")) {
-						<mat-error>{{ "signUp.companyRequired" | transloco }}</mat-error>
-					}
-				</mat-form-field>
+							<!-- Dropdown -->
+							@if (showCountryDropdown && filteredCountryCodes.length > 0) {
+								<div
+									class="absolute z-50 top-full left-0 w-64 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto transform origin-top-left transition-all"
+								>
+									@for (country of filteredCountryCodes; track country.code + country.country) {
+										<button
+											type="button"
+											(mousedown)="selectCountryCode(country)"
+											class="w-full px-4 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center gap-3 transition-colors border-b last:border-0 border-gray-50 dark:border-gray-700/50"
+										>
+											<span class="text-lg leading-none">{{ country.flag }}</span>
+											<span class="font-mono text-sm font-medium text-primary-600 dark:text-primary-400">{{
+												country.code
+											}}</span>
+											<span class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ country.country }}</span>
+										</button>
+									}
+								</div>
+							}
+						</div>
 
-				<!-- ToS and PP -->
-				<div class="mt-1.5 inline-flex w-full items-end">
-					<mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'agreements'">
-						<span>{{ "signUp.agreements" | transloco }}</span>
-						<a
-							class="ml-1 text-primary-500 hover:underline"
-							href="https://docs.zelf.world/docs/legal/terms-of-use"
-							target="_blank"
-							rel="noopener noreferrer"
-							>{{ "signUp.terms" | transloco }}
-						</a>
-						<span>{{ "signUp.and" | transloco }}</span>
-						<a
-							class="ml-1 text-primary-500 hover:underline"
-							href="https://docs.zelf.world/docs/legal/privacy-policy"
-							target="_blank"
-							rel="noopener noreferrer"
-							>{{ "signUp.privacyPolicy" | transloco }}
-						</a>
+						<!-- Phone Number -->
+						<div class="flex-1">
+							<input
+								id="phone"
+								type="tel"
+								[formControlName]="'phone'"
+								class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
+								placeholder="555-0123"
+							/>
+						</div>
+					</div>
+					@if (signUpForm.get("phone").touched && signUpForm.get("phone").invalid) {
+						<div class="text-red-500 text-xs mt-1 ml-1">
+							@if (signUpForm.get("phone").hasError("required")) {
+								{{ "signUp.phoneRequired" | transloco }}
+							}
+							@if (signUpForm.get("phone").hasError("pattern")) {
+								{{ "signUp.phonePattern" | transloco }}
+							}
+						</div>
+					}
+				</div>
+
+				<!-- Master Password -->
+				<div>
+					<label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{{
+						"signUp.masterPassword" | transloco
+					}}</label>
+					<div class="relative">
+						<input
+							#masterPasswordField
+							id="masterPassword"
+							type="password"
+							[formControlName]="'masterPassword'"
+							class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
+							placeholder="••••••••"
+						/>
+						<button
+							type="button"
+							class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1"
+							(click)="
+								masterPasswordField.type === 'password'
+									? (masterPasswordField.type = 'text')
+									: (masterPasswordField.type = 'password')
+							"
+						>
+							<mat-icon
+								class="icon-size-5"
+								[svgIcon]="masterPasswordField.type === 'password' ? 'heroicons_solid:eye' : 'heroicons_solid:eye-slash'"
+							></mat-icon>
+						</button>
+					</div>
+					@if (signUpForm.get("masterPassword").touched && signUpForm.get("masterPassword").hasError("required")) {
+						<div class="text-red-500 text-xs mt-1 ml-1">{{ "signUp.masterPasswordRequired" | transloco }}</div>
+					}
+				</div>
+
+				<!-- Company -->
+				<div class="pb-1">
+					<label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1">{{
+						"signUp.companyName" | transloco
+					}}</label>
+					<input
+						id="company"
+						[formControlName]="'company'"
+						class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
+						placeholder="Acme Inc."
+					/>
+					@if (signUpForm.get("company").touched && signUpForm.get("company").hasError("required")) {
+						<div class="text-red-500 text-xs mt-1 ml-1">{{ "signUp.companyRequired" | transloco }}</div>
+					}
+				</div>
+
+				<!-- Agreements -->
+				<div class="flex items-start">
+					<mat-checkbox [color]="'primary'" [formControlName]="'agreements'" class="custom-checkbox mt-1">
+						<span class="text-sm text-gray-600 dark:text-gray-300 ml-1 leading-normal">
+							I agree to the
+							<a class="text-primary-600 hover:underline" href="https://docs.zelf.world/docs/legal/terms-of-use" target="_blank">{{
+								"signUp.terms" | transloco
+							}}</a>
+							and
+							<a class="text-primary-600 hover:underline" href="https://docs.zelf.world/docs/legal/privacy-policy" target="_blank">{{
+								"signUp.privacyPolicy" | transloco
+							}}</a>
+						</span>
 					</mat-checkbox>
 				</div>
 
-				<!-- Submit button -->
+				<!-- Submit Button -->
 				<button
-					class="fuse-mat-button-large mt-6 w-full"
-					mat-flat-button
-					[color]="'primary'"
+					class="w-full py-4 px-6 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2 text-lg mt-4"
+					type="button"
 					[disabled]="signUpForm.disabled"
 					(click)="signUp()"
 				>
 					@if (!signUpForm.disabled) {
-						<span>{{ "signUp.createAccount" | transloco }}</span>
+						<span>Create Account</span>
+						<mat-icon class="icon-size-5">arrow_forward</mat-icon>
 					}
 					@if (signUpForm.disabled) {
 						<mat-progress-spinner [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
 					}
 				</button>
 			</form>
+
+			<!-- Test Utils -->
+			@if (!production) {
+				<div class="mt-8 flex justify-center">
+					<button
+						type="button"
+						(click)="fillRandomData()"
+						class="text-xs font-medium text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+					>
+						<mat-icon class="icon-size-4">casino</mat-icon>
+						Fill Random Data
+					</button>
+				</div>
+			}
 		</div>
 	</div>
-	<div class="relative hidden h-full w-1/2 flex-auto items-center justify-center overflow-hidden bg-gray-800 p-16 dark:border-l md:flex lg:px-28">
-		<!-- Background -->
-		<!-- Rings -->
-		<!-- prettier-ignore -->
-		<svg class="absolute inset-0 pointer-events-none"
-             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-                <circle r="234" cx="196" cy="23"></circle>
-                <circle r="234" cx="790" cy="491"></circle>
-            </g>
-        </svg>
-		<!-- Dots -->
-		<!-- prettier-ignore -->
-		<svg class="absolute -top-16 -right-16 text-gray-700"
-             viewBox="0 0 220 192" width="220" height="192" fill="none">
-            <defs>
-                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
-                </pattern>
-            </defs>
-            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
-        </svg>
-		<!-- Content -->
-		<div class="relative z-10 w-full max-w-2xl">
-			<div class="text-7xl font-bold leading-none text-gray-100">
-				<div>Welcome to</div>
-				<div class="text-primary-400">Zelf</div>
-			</div>
-			<div class="mt-6 text-lg leading-6 tracking-tight text-gray-400">
-				Join the future of decentralized identity and secure digital authentication. Experience biometric verification and blockchain-powered
-				security like never before.
-			</div>
 
-			<!-- Language Picker -->
-			<div class="relative pt-4">
-				<select
-					[value]="currentLanguage"
-					(change)="onLanguageChange($event.target.value)"
-					class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-				>
-					@for (lang of availableLanguages; track lang.code) {
-						<option [value]="lang.code">{{ lang.flag }} {{ lang.name }}</option>
-					}
-				</select>
-			</div>
-
-			<!-- Language picker and Random data button -->
-			<div class="flex items-center gap-2 pt-4" *ngIf="!production">
-				<!-- Random data button for testing -->
-				<button
-					type="button"
-					(click)="fillRandomData()"
-					class="px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
-					title="Fill form with random data for testing"
-				>
-					🎲 Random
-				</button>
-			</div>
-
-			<div class="mt-8 flex items-center">
-				<div class="flex flex-0 items-center -space-x-1.5">
-					<img
-						class="h-10 w-10 flex-0 rounded-full object-cover ring-4 ring-gray-800 ring-offset-1 ring-offset-gray-800"
-						src="images/avatars/female-18.jpg"
-					/>
-					<img
-						class="h-10 w-10 flex-0 rounded-full object-cover ring-4 ring-gray-800 ring-offset-1 ring-offset-gray-800"
-						src="images/avatars/female-11.jpg"
-					/>
-					<img
-						class="h-10 w-10 flex-0 rounded-full object-cover ring-4 ring-gray-800 ring-offset-1 ring-offset-gray-800"
-						src="images/avatars/male-09.jpg"
-					/>
-					<img
-						class="h-10 w-10 flex-0 rounded-full object-cover ring-4 ring-gray-800 ring-offset-1 ring-offset-gray-800"
-						src="images/avatars/male-16.jpg"
-					/>
-				</div>
-				<div class="ml-4 font-medium tracking-tight text-gray-400">Join the early adopters building the future</div>
-			</div>
-			<!-- Feature highlights -->
-			<div class="mt-8 grid grid-cols-2 gap-4">
-				<div class="flex items-center space-x-3">
-					<div class="flex-shrink-0">
-						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							></path>
-						</svg>
-					</div>
-					<span class="text-sm text-gray-300">Biometric Security</span>
-				</div>
-				<div class="flex items-center space-x-3">
-					<div class="flex-shrink-0">
-						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							></path>
-						</svg>
-					</div>
-					<span class="text-sm text-gray-300">Blockchain Identity</span>
-				</div>
-				<div class="flex items-center space-x-3">
-					<div class="flex-shrink-0">
-						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							></path>
-						</svg>
-					</div>
-					<span class="text-sm text-gray-300">Zero-Knowledge Face Proofs</span>
-				</div>
-				<div class="flex items-center space-x-3">
-					<div class="flex-shrink-0">
-						<svg class="h-5 w-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							></path>
-						</svg>
-					</div>
-					<span class="text-sm text-gray-300">Decentralized Storage</span>
-				</div>
-			</div>
-		</div>
+	<!-- Language Selector (Bottom Right) -->
+	<div class="fixed bottom-6 right-6 z-20">
+		<select
+			[value]="currentLanguage"
+			(change)="onLanguageChange($event.target.value)"
+			class="px-3 py-2 text-sm font-medium text-gray-500 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:bg-white dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer transition-all"
+		>
+			@for (lang of availableLanguages; track lang.code) {
+				<option [value]="lang.code">{{ lang.flag }} {{ lang.name }}</option>
+			}
+		</select>
 	</div>
 </div>
