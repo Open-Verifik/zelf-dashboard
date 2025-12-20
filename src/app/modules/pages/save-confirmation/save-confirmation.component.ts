@@ -12,6 +12,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { DataBiometricsComponent, BiometricData } from "../../auth/biometric-verification/biometric-verification.component";
 import { SaveConfirmationService, SaveConfirmationData } from "../../../core/services/save-confirmation.service";
 import { HttpWrapperService } from "../../../http-wrapper.service";
+import { PasskeyService } from "../../../core/services/passkey.service";
 import { AuthService } from "../../../core/auth/auth.service";
 import { environment } from "../../../../environments/environment";
 import { License } from "../settings/license/license.class";
@@ -39,6 +40,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	// Form data
 	masterPassword: string = "";
 	showPassword: boolean = false;
+	hasPasskey: boolean = false;
 
 	// Modal state
 	showBiometricModal: boolean = false;
@@ -58,7 +60,8 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		private authService: AuthService,
 		private router: Router,
 		private route: ActivatedRoute,
-		private translocoService: TranslocoService
+		private translocoService: TranslocoService,
+		private passkeyService: PasskeyService
 	) {}
 
 	ngOnInit(): void {
@@ -78,6 +81,15 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				this.router.navigate([this.redirectUrl]);
 			}
 		});
+
+		// Check for passkey
+		const email = this.authService.zelfAccount?.publicData?.accountEmail;
+		if (email) {
+			const metadata = this.passkeyService.getPasskeyMetadata(email);
+			if (metadata) {
+				this.hasPasskey = true;
+			}
+		}
 	}
 
 	ngOnDestroy(): void {
@@ -90,6 +102,40 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 */
 	togglePasswordVisibility(): void {
 		this.showPassword = !this.showPassword;
+	}
+
+	/**
+	 * Login with Passkey
+	 */
+	async onPasskeyLogin(): Promise<void> {
+		this.isLoading = true;
+		try {
+			const email = this.authService.zelfAccount?.publicData?.accountEmail;
+			if (!email) throw new Error("No user email found");
+
+			const metadata = this.passkeyService.getPasskeyMetadata(email);
+			if (!metadata) throw new Error("No passkey metadata found");
+
+			// Authenticate with passkey
+			const key = await this.passkeyService.authenticate(metadata.credentialId, this.passkeyService.base64ToBuffer(metadata.salt));
+
+			if (key) {
+				// Decrypt master password
+				const decryptedPassword = await this.passkeyService.decryptPassword(metadata.ciphertext, metadata.iv, key);
+
+				if (decryptedPassword) {
+					this.masterPassword = decryptedPassword;
+					this.isLoading = false;
+					this.proceedToBiometric();
+					return;
+				}
+			}
+			throw new Error("Passkey authentication failed");
+		} catch (error) {
+			console.error("Passkey login error:", error);
+			this.showError("Passkey login failed. Please use your master password.");
+			this.isLoading = false;
+		}
 	}
 
 	/**
@@ -115,7 +161,10 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 */
 	onBiometricSuccess(biometricData: BiometricData): void {
 		this.showBiometricModal = false;
-		this.isLoading = true;
+		// Don't set isLoading here if we came from passkey, as we might already be processing
+		if (!this.isLoading) {
+			this.isLoading = true;
+		}
 
 		if (!this.saveData) {
 			this.showError("No save data available");

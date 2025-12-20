@@ -125,7 +125,8 @@
 		"cancel": "キャンセル",
 		"processing": "処理中...",
 		"continue": "続行",
-		"biometric_verification": "生体認証"
+		"biometric_verification": "生体認証",
+		"biometrics_disabled_debugging": "デバッグのため生体認証が一時的に無効になっています。"
 	},
 	"license": {
 		"title": "ドメイン設定",
@@ -367,7 +368,7 @@
 			"comingSoon": "近日公開",
 			"unknown": "不明"
 		},
-		"chart": {
+		"chartData": {
 			"total": "合計",
 			"allTags": "すべてのタグ",
 			"paidTags": "有料タグ",

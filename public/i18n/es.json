@@ -125,7 +125,8 @@
 		"cancel": "Cancelar",
 		"processing": "Procesando...",
 		"continue": "Continuar",
-		"biometric_verification": "Verificación Biométrica"
+		"biometric_verification": "Verificación Biométrica",
+		"biometrics_disabled_debugging": "Biometría temporalmente deshabilitada para depuración."
 	},
 	"license": {
 		"title": "Configuración de Dominio",
@@ -367,7 +368,7 @@
 			"comingSoon": "próximamente",
 			"unknown": "Desconocido"
 		},
-		"chart": {
+		"chartData": {
 			"total": "Total",
 			"allTags": "Todas las Etiquetas",
 			"paidTags": "Etiquetas Pagadas",

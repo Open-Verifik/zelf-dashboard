@@ -373,27 +373,19 @@ export class AuthSignUpComponent implements OnInit {
 	 * Handle Passkey Save
 	 */
 	onPasskeySave(): void {
-		console.log("🔑 [DEBUG] onPasskeySave called");
-		console.log("🔑 [DEBUG] userData state:", this.userData);
-
 		const email = this.userData.email;
 		const password = this.userData.masterPassword;
 		const countryCode = this.userData.countryCode;
 		const phone = this.userData.phone;
 
-		console.log("🔑 [DEBUG] Extracted values:", { email, hasPassword: !!password, countryCode, phone });
-
 		if (email && password) {
-			console.log("🔑 [DEBUG] Proceeding to register passkey...");
 			// Register using email as the primary credential username
 			this._passkeyService
 				.register(email)
 				.then(async (regResult) => {
-					console.log("🔑 [DEBUG] Register result:", regResult);
 					if (regResult) {
 						try {
 							const encrypted = await this._passkeyService.encryptPassword(password, regResult.key);
-							console.log("🔑 [DEBUG] Password encrypted successfully. Saving metadata...");
 
 							// 1. Save for Email
 							this._passkeyService.savePasskeyMetadata(email, {
@@ -402,7 +394,6 @@ export class AuthSignUpComponent implements OnInit {
 								iv: encrypted.iv,
 								ciphertext: encrypted.ciphertext,
 							});
-							console.log("🔑 [DEBUG] Metadata saved for EMAIL:", email);
 
 							// 2. Save for Phone (if available)
 							if (countryCode && phone) {
@@ -413,12 +404,10 @@ export class AuthSignUpComponent implements OnInit {
 									iv: encrypted.iv,
 									ciphertext: encrypted.ciphertext,
 								});
-								console.log("🔑 [DEBUG] Metadata saved for PHONE:", phoneIdentifier);
 							}
 
 							// Verify storage
 							const check = localStorage.getItem("zelf_passkeys");
-							console.log("🔑 [DEBUG] Final localStorage 'zelf_passkeys' check:", check);
 						} catch (err) {
 							console.error("❌ [DEBUG] Error encrypting/saving passkey:", err);
 						}

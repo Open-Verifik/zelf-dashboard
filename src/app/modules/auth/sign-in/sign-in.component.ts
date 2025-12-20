@@ -214,7 +214,10 @@ export class AuthSignInComponent implements OnInit {
 				const password = await this._passkeyService.decryptPassword(metadata.ciphertext, metadata.iv, key);
 
 				// Fill form and submit
-				this.signInForm.patchValue({ masterPassword: password });
+				this.signInForm.patchValue({
+					masterPassword: password,
+					rememberMe: true,
+				});
 				this.signIn();
 			}
 		} catch (error) {

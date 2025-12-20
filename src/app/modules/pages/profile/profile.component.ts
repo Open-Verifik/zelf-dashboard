@@ -8,8 +8,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
-import { RouterLink, Router } from "@angular/router";
-import { FuseCardComponent } from "@fuse/components/card";
+import { Router } from "@angular/router";
 import { AuthService } from "app/core/auth/auth.service";
 import { CommonModule } from "@angular/common";
 import { ZelfUser } from "app/core/user/user.types";
@@ -18,6 +17,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { SaveConfirmationService, SaveConfirmationData } from "app/core/services/save-confirmation.service";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
 
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+
 @Component({
 	selector: "profile",
 	templateUrl: "./profile.component.html",
@@ -25,14 +26,13 @@ import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
-		RouterLink,
-		FuseCardComponent,
 		MatIconModule,
 		MatButtonModule,
 		MatMenuModule,
 		MatFormFieldModule,
 		MatInputModule,
 		MatSelectModule,
+		MatProgressSpinnerModule,
 		TextFieldModule,
 		MatDividerModule,
 		MatTooltipModule,

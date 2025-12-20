@@ -1,727 +1,757 @@
-<div class="w-full max-w-6xl" *transloco="let t">
-	<!-- Alert Messages -->
-	<div
-		*ngIf="showAlert"
-		class="mb-6 p-4 rounded-lg"
-		[ngClass]="{
-			'bg-green-100 text-green-800 border border-green-200': alertType === 'success',
-			'bg-red-100 text-red-800 border border-red-200': alertType === 'error',
-		}"
-	>
-		<div class="flex items-center">
-			<mat-icon
-				class="mr-2"
-				[ngClass]="{
-					'text-green-600': alertType === 'success',
-					'text-red-600': alertType === 'error',
-				}"
-			>
-				{{ alertType === "success" ? "check_circle" : "error" }}
-			</mat-icon>
-			<span>{{ alertMessage }}</span>
-		</div>
-	</div>
-
-	<!-- Form -->
-	<form [formGroup]="accountForm">
-		<!-- Domain Configuration Header -->
-		<div class="mb-8">
-			<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ t("license.title") }}</h1>
-			<p class="text-gray-600 dark:text-gray-300">{{ t("license.subtitle") }}</p>
-		</div>
-
-		<!-- Field Restrictions Information -->
-		<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
-			<div class="flex items-start">
-				<mat-icon class="text-blue-600 dark:text-blue-400 mr-3 mt-0.5">info</mat-icon>
-				<div>
-					<h3 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">Field Restrictions</h3>
-					<div class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-						<p><strong>Editable:</strong> Domain name, validation rules, payment settings, pricing, storage options, and metadata</p>
-						<p>
-							<strong>Read-only:</strong> Start/end dates, status, limits (managed by subscription), Stripe data (managed by webhooks)
-						</p>
-						<p><strong>Supported Currencies:</strong> BTC, ETH, SOL, USDC, USDT, BDAG, AVAX, ZNS</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Basic Information -->
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-			<div class="flex items-center mb-4">
-				<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">info</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.basic_information.title") }}</h2>
-			</div>
-
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.domain_name") }}</mat-label>
-						<span matPrefix>{{ t("license.basic_information.domain_prefix") }}</span>
-						<input [formControlName]="'domain'" matInput [placeholder]="t('license.basic_information.domain_placeholder')" />
-						<mat-error *ngIf="accountForm.get('domain')?.hasError('required')">
-							{{ t("license.basic_information.domain_required") }}
-						</mat-error>
-						<mat-error *ngIf="accountForm.get('domain')?.hasError('pattern')">
-							{{ t("license.basic_information.domain_pattern_error") }}
-						</mat-error>
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.status") }}</mat-label>
-						<input [formControlName]="'status'" matInput readonly />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.owner") }}</mat-label>
-						<input [formControlName]="'owner'" matInput [placeholder]="t('license.basic_information.owner_placeholder')" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.start_date") }}</mat-label>
-						<input [formControlName]="'startDate'" matInput type="date" readonly />
-						<mat-hint class="text-orange-600 dark:text-orange-400">
-							<mat-icon class="text-sm mr-1">info</mat-icon>
-							System-managed field
-						</mat-hint>
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.end_date") }}</mat-label>
-						<input [formControlName]="'endDate'" matInput type="date" readonly />
-						<mat-hint class="text-orange-600 dark:text-orange-400">
-							<mat-icon class="text-sm mr-1">info</mat-icon>
-							System-managed field
-						</mat-hint>
-					</mat-form-field>
-				</div>
-
-				<div class="md:col-span-2">
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.basic_information.description") }}</mat-label>
-						<textarea
-							[formControlName]="'description'"
-							matInput
-							[placeholder]="t('license.basic_information.description_placeholder')"
-							rows="3"
-						></textarea>
-					</mat-form-field>
-				</div>
-			</div>
-		</div>
-
-		<!-- Features Configuration -->
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-			<div class="flex items-center mb-4">
-				<mat-icon class="text-green-600 dark:text-green-400 mr-2">extension</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.features.title") }}</h2>
-			</div>
-
-			<div class="space-y-4">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-						<div class="flex items-center justify-between mb-2">
-							<h3 class="font-medium text-gray-900 dark:text-white">{{ t("license.features.zns_title") }}</h3>
-							<mat-slide-toggle [formControlName]="'znsEnabled'"></mat-slide-toggle>
-						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.features.zns_description") }}</p>
-					</div>
-
-					<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-						<div class="flex items-center justify-between mb-2">
-							<h3 class="font-medium text-gray-900 dark:text-white">{{ t("license.features.zelfkeys_title") }}</h3>
-							<mat-slide-toggle [formControlName]="'zelfkeysEnabled'"></mat-slide-toggle>
-						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.features.zelfkeys_description") }}</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- ZNS Configuration - Only show when ZNS is enabled -->
-		<div *ngIf="accountForm.get('znsEnabled')?.value" class="mb-6 transition-all duration-300 ease-in-out">
-			<!-- ZNS Header -->
-			<div class="flex items-center mb-6">
-				<mat-icon class="text-blue-600 dark:text-blue-400 mr-3 text-2xl">dns</mat-icon>
-				<div>
-					<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.features.zns_title") }}</h2>
-					<p class="text-sm text-gray-600 dark:text-gray-400">{{ t("license.features.zns_description") }}</p>
-				</div>
+<div class="flex flex-col min-h-screen bg-gray-50/50 dark:bg-gray-900 w-full" *transloco="let t">
+	<!-- Main Content Container -->
+	<div class="flex-auto px-4 py-8 sm:px-6 sm:py-12 md:px-8 w-full max-w-4xl mx-auto">
+		<!-- Alert Messages -->
+		@if (showAlert) {
+			<div class="mb-6 animate-fade-in">
 				<div
-					class="ml-auto px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-sm font-medium rounded-full border border-green-200 dark:border-green-700"
+					class="flex items-center justify-between p-4 rounded-2xl shadow-sm border transaction-all duration-300"
+					[class]="
+						alertType === 'success'
+							? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
+							: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+					"
 				>
-					{{ t("license.features.zns_enabled") }}
+					<div class="flex items-center gap-3">
+						<div
+							class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+							[class]="
+								alertType === 'success'
+									? 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200'
+									: 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-200'
+							"
+						>
+							<mat-icon class="icon-size-5">{{ alertType === "success" ? "check" : "priority_high" }}</mat-icon>
+						</div>
+						<span class="font-medium text-sm">{{ alertMessage }}</span>
+					</div>
+				</div>
+			</div>
+		}
+
+		<form [formGroup]="accountForm">
+			<!-- Field Restrictions Information -->
+			<div class="mb-8 p-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-2xl flex items-start gap-4">
+				<mat-icon class="icon-size-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0">info</mat-icon>
+				<div class="text-sm text-blue-900 dark:text-blue-200">
+					<h3 class="font-semibold mb-1">Field Restrictions</h3>
+					<div class="opacity-90 space-y-1">
+						<p><span class="font-medium">Editable:</span> Domain name, rules, payments, pricing, storage, metadata</p>
+						<p><span class="font-medium">Read-only:</span> Dates, status, limits, Stripe data</p>
+						<p><span class="font-medium">Currencies:</span> BTC, ETH, SOL, USDC, USDT, BDAG, AVAX, ZNS</p>
+					</div>
 				</div>
 			</div>
 
-			<!-- ZNS Cards Container with Indentation -->
-			<div class="ml-6 space-y-4">
-				<!-- Validation Rules Card -->
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-orange-200 dark:border-orange-700 p-6">
-					<div class="flex items-center mb-4">
-						<mat-icon class="text-orange-600 dark:text-orange-400 mr-2">rule</mat-icon>
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.validation_rules.title") }}</h3>
-					</div>
-
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-						<div>
-							<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-								<mat-label>{{ t("license.validation_rules.min_length") }}</mat-label>
-								<input
-									[formControlName]="'minLength'"
-									matInput
-									type="number"
-									[placeholder]="t('license.validation_rules.min_length_placeholder')"
-								/>
-							</mat-form-field>
+			<!-- Basic Information Card -->
+			<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+				<div class="p-8 sm:p-10">
+					<div class="flex items-center gap-3 mb-6">
+						<div
+							class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400"
+						>
+							<mat-icon class="icon-size-5">info</mat-icon>
 						</div>
-
 						<div>
-							<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-								<mat-label>{{ t("license.validation_rules.max_length") }}</mat-label>
-								<input
-									[formControlName]="'maxLength'"
-									matInput
-									type="number"
-									min="1"
-									max="27"
-									[placeholder]="t('license.validation_rules.max_length_placeholder')"
-								/>
-								<mat-hint align="end">{{ t("license.validation_rules.max_length_hint") }}</mat-hint>
-								<mat-error *ngIf="accountForm.get('maxLength')?.hasError('max')">
-									{{ t("license.validation_rules.max_length_error") }}
-								</mat-error>
-							</mat-form-field>
-						</div>
-
-						<div>
-							<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-								<mat-label>{{ t("license.validation_rules.hold_suffix") }}</mat-label>
-								<input
-									[formControlName]="'holdSuffix'"
-									matInput
-									[placeholder]="t('license.validation_rules.hold_suffix_placeholder')"
-								/>
-							</mat-form-field>
+							<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.basic_information.title") }}</h2>
+							<p class="text-sm text-gray-500 dark:text-gray-400">General domain settings</p>
 						</div>
 					</div>
 
-					<!-- Reserved Words -->
-					<div class="mt-6">
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{
-							t("license.validation_rules.reserved_words")
-						}}</label>
-						<div class="flex flex-wrap gap-2">
-							<span
-								*ngFor="let word of reservedWords"
-								class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<!-- Domain Name -->
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.basic_information.domain_name")
+							}}</label>
+							<div
+								class="flex items-center w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 focus-within:border-gray-400 dark:focus-within:border-gray-500 focus-within:ring-4 focus-within:ring-gray-100 dark:focus-within:ring-gray-800 transition-all"
 							>
-								{{ word }}
-								<button
-									type="button"
-									(click)="removeReservedWord(word)"
-									class="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
-								>
-									<mat-icon class="text-sm">close</mat-icon>
-								</button>
-							</span>
-							<div class="flex items-center">
+								<span class="text-gray-500 font-medium select-none text-base">johndoe</span>
+								<span class="text-gray-400 dark:text-gray-500 font-medium select-none mx-0.5">.</span>
 								<input
-									#newReservedWord
-									type="text"
-									[placeholder]="t('license.validation_rules.add_reserved_word')"
-									class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-									(keyup.enter)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
+									[formControlName]="'domain'"
+									class="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white py-3 font-semibold text-base placeholder-gray-400"
+									[placeholder]="t('license.basic_information.domain_placeholder')"
 								/>
-								<button
-									type="button"
-									(click)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
-									class="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+							</div>
+							<div class="h-4 pl-1">
+								<span
+									*ngIf="accountForm.get('domain')?.hasError('required') && accountForm.get('domain')?.touched"
+									class="text-xs text-red-500 font-medium"
 								>
-									<mat-icon class="text-sm">add</mat-icon>
-								</button>
+									{{ t("license.basic_information.domain_required") }}
+								</span>
+								<span
+									*ngIf="accountForm.get('domain')?.hasError('pattern') && accountForm.get('domain')?.touched"
+									class="text-xs text-red-500 font-medium"
+								>
+									{{ t("license.basic_information.domain_pattern_error") }}
+								</span>
 							</div>
 						</div>
-					</div>
 
-					<!-- Inappropriate Words Filter -->
-					<div class="mt-4">
-						<div class="flex items-center mb-2">
-							<mat-icon class="text-red-600 dark:text-red-400 mr-2">block</mat-icon>
-							<label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{
-								t("license.validation_rules.content_filter")
+						<!-- Status -->
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.basic_information.status")
 							}}</label>
-							<mat-slide-toggle [formControlName]="'contentFilterEnabled'" class="ml-2"></mat-slide-toggle>
+							<input
+								[formControlName]="'status'"
+								readonly
+								class="w-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 cursor-not-allowed font-medium uppercase"
+							/>
 						</div>
-						<p class="text-sm text-gray-600 dark:text-gray-300">
-							{{ t("license.validation_rules.content_filter_description") }}
-						</p>
+
+						<!-- Owner -->
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.basic_information.owner")
+							}}</label>
+							<input
+								[formControlName]="'owner'"
+								class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium"
+								[placeholder]="t('license.basic_information.owner_placeholder')"
+							/>
+						</div>
+
+						<!-- Dates -->
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between">
+								{{ t("license.basic_information.start_date") }}
+								<span class="text-xs font-normal text-orange-500 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full"
+									>System</span
+								>
+							</label>
+							<input
+								[formControlName]="'startDate'"
+								type="date"
+								readonly
+								class="w-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 cursor-not-allowed font-medium"
+							/>
+						</div>
+
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1 flex items-center justify-between">
+								{{ t("license.basic_information.end_date") }}
+								<span class="text-xs font-normal text-orange-500 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full"
+									>System</span
+								>
+							</label>
+							<input
+								[formControlName]="'endDate'"
+								type="date"
+								readonly
+								class="w-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 cursor-not-allowed font-medium"
+							/>
+						</div>
+
+						<!-- Description -->
+						<div class="md:col-span-2 space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.basic_information.description")
+							}}</label>
+							<textarea
+								[formControlName]="'description'"
+								rows="3"
+								class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium resize-none"
+								[placeholder]="t('license.basic_information.description_placeholder')"
+							></textarea>
+						</div>
 					</div>
 				</div>
+			</div>
 
-				<!-- Payment Configuration Card -->
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-orange-200 dark:border-orange-700 p-6">
-					<div class="flex items-center mb-4">
-						<mat-icon class="text-green-600 dark:text-green-400 mr-2">payment</mat-icon>
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.payment_settings.title") }}</h3>
+			<!-- Features Configuration -->
+			<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+				<div class="p-8 sm:p-10">
+					<div class="flex items-center gap-3 mb-6">
+						<div
+							class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400"
+						>
+							<mat-icon class="icon-size-5">extension</mat-icon>
+						</div>
+						<div>
+							<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.features.title") }}</h2>
+							<p class="text-sm text-gray-500 dark:text-gray-400">Enable services</p>
+						</div>
 					</div>
 
-					<div class="space-y-6">
-						<!-- Payment Methods -->
-						<div>
-							<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{
-								t("license.payment_settings.payment_methods")
-							}}</label>
-							<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-								<div class="flex items-center" *ngFor="let method of ['coinbase', 'crypto', 'stripe', 'paypal']">
-									<mat-checkbox [checked]="isPaymentMethodEnabled(method)" (change)="togglePaymentMethod(method)"></mat-checkbox>
-									<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ method | titlecase }}</span>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<!-- ZNS Toggle -->
+						<div
+							class="flex items-center justify-between p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all cursor-pointer"
+							(click)="accountForm.get('znsEnabled')?.setValue(!accountForm.get('znsEnabled')?.value)"
+						>
+							<div>
+								<h3 class="font-semibold text-gray-900 dark:text-white">{{ t("license.features.zns_title") }}</h3>
+								<p class="text-sm text-gray-500 dark:text-gray-400">{{ t("license.features.zns_description") }}</p>
+							</div>
+							<mat-slide-toggle [formControlName]="'znsEnabled'" (click)="$event.stopPropagation()"></mat-slide-toggle>
+						</div>
+
+						<!-- ZelfKeys Toggle -->
+						<div
+							class="flex items-center justify-between p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all cursor-pointer"
+							(click)="accountForm.get('zelfkeysEnabled')?.setValue(!accountForm.get('zelfkeysEnabled')?.value)"
+						>
+							<div>
+								<h3 class="font-semibold text-gray-900 dark:text-white">{{ t("license.features.zelfkeys_title") }}</h3>
+								<p class="text-sm text-gray-500 dark:text-gray-400">{{ t("license.features.zelfkeys_description") }}</p>
+							</div>
+							<mat-slide-toggle [formControlName]="'zelfkeysEnabled'" (click)="$event.stopPropagation()"></mat-slide-toggle>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ZNS Configuration -->
+			@if (accountForm.get("znsEnabled")?.value) {
+				<div class="mb-8 animate-fade-in pl-4 border-l-2 border-green-500">
+					<div class="flex items-center gap-3 mb-6">
+						<span
+							class="px-4 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-bold border border-green-200 dark:border-green-800 flex items-center gap-2 shadow-sm"
+						>
+							<mat-icon class="icon-size-4">dns</mat-icon>
+							Zelf Name Service
+						</span>
+						<div class="h-px bg-green-200 dark:bg-green-800/50 flex-1"></div>
+					</div>
+
+					<!-- Validation Rules Card -->
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<div class="flex items-center gap-3 mb-6">
+								<div
+									class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400"
+								>
+									<mat-icon class="icon-size-5">rule</mat-icon>
+								</div>
+								<div>
+									<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.validation_rules.title") }}</h2>
+									<p class="text-sm text-gray-500 dark:text-gray-400">Rules for subdomains</p>
 								</div>
 							</div>
-							<div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-								Selected methods: {{ getPaymentMethods().join(", ") || "None" }}
-							</div>
-						</div>
 
-						<!-- Supported Networks -->
-						<div>
-							<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"> Supported Networks </label>
-							<networks-config [networksFormGroup]="networksFormGroup"></networks-config>
-						</div>
-
-						<!-- Whitelist Configuration -->
-						<div>
-							<div class="flex items-center justify-between mb-4">
-								<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-									{{ t("license.payment_settings.whitelist_title") }}
-								</h4>
-								<button
-									type="button"
-									(click)="addWhitelistItem()"
-									class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-								>
-									<mat-icon class="text-sm mr-1">add</mat-icon>
-									{{ t("license.payment_settings.add_item") }}
-								</button>
-							</div>
-
-							<div *ngIf="whitelistItems.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
-								<mat-icon class="text-4xl mb-2">inbox</mat-icon>
-								<p>{{ t("license.payment_settings.no_items") }}</p>
-							</div>
-
-							<div *ngIf="whitelistItems.length > 0" class="space-y-3">
-								<div
-									*ngFor="let item of whitelistItems; let i = index"
-									class="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg"
-								>
-									<div class="flex-1">
-										<input
-											[(ngModel)]="item.domain"
-											[ngModelOptions]="{ standalone: true }"
-											[placeholder]="t('license.payment_settings.tag_name')"
-											class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-										/>
+							<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+										t("license.validation_rules.min_length")
+									}}</label>
+									<input
+										[formControlName]="'minLength'"
+										type="number"
+										class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+										[placeholder]="t('license.validation_rules.min_length_placeholder')"
+									/>
+								</div>
+								<div class="space-y-1.5">
+									<div class="flex justify-between">
+										<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+											t("license.validation_rules.max_length")
+										}}</label>
+										<span class="text-xs text-gray-400">{{ t("license.validation_rules.max_length_hint") }}</span>
 									</div>
-									<div class="flex-1">
-										<input
-											[(ngModel)]="item.discount"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											[placeholder]="t('license.payment_settings.discount')"
-											class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-										/>
-									</div>
-									<div class="flex-1">
-										<select
-											[(ngModel)]="item.type"
-											[ngModelOptions]="{ standalone: true }"
-											class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+									<input
+										[formControlName]="'maxLength'"
+										type="number"
+										min="1"
+										max="27"
+										class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+										[placeholder]="t('license.validation_rules.max_length_placeholder')"
+									/>
+									<span *ngIf="accountForm.get('maxLength')?.hasError('max')" class="text-xs text-red-500 pl-1 block mb-1">
+										{{ t("license.validation_rules.max_length_error") }}
+									</span>
+								</div>
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+										t("license.validation_rules.hold_suffix")
+									}}</label>
+									<input
+										[formControlName]="'holdSuffix'"
+										class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+										[placeholder]="t('license.validation_rules.hold_suffix_placeholder')"
+									/>
+								</div>
+							</div>
+
+							<!-- Reserved Words -->
+							<div class="mb-8">
+								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 ml-1">{{
+									t("license.validation_rules.reserved_words")
+								}}</label>
+								<div class="flex flex-wrap gap-2 mb-3">
+									<span
+										*ngFor="let word of reservedWords"
+										class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800"
+									>
+										{{ word }}
+										<button
+											type="button"
+											(click)="removeReservedWord(word)"
+											class="ml-2 text-red-400 hover:text-red-600 transition-colors"
 										>
-											<option value="percentage">{{ t("license.payment_settings.percentage") }}</option>
-											<option value="fixed">{{ t("license.payment_settings.fixed_amount") }}</option>
-										</select>
-									</div>
+											<mat-icon class="icon-size-4">close</mat-icon>
+										</button>
+									</span>
+								</div>
+								<div class="flex items-center gap-2 max-w-sm">
+									<input
+										#newReservedWord
+										type="text"
+										[placeholder]="t('license.validation_rules.add_reserved_word')"
+										class="flex-1 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+										(keyup.enter)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
+									/>
 									<button
 										type="button"
-										(click)="removeWhitelistItem(i)"
-										class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+										(click)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
+										class="p-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
 									>
-										<mat-icon class="text-sm">delete</mat-icon>
+										<mat-icon class="icon-size-5">add</mat-icon>
 									</button>
 								</div>
 							</div>
 
-							<div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-								<p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-									{{ t("license.payment_settings.examples") }}
-								</p>
-								<p class="text-sm text-gray-600 dark:text-gray-400">{{ t("license.payment_settings.example_1") }}</p>
-								<p class="text-sm text-gray-600 dark:text-gray-400">{{ t("license.payment_settings.example_2") }}</p>
+							<!-- Content Filter -->
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-800/30"
+							>
+								<div class="flex items-center gap-3 mb-2 sm:mb-0">
+									<mat-icon class="text-red-500 icon-size-5">block</mat-icon>
+									<div>
+										<h4 class="font-semibold text-gray-900 dark:text-white">
+											{{ t("license.validation_rules.content_filter") }}
+										</h4>
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											{{ t("license.validation_rules.content_filter_description") }}
+										</p>
+									</div>
+								</div>
+								<mat-slide-toggle [formControlName]="'contentFilterEnabled'" [color]="'warn'"></mat-slide-toggle>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<!-- Pricing Table Card -->
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-orange-200 dark:border-orange-700 p-6">
-					<div class="flex items-center justify-between mb-4">
-						<div class="flex items-center">
-							<mat-icon class="text-purple-600 dark:text-purple-400 mr-2">table_chart</mat-icon>
-							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.pricing_table.title") }}</h3>
-						</div>
-						<button
-							type="button"
-							(click)="resetPricingTable()"
-							class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-						>
-							<mat-icon class="text-sm mr-1">refresh</mat-icon>
-							{{ t("license.pricing_table.reset_default") }}
-						</button>
-					</div>
-
-					<div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-						<p class="text-sm text-blue-700 dark:text-blue-300">{{ t("license.pricing_table.description") }}</p>
-					</div>
-
-					<div class="overflow-x-auto">
-						<table class="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg">
-							<thead class="bg-gray-50 dark:bg-gray-800">
-								<tr>
-									<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.length") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.one_year") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.two_years") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.three_years") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.four_years") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.five_years") }}
-									</th>
-									<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-										{{ t("license.pricing_table.lifetime") }}
-									</th>
-								</tr>
-							</thead>
-							<tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-								<tr *ngFor="let row of pricingTableRows; let i = index">
-									<td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ row.length }}</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.oneYear"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.twoYears"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.threeYears"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.fourYears"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.fiveYears"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-									<td class="px-4 py-3 text-center">
-										<input
-											[(ngModel)]="row.lifetime"
-											[ngModelOptions]="{ standalone: true }"
-											type="number"
-											class="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-										/>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-
-					<div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-						<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-							{{ t("license.pricing_table.pricing_info") }}
-						</h4>
-						<ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-							<li>{{ t("license.pricing_table.pricing_info_1") }}</li>
-							<li>{{ t("license.pricing_table.pricing_info_2") }}</li>
-							<li>{{ t("license.pricing_table.pricing_info_3") }}</li>
-							<li>{{ t("license.pricing_table.pricing_info_4") }}</li>
-						</ul>
-					</div>
-				</div>
-
-				<!-- ZNS Storage Options Card -->
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-orange-200 dark:border-orange-700 p-6">
-					<div class="flex items-center mb-4">
-						<mat-icon class="text-purple-600 dark:text-purple-400 mr-2">storage</mat-icon>
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.storage_options.title") }} (ZNS)</h3>
-					</div>
-
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="space-y-4">
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">cloud</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.ipfs_title") }}
-										</h3>
-									</div>
-									<mat-slide-toggle [formControlName]="'ipfsEnabled'"></mat-slide-toggle>
+					<!-- Payment Configuration -->
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<div class="flex items-center gap-3 mb-6">
+								<div
+									class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400"
+								>
+									<mat-icon class="icon-size-5">payment</mat-icon>
 								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.storage_options.ipfs_description") }}</p>
+								<div>
+									<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.payment_settings.title") }}</h2>
+									<p class="text-sm text-gray-500 dark:text-gray-400">Methods and whitelisting</p>
+								</div>
 							</div>
 
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-green-600 dark:text-green-400 mr-2">archive</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.arweave_title") }}
-										</h3>
+							<div class="space-y-8">
+								<!-- Payment Methods -->
+								<div>
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1 block mb-3">{{
+										t("license.payment_settings.payment_methods")
+									}}</label>
+									<div class="flex flex-wrap gap-4">
+										<div
+											*ngFor="let method of ['coinbase', 'crypto', 'stripe', 'paypal']"
+											class="flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+											(click)="togglePaymentMethod(method)"
+										>
+											<mat-checkbox
+												[checked]="isPaymentMethodEnabled(method)"
+												(click)="$event.stopPropagation()"
+												(change)="togglePaymentMethod(method)"
+												color="primary"
+											></mat-checkbox>
+											<span class="ml-2 font-medium text-gray-700 dark:text-gray-300 capitalize">{{ method }}</span>
+										</div>
 									</div>
-									<mat-slide-toggle [formControlName]="'arweaveEnabled'"></mat-slide-toggle>
 								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">
-									{{ t("license.storage_options.arweave_description") }}
-								</p>
-							</div>
 
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-orange-600 dark:text-orange-400 mr-2">pets</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.walrus_title") }}
-										</h3>
-									</div>
-									<mat-slide-toggle [formControlName]="'walrusEnabled'"></mat-slide-toggle>
+								<div class="h-px bg-gray-100 dark:bg-gray-700"></div>
+
+								<!-- Networks -->
+								<div>
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1 block mb-3"> Supported Networks </label>
+									<networks-config [networksFormGroup]="networksFormGroup"></networks-config>
 								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.storage_options.walrus_description") }}</p>
+
+								<div class="h-px bg-gray-100 dark:bg-gray-700"></div>
+
+								<!-- Whitelist -->
+								<div>
+									<div class="flex items-center justify-between mb-4">
+										<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">
+											{{ t("license.payment_settings.whitelist_title") }}
+										</label>
+										<button
+											type="button"
+											(click)="addWhitelistItem()"
+											class="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+										>
+											+ {{ t("license.payment_settings.add_item") }}
+										</button>
+									</div>
+
+									@if (whitelistItems.length === 0) {
+										<div
+											class="text-center py-8 bg-gray-50/50 dark:bg-gray-900/30 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700"
+										>
+											<mat-icon class="text-gray-400 icon-size-8 mb-2">inbox</mat-icon>
+											<p class="text-gray-500 text-sm">{{ t("license.payment_settings.no_items") }}</p>
+										</div>
+									} @else {
+										<div class="space-y-3">
+											<div
+												*ngFor="let item of whitelistItems; let i = index"
+												class="flex flex-col sm:flex-row gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700"
+											>
+												<input
+													[(ngModel)]="item.domain"
+													[ngModelOptions]="{ standalone: true }"
+													[placeholder]="t('license.payment_settings.tag_name')"
+													class="flex-[2] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+												/>
+												<div class="flex gap-3 flex-[2]">
+													<input
+														[(ngModel)]="item.discount"
+														[ngModelOptions]="{ standalone: true }"
+														type="number"
+														[placeholder]="t('license.payment_settings.discount')"
+														class="flex-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+													/>
+													<select
+														[(ngModel)]="item.type"
+														[ngModelOptions]="{ standalone: true }"
+														class="flex-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+													>
+														<option value="percentage">%</option>
+														<option value="fixed">$</option>
+													</select>
+												</div>
+												<button
+													type="button"
+													(click)="removeWhitelistItem(i)"
+													class="p-2 sm:p-0 text-red-500 hover:text-red-700 flex items-center justify-center bg-white sm:bg-transparent rounded-lg border sm:border-0 border-gray-200"
+												>
+													<mat-icon class="icon-size-5">delete</mat-icon>
+												</button>
+											</div>
+										</div>
+									}
+								</div>
 							</div>
 						</div>
+					</div>
 
-						<div class="space-y-4">
-							<div>
-								<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-									<mat-label>{{ t("license.storage_options.key_prefix") }}</mat-label>
+					<!-- Pricing Table -->
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<div class="flex items-center justify-between mb-6">
+								<div class="flex items-center gap-3">
+									<div
+										class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400"
+									>
+										<mat-icon class="icon-size-5">table_chart</mat-icon>
+									</div>
+									<div>
+										<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.pricing_table.title") }}</h2>
+										<p class="text-sm text-gray-500 dark:text-gray-400">Pricing structure</p>
+									</div>
+								</div>
+								<button
+									type="button"
+									(click)="resetPricingTable()"
+									class="text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+								>
+									<mat-icon class="icon-size-4">refresh</mat-icon>
+									{{ t("license.pricing_table.reset_default") }}
+								</button>
+							</div>
+
+							<div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+								<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+									<thead class="bg-gray-50 dark:bg-gray-900/50">
+										<tr>
+											<th
+												class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 dark:bg-gray-900/50 z-10"
+											>
+												{{ t("license.pricing_table.length") }}
+											</th>
+											<th
+												*ngFor="let year of ['one', 'two', 'three', 'four', 'five']"
+												class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+											>
+												{{ t("license.pricing_table." + year + "_years") | slice: 0 : 1 }} Year
+											</th>
+											<th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Life</th>
+										</tr>
+									</thead>
+									<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+										<tr *ngFor="let row of pricingTableRows">
+											<td
+												class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-white bg-gray-50/50 dark:bg-gray-900/20 sticky left-0 z-10"
+											>
+												{{ row.length }}
+											</td>
+											<td
+												class="px-2 py-2 text-center"
+												*ngFor="let col of ['oneYear', 'twoYears', 'threeYears', 'fourYears', 'fiveYears', 'lifetime']"
+											>
+												<input
+													[(ngModel)]="row[col]"
+													[ngModelOptions]="{ standalone: true }"
+													type="number"
+													class="w-16 px-1.5 py-1 text-sm text-center border border-gray-300 dark:border-gray-600 rounded-md bg-transparent focus:ring-1 focus:ring-purple-500 outline-none"
+												/>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<!-- Storage Options (ZNS) -->
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<div class="flex items-center gap-3 mb-6">
+								<div
+									class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400"
+								>
+									<mat-icon class="icon-size-5">storage</mat-icon>
+								</div>
+								<div>
+									<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.storage_options.title") }} (ZNS)</h2>
+									<p class="text-sm text-gray-500 dark:text-gray-400">Decentralized storage</p>
+								</div>
+							</div>
+
+							<div class="space-y-6">
+								<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+									<!-- IPFS -->
+									<div
+										class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors"
+									>
+										<div class="flex items-center justify-between mb-2">
+											<div class="flex items-center gap-2">
+												<mat-icon class="icon-size-5 text-blue-500">cloud</mat-icon>
+												<span class="font-medium text-gray-900 dark:text-white">{{
+													t("license.storage_options.ipfs_title")
+												}}</span>
+											</div>
+											<mat-slide-toggle [formControlName]="'ipfsEnabled'"></mat-slide-toggle>
+										</div>
+										<p class="text-xs text-gray-500">{{ t("license.storage_options.ipfs_description") }}</p>
+									</div>
+
+									<!-- Arweave -->
+									<div
+										class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors"
+									>
+										<div class="flex items-center justify-between mb-2">
+											<div class="flex items-center gap-2">
+												<mat-icon class="icon-size-5 text-green-500">archive</mat-icon>
+												<span class="font-medium text-gray-900 dark:text-white">Arweave</span>
+											</div>
+											<mat-slide-toggle [formControlName]="'arweaveEnabled'"></mat-slide-toggle>
+										</div>
+										<p class="text-xs text-gray-500">{{ t("license.storage_options.arweave_description") }}</p>
+									</div>
+
+									<!-- Walrus -->
+									<div
+										class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors"
+									>
+										<div class="flex items-center justify-between mb-2">
+											<div class="flex items-center gap-2">
+												<mat-icon class="icon-size-5 text-orange-500">pets</mat-icon>
+												<span class="font-medium text-gray-900 dark:text-white">Walrus</span>
+											</div>
+											<mat-slide-toggle [formControlName]="'walrusEnabled'"></mat-slide-toggle>
+										</div>
+										<p class="text-xs text-gray-500">{{ t("license.storage_options.walrus_description") }}</p>
+									</div>
+								</div>
+
+								<div class="space-y-1.5 max-w-md">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+										t("license.storage_options.key_prefix")
+									}}</label>
 									<input
 										[formControlName]="'keyPrefix'"
-										matInput
+										class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
 										[placeholder]="t('license.storage_options.key_prefix_placeholder')"
 									/>
-								</mat-form-field>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
+			}
 
-		<!-- ZelfKeys Configuration - Only show when ZelfKeys is enabled -->
-		<div *ngIf="accountForm.get('zelfkeysEnabled')?.value" class="mb-6 transition-all duration-300 ease-in-out">
-			<!-- ZelfKeys Header -->
-			<div class="flex items-center mb-6">
-				<mat-icon class="text-blue-600 dark:text-blue-400 mr-3 text-2xl">vpn_key</mat-icon>
-				<div>
-					<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.features.zelfkeys_title") }}</h2>
-					<p class="text-sm text-gray-600 dark:text-gray-400">{{ t("license.features.zelfkeys_description") }}</p>
-				</div>
-				<div
-					class="ml-auto px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-sm font-medium rounded-full border border-green-200 dark:border-green-700"
-				>
-					{{ t("license.features.zelfkeys_enabled") }}
-				</div>
-			</div>
+			<!-- ZelfKeys Storage (Simplified for brevity, similar structure to ZNS) -->
+			@if (accountForm.get("zelfkeysEnabled")?.value) {
+				<div class="mb-8 animate-fade-in pl-4 border-l-2 border-blue-500">
+					<div class="flex items-center gap-3 mb-6">
+						<span
+							class="px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-bold border border-blue-200 dark:border-blue-800 flex items-center gap-2 shadow-sm"
+						>
+							<mat-icon class="icon-size-4">vpn_key</mat-icon>
+							ZelfKeys
+						</span>
+						<div class="h-px bg-blue-200 dark:bg-blue-800/50 flex-1"></div>
+					</div>
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<div class="flex items-center gap-3 mb-6">
+								<div
+									class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400"
+								>
+									<mat-icon class="icon-size-5">vpn_key</mat-icon>
+								</div>
+								<div>
+									<h2 class="text-xl font-bold text-gray-900 dark:text-white">
+										{{ t("license.storage_options.title") }} (ZelfKeys)
+									</h2>
+									<p class="text-sm text-gray-500 dark:text-gray-400">Key storage settings</p>
+								</div>
+							</div>
 
-			<!-- ZelfKeys Cards Container with Indentation -->
-			<div class="ml-6 space-y-4">
-				<!-- ZelfKeys Storage Options Card -->
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-blue-200 dark:border-blue-700 p-6">
-					<div class="flex items-center mb-4">
-						<mat-icon class="text-purple-600 dark:text-purple-400 mr-2">storage</mat-icon>
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.storage_options.title") }} (ZelfKeys)</h3>
+							<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+								<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20">
+									<div class="flex justify-between items-center mb-2">
+										<span class="font-medium text-gray-900 dark:text-white">IPFS</span>
+										<mat-slide-toggle [formControlName]="'zelfkeysIpfsEnabled'"></mat-slide-toggle>
+									</div>
+								</div>
+								<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20">
+									<div class="flex justify-between items-center mb-2">
+										<span class="font-medium text-gray-900 dark:text-white">Arweave</span>
+										<mat-slide-toggle [formControlName]="'zelfkeysArweaveEnabled'"></mat-slide-toggle>
+									</div>
+								</div>
+								<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20">
+									<div class="flex justify-between items-center mb-2">
+										<span class="font-medium text-gray-900 dark:text-white">Walrus</span>
+										<mat-slide-toggle [formControlName]="'zelfkeysWalrusEnabled'"></mat-slide-toggle>
+									</div>
+								</div>
+							</div>
+
+							<div class="space-y-1.5 max-w-md">
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+									t("license.storage_options.key_prefix")
+								}}</label>
+								<input
+									[formControlName]="'zelfkeysKeyPrefix'"
+									class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+
+			<!-- Metadata Card -->
+			<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+				<div class="p-8 sm:p-10">
+					<div class="flex items-center gap-3 mb-6">
+						<div
+							class="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400"
+						>
+							<mat-icon class="icon-size-5">description</mat-icon>
+						</div>
+						<div>
+							<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.metadata.title") }}</h2>
+							<p class="text-sm text-gray-500 dark:text-gray-400">Additional information</p>
+						</div>
 					</div>
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="space-y-4">
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-blue-600 dark:text-blue-400 mr-2">cloud</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.ipfs_title") }}
-										</h3>
-									</div>
-									<mat-slide-toggle [formControlName]="'zelfkeysIpfsEnabled'"></mat-slide-toggle>
-								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.storage_options.ipfs_description") }}</p>
-							</div>
-
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-green-600 dark:text-green-400 mr-2">archive</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.arweave_title") }}
-										</h3>
-									</div>
-									<mat-slide-toggle [formControlName]="'zelfkeysArweaveEnabled'"></mat-slide-toggle>
-								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">
-									{{ t("license.storage_options.arweave_description") }}
-								</p>
-							</div>
-
-							<div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-								<div class="flex items-center justify-between mb-2">
-									<div class="flex items-center">
-										<mat-icon class="text-orange-600 dark:text-orange-400 mr-2">pets</mat-icon>
-										<h3 class="font-medium text-gray-900 dark:text-white">
-											{{ t("license.storage_options.walrus_title") }}
-										</h3>
-									</div>
-									<mat-slide-toggle [formControlName]="'zelfkeysWalrusEnabled'"></mat-slide-toggle>
-								</div>
-								<p class="text-sm text-gray-600 dark:text-gray-300">{{ t("license.storage_options.walrus_description") }}</p>
-							</div>
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.metadata.launch_date") }}</label>
+							<input
+								[formControlName]="'launchDate'"
+								type="date"
+								class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium"
+							/>
 						</div>
-
-						<div class="space-y-4">
-							<div>
-								<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-									<mat-label>{{ t("license.storage_options.key_prefix") }}</mat-label>
-									<input
-										[formControlName]="'zelfkeysKeyPrefix'"
-										matInput
-										[placeholder]="t('license.storage_options.key_prefix_placeholder')"
-									/>
-								</mat-form-field>
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.metadata.version") }}</label>
+							<input
+								[formControlName]="'version'"
+								class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium"
+							/>
+						</div>
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.metadata.documentation_url")
+							}}</label>
+							<input
+								[formControlName]="'documentation'"
+								class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium"
+							/>
+						</div>
+						<div class="space-y-1.5">
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								t("license.metadata.support_level")
+							}}</label>
+							<div class="relative">
+								<select
+									[formControlName]="'support'"
+									class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium appearance-none"
+								>
+									<option value="standard">{{ t("license.metadata.support_standard") }}</option>
+									<option value="premium">{{ t("license.metadata.support_premium") }}</option>
+									<option value="enterprise">{{ t("license.metadata.support_enterprise") }}</option>
+								</select>
+								<mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 icon-size-4 text-gray-500 pointer-events-none"
+									>expand_more</mat-icon
+								>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- Metadata Configuration -->
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-			<div class="flex items-center mb-4">
-				<mat-icon class="text-indigo-600 dark:text-indigo-400 mr-2">info</mat-icon>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t("license.metadata.title") }}</h2>
-			</div>
-
-			<!-- Limits Information -->
-			<div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-				<div class="flex">
-					<div class="flex-shrink-0">
-						<mat-icon class="text-blue-400">info</mat-icon>
+			<!-- Bottom Actions -->
+			<div class="sticky bottom-6 z-10 mx-auto max-w-4xl">
+				<div
+					class="bg-gray-900/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-white/10"
+				>
+					<button
+						(click)="cancel()"
+						[disabled]="isLoading"
+						class="px-4 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+					>
+						{{ t("license.actions.cancel") }}
+					</button>
+					<div class="flex items-center gap-3">
+						<button class="px-4 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors" [disabled]="isLoading">
+							Reset
+						</button>
+						<button
+							(click)="saveLicense()"
+							[disabled]="isLoading || accountForm.invalid"
+							class="px-6 py-2 bg-white text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+						>
+							@if (isLoading) {
+								<mat-icon class="icon-size-4 animate-spin">refresh</mat-icon>
+								<span>{{ t("license.actions.processing") }}</span>
+							} @else {
+								<span>{{ t("license.actions.save_configuration") }}</span>
+							}
+						</button>
 					</div>
-					<div class="ml-3">
-						<h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">{{ t("license.limits.info_title") }}</h3>
-						<div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-							<p>{{ t("license.limits.info_description") }}</p>
-							<p class="mt-1">{{ t("license.limits.info_subscription") }}</p>
-						</div>
-					</div>
 				</div>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.launch_date") }}</mat-label>
-						<input [formControlName]="'launchDate'" matInput type="date" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.version") }}</mat-label>
-						<input [formControlName]="'version'" matInput [placeholder]="t('license.metadata.version_placeholder')" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.documentation_url") }}</mat-label>
-						<input [formControlName]="'documentation'" matInput [placeholder]="t('license.metadata.documentation_placeholder')" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.community") }}</mat-label>
-						<input [formControlName]="'community'" matInput [placeholder]="t('license.metadata.community_placeholder')" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.enterprise") }}</mat-label>
-						<input [formControlName]="'enterprise'" matInput [placeholder]="t('license.metadata.enterprise_placeholder')" />
-					</mat-form-field>
-				</div>
-
-				<div>
-					<mat-form-field class="fuse-mat-emphasized-affix w-full" [subscriptSizing]="'dynamic'">
-						<mat-label>{{ t("license.metadata.support_level") }}</mat-label>
-						<mat-select [formControlName]="'support'">
-							<mat-option value="standard">{{ t("license.metadata.support_standard") }}</mat-option>
-							<mat-option value="premium">{{ t("license.metadata.support_premium") }}</mat-option>
-							<mat-option value="enterprise">{{ t("license.metadata.support_enterprise") }}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-			</div>
-		</div>
-
-		<!-- Actions -->
-		<div class="flex items-center justify-end space-x-4">
-			<button mat-stroked-button type="button" (click)="cancel()" [disabled]="isLoading">{{ t("license.actions.cancel") }}</button>
-			<button mat-flat-button type="button" [color]="'primary'" (click)="saveLicense()" [disabled]="isLoading || accountForm.invalid">
-				<mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
-				{{ isLoading ? t("license.actions.processing") : t("license.actions.save_configuration") }}
-			</button>
-		</div>
-	</form>
+			<div class="h-12"></div>
+		</form>
+	</div>
 </div>

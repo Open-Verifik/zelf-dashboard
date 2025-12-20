@@ -139,7 +139,8 @@
 		"cancel": "Cancel",
 		"processing": "Processing...",
 		"continue": "Continue",
-		"biometric_verification": "Biometric Verification"
+		"biometric_verification": "Biometric Verification",
+		"biometrics_disabled_debugging": "Biometrics temporarily disabled for debugging."
 	},
 	"license": {
 		"title": "Domain Configuration",
@@ -632,5 +633,23 @@
 			"nextPage": "Next page",
 			"lastPage": "Last page"
 		}
+	},
+	"biometricVerification": {
+		"title": "Verify Identity",
+		"verifyingAs": "Verifying as",
+		"newAccount": "New Account",
+		"account": "Account",
+		"verificationFailed": "Verification Failed",
+		"tryAgain": "Try Again",
+		"cancel": "Cancel",
+		"processingData": "Processing your biometric data...",
+		"initializingCamera": "Initializing safe camera...",
+		"positionFace": "Position your face in the center",
+		"lookAtCamera": "Look directly at the camera and stay still",
+		"verifyInstruction": "Please look at the camera to verify your identity and complete your account registration",
+		"cameraNotAvailable": "Camera not available",
+		"cameraAccessible": "Please ensure your camera is enabled and accessible for biometric verification",
+		"permissionRequired": "Camera Permission Required",
+		"allowAccess": "Please allow camera access to continue with biometric verification"
 	}
 }

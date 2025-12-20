@@ -1,167 +1,171 @@
-<div class="w-full max-w-6xl">
-	<!-- Header -->
-	<div class="mb-8">
-		<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Domain Notifications</h2>
-		<p class="mt-2 text-gray-600 dark:text-gray-400">
-			Configure notifications for domain registrations, expirations, subscriptions, and customer interactions.
-		</p>
-	</div>
-
-	<!-- Loading State -->
-	@if (isLoading) {
-		<div class="flex items-center justify-center py-12">
-			<mat-icon class="animate-spin">refresh</mat-icon>
-			<span class="ml-2">Loading notification settings...</span>
-		</div>
-	} @else {
-		<!-- Form -->
-		<form [formGroup]="notificationsForm" class="space-y-8">
-			<!-- Notification Channels Section -->
-			<mat-card class="p-6">
-				<div class="mb-6">
-					<h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Notification Channels</h3>
-					<p class="text-gray-600 dark:text-gray-400">Choose how you want to receive notifications</p>
-				</div>
-
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-					@for (channel of notificationChannels; track channel.key) {
-						<div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-							<div class="flex items-center space-x-3">
-								<mat-icon [svgIcon]="channel.icon" class="text-gray-500"></mat-icon>
-								<div>
-									<div class="font-medium text-gray-900 dark:text-white">
-										{{ channel.label }}
-									</div>
-									<div class="text-sm text-gray-600 dark:text-gray-400">
-										{{ channel.description }}
-									</div>
-								</div>
+<div class="flex flex-col min-h-screen bg-gray-50/50 dark:bg-gray-900 w-full">
+	<!-- Main Content Container -->
+	<div class="flex-auto px-4 py-8 sm:px-6 sm:py-12 md:px-8 w-full max-w-4xl mx-auto">
+		<!-- Loading State -->
+		@if (isLoading) {
+			<div class="flex flex-col items-center justify-center h-96">
+				<mat-icon class="animate-spin text-4xl text-gray-400">refresh</mat-icon>
+				<span class="mt-4 text-gray-500 font-medium">Loading settings...</span>
+			</div>
+		} @else {
+			<form [formGroup]="notificationsForm">
+				<!-- Notification Channels Card -->
+				<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+					<div class="p-8 sm:p-10">
+						<div class="flex items-center gap-3 mb-6">
+							<div
+								class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400"
+							>
+								<mat-icon class="icon-size-5">notifications</mat-icon>
 							</div>
-							<mat-slide-toggle [color]="'primary'" [formControlName]="channel.key"> </mat-slide-toggle>
-						</div>
-					}
-				</div>
-			</mat-card>
-
-			<!-- Notification Categories -->
-			@for (category of notificationCategories; track category.id) {
-				<mat-card class="p-6">
-					<!-- Category Header -->
-					<div class="flex items-center justify-between mb-6">
-						<div class="flex items-center space-x-3">
-							<mat-icon
-								[svgIcon]="category.icon"
-								[ngClass]="{
-									'text-primary': category.color === 'primary',
-									'text-warn': category.color === 'warn',
-									'text-accent': category.color === 'accent',
-								}"
-							></mat-icon>
 							<div>
-								<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-									{{ category.title }}
-								</h3>
-								<p class="text-gray-600 dark:text-gray-400">
-									{{ category.description }}
-								</p>
+								<h2 class="text-xl font-bold text-gray-900 dark:text-white">Notification Channels</h2>
+								<p class="text-sm text-gray-500 dark:text-gray-400">Choose how you want to receive notifications</p>
 							</div>
 						</div>
 
-						<!-- Category Actions -->
-						<div class="flex items-center space-x-2">
-							@if (isCategoryFullyEnabled(category.id)) {
-								<mat-chip [color]="'primary'" [selected]="true" (click)="disableCategory(category.id)" class="cursor-pointer">
-									All Enabled
-								</mat-chip>
-							} @else if (isCategoryPartiallyEnabled(category.id)) {
-								<mat-chip [color]="'accent'" [selected]="true" class="cursor-pointer"> Partial </mat-chip>
-							} @else {
-								<mat-chip [color]="'warn'" [selected]="true" class="cursor-pointer"> Disabled </mat-chip>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							@for (channel of notificationChannels; track channel.key) {
+								<div
+									class="relative flex items-center justify-between p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all cursor-pointer group"
+									(click)="notificationsForm.get(channel.key)?.setValue(!notificationsForm.get(channel.key)?.value)"
+								>
+									<div class="flex items-center gap-4">
+										<div
+											class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors"
+										>
+											<mat-icon [svgIcon]="channel.icon" class="icon-size-5"></mat-icon>
+										</div>
+										<div>
+											<div class="font-semibold text-gray-900 dark:text-gray-200">{{ channel.label }}</div>
+											<div class="text-xs text-gray-500 max-w-[180px]">{{ channel.description }}</div>
+										</div>
+									</div>
+									<mat-slide-toggle
+										[color]="'primary'"
+										[formControlName]="channel.key"
+										(click)="$event.stopPropagation()"
+									></mat-slide-toggle>
+								</div>
 							}
-
-							<button
-								mat-icon-button
-								[matTooltip]="'Enable all notifications in this category'"
-								(click)="enableCategory(category.id)"
-								class="text-green-600 hover:text-green-700"
-							>
-								<mat-icon>check_circle</mat-icon>
-							</button>
-
-							<button
-								mat-icon-button
-								[matTooltip]="'Disable all notifications in this category'"
-								(click)="disableCategory(category.id)"
-								class="text-red-600 hover:text-red-700"
-							>
-								<mat-icon>cancel</mat-icon>
-							</button>
 						</div>
 					</div>
+				</div>
 
-					<!-- Category Settings -->
-					<div class="space-y-4">
-						@for (setting of category.settings; track setting.key) {
-							<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-								<div
-									class="flex-1 cursor-pointer"
-									(click)="notificationsForm.get(setting.key)?.setValue(!notificationsForm.get(setting.key)?.value)"
-								>
-									<div class="font-medium text-gray-900 dark:text-white">
-										{{ setting.label }}
+				<!-- Notification Categories -->
+				@for (category of notificationCategories; track category.id) {
+					<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+						<div class="p-8 sm:p-10">
+							<!-- Category Header -->
+							<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+								<div class="flex items-center gap-3">
+									<div
+										class="w-10 h-10 rounded-full flex items-center justify-center"
+										[ngClass]="{
+											'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400': category.color === 'primary',
+											'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400': category.color === 'warn',
+											'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400': category.color === 'accent',
+										}"
+									>
+										<mat-icon [svgIcon]="category.icon" class="icon-size-5"></mat-icon>
 									</div>
-									<div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-										{{ setting.description }}
+									<div>
+										<h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ category.title }}</h3>
+										<p class="text-sm text-gray-500 dark:text-gray-400">{{ category.description }}</p>
 									</div>
 								</div>
-								<mat-slide-toggle [color]="category.color" [formControlName]="setting.key"> </mat-slide-toggle>
+
+								<!-- Actions -->
+								<div class="flex items-center gap-3">
+									<button
+										type="button"
+										(click)="enableCategory(category.id)"
+										matTooltip="Enable all"
+										class="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all"
+									>
+										<mat-icon class="icon-size-5">check_circle</mat-icon>
+									</button>
+									<button
+										type="button"
+										(click)="disableCategory(category.id)"
+										matTooltip="Disable all"
+										class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+									>
+										<mat-icon class="icon-size-5">block</mat-icon>
+									</button>
+								</div>
 							</div>
-						}
+
+							<!-- Settings List -->
+							<div class="space-y-1">
+								@for (setting of category.settings; track setting.key; let last = $last) {
+									<div
+										class="group flex items-center justify-between py-4 px-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
+										(click)="notificationsForm.get(setting.key)?.setValue(!notificationsForm.get(setting.key)?.value)"
+										[class.border-b]="!last"
+										class="border-gray-100 dark:border-gray-700/50"
+									>
+										<div class="pr-4">
+											<div class="font-medium text-gray-900 dark:text-gray-200">{{ setting.label }}</div>
+											<div class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ setting.description }}</div>
+										</div>
+										<mat-slide-toggle
+											[color]="'primary'"
+											[formControlName]="setting.key"
+											(click)="$event.stopPropagation()"
+										></mat-slide-toggle>
+									</div>
+								}
+							</div>
+						</div>
 					</div>
-				</mat-card>
-			}
+				}
 
-			<!-- Actions -->
-			<div class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
-				<div class="flex items-center space-x-4">
-					<button mat-stroked-button type="button" (click)="resetToDefaults()" [disabled]="isSaving">Reset to Defaults</button>
-				</div>
-
-				<div class="flex items-center space-x-4">
-					<button mat-stroked-button type="button" [disabled]="isSaving">Cancel</button>
-					<button
-						mat-flat-button
-						type="button"
-						[color]="'primary'"
-						[disabled]="isSaving || notificationsForm.invalid"
-						(click)="saveSettings()"
+				<!-- Bottom Actions -->
+				<div class="sticky bottom-6 z-10 mx-auto max-w-4xl">
+					<div
+						class="bg-gray-900/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-white/10"
 					>
-						@if (isSaving) {
-							<mat-icon class="animate-spin mr-2">refresh</mat-icon>
-							Saving...
-						} @else {
-							Save Settings
-						}
-					</button>
+						<button
+							(click)="resetToDefaults()"
+							[disabled]="isSaving"
+							class="px-4 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+						>
+							Reset Defaults
+						</button>
+						<div class="flex items-center gap-3">
+							<button class="px-4 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors" [disabled]="isSaving">
+								Discard
+							</button>
+							<button
+								(click)="saveSettings()"
+								[disabled]="isSaving || notificationsForm.invalid"
+								class="px-6 py-2 bg-white text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+							>
+								@if (isSaving) {
+									<mat-icon class="icon-size-4 animate-spin">refresh</mat-icon>
+									<span>Saving...</span>
+								} @else {
+									<span>Save Changes</span>
+								}
+							</button>
+						</div>
+					</div>
 				</div>
-			</div>
-		</form>
-	}
 
-	<!-- Additional Information -->
-	<mat-card class="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-		<div class="flex items-start space-x-3">
-			<mat-icon class="text-blue-600 dark:text-blue-400 mt-1">info</mat-icon>
-			<div>
-				<h4 class="font-medium text-blue-900 dark:text-blue-100 mb-2">Notification Preferences</h4>
-				<div class="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-					<p>• Email notifications are sent to your registered email address</p>
-					<p>• In-app notifications appear in the dashboard notification panel</p>
-					<p>• Push notifications require browser permission and work when the dashboard is open</p>
-					<p>• SMS notifications are available for premium plans only</p>
-					<p>• Critical notifications (expiration warnings, payment failures) are always sent via email</p>
+				<!-- Footer Info -->
+				<div class="mt-8 mb-12 p-6 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 flex gap-4">
+					<mat-icon class="text-blue-600 dark:text-blue-400 shrink-0">info</mat-icon>
+					<div class="text-sm text-blue-900 dark:text-blue-200">
+						<p class="font-semibold mb-2">About Notifications</p>
+						<ul class="space-y-1 opacity-80 list-disc list-inside">
+							<li>Critical security alerts and payment failures are always sent via email.</li>
+							<li>Push notifications require browser permission to function.</li>
+							<li>SMS notifications are available on Premium and Enterprise plans.</li>
+						</ul>
+					</div>
 				</div>
-			</div>
-		</div>
-	</mat-card>
+			</form>
+		}
+	</div>
 </div>

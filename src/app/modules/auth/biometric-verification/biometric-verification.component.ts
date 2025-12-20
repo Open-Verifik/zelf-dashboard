@@ -17,10 +17,12 @@ export interface BiometricData {
 
 import { fadeIn } from "@fuse/animations";
 
+import { TranslocoModule } from "@jsverse/transloco";
+
 @Component({
 	selector: "app-data-biometrics",
 	standalone: true,
-	imports: [CommonModule, FormsModule, MatButtonModule, MatProgressSpinnerModule, MatIconModule, WebcamModule, RouterModule],
+	imports: [CommonModule, FormsModule, MatButtonModule, MatProgressSpinnerModule, MatIconModule, WebcamModule, RouterModule, TranslocoModule],
 	templateUrl: "./biometric-verification.component.html",
 	styleUrls: ["./biometric-verification.component.scss"],
 	animations: [fadeIn],
@@ -369,19 +371,25 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 	}
 
 	private async _initializeBiometrics(): Promise<void> {
+		console.log("BiometricVerification: _initializeBiometrics started");
 		try {
 			// Initialize master password from user data
 			if (this.userData && this.userData.masterPassword) {
 				this.masterPassword = this.userData.masterPassword;
 				this.useMasterPassword = true;
+				console.log("BiometricVerification: Master password initialized");
 			}
 
 			// Always wait for the biometric service to load the models
+			console.log("BiometricVerification: Waiting for faceapi models...");
 			this._biometricService.faceapi$.pipe(takeUntil(this.unsubscriber$)).subscribe(async (isLoaded) => {
+				console.log("BiometricVerification: faceapi loaded signal received", isLoaded);
 				if (!isLoaded) return;
 
 				this.camera.isLoading = false;
+				console.log("BiometricVerification: Camera loading flag cleared. Setting dimensions...");
 				await this._setMaxVideoDimensions();
+				console.log("BiometricVerification: Dimensions set. Starting video interval...");
 				this._startNgxVideoInterval();
 			});
 		} catch (error) {
@@ -390,8 +398,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 	}
 
 	private async _setMaxVideoDimensions(): Promise<void> {
-		const maxWidth = 800;
-		const maxHeight = 600;
+		const maxWidth = 640;
+		const maxHeight = 480;
 
 		// Set initial video dimensions
 		this.camera.dimensions.video.width = maxWidth;

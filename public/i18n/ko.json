@@ -125,7 +125,8 @@
 		"cancel": "취소",
 		"processing": "처리 중...",
 		"continue": "계속",
-		"biometric_verification": "생체 인증"
+		"biometric_verification": "생체 인증",
+		"biometrics_disabled_debugging": "디버깅을 위해 생체 인증이 일시적으로 비활성화되었습니다."
 	},
 	"license": {
 		"title": "도메인 설정",
@@ -367,7 +368,7 @@
 			"comingSoon": "출시 예정",
 			"unknown": "알 수 없음"
 		},
-		"chart": {
+		"chartData": {
 			"total": "총계",
 			"allTags": "모든 태그",
 			"paidTags": "유료 태그",

@@ -125,7 +125,8 @@
 		"cancel": "取消",
 		"processing": "处理中...",
 		"continue": "继续",
-		"biometric_verification": "生物识别验证"
+		"biometric_verification": "生物识别验证",
+		"biometrics_disabled_debugging": "生物识别已暂时禁用以进行调试。"
 	},
 	"license": {
 		"title": "域名配置",
@@ -367,7 +368,7 @@
 			"comingSoon": "即将推出",
 			"unknown": "未知"
 		},
-		"chart": {
+		"chartData": {
 			"total": "总计",
 			"allTags": "所有标签",
 			"paidTags": "付费标签",

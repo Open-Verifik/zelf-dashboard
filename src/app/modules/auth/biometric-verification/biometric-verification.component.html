@@ -41,14 +41,14 @@
 				</div>
 
 				<div *ngIf="!errorFace && !response.isLoading" class="biometric__instructions">
-					<div class="biometric__instruction-title">Position your face in the center</div>
-					<div class="biometric__instruction-subtitle">Look directly at the camera and stay still</div>
+					<div class="biometric__instruction-title">{{ "biometricVerification.positionFace" | transloco }}</div>
+					<div class="biometric__instruction-subtitle">{{ "biometricVerification.lookAtCamera" | transloco }}</div>
 				</div>
 			</div>
 
 			<!-- Instructions - Compact and Strategic -->
 			<div class="compact-instructions">
-				<p>Please look at the camera to verify your identity and complete your account registration</p>
+				<p>{{ "biometricVerification.verifyInstruction" | transloco }}</p>
 			</div>
 		</div>
 
@@ -56,17 +56,17 @@
 		<div class="api-error-container" fxLayout="column" fxLayoutAlign="center center" *ngIf="hasApiError && !response.isLoading">
 			<div class="api-error-card">
 				<div class="error-icon">⚠️</div>
-				<h3 class="error-title">Verification Failed</h3>
+				<h3 class="error-title">{{ "biometricVerification.verificationFailed" | transloco }}</h3>
 				<p class="error-message">{{ apiError }}</p>
 				<div class="error-actions">
-					<button class="btn-retry" (click)="clearApiError()">Try Again</button>
-					<button class="btn-back-error" (click)="onBiometricsCancel()">Cancel</button>
+					<button class="btn-retry" (click)="clearApiError()">{{ "biometricVerification.tryAgain" | transloco }}</button>
+					<button class="btn-back-error" (click)="onBiometricsCancel()">{{ "biometricVerification.cancel" | transloco }}</button>
 				</div>
 			</div>
 		</div>
 
 		<div
-			class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300"
+			class="flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 w-full h-[600px]"
 			*ngIf="(response.base64Image || camera.isLoading) && !hasApiError"
 			[@fadeIn]="true"
 		>
@@ -74,20 +74,20 @@
 				<!-- Outer Ring -->
 				<div class="absolute inset-0 rounded-full border-4 border-gray-100 dark:border-gray-800"></div>
 				<!-- Spinner -->
-				<mat-spinner [diameter]="64" [strokeWidth]="4"></mat-spinner>
+				<mat-spinner [diameter]="80" [strokeWidth]="5"></mat-spinner>
 			</div>
-			<div *ngIf="response.isLoading" class="mt-8 text-lg font-medium text-gray-800 dark:text-gray-100 animate-pulse">
-				Processing your biometric data...
+			<div *ngIf="response.isLoading" class="mt-10 text-xl font-medium text-gray-800 dark:text-gray-100 animate-pulse">
+				{{ "biometricVerification.processingData" | transloco }}
 			</div>
-			<div *ngIf="camera.isLoading && !response.isLoading" class="mt-8 text-lg font-medium text-gray-600 dark:text-gray-300">
-				Initializing safe camera...
+			<div *ngIf="camera.isLoading && !response.isLoading" class="mt-10 text-xl font-medium text-gray-600 dark:text-gray-300">
+				{{ "biometricVerification.initializingCamera" | transloco }}
 			</div>
 		</div>
 
 		<div class="error-container" fxLayout="column" fxLayoutAlign="center center" *ngIf="!camera.isLoading && camera.isLowQuality && !hasApiError">
 			<mat-icon class="camera-error-icon" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
-			<h2 class="error-title">Camera not available</h2>
-			<p class="error-description">Please ensure your camera is enabled and accessible for biometric verification</p>
+			<h2 class="error-title">{{ "biometricVerification.cameraNotAvailable" | transloco }}</h2>
+			<p class="error-description">{{ "biometricVerification.cameraAccessible" | transloco }}</p>
 		</div>
 
 		<div
@@ -97,9 +97,9 @@
 			*ngIf="!camera.isLoading && !camera.hasPermissions && !hasApiError"
 		>
 			<mat-icon class="permission-icon" [svgIcon]="'heroicons_outline:camera'"></mat-icon>
-			<h2 class="permission-title">Camera Permission Required</h2>
-			<p class="permission-description">Please allow camera access to continue with biometric verification</p>
-			<button class="btn-retry" (click)="onBiometricsCancel()">Cancel</button>
+			<h2 class="permission-title">{{ "biometricVerification.permissionRequired" | transloco }}</h2>
+			<p class="permission-description">{{ "biometricVerification.allowAccess" | transloco }}</p>
+			<button class="btn-retry" (click)="onBiometricsCancel()">{{ "biometricVerification.cancel" | transloco }}</button>
 		</div>
 	</div>
 </div>

@@ -1,16 +1,8 @@
-import { TextFieldModule } from "@angular/cdk/text-field";
 import { CommonModule } from "@angular/common";
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { FormControl, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
-import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatOptionModule } from "@angular/material/core";
-import { MatDialogModule } from "@angular/material/dialog";
-import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
 import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
@@ -46,15 +38,7 @@ export interface WhitelistItem {
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
-		MatFormFieldModule,
 		MatIconModule,
-		MatInputModule,
-		TextFieldModule,
-		MatSelectModule,
-		MatOptionModule,
-		MatButtonModule,
-		MatDialogModule,
-		MatProgressSpinnerModule,
 		MatSlideToggleModule,
 		MatCheckboxModule,
 		TranslocoModule,
