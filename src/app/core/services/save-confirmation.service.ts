@@ -34,6 +34,17 @@ export interface SaveConfirmationData {
 		faceBase64: string;
 		masterPassword: string;
 	};
+	staffData?: {
+		staffEmail: string;
+		staffPhone: string;
+		staffName: string;
+		role: string;
+		operation: string; // "inviteStaff", "removeStaff", "updateRole"
+		faceBase64?: string;
+		masterPassword?: string;
+		newRole?: string; // For updateRole operation
+		isResend?: boolean;
+	};
 }
 
 @Injectable({

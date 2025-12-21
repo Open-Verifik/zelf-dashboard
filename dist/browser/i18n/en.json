@@ -74,6 +74,21 @@
 		"cancel": "Cancel",
 		"success": "Success!",
 		"redirecting": "Redirecting you back...",
+		"domain": "Domain",
+		"status": "Status",
+		"action": "Action",
+		"name": "Name",
+		"email": "Email",
+		"role": "Role",
+		"load_api_key_label": "Load API Key",
+		"change_password_label": "Change Password",
+		"invite_member": "Invite Member",
+		"remove_member": "Remove Member",
+		"update_role": "Update Role",
+		"continue_with_passkey": "Continue with Passkey",
+		"or_use_password": "Or use password",
+		"master_password_label": "Master Password",
+		"enter_master_password": "Enter your master password",
 		"theme_settings_updated_successfully": "Theme settings updated successfully!",
 		"license_configuration": {
 			"title": "Confirm License Configuration",
@@ -382,7 +397,7 @@
 			"comingSoon": "coming soon",
 			"unknown": "Unknown"
 		},
-		"chart": {
+		"chartData": {
 			"total": "Total",
 			"allTags": "All Tags",
 			"paidTags": "Paid Tags",

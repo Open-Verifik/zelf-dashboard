@@ -14,6 +14,7 @@ import { SaveConfirmationService, SaveConfirmationData } from "../../../core/ser
 import { HttpWrapperService } from "../../../http-wrapper.service";
 import { PasskeyService } from "../../../core/services/passkey.service";
 import { AuthService } from "../../../core/auth/auth.service";
+import { StaffService } from "../../../core/services/staff.service";
 import { environment } from "../../../../environments/environment";
 import { License } from "../settings/license/license.class";
 
@@ -61,7 +62,8 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private route: ActivatedRoute,
 		private translocoService: TranslocoService,
-		private passkeyService: PasskeyService
+		private passkeyService: PasskeyService,
+		private staffService: StaffService
 	) {}
 
 	ngOnInit(): void {
@@ -76,10 +78,16 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		this.saveConfirmationService.saveData$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
 			if (data) {
 				this.saveData = data;
-			} else {
-				// No data available, redirect back
-				this.router.navigate([this.redirectUrl]);
+				// Update redirect URL from save data if provided
+				if (data.redirectUrl) {
+					this.redirectUrl = data.redirectUrl;
+				}
+
+				return;
 			}
+
+			// No data available, redirect back
+			this.router.navigate([this.redirectUrl]);
 		});
 
 		// Check for passkey
@@ -188,6 +196,9 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		} else if (this.saveData.profileData) {
 			// Handle profile operation
 			this.handleProfileOperation(biometricData);
+		} else if (this.saveData.staffData) {
+			// Handle staff operation
+			this.handleStaffOperation(biometricData);
 		} else {
 			this.showError("Invalid operation data");
 			this.isLoading = false;
@@ -358,6 +369,61 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				} else if (error.message.includes("404")) {
 					errorMessage = "Account not found. Please contact support.";
 				} else if (error.message.includes("409")) {
+					errorMessage = "Verification failed. Please try again.";
+				} else {
+					errorMessage = error.message;
+				}
+			}
+
+			this.showError(errorMessage);
+		} finally {
+			this.isLoading = false;
+		}
+	}
+
+	/**
+	 * Handle staff operation (invite, remove, update role)
+	 */
+	private async handleStaffOperation(biometricData: BiometricData): Promise<void> {
+		if (!this.saveData?.staffData) {
+			this.showError("No staff data available");
+			this.isLoading = false;
+			return;
+		}
+
+		try {
+			const staffData = {
+				...this.saveData.staffData,
+				faceBase64: biometricData.faceBase64,
+				masterPassword: biometricData.password || this.masterPassword,
+			};
+
+			switch (staffData.operation) {
+				case "inviteStaff":
+					await this.inviteStaff(staffData);
+					break;
+				case "removeStaff":
+					await this.removeStaff(staffData);
+					break;
+				case "updateRole":
+					await this.updateStaffRole(staffData);
+					break;
+				default:
+					throw new Error("Unknown staff operation");
+			}
+		} catch (error) {
+			let errorMessage = "Failed to complete staff operation. Please try again.";
+
+			if (error?.message) {
+				if (error.message.includes("FACE IS NOT CENTRAL")) {
+				errorMessage = "Face is not central. Please use an image with a central face.";
+			} else if (error.message.includes("error_decrypting_zelf_account")) {
+					errorMessage = "Biometric verification failed. Please check your face image and master password.";
+				} else if (error.message.includes("staff_already_exists")) {
+					errorMessage = "This staff member already exists.";
+				} else if (error.message.includes("staff_not_found")) {
+					errorMessage = "Staff member not found.";
+				} else if (error.message.includes("verification_failed")) {
 					errorMessage = "Verification failed. Please try again.";
 				} else {
 					errorMessage = error.message;
@@ -576,6 +642,65 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		setTimeout(() => {
 			this.showAlert = false;
 		}, 5000);
+	}
+
+	/**
+	 * Invite staff member
+	 */
+	private async inviteStaff(staffData: any): Promise<void> {
+		const response: any = await this.staffService
+			.inviteStaff({
+				staffEmail: staffData.staffEmail,
+				staffPhone: staffData.staffPhone,
+				staffName: staffData.staffName,
+				role: staffData.role,
+				faceBase64: staffData.faceBase64,
+				masterPassword: staffData.masterPassword,
+				isResend: staffData.isResend,
+			})
+			.toPromise();
+
+		this.showSuccess("Invitation sent successfully!");
+		setTimeout(() => {
+			this.router.navigate([this.saveData?.redirectUrl || "/settings/team"]);
+		}, 2000);
+	}
+
+	/**
+	 * Remove staff member
+	 */
+	private async removeStaff(staffData: any): Promise<void> {
+		await this.staffService
+			.removeStaff({
+				staffEmail: staffData.staffEmail,
+				faceBase64: staffData.faceBase64,
+				masterPassword: staffData.masterPassword,
+			})
+			.toPromise();
+
+		this.showSuccess("Staff member removed successfully!");
+		setTimeout(() => {
+			this.router.navigate([this.saveData?.redirectUrl || "/settings/team"]);
+		}, 2000);
+	}
+
+	/**
+	 * Update staff member role
+	 */
+	private async updateStaffRole(staffData: any): Promise<void> {
+		await this.staffService
+			.updateRole({
+				staffEmail: staffData.staffEmail,
+				newRole: staffData.newRole,
+				faceBase64: staffData.faceBase64,
+				masterPassword: staffData.masterPassword,
+			})
+			.toPromise();
+
+		this.showSuccess("Role updated successfully!");
+		setTimeout(() => {
+			this.router.navigate([this.saveData?.redirectUrl || "/settings/team"]);
+		}, 2000);
 	}
 
 	/**

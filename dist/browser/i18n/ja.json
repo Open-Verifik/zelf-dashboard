@@ -74,6 +74,21 @@
 		"cancel": "キャンセル",
 		"success": "成功！",
 		"redirecting": "リダイレクト中...",
+		"domain": "ドメイン",
+		"status": "ステータス",
+		"action": "アクション",
+		"name": "名前",
+		"email": "メール",
+		"role": "役割",
+		"load_api_key_label": "APIキーを読み込む",
+		"change_password_label": "パスワードを変更",
+		"invite_member": "メンバーを招待",
+		"remove_member": "メンバーを削除",
+		"update_role": "役割を更新",
+		"continue_with_passkey": "パスキーで続行",
+		"or_use_password": "またはパスワードを使用",
+		"master_password_label": "マスターパスワード",
+		"enter_master_password": "マスターパスワードを入力してください",
 		"theme_settings_updated_successfully": "テーマ設定が正常に更新されました！",
 		"license_configuration": {
 			"title": "ライセンス設定を確認",
@@ -125,7 +140,8 @@
 		"cancel": "キャンセル",
 		"processing": "処理中...",
 		"continue": "続行",
-		"biometric_verification": "生体認証"
+		"biometric_verification": "生体認証",
+		"biometrics_disabled_debugging": "デバッグのため生体認証が一時的に無効になっています。"
 	},
 	"license": {
 		"title": "ドメイン設定",
@@ -367,7 +383,7 @@
 			"comingSoon": "近日公開",
 			"unknown": "不明"
 		},
-		"chart": {
+		"chartData": {
 			"total": "合計",
 			"allTags": "すべてのタグ",
 			"paidTags": "有料タグ",

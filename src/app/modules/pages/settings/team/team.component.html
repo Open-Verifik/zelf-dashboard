@@ -1,99 +1,123 @@
-<div class="w-full max-w-3xl">
-    <!-- Add team member -->
-    <div class="w-full">
-        <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
-            <mat-label>Add team members</mat-label>
-            <mat-icon
-                class="icon-size-5"
-                [svgIcon]="'heroicons_solid:user'"
-                matPrefix
-            ></mat-icon>
-            <input matInput [placeholder]="'Email address'" />
-            <button mat-icon-button matSuffix>
-                <mat-icon
-                    class="icon-size-5"
-                    [svgIcon]="'heroicons_solid:plus-circle'"
-                ></mat-icon>
-            </button>
-        </mat-form-field>
-    </div>
+<div class="flex flex-col w-full min-h-screen p-4 sm:p-8">
+	<div class="w-full max-w-5xl mx-auto space-y-8 animate-fade-in">
+		<!-- Header Section -->
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+			<div>
+				<h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Team Management</h2>
+				<p class="text-gray-500 dark:text-gray-400 mt-1">Manage access and permissions for your project members</p>
+			</div>
+			<button
+				mat-flat-button
+				(click)="openInviteModal()"
+				class="!rounded-xl !px-6 !py-2.5 !bg-gray-900 dark:!bg-white !text-white dark:!text-gray-900 !font-bold hover:opacity-90 transition-opacity"
+			>
+				<mat-icon class="icon-size-5 mr-2">add</mat-icon>
+				Invite Member
+			</button>
+		</div>
 
-    <!-- Team members -->
-    <div class="mt-8 flex flex-col divide-y border-b border-t">
-        @for (member of members; track trackByFn($index, member)) {
-            <div class="flex flex-col py-6 sm:flex-row sm:items-center">
-                <div class="flex items-center">
-                    <div
-                        class="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full"
-                    >
-                        @if (member.avatar) {
-                            <img
-                                class="h-full w-full object-cover"
-                                [src]="member.avatar"
-                                alt="Contact avatar"
-                            />
-                        }
-                        @if (!member.avatar) {
-                            <div
-                                class="flex h-full w-full items-center justify-center rounded-full bg-gray-200 text-lg uppercase text-gray-600 dark:bg-gray-700 dark:text-gray-200"
-                            >
-                                {{ member.name.charAt(0) }}
-                            </div>
-                        }
-                    </div>
-                    <div class="ml-4">
-                        <div class="font-medium">{{ member.name }}</div>
-                        <div class="text-secondary">{{ member.email }}</div>
-                    </div>
-                </div>
-                <div class="mt-4 flex items-center sm:ml-auto sm:mt-0">
-                    <div class="order-2 ml-4 sm:order-1 sm:ml-0">
-                        <mat-form-field
-                            class="fuse-mat-dense w-32"
-                            [subscriptSizing]="'dynamic'"
-                        >
-                            <mat-select
-                                [panelClass]="
-                                    'w-72 min-w-72 max-w-72 h-auto max-h-none'
-                                "
-                                [value]="member.role"
-                                disableOptionCentering
-                                #roleSelect="matSelect"
-                            >
-                                <mat-select-trigger class="text-md">
-                                    <span>Role:</span>
-                                    <span class="ml-1 font-medium">{{
-                                        roleSelect.value | titlecase
-                                    }}</span>
-                                </mat-select-trigger>
-                                @for (role of roles; track role) {
-                                    <mat-option
-                                        class="h-auto py-4 leading-none"
-                                        [value]="role.value"
-                                    >
-                                        <div class="font-medium">
-                                            {{ role.label }}
-                                        </div>
-                                        <div
-                                            class="text-secondary mt-1.5 whitespace-normal text-sm leading-normal"
-                                        >
-                                            {{ role.description }}
-                                        </div>
-                                    </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="order-1 sm:order-2 sm:ml-3">
-                        <button mat-icon-button>
-                            <mat-icon
-                                class="text-hint"
-                                [svgIcon]="'heroicons_outline:trash'"
-                            ></mat-icon>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+		<!-- Team List Card -->
+		<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+			@if (isLoading && !members.length) {
+				<div class="flex flex-col items-center justify-center p-12 space-y-4">
+					<mat-spinner diameter="40"></mat-spinner>
+					<p class="text-gray-500">Loading team members...</p>
+				</div>
+			} @else if (!members.length) {
+				<!-- Empty State -->
+				<div class="flex flex-col items-center justify-center p-16 text-center">
+					<div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+						<mat-icon class="icon-size-10 text-gray-400">group_off</mat-icon>
+					</div>
+					<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No team members yet</h3>
+					<p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8">
+						Invite your colleagues to collaborate on this project. They will need to complete biometric verification to join.
+					</p>
+					<button mat-stroked-button (click)="openInviteModal()" class="!rounded-xl !px-6 !border-gray-300 dark:!border-gray-600">
+						Invite your first member
+					</button>
+				</div>
+			} @else {
+				<!-- List -->
+				<div class="divide-y divide-gray-100 dark:divide-gray-700/50">
+					<div
+						class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 text-xs font-semibold uppercase text-gray-500 tracking-wider"
+					>
+						<div class="col-span-12 sm:col-span-5">Member</div>
+						<div class="col-span-6 sm:col-span-3">Role</div>
+						<div class="col-span-6 sm:col-span-2">Joined</div>
+						<div class="col-span-12 sm:col-span-2 text-right">Actions</div>
+					</div>
+
+					@for (member of members; track trackByFn($index, member)) {
+						<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
+							<!-- Member Info -->
+							<div class="col-span-12 sm:col-span-5 flex items-center gap-4">
+								<div
+									class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold uppercase"
+								>
+									{{ (member.publicData?.staffName || member.name || member.publicData?.staffEmail || "U").charAt(0) }}
+								</div>
+								<div class="min-w-0">
+									<div class="font-semibold text-gray-900 dark:text-white truncate">
+										{{ member.publicData?.staffName || member.name }}
+										@if (member.isPending) {
+											<span
+												class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 ml-2"
+												>Pending</span
+											>
+										}
+									</div>
+									<div class="text-sm text-gray-500 truncate">{{ member.publicData?.staffEmail || member.email }}</div>
+								</div>
+							</div>
+
+							<!-- Role -->
+							<div class="col-span-6 sm:col-span-3">
+								<span
+									class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 capitalize"
+								>
+									{{ member.publicData?.staffRole || member.role }}
+								</span>
+							</div>
+
+							<!-- Joined Date -->
+							<div class="col-span-6 sm:col-span-2 text-sm text-gray-500">
+								{{ (member.createdAt | date: "mediumDate") || "Just now" }}
+							</div>
+
+							<!-- Actions -->
+							<div class="col-span-12 sm:col-span-2 flex justify-end gap-2">
+								@if (member.isPending) {
+									<button
+										mat-icon-button
+										(click)="initiateResend(member)"
+										[matTooltip]="'Resend Invitation'"
+										class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-blue-600 transition-colors"
+									>
+										<mat-icon class="icon-size-4">send</mat-icon>
+									</button>
+								}
+								<button
+									mat-icon-button
+									(click)="initiateUpdateRole(member)"
+									[matTooltip]="'Change role'"
+									class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-blue-600 transition-colors"
+								>
+									<mat-icon class="icon-size-4">edit</mat-icon>
+								</button>
+								<button
+									mat-icon-button
+									(click)="initiateRemove(member)"
+									class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-red-600 transition-colors"
+								>
+									<mat-icon class="icon-size-4">delete_outline</mat-icon>
+								</button>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+	</div>
 </div>

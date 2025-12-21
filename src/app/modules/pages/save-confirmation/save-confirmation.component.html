@@ -71,11 +71,11 @@
 						@if (saveData.domainConfig) {
 							<div class="space-y-2">
 								<div class="flex justify-between items-center">
-									<span class="text-sm text-gray-500 dark:text-gray-400">Domain</span>
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.domain" | transloco }}</span>
 									<span class="text-sm font-semibold text-gray-900 dark:text-white">{{ saveData.domainConfig.name }}</span>
 								</div>
 								<div class="flex justify-between items-center">
-									<span class="text-sm text-gray-500 dark:text-gray-400">Status</span>
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.status" | transloco }}</span>
 									<span
 										class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
 									>
@@ -89,11 +89,51 @@
 						@if (saveData.securityData) {
 							<div class="space-y-2">
 								<div class="flex justify-between items-center">
-									<span class="text-sm text-gray-500 dark:text-gray-400">Action</span>
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.action" | transloco }}</span>
 									<span class="text-sm font-semibold text-gray-900 dark:text-white">
-										{{ saveData.securityData.operation === "loadApiKey" ? "Load API Key" : "Change Password" }}
+										{{
+											saveData.securityData.operation === "loadApiKey"
+												? ("saving_operations.load_api_key_label" | transloco)
+												: ("saving_operations.change_password_label" | transloco)
+										}}
 									</span>
 								</div>
+							</div>
+						}
+
+						<!-- Staff Data -->
+						@if (saveData.staffData) {
+							<div class="space-y-2">
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.action" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+										{{
+											saveData.staffData.operation === "inviteStaff"
+												? ("saving_operations.invite_member" | transloco)
+												: saveData.staffData.operation === "removeStaff"
+													? ("saving_operations.remove_member" | transloco)
+													: ("saving_operations.update_role" | transloco)
+										}}
+									</span>
+								</div>
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.name" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white">{{ saveData.staffData.staffName }}</span>
+								</div>
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.email" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white">{{ saveData.staffData.staffEmail }}</span>
+								</div>
+								@if (saveData.staffData.operation === "inviteStaff" || saveData.staffData.operation === "updateRole") {
+									<div class="flex justify-between items-center">
+										<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.role" | transloco }}</span>
+										<span
+											class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+										>
+											{{ saveData.staffData.operation === "updateRole" ? saveData.staffData.newRole : saveData.staffData.role }}
+										</span>
+									</div>
+								}
 							</div>
 						}
 					</div>
@@ -107,11 +147,11 @@
 								class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-xl font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-200 dark:border-blue-800"
 							>
 								<mat-icon class="icon-size-5">fingerprint</mat-icon>
-								Continue with Passkey
+								{{ "saving_operations.continue_with_passkey" | transloco }}
 							</button>
 							<div class="mt-4 flex items-center gap-3">
 								<div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-								<span class="text-xs font-medium text-gray-400 uppercase">Or use password</span>
+								<span class="text-xs font-medium text-gray-400 uppercase">{{ "saving_operations.or_use_password" | transloco }}</span>
 								<div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
 							</div>
 						</div>
@@ -120,7 +160,9 @@
 					<!-- Password Form -->
 					<form (ngSubmit)="proceedToBiometric()">
 						<div class="space-y-1.5 mb-6">
-							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Master Password</label>
+							<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+								"saving_operations.master_password_label" | transloco
+							}}</label>
 							<div
 								class="flex items-center w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 focus-within:border-blue-500 dark:focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all"
 							>
@@ -130,7 +172,7 @@
 									[type]="showPassword ? 'text' : 'password'"
 									name="masterPassword"
 									class="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white py-3 font-medium placeholder-gray-400"
-									placeholder="Enter your master password"
+									[placeholder]="'saving_operations.enter_master_password' | transloco"
 									required
 								/>
 								<button
@@ -170,63 +212,53 @@
 			</div>
 		</div>
 
-		<!-- Safe Cancel Link -->
-		<div class="text-center mt-6">
-			<button
-				(click)="goBack()"
-				class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+		<!-- Biometric Verification Modal - Full Screen (Matches Sign In Style) -->
+		@if (showBiometricModal) {
+			<div
+				class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300 animate-fade-in"
 			>
-				Go back to settings
-			</button>
-		</div>
-	</div>
-
-	<!-- Biometric Verification Modal - Full Screen (Matches Sign In Style) -->
-	@if (showBiometricModal) {
-		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300 animate-fade-in"
-		>
-			<div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-				<!-- Header -->
-				<div class="px-6 py-5 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-800">
-					<div class="flex flex-col">
-						<h2 class="text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
-							{{ "save_confirmation.biometric_verification" | transloco }}
-						</h2>
-						<div class="flex items-center gap-1.5 mt-1">
-							<div
-								class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide flex items-center gap-1"
-							>
-								<mat-icon class="icon-size-3">lock</mat-icon>
-								<span>SECURE</span>
+				<div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+					<!-- Header -->
+					<div class="px-6 py-5 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-800">
+						<div class="flex flex-col">
+							<h2 class="text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+								{{ "save_confirmation.biometric_verification" | transloco }}
+							</h2>
+							<div class="flex items-center gap-1.5 mt-1">
+								<div
+									class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide flex items-center gap-1"
+								>
+									<mat-icon class="icon-size-3">lock</mat-icon>
+									<span>SECURE</span>
+								</div>
+								<span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+									{{ saveData?.domainConfig?.name || saveData?.operation?.itemName || "configuration" }}
+								</span>
 							</div>
-							<span class="text-xs font-medium text-gray-500 dark:text-gray-400">
-								{{ saveData?.domainConfig?.name || saveData?.operation?.itemName || "configuration" }}
-							</span>
 						</div>
+						<button
+							mat-icon-button
+							(click)="onBiometricCancel()"
+							class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors"
+						>
+							<mat-icon class="icon-size-4 text-gray-500 dark:text-gray-400">close</mat-icon>
+						</button>
 					</div>
-					<button
-						mat-icon-button
-						(click)="onBiometricCancel()"
-						class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors"
-					>
-						<mat-icon class="icon-size-4 text-gray-500 dark:text-gray-400">close</mat-icon>
-					</button>
-				</div>
 
-				<div class="p-0 pt-4 pb-8 overflow-y-auto flex-1 flex flex-col justify-center items-center">
-					<!-- Biometric Component -->
-					<app-data-biometrics
-						[userData]="{
-							domain: saveData?.domainConfig?.name || saveData?.operation?.itemName,
-							masterPassword: masterPassword,
-						}"
-						[isModalContext]="true"
-						(biometricsSuccess)="onBiometricSuccess($event)"
-						(biometricsCancel)="onBiometricCancel()"
-					></app-data-biometrics>
+					<div class="p-0 pt-4 pb-8 overflow-y-auto flex-1 flex flex-col justify-center items-center">
+						<!-- Biometric Component -->
+						<app-data-biometrics
+							[userData]="{
+								domain: saveData?.domainConfig?.name || saveData?.operation?.itemName,
+								masterPassword: masterPassword,
+							}"
+							[isModalContext]="true"
+							(biometricsSuccess)="onBiometricSuccess($event)"
+							(biometricsCancel)="onBiometricCancel()"
+						></app-data-biometrics>
+					</div>
 				</div>
 			</div>
-		</div>
-	}
+		}
+	</div>
 </div>
