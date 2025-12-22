@@ -11,6 +11,7 @@ export interface User {
 export interface ZelfAccountMetadata {
 	// Client account properties
 	name?: string;
+	accountName?: string;
 	accountType: string;
 	accountEmail?: string;
 	accountPhone?: string;
@@ -64,7 +65,7 @@ export class ZelfUser {
 	public readonly userId: string;
 
 	constructor(zelfAccount: ZelfAccount) {
-		const metadata = zelfAccount.publicData;
+		const metadata = (zelfAccount.publicData || {}) as ZelfAccountMetadata;
 
 		this.id = zelfAccount.id;
 
@@ -78,7 +79,7 @@ export class ZelfUser {
 		this.subscriptionId = metadata.accountSubscriptionId || "free";
 		this.zelfProof = metadata.accountZelfProof || "";
 		this.type = metadata.accountType || "client_account";
-		this.name = metadata.staffName || metadata.name || this.extractNameFromEmail(this.email);
+		this.name = metadata.staffName || metadata.name || metadata.accountName || this.extractNameFromEmail(this.email);
 		this.createdAt = zelfAccount.date_pinned || zelfAccount.created_at;
 		this.ipfsHash = zelfAccount.ipfs_pin_hash;
 		this.userId = zelfAccount.user_id;

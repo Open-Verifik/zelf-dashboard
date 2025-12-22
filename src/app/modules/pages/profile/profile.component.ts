@@ -111,10 +111,14 @@ export class ProfileComponent implements OnInit {
 				return;
 			}
 
-			const email = zelfAccount.publicData?.accountEmail || zelfAccount.publicData?.staffEmail;
+			const publicData = zelfAccount.publicData || zelfAccount.keyvalues;
+
+			const email = publicData?.accountEmail || publicData?.staffEmail;
+
 			if (email) {
 				try {
 					const response = await this._clientService.getProfile(email);
+
 					if (response && response.data) {
 						const freshRecord = response.data;
 						// Map keyvalues to publicData if needed (IPFS record structure)
@@ -124,10 +128,6 @@ export class ProfileComponent implements OnInit {
 						const updatedAccount = {
 							...zelfAccount,
 							...freshRecord,
-							publicData: {
-								...zelfAccount.publicData,
-								...freshRecord.publicData,
-							},
 						};
 
 						// Update session
