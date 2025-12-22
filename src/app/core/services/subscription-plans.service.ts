@@ -204,4 +204,23 @@ export class SubscriptionPlansService {
 			throw error;
 		}
 	}
+
+	/**
+	 * Verify Stripe session payment
+	 */
+	async verifySession(sessionId: string): Promise<VerifySessionResponse> {
+		try {
+			const response = await this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/subscription-plans/verify-session`, {
+				sessionId,
+			});
+			return response.data || response;
+		} catch (error) {
+			throw error;
+		}
+	}
+}
+
+export interface VerifySessionResponse {
+	success: boolean;
+	record: any;
 }

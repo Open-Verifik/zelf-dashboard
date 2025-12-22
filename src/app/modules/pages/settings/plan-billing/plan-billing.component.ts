@@ -1,4 +1,5 @@
-import { NgClass } from "@angular/common";
+import { CommonModule, NgClass } from "@angular/common";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -8,9 +9,8 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatSelectModule } from "@angular/material/select";
-import { FuseAlertComponent } from "@fuse/components/alert";
-import { FuseCardComponent } from "@fuse/components/card";
-import { SubscriptionPlansService, SubscriptionPlan, Price, SubscribeRequest } from "app/core/services/subscription-plans.service";
+import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
+import { Price, SubscribeRequest, SubscriptionPlan, SubscriptionPlansService } from "app/core/services/subscription-plans.service";
 
 @Component({
 	selector: "settings-plan-billing",
@@ -18,10 +18,9 @@ import { SubscriptionPlansService, SubscriptionPlan, Price, SubscribeRequest } f
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
+		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
-		FuseAlertComponent,
-		FuseCardComponent,
 		MatRadioModule,
 		NgClass,
 		MatIconModule,
@@ -30,6 +29,7 @@ import { SubscriptionPlansService, SubscriptionPlan, Price, SubscribeRequest } f
 		MatSelectModule,
 		MatOptionModule,
 		MatButtonModule,
+		TranslocoModule,
 	],
 })
 export class SettingsPlanBillingComponent implements OnInit {
@@ -52,7 +52,10 @@ export class SettingsPlanBillingComponent implements OnInit {
 	constructor(
 		private _formBuilder: UntypedFormBuilder,
 		private _subscriptionPlansService: SubscriptionPlansService,
-		private _cdr: ChangeDetectorRef
+		private _cdr: ChangeDetectorRef,
+		private _translocoService: TranslocoService,
+		private _activatedRoute: ActivatedRoute,
+		private _router: Router
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -78,13 +81,41 @@ export class SettingsPlanBillingComponent implements OnInit {
 		});
 
 		try {
-			// Load subscription data first
+			// Check for session_id (return from Stripe checkout)
+			const sessionId = this._activatedRoute.snapshot.queryParamMap.get("session_id");
+
+			if (sessionId) await this.handleSessionVerification(sessionId);
+
+			// Load subscription data (always reload to get fresh state)
 			await this.loadMyPlan();
+
 			// Then load subscription plans
 			await this.loadSubscriptionPlans();
+		} catch (err) {
+			console.error("Error initializing plan billing:", err);
 		} finally {
 			this.initialLoading = false;
 			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Handle session verification
+	 */
+	async handleSessionVerification(sessionId: string): Promise<void> {
+		this.initialLoading = true;
+		this._cdr.detectChanges();
+
+		// Wait 3 seconds to allow webhook to process (if it beats us)
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+
+		// Verify session if needed
+		try {
+			console.log("Verifying session...", sessionId);
+			await this._subscriptionPlansService.verifySession(sessionId);
+		} catch (err) {
+			console.error("Session verification failed", err);
+			this.error = "Failed to verify subscription. Please contact support.";
 		}
 	}
 
@@ -112,7 +143,12 @@ export class SettingsPlanBillingComponent implements OnInit {
 		try {
 			const plans = await this._subscriptionPlansService.getSubscriptionPlans();
 
-			this.plans = plans;
+			// Sort plans by price (cheapest to expensive)
+			this.plans = plans.sort((a, b) => {
+				const priceA = this.getCheapestPrice(a)?.unit_amount || 0;
+				const priceB = this.getCheapestPrice(b)?.unit_amount || 0;
+				return priceA - priceB;
+			});
 
 			// Set default plan if available
 			if (plans.length > 0) {
@@ -210,13 +246,16 @@ export class SettingsPlanBillingComponent implements OnInit {
 	/**
 	 * Handle subscribe button click
 	 */
-	async onSubscribe(): Promise<void> {
-		const selectedPlanId = this.planBillingForm.get("plan")?.value;
+	subscribingPlanId: string | null = null;
 
-		if (!selectedPlanId) return;
+	/**
+	 * Handle subscribe button click
+	 */
+	async onSubscribe(planId: string): Promise<void> {
+		if (!planId) return;
 
 		// Find the selected plan
-		const selectedPlan = this.plans.find((plan) => plan.id === selectedPlanId);
+		const selectedPlan = this.plans.find((plan) => plan.id === planId);
 
 		if (!selectedPlan) return;
 
@@ -226,6 +265,7 @@ export class SettingsPlanBillingComponent implements OnInit {
 		if (!cheapestPrice) return;
 
 		this.subscribing = true;
+		this.subscribingPlanId = planId;
 
 		this.error = null;
 
@@ -252,6 +292,7 @@ export class SettingsPlanBillingComponent implements OnInit {
 			this.error = `Failed to create checkout session: ${error.message || "Unknown error"}`;
 		} finally {
 			this.subscribing = false;
+			this.subscribingPlanId = null;
 			this._cdr.detectChanges();
 		}
 	}

@@ -132,6 +132,54 @@
 			"action": "updating",
 			"itemName": "subscription plan"
 		},
+		"plan_billing_page": {
+			"loading_title": "Loading subscription details...",
+			"loading_description": "Please wait while we fetch your plan information",
+			"active_subscription": {
+				"title": "Current Plan",
+				"per": "per"
+			},
+			"details": {
+				"title": "Subscription Details",
+				"next_billing": "Next Billing Date",
+				"current_period": "Current Period",
+				"subscription_id": "Subscription ID"
+			},
+			"actions": {
+				"title": "Actions",
+				"manage_billing": "Manage Billing",
+				"cancel_plan": "Cancel Plan"
+			},
+			"limits": {
+				"title": "Plan Limits",
+				"subtitle": "Your current usage limits",
+				"tags": "Tags",
+				"zelfkeys": "ZelfKeys",
+				"zelfproofs": "ZelfProofs"
+			},
+			"available_upgrades": {
+				"title": "Available Upgrades",
+				"cancel": "Cancel Upgrade"
+			},
+			"select_plan": "Select a Plan",
+			"selected": "SELECTED",
+			"upgrade": "Upgrade",
+			"processing": "Processing...",
+			"get_started": "Get Started",
+			"billing_history": {
+				"title": "Billing History"
+			},
+			"features": {
+				"active_users": "active users",
+				"encryptions_mo": "encryptions/mo",
+				"encryptions": "encryptions",
+				"priority_support": "Priority Support",
+				"advanced_analytics": "Advanced Analytics",
+				"users": "users",
+				"dedicated_infra": "Dedicated Infra",
+				"unlimited": "Unlimited"
+			}
+		},
 		"notifications": {
 			"title": "Confirm Notification Settings",
 			"description": "Please enter your master password to proceed with updating your notification preferences",
