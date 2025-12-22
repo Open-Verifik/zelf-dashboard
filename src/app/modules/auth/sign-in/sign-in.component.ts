@@ -523,6 +523,9 @@ export class AuthSignInComponent implements OnInit {
 			if (errorMessage.includes("client_invalid_api_key")) {
 				return this._translocoService.translate("errors.client_invalid_api_key");
 			}
+			if (errorMessage.toUpperCase().includes("THE PROVIDED PASSWORD IS INVALID")) {
+				return this._translocoService.translate("errors.invalid_password");
+			}
 			if (errorMessage.includes("Incomplete authentication data received")) {
 				return this._translocoService.translate("errors.incomplete_auth_data");
 			}

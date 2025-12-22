@@ -51,6 +51,7 @@
 		"privacyPolicy": "Politique de confidentialité"
 	},
 	"errors": {
+		"invalid_password": "Le mot de passe fourni est invalide.",
 		"phone_already_exists": "Ce numéro de téléphone est déjà enregistré. Veuillez utiliser un numéro différent ou essayer de vous connecter.",
 		"email_already_exists": "Cette adresse e-mail est déjà enregistrée. Veuillez utiliser un e-mail différent ou essayer de vous connecter.",
 		"client_not_found": "Aucun compte trouvé avec les identifiants fournis. Veuillez vérifier vos informations et réessayer.",

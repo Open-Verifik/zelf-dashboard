@@ -19,6 +19,8 @@ export interface ZelfAccountMetadata {
 	accountZelfProof?: string;
 	accountCountryCode?: string;
 	accountSubscriptionId?: string;
+	accountPhoto?: string;
+	accountPhotoUrl?: string;
 
 	// Staff account properties
 	staffEmail?: string;

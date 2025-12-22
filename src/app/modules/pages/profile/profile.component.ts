@@ -147,8 +147,10 @@ export class ProfileComponent implements OnInit {
 			this.user = new ZelfUser(zelfAccount);
 
 			// Load staff photo if available
-			if (zelfAccount.metadata?.staffPhotoUrl) {
-				this.userPhoto = zelfAccount.metadata.staffPhotoUrl;
+			const meta = zelfAccount.publicData || zelfAccount.keyvalues || zelfAccount.metadata || {};
+
+			if (meta.staffPhotoUrl || meta.accountPhotoUrl) {
+				this.userPhoto = meta.staffPhotoUrl || meta.accountPhotoUrl;
 			}
 
 			this.populateForm();
@@ -357,6 +359,10 @@ export class ProfileComponent implements OnInit {
 				...profileData,
 				...formValue,
 			};
+
+			if (this.selectedPhotoBase64) {
+				profileData.accountPhoto = this.selectedPhotoBase64;
+			}
 		}
 
 		// Set save data in service

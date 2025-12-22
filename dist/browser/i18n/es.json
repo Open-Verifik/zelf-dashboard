@@ -52,6 +52,7 @@
 		"privacyPolicy": "Política de Privacidad"
 	},
 	"errors": {
+		"invalid_password": "La contraseña proporcionada es inválida.",
 		"phone_already_exists": "Este número de teléfono ya está registrado. Por favor usa un número diferente o intenta iniciar sesión.",
 		"email_already_exists": "Esta dirección de email ya está registrada. Por favor usa un email diferente o intenta iniciar sesión.",
 		"client_not_found": "No se encontró ninguna cuenta con las credenciales proporcionadas. Por favor verifica tu información e intenta de nuevo.",
