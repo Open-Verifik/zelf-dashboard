@@ -316,9 +316,9 @@ export class License {
 				storage: {
 					// Moved storage inside tags
 					keyPrefix: configData?.tags?.storage?.keyPrefix || "tagName",
-					ipfsEnabled: configData?.tags?.storage?.ipfsEnabled || true,
-					arweaveEnabled: configData?.tags?.storage?.arweaveEnabled || true,
-					walrusEnabled: configData?.tags?.storage?.walrusEnabled || true,
+					ipfsEnabled: configData?.tags?.storage?.ipfsEnabled ?? true,
+					arweaveEnabled: configData?.tags?.storage?.arweaveEnabled ?? true,
+					walrusEnabled: configData?.tags?.storage?.walrusEnabled ?? true,
 					backupEnabled: configData?.tags?.storage?.backupEnabled || false,
 				},
 			},
@@ -331,9 +331,9 @@ export class License {
 				storage: {
 					// Moved storage inside zelfkeys
 					keyPrefix: configData?.zelfkeys?.storage?.keyPrefix || "tagName",
-					ipfsEnabled: configData?.zelfkeys?.storage?.ipfsEnabled || true,
-					arweaveEnabled: configData?.zelfkeys?.storage?.arweaveEnabled || true,
-					walrusEnabled: configData?.zelfkeys?.storage?.walrusEnabled || true,
+					ipfsEnabled: configData?.zelfkeys?.storage?.ipfsEnabled ?? true,
+					arweaveEnabled: configData?.zelfkeys?.storage?.arweaveEnabled ?? true,
+					walrusEnabled: configData?.zelfkeys?.storage?.walrusEnabled ?? true,
 					backupEnabled: configData?.zelfkeys?.storage?.backupEnabled || false,
 				},
 			},
