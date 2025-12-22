@@ -15,6 +15,7 @@ import { HttpWrapperService } from "../../../http-wrapper.service";
 import { PasskeyService } from "../../../core/services/passkey.service";
 import { AuthService } from "../../../core/auth/auth.service";
 import { StaffService } from "../../../core/services/staff.service";
+import { ClientService } from "../../../core/services/client.service";
 import { environment } from "../../../../environments/environment";
 import { License } from "../settings/license/license.class";
 
@@ -63,7 +64,8 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private translocoService: TranslocoService,
 		private passkeyService: PasskeyService,
-		private staffService: StaffService
+		private staffService: StaffService,
+		private clientService: ClientService
 	) {}
 
 	ngOnInit(): void {
@@ -91,12 +93,13 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 		});
 
 		// Check for passkey
-		const email = this.authService.zelfAccount?.publicData?.accountEmail;
+		const email = this.authService.zelfAccount?.publicData?.accountEmail || this.authService.zelfAccount?.publicData?.staffEmail;
 		if (email) {
-			const metadata = this.passkeyService.getPasskeyMetadata(email);
-			if (metadata) {
-				this.hasPasskey = true;
-			}
+			this.passkeyService.getPasskeyMetadata(email).then((metadata) => {
+				if (metadata) {
+					this.hasPasskey = true;
+				}
+			});
 		}
 	}
 
@@ -118,10 +121,10 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	async onPasskeyLogin(): Promise<void> {
 		this.isLoading = true;
 		try {
-			const email = this.authService.zelfAccount?.publicData?.accountEmail;
+			const email = this.authService.zelfAccount?.publicData?.accountEmail || this.authService.zelfAccount?.publicData?.staffEmail;
 			if (!email) throw new Error("No user email found");
 
-			const metadata = this.passkeyService.getPasskeyMetadata(email);
+			const metadata = await this.passkeyService.getPasskeyMetadata(email);
 			if (!metadata) throw new Error("No passkey metadata found");
 
 			// Authenticate with passkey
@@ -416,8 +419,8 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 
 			if (error?.message) {
 				if (error.message.includes("FACE IS NOT CENTRAL")) {
-				errorMessage = "Face is not central. Please use an image with a central face.";
-			} else if (error.message.includes("error_decrypting_zelf_account")) {
+					errorMessage = "Face is not central. Please use an image with a central face.";
+				} else if (error.message.includes("error_decrypting_zelf_account")) {
 					errorMessage = "Biometric verification failed. Please check your face image and master password.";
 				} else if (error.message.includes("staff_already_exists")) {
 					errorMessage = "This staff member already exists.";
@@ -594,7 +597,17 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 				// Don't override the email - let the backend handle it
 			};
 
-			const response = await this.httpWrapper.sendRequest("put", `${environment.apiUrl}${environment.endpoints.client.update}`, requestData);
+			let response;
+
+			const isStaff = this.authService.zelfAccount?.publicData?.accountType === "staff_account";
+
+			if (isStaff) {
+				// Use StaffService for staff accounts
+				response = await this.staffService.updateProfile(requestData);
+			} else {
+				// Use standard client update
+				response = await this.clientService.updateProfile(requestData);
+			}
 
 			if (response && response.data) {
 				// Update zelfAccount if provided
@@ -648,17 +661,16 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 * Invite staff member
 	 */
 	private async inviteStaff(staffData: any): Promise<void> {
-		const response: any = await this.staffService
-			.inviteStaff({
-				staffEmail: staffData.staffEmail,
-				staffPhone: staffData.staffPhone,
-				staffName: staffData.staffName,
-				role: staffData.role,
-				faceBase64: staffData.faceBase64,
-				masterPassword: staffData.masterPassword,
-				isResend: staffData.isResend,
-			})
-			.toPromise();
+		const response: any = await this.staffService.inviteStaff({
+			staffEmail: staffData.staffEmail,
+			staffPhone: staffData.staffPhone,
+			staffCountryCode: staffData.staffCountryCode,
+			staffName: staffData.staffName,
+			role: staffData.role,
+			faceBase64: staffData.faceBase64,
+			masterPassword: staffData.masterPassword,
+			isResend: staffData.isResend,
+		});
 
 		this.showSuccess("Invitation sent successfully!");
 		setTimeout(() => {
@@ -670,13 +682,11 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 * Remove staff member
 	 */
 	private async removeStaff(staffData: any): Promise<void> {
-		await this.staffService
-			.removeStaff({
-				staffEmail: staffData.staffEmail,
-				faceBase64: staffData.faceBase64,
-				masterPassword: staffData.masterPassword,
-			})
-			.toPromise();
+		await this.staffService.removeStaff({
+			staffEmail: staffData.staffEmail,
+			faceBase64: staffData.faceBase64,
+			masterPassword: staffData.masterPassword,
+		});
 
 		this.showSuccess("Staff member removed successfully!");
 		setTimeout(() => {
@@ -688,14 +698,12 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 	 * Update staff member role
 	 */
 	private async updateStaffRole(staffData: any): Promise<void> {
-		await this.staffService
-			.updateRole({
-				staffEmail: staffData.staffEmail,
-				newRole: staffData.newRole,
-				faceBase64: staffData.faceBase64,
-				masterPassword: staffData.masterPassword,
-			})
-			.toPromise();
+		await this.staffService.updateRole({
+			staffEmail: staffData.staffEmail,
+			newRole: staffData.newRole,
+			faceBase64: staffData.faceBase64,
+			masterPassword: staffData.masterPassword,
+		});
 
 		this.showSuccess("Role updated successfully!");
 		setTimeout(() => {

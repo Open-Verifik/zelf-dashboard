@@ -175,34 +175,33 @@ export class SettingsTeamComponent implements OnInit {
 	// @ Public methods
 	// -----------------------------------------------------------------------------------------------------
 
-	loadStaff(): void {
+	async loadStaff(): Promise<void> {
 		this.isLoading = true;
 		this._cdr.markForCheck();
 
-		this._staffService.getStaff().subscribe({
-			next: (data) => {
-				const rawMembers = Array.isArray(data) ? data : data.data || [];
-				this.members = rawMembers.map((member: any) => {
-					// Check for pending status in various possible locations
-					const isPending =
-						member.invitationStatus === "pending" ||
-						member.publicData?.invitationStatus === "pending" ||
-						member.metadata?.invitationStatus === "pending";
+		try {
+			const data = await this._staffService.getStaff();
 
-					return {
-						...member,
-						isPending,
-					};
-				});
-				this.isLoading = false;
-				this._cdr.markForCheck();
-			},
-			error: (err) => {
-				console.error("Error loading staff", err);
-				this.isLoading = false;
-				this._cdr.markForCheck();
-			},
-		});
+			const rawMembers = Array.isArray(data) ? data : data.data || [];
+			this.members = rawMembers.map((member: any) => {
+				// Check for pending status in various possible locations
+				const isPending =
+					member.invitationStatus === "pending" ||
+					member.publicData?.invitationStatus === "pending" ||
+					member.metadata?.invitationStatus === "pending";
+
+				return {
+					...member,
+					isPending,
+				};
+			});
+			this.isLoading = false;
+			this._cdr.markForCheck();
+		} catch (err) {
+			console.error("Error loading staff", err);
+			this.isLoading = false;
+			this._cdr.markForCheck();
+		}
 	}
 
 	openInviteModal(): void {
@@ -228,7 +227,8 @@ export class SettingsTeamComponent implements OnInit {
 					},
 					staffData: {
 						staffEmail: formData.email,
-						staffPhone: `${formData.countryCode}${formData.phone}`,
+						staffPhone: formData.phone,
+						staffCountryCode: formData.countryCode,
 						staffName: formData.name,
 						role: formData.role,
 						operation: "inviteStaff",

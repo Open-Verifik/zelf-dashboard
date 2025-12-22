@@ -112,6 +112,22 @@ export class AuthService {
 	}
 
 	/**
+	 * Validate staff invitation
+	 * @param token
+	 */
+	validateInvite(token: string): Promise<any> {
+		return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/staff/validate-invite?token=${token}`);
+	}
+
+	/**
+	 * Accept staff invitation
+	 * @param data
+	 */
+	acceptInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/staff/accept-invite`, data);
+	}
+
+	/**
 	 * Unlock session
 	 *
 	 * @param credentials

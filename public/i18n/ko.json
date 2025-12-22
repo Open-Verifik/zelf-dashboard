@@ -345,7 +345,13 @@
 			"9months": "9개월"
 		},
 		"chart": {
-			"dateFormat": "yyyy년 MMM dd일",
+			"total": "총계",
+			"dateFormat": "dd MMM",
+			"allTags": "모든 태그",
+			"paidTags": "유료 태그",
+			"tag": "태그",
+			"tags": "태그",
+			"chars": "문자",
 			"tooltip": {
 				"colon": ":",
 				"percentage": "%"

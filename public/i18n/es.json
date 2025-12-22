@@ -345,7 +345,13 @@
 			"9months": "9 meses"
 		},
 		"chart": {
-			"dateFormat": "dd MMM, yyyy",
+			"total": "Total",
+			"dateFormat": "dd MMM",
+			"allTags": "Todas las Etiquetas",
+			"paidTags": "Etiquetas Pagadas",
+			"tag": "etiqueta",
+			"tags": "etiquetas",
+			"chars": "caracteres",
 			"tooltip": {
 				"colon": ":",
 				"percentage": "%"
@@ -634,5 +640,14 @@
 			"nextPage": "Página siguiente",
 			"lastPage": "Última página"
 		}
+	},
+	"acceptInvite": {
+		"title": "Aceptar Invitación",
+		"invitedToJoin": "Has sido invitado a unirte a",
+		"createMasterPassword": "Crear Contraseña Maestra",
+		"verifyIdentity": "Verificar Identidad",
+		"biometricsProtected": "Protegido por Zelf Biometrics",
+		"verifyingInvitation": "Verificando invitación...",
+		"faceVerification": "Verificación Facial"
 	}
 }

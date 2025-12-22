@@ -10,6 +10,7 @@ import { Router } from "@angular/router";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { HttpWrapperService } from "../../../../http-wrapper.service";
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
+import { PasskeyService } from "../../../../core/services/passkey.service";
 import { environment } from "../../../../../environments/environment";
 
 @Component({
@@ -49,6 +50,16 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 	jwtToken: string = "";
 	showJwt: boolean = false;
 
+	// Passkey properties
+	passkeys: Array<{
+		identifier: string;
+		synced: boolean;
+		credentialId: string;
+		ipfsHash?: string;
+		ipfsUrl?: string;
+	}> = [];
+	isSyncingPasskey: string | null = null;
+
 	/**
 	 * Constructor
 	 */
@@ -58,7 +69,8 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 		private _cdr: ChangeDetectorRef,
 		private _router: Router,
 		private _saveConfirmationService: SaveConfirmationService,
-		private _translocoService: TranslocoService
+		private _translocoService: TranslocoService,
+		private _passkeyService: PasskeyService
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -83,6 +95,9 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 
 		// Load API key from sessionStorage if available
 		this.loadApiKeyFromStorage();
+
+		// Load passkeys
+		this.loadPasskeys();
 	}
 
 	/**
@@ -92,6 +107,7 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 		// Refresh data when component becomes visible again
 		this.loadJwtToken();
 		this.loadApiKeyFromStorage();
+		this.loadPasskeys();
 	}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -226,6 +242,177 @@ export class SettingsSecurityComponent implements OnInit, AfterViewInit {
 		this.securityForm.reset();
 		this.showAlert = false;
 		this._cdr.detectChanges();
+	}
+
+	/**
+	 * Load passkeys from localStorage for current user
+	 */
+	loadPasskeys(): void {
+		try {
+			// Get current user's email/phone from zelfAccount
+			const zelfAccount = localStorage.getItem("zelfAccount");
+
+			if (!zelfAccount) {
+				this.passkeys = [];
+
+				this._cdr.detectChanges();
+
+				return;
+			}
+
+			const account = JSON.parse(zelfAccount);
+
+			// For staff accounts, use staffEmail/staffPhone; for client accounts, use email/phone
+			const userIdentifier =
+				account.publicData.staffEmail || account.publicData.email || account.publicData.staffPhone || account.publicData.phone;
+
+			if (!userIdentifier) {
+				this.passkeys = [];
+
+				this._cdr.detectChanges();
+
+				return;
+			}
+
+			// Get passkeys from localStorage
+			const passkeyStore = localStorage.getItem("zelf_passkeys");
+
+			if (!passkeyStore) {
+				this.passkeys = [];
+				this._cdr.detectChanges();
+				return;
+			}
+
+			const store = JSON.parse(passkeyStore);
+
+			// Filter passkeys for current user
+			const filteredKeys = Object.keys(store).filter((key) => key === userIdentifier);
+
+			this.passkeys = filteredKeys.map((key) => ({
+				identifier: key,
+				synced: store[key].synced || false,
+				credentialId: store[key].credentialId,
+			}));
+
+			// Fetch IPFS details for synced passkeys
+			this.passkeys.forEach((passkey) => {
+				if (passkey.synced) {
+					this.fetchIpfsDetails(passkey.identifier);
+				}
+			});
+
+			this._cdr.detectChanges();
+		} catch (error) {
+			console.error("Error loading passkeys:", error);
+			this.passkeys = [];
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Sync a passkey to the cloud
+	 */
+	async syncPasskey(identifier: string): Promise<void> {
+		try {
+			this.isSyncingPasskey = identifier;
+			this._cdr.detectChanges();
+
+			// Get the passkey metadata from localStorage
+			const passkeyStore = localStorage.getItem("zelf_passkeys");
+			if (!passkeyStore) {
+				throw new Error("No passkeys found");
+			}
+
+			const store = JSON.parse(passkeyStore);
+			const metadata = store[identifier];
+
+			if (!metadata) {
+				throw new Error("Passkey not found");
+			}
+
+			// Call savePasskeyMetadata which will sync to cloud and update the synced flag
+			await this._passkeyService.savePasskeyMetadata(identifier, {
+				credentialId: metadata.credentialId,
+				salt: metadata.salt,
+				iv: metadata.iv,
+				ciphertext: metadata.ciphertext,
+			});
+
+			// Fetch IPFS details after successful sync
+			await this.fetchIpfsDetails(identifier);
+
+			this.showSuccess("Passkey synced to IPFS successfully");
+		} catch (error) {
+			console.error("Error syncing passkey:", error);
+			this.showError("Failed to sync passkey");
+		} finally {
+			this.isSyncingPasskey = null;
+			this._cdr.detectChanges();
+		}
+	}
+
+	/**
+	 * Fetch IPFS details for a synced passkey
+	 */
+	async fetchIpfsDetails(identifier: string): Promise<void> {
+		try {
+			// Determine if identifier is email or phone
+			const isEmail = identifier.includes("@");
+
+			const keyType = isEmail ? "passKeysEmail" : "passKeysPhone";
+
+			// Call backend to get IPFS record details
+			const response: any = await this._httpWrapper.sendRequest(
+				"get",
+				`${environment.apiUrl}/api/staff/passkeys/ipfs-details?identifier=${encodeURIComponent(identifier)}&keyType=${keyType}`,
+				null
+			);
+
+			if (response && response.data) {
+				// Update the passkey with IPFS details
+				const passkeyIndex = this.passkeys.findIndex((p) => p.identifier === identifier);
+				if (passkeyIndex !== -1) {
+					this.passkeys[passkeyIndex] = {
+						...this.passkeys[passkeyIndex],
+						synced: true,
+						ipfsHash: response.data.ipfsHash,
+						ipfsUrl: response.data.ipfsUrl,
+					};
+					this._cdr.detectChanges();
+				}
+			}
+		} catch (error) {
+			console.error("Error fetching IPFS details:", error);
+			// Don't throw - just reload passkeys without IPFS details
+			this.loadPasskeys();
+		}
+	}
+
+	/**
+	 * Delete a passkey from local storage and IPFS
+	 */
+	async deletePasskey(identifier: string): Promise<void> {
+		if (!confirm(`Are you sure you want to delete the passkey for ${identifier}? This action cannot be undone.`)) {
+			return;
+		}
+
+		try {
+			this.isSyncingPasskey = identifier; // Reuse loading state
+			this._cdr.detectChanges();
+
+			// Delete from both local and cloud
+			await this._passkeyService.deletePasskeyMetadata(identifier);
+
+			// Reload passkeys to reflect deletion
+			this.loadPasskeys();
+			this.showSuccess("Passkey deleted successfully");
+		} catch (error) {
+			console.error("Error deleting passkey:", error);
+			this.showError("Failed to delete passkey");
+		} finally {
+			this.isSyncingPasskey = null;
+			this._cdr.detectChanges();
+		}
 	}
 
 	/**

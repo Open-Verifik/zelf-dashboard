@@ -37,6 +37,7 @@ export interface SaveConfirmationData {
 	staffData?: {
 		staffEmail: string;
 		staffPhone: string;
+		staffCountryCode?: string;
 		staffName: string;
 		role: string;
 		operation: string; // "inviteStaff", "removeStaff", "updateRole"

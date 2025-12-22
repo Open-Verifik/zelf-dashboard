@@ -9,14 +9,25 @@ export interface User {
 }
 
 export interface ZelfAccountMetadata {
-	name: string;
+	// Client account properties
+	name?: string;
 	accountType: string;
-	accountEmail: string;
-	accountPhone: string;
-	accountCompany: string;
-	accountZelfProof: string;
-	accountCountryCode: string;
-	accountSubscriptionId: string;
+	accountEmail?: string;
+	accountPhone?: string;
+	accountCompany?: string;
+	accountZelfProof?: string;
+	accountCountryCode?: string;
+	accountSubscriptionId?: string;
+
+	// Staff account properties
+	staffEmail?: string;
+	staffPhone?: string;
+	staffCountryCode?: string;
+	staffName?: string;
+	staffRole?: string;
+	staffOwnerEmail?: string;
+	staffPhoto?: string; // IPFS hash
+	staffPhotoUrl?: string; // Full IPFS URL
 }
 
 export interface ZelfAccount {
@@ -56,14 +67,18 @@ export class ZelfUser {
 		const metadata = zelfAccount.publicData;
 
 		this.id = zelfAccount.id;
-		this.email = metadata.accountEmail || "";
-		this.phone = metadata.accountPhone || "";
-		this.company = metadata.accountCompany || "";
-		this.countryCode = metadata.accountCountryCode || "";
+
+		// Handle both client and staff account structures
+		// Staff accounts use: staffEmail, staffPhone, staffCountryCode, staffName, staffRole, staffOwnerEmail
+		// Client accounts use: accountEmail, accountPhone, accountCompany, accountCountryCode, etc.
+		this.email = metadata.staffEmail || metadata.accountEmail || "";
+		this.phone = metadata.staffPhone || metadata.accountPhone || "";
+		this.company = metadata.accountCompany || metadata.staffOwnerEmail || "";
+		this.countryCode = metadata.staffCountryCode || metadata.accountCountryCode || "";
 		this.subscriptionId = metadata.accountSubscriptionId || "free";
 		this.zelfProof = metadata.accountZelfProof || "";
 		this.type = metadata.accountType || "client_account";
-		this.name = metadata.name || this.extractNameFromEmail(this.email);
+		this.name = metadata.staffName || metadata.name || this.extractNameFromEmail(this.email);
 		this.createdAt = zelfAccount.date_pinned || zelfAccount.created_at;
 		this.ipfsHash = zelfAccount.ipfs_pin_hash;
 		this.userId = zelfAccount.user_id;

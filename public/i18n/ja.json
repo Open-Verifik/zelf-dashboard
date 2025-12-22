@@ -345,7 +345,13 @@
 			"9months": "9ヶ月"
 		},
 		"chart": {
-			"dateFormat": "yyyy年MMMdd日",
+			"total": "合計",
+			"dateFormat": "dd MMM",
+			"allTags": "すべてのタグ",
+			"paidTags": "有料タグ",
+			"tag": "タグ",
+			"tags": "タグ",
+			"chars": "文字",
 			"tooltip": {
 				"colon": "：",
 				"percentage": "%"

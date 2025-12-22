@@ -345,7 +345,13 @@
 			"9months": "9个月"
 		},
 		"chart": {
-			"dateFormat": "yyyy年MM月dd日",
+			"total": "总计",
+			"dateFormat": "dd MMM",
+			"allTags": "所有标签",
+			"paidTags": "付费标签",
+			"tag": "标签",
+			"tags": "标签",
+			"chars": "字符",
 			"tooltip": {
 				"colon": "：",
 				"percentage": "%"

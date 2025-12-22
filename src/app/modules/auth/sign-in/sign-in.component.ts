@@ -185,10 +185,10 @@ export class AuthSignInComponent implements OnInit {
 	/**
 	 * Check if there is a passkey for the entered identifier
 	 */
-	checkPasskey(): void {
+	async checkPasskey(): Promise<void> {
 		const identifier = this._getCurrentIdentifier();
 		if (identifier) {
-			const metadata = this._passkeyService.getPasskeyMetadata(identifier);
+			const metadata = await this._passkeyService.getPasskeyMetadata(identifier);
 			this.showPasskeyLogin = !!metadata;
 		} else {
 			this.showPasskeyLogin = false;
@@ -202,7 +202,7 @@ export class AuthSignInComponent implements OnInit {
 		const identifier = this._getCurrentIdentifier();
 		if (!identifier) return;
 
-		const metadata = this._passkeyService.getPasskeyMetadata(identifier);
+		const metadata = await this._passkeyService.getPasskeyMetadata(identifier);
 		if (!metadata) return;
 
 		try {
@@ -294,15 +294,28 @@ export class AuthSignInComponent implements OnInit {
 		this._authService.verifyClientExists(this.userData).subscribe(
 			(response) => {
 				const publicData = response.data?.publicData;
+				const isStaffAccount = publicData?.accountType === "staff_account";
 
-				this.userData = {
-					...this.userData, // Preserve original userData including masterPassword and identificationMethod
-					email: publicData?.accountEmail,
-					phone: publicData?.accountPhone,
-					countryCode: publicData?.accountCountryCode,
-				};
+				// Handle both client and staff accounts
+				if (isStaffAccount) {
+					// Staff account - use staffEmail, staffPhone, staffCountryCode
+					this.userData = {
+						...this.userData, // Preserve original userData including masterPassword and identificationMethod
+						email: publicData?.staffEmail,
+						phone: publicData?.staffPhone,
+						countryCode: publicData?.staffCountryCode,
+					};
+				} else {
+					// Client account - use accountEmail, accountPhone, accountCountryCode
+					this.userData = {
+						...this.userData, // Preserve original userData including masterPassword and identificationMethod
+						email: publicData?.accountEmail,
+						phone: publicData?.accountPhone,
+						countryCode: publicData?.accountCountryCode,
+					};
+				}
 
-				if (publicData?.accountEmail) {
+				if (publicData?.accountEmail || publicData?.staffEmail) {
 					this.showBiometricVerification = true;
 
 					this.showAlert = false;
@@ -342,11 +355,9 @@ export class AuthSignInComponent implements OnInit {
 			faceBase64: biometricData.faceBase64,
 		};
 
-		console.info({ signInData, biometricData });
-
 		// Sign in with biometric data
 		this._authService.signIn(signInData).then(
-			(response) => {
+			async (response) => {
 				// Check if we have all required data for authentication
 				if (response.data?.token && response.data?.zelfProof && response.data?.zelfAccount) {
 					// Set session data
@@ -363,7 +374,7 @@ export class AuthSignInComponent implements OnInit {
 					const password = this.signInForm.get("masterPassword")?.value;
 
 					if (identifier && password) {
-						const hasPasskey = this._passkeyService.getPasskeyMetadata(identifier);
+						const hasPasskey = await this._passkeyService.getPasskeyMetadata(identifier);
 
 						if (!hasPasskey) {
 							this.showPasskeyPrompt = true;
@@ -446,7 +457,7 @@ export class AuthSignInComponent implements OnInit {
 			this._passkeyService.register(identifier).then(async (regResult) => {
 				if (regResult) {
 					const encrypted = await this._passkeyService.encryptPassword(password, regResult.key);
-					this._passkeyService.savePasskeyMetadata(identifier, {
+					await this._passkeyService.savePasskeyMetadata(identifier, {
 						credentialId: regResult.credentialId,
 						salt: this._passkeyService.bufferToBase64(regResult.salt),
 						iv: encrypted.iv,

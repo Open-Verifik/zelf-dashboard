@@ -343,7 +343,13 @@
 			"9months": "9 mois"
 		},
 		"chart": {
-			"dateFormat": "dd MMM yyyy",
+			"total": "Total",
+			"dateFormat": "dd MMM",
+			"allTags": "Toutes les Étiquettes",
+			"paidTags": "Étiquettes Payantes",
+			"tag": "étiquette",
+			"tags": "étiquettes",
+			"chars": "caractères",
 			"tooltip": {
 				"colon": " :",
 				"percentage": "%"
@@ -380,14 +386,6 @@
 			"belowTarget": "sous l'objectif",
 			"comingSoon": "bientôt disponible",
 			"unknown": "Inconnu"
-		},
-		"chart": {
-			"total": "Total",
-			"allTags": "Toutes les Étiquettes",
-			"paidTags": "Étiquettes Payantes",
-			"tag": "étiquettes",
-			"tags": "étiquettes",
-			"chars": "caractères"
 		}
 	},
 	"profile": {

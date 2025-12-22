@@ -78,12 +78,21 @@
 							<div
 								class="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-white dark:ring-slate-800 overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl font-bold text-gray-500 dark:text-gray-400"
 							>
-								<img *ngIf="userPhoto" [src]="userPhoto" class="w-full h-full object-cover" [alt]="displayName" />
-								<span *ngIf="!userPhoto">{{ user?.name?.[0] || displayName[0] }}</span>
+								<img
+									*ngIf="photoPreviewUrl || userPhoto"
+									[src]="photoPreviewUrl || userPhoto"
+									class="w-full h-full object-cover"
+									[alt]="displayName"
+								/>
+								<span *ngIf="!photoPreviewUrl && !userPhoto">{{ user?.name?.[0] || displayName[0] }}</span>
 							</div>
-							<!-- Edit Avatar Button (Visual only for now) -->
+							<!-- Hidden file input -->
+							<input type="file" id="photoInput" accept="image/*" (change)="onPhotoSelected($event)" class="hidden" />
+							<!-- Edit Avatar Button -->
 							<button
 								*ngIf="isEditing"
+								(click)="triggerPhotoUpload()"
+								type="button"
 								class="absolute bottom-0 right-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors shadow-md"
 							>
 								<mat-icon class="icon-size-4">camera_alt</mat-icon>
@@ -160,8 +169,8 @@
 								</div>
 							</div>
 
-							<!-- Company -->
-							<div class="space-y-1.5">
+							<!-- Company (Only for client accounts) -->
+							<div class="space-y-1.5" *ngIf="user?.accountType !== 'staff_account'">
 								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
 									"profile.information.company" | transloco
 								}}</label>
@@ -175,31 +184,6 @@
 								<div class="h-3 ml-1"></div>
 							</div>
 
-							<!-- Email -->
-							<div class="space-y-1.5 md:col-span-2">
-								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
-									"profile.information.email" | transloco
-								}}</label>
-								<div class="relative">
-									<mat-icon class="absolute left-4 top-3.5 icon-size-5 text-gray-400">mail</mat-icon>
-									<input
-										type="email"
-										formControlName="email"
-										(input)="onFormChange()"
-										class="w-full pl-12 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-										[placeholder]="'profile.information.email_placeholder' | transloco"
-									/>
-								</div>
-								<div class="h-3 ml-1">
-									<span
-										class="text-xs text-red-500 font-medium"
-										*ngIf="profileForm.get('email')?.hasError('email') && profileForm.get('email')?.touched"
-									>
-										{{ "profile.information.email_invalid" | transloco }}
-									</span>
-								</div>
-							</div>
-
 							<!-- Phone Section -->
 							<div class="md:col-span-2 space-y-1.5">
 								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
@@ -210,6 +194,7 @@
 									<div class="w-36 relative country-code-field">
 										<div class="relative">
 											<input
+												#countryInput
 												type="text"
 												formControlName="countryCode"
 												[(ngModel)]="countryCodeSearchTerm"
@@ -218,7 +203,10 @@
 												placeholder="Code"
 												class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
 											/>
-											<div class="absolute right-3 top-3 text-gray-400 pointer-events-none">
+											<div
+												class="absolute right-3 top-3 text-gray-400 cursor-pointer"
+												(click)="countryInput.focus(); toggleCountryDropdown()"
+											>
 												<mat-icon class="icon-size-5">keyboard_arrow_down</mat-icon>
 											</div>
 										</div>
@@ -255,6 +243,31 @@
 								<div class="h-3 ml-1">
 									<span class="text-xs text-red-500 font-medium" *ngIf="profileForm.get('phone')?.hasError('pattern')">
 										{{ "profile.information.phone_invalid" | transloco }}
+									</span>
+								</div>
+							</div>
+
+							<!-- Email -->
+							<div class="space-y-1.5 md:col-span-2">
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
+									"profile.information.email" | transloco
+								}}</label>
+								<div class="relative">
+									<mat-icon class="absolute left-4 top-3.5 icon-size-5 text-gray-400">mail</mat-icon>
+									<input
+										type="email"
+										formControlName="email"
+										(input)="onFormChange()"
+										class="w-full pl-12 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+										[placeholder]="'profile.information.email_placeholder' | transloco"
+									/>
+								</div>
+								<div class="h-3 ml-1">
+									<span
+										class="text-xs text-red-500 font-medium"
+										*ngIf="profileForm.get('email')?.hasError('email') && profileForm.get('email')?.touched"
+									>
+										{{ "profile.information.email_invalid" | transloco }}
 									</span>
 								</div>
 							</div>

@@ -1,10 +1,14 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "environments/environment";
+import { firstValueFrom } from "rxjs";
 
 @Injectable({
 	providedIn: "root",
 })
 export class PasskeyService {
 	private readonly STORAGE_KEY = "zelf_passkeys";
+	private _httpClient = inject(HttpClient);
 
 	constructor() {}
 
@@ -193,20 +197,99 @@ export class PasskeyService {
 	}
 
 	/**
-	 * Stores the passkey metadata locally
+	 * Stores the passkey metadata locally and in the cloud
 	 */
-	savePasskeyMetadata(identifier: string, metadata: { credentialId: string; salt: string; iv: string; ciphertext: string }) {
+	async savePasskeyMetadata(identifier: string, metadata: { credentialId: string; salt: string; iv: string; ciphertext: string }): Promise<void> {
+		// 1. Save data to localStorage (synced: false initially)
 		const store = this.getStore();
-		store[identifier] = metadata;
+		store[identifier] = { ...metadata, synced: false };
 		localStorage.setItem(this.STORAGE_KEY, JSON.stringify(store));
+
+		// 2. Save data to Cloud (IPFS) via Staff Endpoint
+		try {
+			// Determine if identifier is email or phone
+			const isEmail = identifier.includes("@");
+			const payload: any = { passkey: metadata };
+			if (isEmail) {
+				payload.email = identifier;
+			} else {
+				payload.phone = identifier;
+			}
+
+			// We try to save to both, if staff endpoint fails (e.g. 401/403 or server error), we just log it
+			await firstValueFrom(this._httpClient.post(`${environment.apiUrl}/api/staff/passkeys`, payload));
+
+			// 3. Mark as synced in localStorage
+			const updatedStore = this.getStore();
+			if (updatedStore[identifier]) {
+				updatedStore[identifier].synced = true;
+				localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedStore));
+			}
+		} catch (error) {
+			console.error("Failed to sync passkey to cloud:", error);
+			// We don't throw here to ensure local flow continues
+		}
 	}
 
 	/**
 	 * Retrieves passkey metadata for a user identifier
 	 */
-	getPasskeyMetadata(identifier: string): { credentialId: string; salt: string; iv: string; ciphertext: string } | null {
+	async getPasskeyMetadata(identifier: string): Promise<{ credentialId: string; salt: string; iv: string; ciphertext: string } | null> {
+		// 1. Try Local Storage
 		const store = this.getStore();
-		return store[identifier] || null;
+		if (store[identifier]) {
+			return store[identifier];
+		}
+
+		// 2. Try Cloud (IPFS)
+		try {
+			const response: any = await firstValueFrom(
+				this._httpClient.get(`${environment.apiUrl}/api/staff/passkeys?identifier=${encodeURIComponent(identifier)}`)
+			);
+
+			if (response && response.data) {
+				// Cache locally for next time (synced: true since it came from cloud)
+				const metadata = response.data;
+				const localStore = this.getStore();
+				localStore[identifier] = { ...metadata, synced: true };
+				localStorage.setItem(this.STORAGE_KEY, JSON.stringify(localStore));
+
+				return metadata;
+			}
+		} catch (error) {
+			// If not found or error, just return null
+			// console.log("Passkey not found in cloud");
+		}
+
+		return null;
+	}
+
+	/**
+	 * Delete passkey metadata from localStorage and cloud
+	 */
+	async deletePasskeyMetadata(identifier: string): Promise<void> {
+		// 1. Delete from localStorage
+		const store = this.getStore();
+		if (store[identifier]) {
+			delete store[identifier];
+			localStorage.setItem(this.STORAGE_KEY, JSON.stringify(store));
+		}
+
+		// 2. Delete from Cloud (IPFS)
+		try {
+			const isEmail = identifier.includes("@");
+			const payload: any = { identifier };
+			if (isEmail) {
+				payload.email = identifier;
+			} else {
+				payload.phone = identifier;
+			}
+
+			await firstValueFrom(this._httpClient.delete(`${environment.apiUrl}/api/staff/passkeys`, { body: payload }));
+		} catch (error) {
+			console.error("Failed to delete passkey from cloud:", error);
+			// Don't throw - local deletion succeeded
+		}
 	}
 
 	/**

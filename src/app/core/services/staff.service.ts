@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { HttpWrapperService } from "../../http-wrapper.service";
 import { environment } from "environments/environment";
 
 @Injectable({
@@ -9,49 +8,63 @@ import { environment } from "environments/environment";
 export class StaffService {
 	private _baseUrl = `${environment.apiUrl}/api/staff`;
 
-	constructor(private _httpClient: HttpClient) {}
+	constructor(private _httpWrapper: HttpWrapperService) {}
 
 	/**
 	 * Get all staff members
 	 */
-	getStaff(): Observable<any> {
-		return this._httpClient.get(this._baseUrl);
+	async getStaff(): Promise<any> {
+		return this._httpWrapper.sendRequest("get", this._baseUrl);
 	}
 
 	/**
 	 * Invite a new staff member
 	 * Requires biometric verification from the owner
 	 */
-	inviteStaff(data: {
+	async inviteStaff(data: {
 		staffEmail: string;
 		staffPhone: string;
+		staffCountryCode?: string;
 		staffName: string;
 		role: string;
 		faceBase64: string;
 		masterPassword?: string;
 		isResend?: boolean;
-	}): Observable<any> {
-		return this._httpClient.post(this._baseUrl + "/invite", data);
+	}): Promise<any> {
+		return this._httpWrapper.sendRequest("post", this._baseUrl + "/invite", data);
 	}
 
 	/**
 	 * Accept invitation (Public endpoint)
 	 */
-	acceptInvitation(data: { invitationToken: string; faceBase64: string; masterPassword?: string }): Observable<any> {
-		return this._httpClient.post(this._baseUrl + "/accept-invite", data);
+	async acceptInvitation(data: { invitationToken: string; faceBase64: string; masterPassword?: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("post", this._baseUrl + "/accept-invite", data);
 	}
 
 	/**
 	 * Update staff role
 	 */
-	updateRole(data: { staffEmail: string; newRole: string; faceBase64: string; masterPassword?: string }): Observable<any> {
-		return this._httpClient.put(this._baseUrl + "/role", data);
+	async updateRole(data: { staffEmail: string; newRole: string; faceBase64: string; masterPassword?: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("put", this._baseUrl + "/role", data);
 	}
 
 	/**
 	 * Remove staff member
 	 */
-	removeStaff(data: { staffEmail: string; faceBase64: string; masterPassword?: string }): Observable<any> {
-		return this._httpClient.delete(this._baseUrl, { body: data });
+	async removeStaff(data: { staffEmail: string; faceBase64: string; masterPassword?: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("delete", this._baseUrl, { body: data });
+	}
+
+	/**
+	 * Update staff profile
+	 */
+	async updateProfile(data: {
+		staffName?: string;
+		staffEmail?: string;
+		staffPhone?: string;
+		staffCountryCode?: string;
+		staffPhoto?: string;
+	}): Promise<any> {
+		return this._httpWrapper.sendRequest("put", this._baseUrl, data);
 	}
 }

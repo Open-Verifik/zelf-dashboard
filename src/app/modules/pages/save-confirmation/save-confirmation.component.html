@@ -136,6 +136,47 @@
 								}
 							</div>
 						}
+
+						<!-- Profile Data -->
+						@if (saveData.profileData) {
+							<div class="space-y-2">
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.name" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+										saveData.profileData.name || saveData.profileData.staffName
+									}}</span>
+								</div>
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.email" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+										saveData.profileData.email || saveData.profileData.staffEmail
+									}}</span>
+								</div>
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.phone" | transloco }}</span>
+									<span class="text-sm font-semibold text-gray-900 dark:text-white">
+										{{ saveData.profileData.countryCode || saveData.profileData.staffCountryCode }}
+										{{ saveData.profileData.phone || saveData.profileData.staffPhone }}
+									</span>
+								</div>
+								@if (saveData.profileData.company) {
+									<div class="flex justify-between items-center">
+										<span class="text-sm text-gray-500 dark:text-gray-400">{{ "saving_operations.company" | transloco }}</span>
+										<span class="text-sm font-semibold text-gray-900 dark:text-white">{{ saveData.profileData.company }}</span>
+									</div>
+								}
+								@if (saveData.profileData.staffPhoto) {
+									<div class="flex justify-between items-center">
+										<span class="text-sm text-gray-500 dark:text-gray-400">{{ "profile.photo" | transloco }}</span>
+										<span
+											class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+										>
+											{{ "saving_operations.updated" | transloco }}
+										</span>
+									</div>
+								}
+							</div>
+						}
 					</div>
 
 					<!-- Passkey Login Option -->

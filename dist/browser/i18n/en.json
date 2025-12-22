@@ -89,6 +89,9 @@
 		"or_use_password": "Or use password",
 		"master_password_label": "Master Password",
 		"enter_master_password": "Enter your master password",
+		"phone": "Phone",
+		"updated": "UPDATED",
+		"company": "Company",
 		"theme_settings_updated_successfully": "Theme settings updated successfully!",
 		"license_configuration": {
 			"title": "Confirm License Configuration",
@@ -359,7 +362,13 @@
 			"9months": "9 months"
 		},
 		"chart": {
-			"dateFormat": "MMM dd, yyyy",
+			"total": "Total",
+			"dateFormat": "dd MMM",
+			"allTags": "All Tags",
+			"paidTags": "Paid Tags",
+			"tag": "tag",
+			"tags": "tags",
+			"chars": "chars",
 			"tooltip": {
 				"colon": ":",
 				"percentage": "%"
@@ -408,6 +417,7 @@
 	},
 	"profile": {
 		"loading": "Loading profile...",
+		"photo": "Photo",
 		"status": "STATUS",
 		"menu": {
 			"profile": "Profile",
@@ -666,5 +676,14 @@
 		"cameraAccessible": "Please ensure your camera is enabled and accessible for biometric verification",
 		"permissionRequired": "Camera Permission Required",
 		"allowAccess": "Please allow camera access to continue with biometric verification"
+	},
+	"acceptInvite": {
+		"title": "Accept Invitation",
+		"invitedToJoin": "You've been invited to join",
+		"createMasterPassword": "Create Master Password",
+		"verifyIdentity": "Verify Identity",
+		"biometricsProtected": "Protected by Zelf Biometrics",
+		"verifyingInvitation": "Verifying invitation...",
+		"faceVerification": "Face Verification"
 	}
 }

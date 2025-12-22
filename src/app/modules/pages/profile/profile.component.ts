@@ -1,5 +1,5 @@
 import { TextFieldModule } from "@angular/cdk/text-field";
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation, HostListener } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation, HostListener } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -16,6 +16,8 @@ import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { SaveConfirmationService, SaveConfirmationData } from "app/core/services/save-confirmation.service";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
+import { StaffService } from "app/core/services/staff.service";
+import { ClientService } from "app/core/services/client.service";
 
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
@@ -65,6 +67,11 @@ export class ProfileComponent implements OnInit {
 	filteredCountryCodes: any[] = this.countryCodes;
 	showCountryDropdown = false;
 
+	// Photo upload
+	selectedPhotoFile: File | null = null;
+	selectedPhotoBase64: string | null = null;
+	photoPreviewUrl: string | null = null;
+
 	/**
 	 * Constructor
 	 */
@@ -73,7 +80,10 @@ export class ProfileComponent implements OnInit {
 		private _formBuilder: FormBuilder,
 		private _router: Router,
 		private _translocoService: TranslocoService,
-		private _saveConfirmationService: SaveConfirmationService
+		private _saveConfirmationService: SaveConfirmationService,
+		private _staffService: StaffService,
+		private _clientService: ClientService,
+		private _cdr: ChangeDetectorRef
 	) {
 		this.profileForm = this._formBuilder.group({
 			name: ["", [Validators.required, Validators.minLength(2)]],
@@ -92,18 +102,63 @@ export class ProfileComponent implements OnInit {
 
 	private async loadUserData(): Promise<void> {
 		try {
-			const zelfAccount = this._authService.zelfAccount;
+			let zelfAccount = this._authService.zelfAccount;
 
-			if (zelfAccount) {
-				this.user = new ZelfUser(zelfAccount);
-				this.populateForm();
+			if (!zelfAccount) {
+				// redirect to sign in
+				this._router.navigate(["/sign-in"]);
+
+				return;
 			}
+
+			const email = zelfAccount.publicData?.accountEmail || zelfAccount.publicData?.staffEmail;
+			if (email) {
+				try {
+					const response = await this._clientService.getProfile(email);
+					if (response && response.data) {
+						const freshRecord = response.data;
+						// Map keyvalues to publicData if needed (IPFS record structure)
+						freshRecord.publicData = freshRecord.keyvalues || freshRecord.publicData;
+
+						// Merge with existing account data to preserve other fields
+						const updatedAccount = {
+							...zelfAccount,
+							...freshRecord,
+							publicData: {
+								...zelfAccount.publicData,
+								...freshRecord.publicData,
+							},
+						};
+
+						// Update session
+						this._authService.setSession({
+							zelfProof: this._authService.zelfProof,
+							zelfAccount: updatedAccount,
+						});
+
+						// Use updated account
+						zelfAccount = updatedAccount;
+					}
+				} catch (err) {
+					console.error("Failed to refresh profile data", err);
+				}
+			}
+
+			this.user = new ZelfUser(zelfAccount);
+
+			// Load staff photo if available
+			if (zelfAccount.metadata?.staffPhotoUrl) {
+				this.userPhoto = zelfAccount.metadata.staffPhotoUrl;
+			}
+
+			this.populateForm();
 
 			this.loading = false;
 		} catch (error) {
 			console.error("Error loading user data:", error);
 		} finally {
 			this.loading = false;
+			this._cdr.markForCheck();
 		}
 	}
 
@@ -130,7 +185,7 @@ export class ProfileComponent implements OnInit {
 			const codeOnly = this.user.countryCode.replace(/^[^\d+]*/, "").trim();
 			const country = this.countryCodes.find((c) => c.code === codeOnly);
 			if (country) {
-				this.countryCodeSearchTerm = `${country.flag} ${country.code}`;
+				this.countryCodeSearchTerm = country.code;
 				// Update the form with the clean code
 				this.profileForm.patchValue({ countryCode: country.code });
 			}
@@ -206,7 +261,7 @@ export class ProfileComponent implements OnInit {
 			company: this.user.company || "",
 		};
 
-		this.hasChanges = JSON.stringify(currentValues) !== JSON.stringify(originalValues);
+		this.hasChanges = JSON.stringify(currentValues) !== JSON.stringify(originalValues) || !!this.selectedPhotoBase64;
 	}
 
 	/**
@@ -230,8 +285,10 @@ export class ProfileComponent implements OnInit {
 	 * Select a country code from the dropdown
 	 */
 	selectCountryCode(country: any): void {
-		this.profileForm.patchValue({ countryCode: country.code });
-		this.countryCodeSearchTerm = `${country.flag} ${country.code}`;
+		// Ensure only the code part is set (remove any potential non-digit/plus characters)
+		const cleanCode = country.code.replace(/^[^\d+]*/, "").trim();
+		this.profileForm.patchValue({ countryCode: cleanCode });
+		this.countryCodeSearchTerm = country.code;
 		this.filteredCountryCodes = this.countryCodes;
 		this.showCountryDropdown = false;
 		this.onFormChange();
@@ -251,11 +308,8 @@ export class ProfileComponent implements OnInit {
 	 * Toggle country dropdown visibility
 	 */
 	toggleCountryDropdown(): void {
-		if (!this.countryCodeSearchTerm) {
-			this.countryCodeSearchTerm = "";
-			this.filteredCountryCodes = this.countryCodes;
-			this.showCountryDropdown = true;
-		}
+		this.filteredCountryCodes = this.countryCodes;
+		this.showCountryDropdown = true;
 	}
 
 	/**
@@ -279,11 +333,31 @@ export class ProfileComponent implements OnInit {
 		}
 
 		// Create profile data object
-		const profileData = {
-			...this.profileForm.value,
+		const formValue = this.profileForm.value;
+
+		let profileData: any = {
 			faceBase64: "", // Will be set during biometric verification
 			masterPassword: "", // Will be set during biometric verification
 		};
+
+		if (this.user?.type === "staff_account") {
+			profileData = {
+				...profileData,
+				staffName: formValue.name,
+				staffEmail: formValue.email,
+				staffPhone: formValue.phone,
+				staffCountryCode: formValue.countryCode,
+			};
+
+			if (this.selectedPhotoBase64) {
+				profileData.staffPhoto = this.selectedPhotoBase64;
+			}
+		} else {
+			profileData = {
+				...profileData,
+				...formValue,
+			};
+		}
 
 		// Set save data in service
 		const saveData: SaveConfirmationData = {
@@ -320,18 +394,6 @@ export class ProfileComponent implements OnInit {
 	}
 
 	/**
-	 * Show success message
-	 */
-	private showSuccess(message: string): void {
-		this.alertMessage = message;
-		this.alertType = "success";
-		this.showAlert = true;
-		setTimeout(() => {
-			this.showAlert = false;
-		}, 5000);
-	}
-
-	/**
 	 * Clear alert
 	 */
 	clearAlert(): void {
@@ -348,6 +410,51 @@ export class ProfileComponent implements OnInit {
 		const countryCodeField = target.closest(".country-code-field");
 		if (!countryCodeField) {
 			this.showCountryDropdown = false;
+		}
+	}
+
+	/**
+	 * Handle photo file selection
+	 */
+	onPhotoSelected(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		if (input.files && input.files[0]) {
+			const file = input.files[0];
+
+			// Validate file type
+			if (!file.type.startsWith("image/")) {
+				this.showError("Please select a valid image file");
+				return;
+			}
+
+			// Validate file size (max 5MB)
+			if (file.size > 5 * 1024 * 1024) {
+				this.showError("Image size must be less than 5MB");
+				return;
+			}
+
+			this.selectedPhotoFile = file;
+
+			// Create preview URL
+			const reader = new FileReader();
+			reader.onload = (e: any) => {
+				this.photoPreviewUrl = e.target.result;
+				this.selectedPhotoBase64 = e.target.result;
+				this.hasChanges = true;
+				// Manually trigger change detection
+				this._cdr.detectChanges();
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
+	/**
+	 * Trigger file input click
+	 */
+	triggerPhotoUpload(): void {
+		const fileInput = document.getElementById("photoInput") as HTMLInputElement;
+		if (fileInput) {
+			fileInput.click();
 		}
 	}
 }
