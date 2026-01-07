@@ -1,0 +1,37 @@
+:host {
+	display: block;
+	width: 100%;
+}
+
+.custom-card {
+	transition: all 0.3s ease;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+	}
+}
+
+pre {
+	font-family: "Courier New", monospace;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+mat-form-field {
+	width: 100%;
+}
+
+.payment-badge {
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}

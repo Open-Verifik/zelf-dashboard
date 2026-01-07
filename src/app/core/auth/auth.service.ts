@@ -43,6 +43,14 @@ export class AuthService {
 		return account ? JSON.parse(account) : null;
 	}
 
+	/**
+	 * Getter for wallet
+	 */
+	get wallet(): any {
+		const wallet = localStorage.getItem("wallet");
+		return wallet ? JSON.parse(wallet) : null;
+	}
+
 	// -----------------------------------------------------------------------------------------------------
 	// @ Public methods
 	// -----------------------------------------------------------------------------------------------------
@@ -79,6 +87,7 @@ export class AuthService {
 		localStorage.removeItem("zelfProof");
 		localStorage.removeItem("zelfAccount");
 		localStorage.removeItem("license");
+		localStorage.removeItem("wallet");
 
 		// Remove session and account-related data
 		localStorage.removeItem("sessionToken");

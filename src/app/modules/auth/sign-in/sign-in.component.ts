@@ -369,6 +369,11 @@ export class AuthSignInComponent implements OnInit {
 					// Set access token
 					this._authService.setAccessToken(response.data.token);
 
+					// Save wallet data to localStorage if available
+					if (response.data?.wallet) {
+						localStorage.setItem("wallet", JSON.stringify(response.data.wallet));
+					}
+
 					// POC: Prompt to save with Passkey
 					const identifier = this._getCurrentIdentifier();
 					const password = this.signInForm.get("masterPassword")?.value;

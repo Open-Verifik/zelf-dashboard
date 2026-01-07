@@ -24,6 +24,21 @@ export const defaultNavigation: FuseNavigationItem[] = [
 		link: "/zelfkeys",
 	},
 	{
+		id: "play-area",
+		title: "Play Area",
+		type: "collapsable",
+		icon: "heroicons_outline:beaker",
+		children: [
+			{
+				id: "play-area.zelfproofs",
+				title: "ZelfProofs",
+				type: "basic",
+				icon: "heroicons_outline:shield-check",
+				link: "/play-area/zelfproofs",
+			},
+		],
+	},
+	{
 		id: "settings",
 		title: "Settings",
 		type: "basic",
@@ -80,6 +95,21 @@ export const horizontalNavigation: FuseNavigationItem[] = [
 		type: "basic",
 		icon: "heroicons_outline:key",
 		link: "/zelfkeys",
+	},
+	{
+		id: "play-area",
+		title: "Play Area",
+		type: "collapsable",
+		icon: "heroicons_outline:beaker",
+		children: [
+			{
+				id: "play-area.zelfproofs",
+				title: "ZelfProofs",
+				type: "basic",
+				icon: "heroicons_outline:shield-check",
+				link: "/play-area/zelfproofs",
+			},
+		],
 	},
 	{
 		id: "settings",

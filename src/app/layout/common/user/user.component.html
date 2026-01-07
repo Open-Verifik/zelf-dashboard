@@ -1,47 +1,151 @@
 <!-- Button -->
-<button mat-icon-button [matMenuTriggerFor]="userActions">
-	<span class="relative">
-		@if (showAvatar && user?.avatar) {
-			<img class="h-7 w-7 rounded-full" [src]="user.avatar" [alt]="user.name || 'User avatar'" />
-		}
-		@if (!showAvatar || !user?.avatar) {
-			<mat-icon [svgIcon]="'heroicons_outline:user-circle'" class="h-7 w-7 text-gray-500"></mat-icon>
-		}
-		@if (user) {
-			<span
-				class="absolute bottom-0 right-0 h-2 w-2 rounded-full"
-				[ngClass]="{
-					'mb-px mr-px': !showAvatar || !user.avatar,
-					'bg-green-500': user.status === 'online',
-					'bg-amber-500': user.status === 'away',
-					'bg-red-500': user.status === 'busy',
-					'bg-gray-400': user.status === 'not-visible',
-				}"
-			></span>
-		}
-	</span>
-</button>
-
-<mat-menu [xPosition]="'before'" #userActions="matMenu">
-	<button mat-menu-item>
-		<span class="flex flex-col leading-none" *ngIf="user">
-			<span>Signed in as</span>
-			<span class="mt-1.5 text-md font-medium">{{ user.name }}</span>
+@if (walletAddress) {
+	<button mat-button [matMenuTriggerFor]="userActions" class="wallet-button">
+		<span class="flex items-center gap-2">
+			<mat-icon class="icon-size-5 text-purple-500">account_balance_wallet</mat-icon>
+			<span class="text-sm font-mono font-medium">
+				{{ formatAddress(walletAddress) }}
+			</span>
 		</span>
 	</button>
-	<mat-divider class="my-2"></mat-divider>
-	<button mat-menu-item [routerLink]="['/profile']">
-		<mat-icon [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+}
+@if (!walletAddress) {
+	<button mat-icon-button [matMenuTriggerFor]="userActions">
+		<span class="relative">
+			@if (showAvatar && user?.avatar) {
+				<img class="h-8 w-8 rounded-full" [src]="user.avatar" [alt]="user.name || 'User avatar'" />
+			}
+			@if (!showAvatar || !user?.avatar) {
+				<mat-icon [svgIcon]="'heroicons_outline:user-circle'" class="icon-size-8 text-gray-500"></mat-icon>
+			}
+			@if (user) {
+				<span
+					class="absolute bottom-0 right-0 h-2 w-2 rounded-full ring-2 ring-white dark:ring-gray-900"
+					[ngClass]="{
+						'bg-green-500': user.status === 'online',
+						'bg-amber-500': user.status === 'away',
+						'bg-red-500': user.status === 'busy',
+						'bg-gray-400': user.status === 'not-visible',
+					}"
+				></span>
+			}
+		</span>
+	</button>
+}
+
+<mat-menu [xPosition]="'before'" #userActions="matMenu" class="user-menu">
+	<div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+		<span class="flex flex-col" *ngIf="user">
+			<span class="text-xs text-gray-500 dark:text-gray-400">Signed in as</span>
+			<span class="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">{{ user.name }}</span>
+		</span>
+	</div>
+
+	<!-- Wallet Addresses Section -->
+	@if (wallet) {
+		<div class="px-4 py-2 bg-gray-50 dark:bg-gray-800/50">
+			<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Wallets</span>
+		</div>
+
+		@if (wallet.solanaAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.solanaAddress, 'Solana')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Solana</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.solanaAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.ethAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.ethAddress, 'Ethereum')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Ethereum</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.ethAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.ethAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.ethAddress, 'Avalanche')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Avalanche (EVM)</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.ethAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.ethAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.ethAddress, 'Base')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Base (EVM)</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.ethAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.ethAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.ethAddress, 'BlockDAG')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">BlockDAG (EVM)</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.ethAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.btcAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.btcAddress, 'Bitcoin')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Bitcoin</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.btcAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		@if (wallet.suiAddress) {
+			<button mat-menu-item (click)="copyAddress(wallet.suiAddress, 'Sui')" class="wallet-item">
+				<div class="flex items-center justify-between w-full py-1">
+					<div class="flex flex-col">
+						<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Sui</span>
+						<span class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ formatAddressLong(wallet.suiAddress) }}</span>
+					</div>
+					<mat-icon class="icon-size-4 text-gray-400 ml-3">content_copy</mat-icon>
+				</div>
+			</button>
+		}
+
+		<mat-divider class="my-1"></mat-divider>
+	}
+
+	<button mat-menu-item [routerLink]="['/profile']" class="menu-item">
+		<mat-icon [svgIcon]="'heroicons_outline:user-circle'" class="icon-size-5"></mat-icon>
 		<span>Profile</span>
 	</button>
-	<button mat-menu-item [routerLink]="['/settings']">
-		<mat-icon [svgIcon]="'heroicons_outline:cog-8-tooth'"></mat-icon>
+	<button mat-menu-item [routerLink]="['/settings']" class="menu-item">
+		<mat-icon [svgIcon]="'heroicons_outline:cog-8-tooth'" class="icon-size-5"></mat-icon>
 		<span>Settings</span>
 	</button>
 
-	<mat-divider class="my-2"></mat-divider>
-	<button mat-menu-item (click)="signOut()">
-		<mat-icon [svgIcon]="'heroicons_outline:arrow-right-on-rectangle'"></mat-icon>
+	<mat-divider class="my-1"></mat-divider>
+	<button mat-menu-item (click)="signOut()" class="menu-item">
+		<mat-icon [svgIcon]="'heroicons_outline:arrow-right-on-rectangle'" class="icon-size-5"></mat-icon>
 		<span>Sign out</span>
 	</button>
 </mat-menu>

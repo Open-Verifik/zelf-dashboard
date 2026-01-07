@@ -5,6 +5,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Router, RouterLink } from "@angular/router";
 import { UserService } from "app/core/user/user.service";
 import { User, ZelfUser } from "app/core/user/user.types";
@@ -16,7 +17,7 @@ import { Subject, takeUntil } from "rxjs";
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	exportAs: "user",
-	imports: [CommonModule, MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink],
+	imports: [CommonModule, MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink, MatSnackBarModule],
 })
 export class UserComponent implements OnInit, OnDestroy {
 	/* eslint-disable @typescript-eslint/naming-convention */
@@ -25,6 +26,8 @@ export class UserComponent implements OnInit, OnDestroy {
 
 	@Input() showAvatar: boolean = true;
 	user: User | null = null;
+	wallet: any = null;
+	walletAddress: string = "";
 
 	private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -34,7 +37,8 @@ export class UserComponent implements OnInit, OnDestroy {
 	constructor(
 		private _changeDetectorRef: ChangeDetectorRef,
 		private _router: Router,
-		private _userService: UserService
+		private _userService: UserService,
+		private _snackBar: MatSnackBar
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -50,9 +54,11 @@ export class UserComponent implements OnInit, OnDestroy {
 
 		if (zelfAccount) {
 			const _zelfAccount = JSON.parse(zelfAccount);
-
 			this.user = new ZelfUser(_zelfAccount);
 		}
+
+		// Load wallet data
+		this.loadWallet();
 	}
 
 	/**
@@ -67,6 +73,48 @@ export class UserComponent implements OnInit, OnDestroy {
 	// -----------------------------------------------------------------------------------------------------
 	// @ Public methods
 	// -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Load wallet data from localStorage
+	 */
+	loadWallet(): void {
+		const walletData = localStorage.getItem("wallet");
+		if (walletData) {
+			this.wallet = JSON.parse(walletData);
+			// Set default address to Solana
+			this.walletAddress = this.wallet.solanaAddress || this.wallet.ethAddress || this.wallet.btcAddress || this.wallet.suiAddress || "";
+			this._changeDetectorRef.markForCheck();
+		}
+	}
+
+	/**
+	 * Format address for display (show first 4 and last 4 characters)
+	 */
+	formatAddress(address: string): string {
+		if (!address) return "";
+		if (address.length <= 12) return address;
+		return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
+	}
+
+	/**
+	 * Format address for dropdown display (show first 6 and last 6 characters)
+	 */
+	formatAddressLong(address: string): string {
+		if (!address) return "";
+		if (address.length <= 16) return address;
+		return `${address.substring(0, 6)}...${address.substring(address.length - 6)}`;
+	}
+
+	/**
+	 * Copy address to clipboard
+	 */
+	copyAddress(address: string, chain: string): void {
+		navigator.clipboard.writeText(address).then(() => {
+			this._snackBar.open(`${chain} address copied to clipboard`, "Close", {
+				duration: 2000,
+			});
+		});
+	}
 
 	/**
 	 * Update the user status
