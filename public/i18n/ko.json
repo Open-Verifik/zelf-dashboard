@@ -217,6 +217,8 @@
 			"stripe": "Stripe",
 			"supported_currencies": "지원 통화",
 			"add_currency": "통화 추가",
+			"no_currencies": "활성화된 통화가 없습니다. '통화 추가'를 클릭하여 활성화하십시오.",
+			"all_currencies_enabled": "모든 통화가 활성화되었습니다",
 			"whitelist_title": "화이트리스트 (특별 가격)",
 			"add_item": "항목 추가",
 			"tag_name": "태그 이름",

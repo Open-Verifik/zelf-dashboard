@@ -11,7 +11,6 @@ import { SaveConfirmationService } from "../../../../core/services/save-confirma
 import { HttpWrapperService } from "../../../../http-wrapper.service";
 import { DomainConfig, License, NetworkConfig } from "./license.class";
 import { LicenseService } from "./license.service";
-import { NetworksConfigComponent } from "./networks-config/networks-config.component";
 
 export interface PricingRow {
 	length: string;
@@ -34,16 +33,7 @@ export interface WhitelistItem {
 	encapsulation: ViewEncapsulation.None,
 	selector: "settings-license",
 	templateUrl: "./license.component.html",
-	imports: [
-		CommonModule,
-		FormsModule,
-		ReactiveFormsModule,
-		MatIconModule,
-		MatSlideToggleModule,
-		MatCheckboxModule,
-		TranslocoModule,
-		NetworksConfigComponent,
-	],
+	imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatSlideToggleModule, MatCheckboxModule, TranslocoModule],
 })
 export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	accountForm: UntypedFormGroup;
@@ -96,7 +86,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		private _translocoService: TranslocoService,
 		private _cdr: ChangeDetectorRef,
 		private _licenseService: LicenseService,
-		private _httpWrapper: HttpWrapperService
+		private _httpWrapper: HttpWrapperService,
 	) {}
 
 	get networksFormGroup(): UntypedFormGroup {
@@ -176,6 +166,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	}
 
 	/**
+	 * Get simplified networks object (only enabled flag)
+	 */
+	private getSimplifiedNetworks(networks: { [key: string]: any }): { [key: string]: { enabled: boolean } } {
+		const simplified: { [key: string]: { enabled: boolean } } = {};
+		Object.keys(networks).forEach((key) => {
+			simplified[key] = { enabled: !!networks[key].enabled };
+		});
+		return simplified;
+	}
+
+	/**
 	 * Create networks form group
 	 */
 	private createNetworksFormGroup(networks: { [key: string]: NetworkConfig } | null = null): UntypedFormGroup {
@@ -202,7 +203,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 									standard: [net.altCoins.standard],
 								})
 							: null,
-					})
+					}),
 				);
 			}
 		});
@@ -684,6 +685,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 					arweaveEnabled: formValue.arweaveEnabled,
 					walrusEnabled: formValue.walrusEnabled,
 					// Note: backupEnabled is excluded as it's not allowed by backend
+				},
+				wallet: {
+					networks: this.getSimplifiedNetworks(formValue.networks || {}),
 				},
 			},
 			zelfkeys: {

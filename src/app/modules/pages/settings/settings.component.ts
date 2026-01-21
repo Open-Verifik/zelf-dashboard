@@ -29,7 +29,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 		private _changeDetectorRef: ChangeDetectorRef,
 		private _fuseMediaWatcherService: FuseMediaWatcherService,
 		private _router: Router,
-		private _activatedRoute: ActivatedRoute
+		private _activatedRoute: ActivatedRoute,
 	) {}
 
 	// -----------------------------------------------------------------------------------------------------
@@ -53,6 +53,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 				icon: "heroicons_outline:paint-brush",
 				title: "Theme & Styles",
 				description: "Customize colors for Zelf Name Service and ZelfKeys",
+			},
+			{
+				id: "zelf-name-service",
+				icon: "heroicons_outline:globe-alt",
+				title: "Zelf Name Service",
+				description: "Manage your Zelf Name Service settings",
 			},
 			{
 				id: "security",
@@ -98,7 +104,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 		this._router.events
 			.pipe(
 				filter((event) => event instanceof NavigationEnd),
-				takeUntil(this._unsubscribeAll)
+				takeUntil(this._unsubscribeAll),
 			)
 			.subscribe((event: NavigationEnd) => {
 				// Extract the panel from the URL
@@ -223,6 +229,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 				icon: "heroicons_outline:paint-brush",
 				title: "Theme & Styles",
 				description: "Customize colors for Zelf Name Service and ZelfKeys",
+			},
+			{
+				id: "zelf-name-service",
+				icon: "heroicons_outline:globe-alt",
+				title: "Zelf Name Service",
+				description: "Manage your Zelf Name Service settings",
 			},
 			{
 				id: "security",

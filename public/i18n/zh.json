@@ -217,6 +217,8 @@
 			"stripe": "Stripe",
 			"supported_currencies": "支持的货币",
 			"add_currency": "添加货币",
+			"no_currencies": "未启用任何货币。点击“添加货币”以启用一个。",
+			"all_currencies_enabled": "所有货币已启用",
 			"whitelist_title": "白名单（特殊定价）",
 			"add_item": "添加项目",
 			"tag_name": "标签名称",

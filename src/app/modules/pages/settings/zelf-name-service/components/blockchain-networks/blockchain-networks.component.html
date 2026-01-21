@@ -1,0 +1,42 @@
+<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+	<div class="p-8 sm:p-10">
+		<div class="flex items-center gap-3 mb-6">
+			<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+				<mat-icon class="icon-size-5">hub</mat-icon>
+			</div>
+			<div>
+				<h2 class="text-xl font-bold text-gray-900 dark:text-white">Blockchain Networks</h2>
+				<p class="text-sm text-gray-500 dark:text-gray-400">Supported license networks</p>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 gap-4" [formGroup]="networksFormGroup">
+			<div
+				*ngFor="let key of networkKeys"
+				[formGroupName]="key"
+				class="bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+			>
+				<div
+					class="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors flex items-center gap-3 cursor-pointer"
+					(click)="getNetworkGroup(key).get('enabled')?.setValue(!getNetworkGroup(key).get('enabled')?.value); toggleNetwork(key)"
+				>
+					<mat-checkbox
+						formControlName="enabled"
+						color="primary"
+						(click)="$event.stopPropagation()"
+						(change)="toggleNetwork(key)"
+					></mat-checkbox>
+					<div class="flex items-center gap-3">
+						<div
+							class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+							[ngClass]="getNetworkStyle(key).colorClass"
+						>
+							{{ getNetworkStyle(key).initials }}
+						</div>
+						<span class="font-medium text-gray-900 dark:text-white select-none">{{ getNetworkLabel(key) }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

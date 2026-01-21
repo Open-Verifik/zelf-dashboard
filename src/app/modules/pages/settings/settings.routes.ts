@@ -23,6 +23,13 @@ export default [
 					import("app/modules/pages/settings/theme-styles/theme-styles.component").then((m) => m.SettingsThemeStylesComponent),
 			},
 			{
+				path: "zelf-name-service",
+				loadComponent: () =>
+					import("app/modules/pages/settings/zelf-name-service/zelf-name-service.component").then(
+						(m) => m.SettingsZelfNameServiceComponent,
+					),
+			},
+			{
 				path: "security",
 				loadComponent: () => import("app/modules/pages/settings/security/security.component").then((m) => m.SettingsSecurityComponent),
 			},

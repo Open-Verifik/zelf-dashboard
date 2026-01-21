@@ -1,0 +1,100 @@
+<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50" *transloco="let t">
+	<div class="p-8 sm:p-10" [formGroup]="formGroup">
+		<div class="flex items-center gap-3 mb-6">
+			<div
+				class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400"
+			>
+				<mat-icon class="icon-size-5">rule</mat-icon>
+			</div>
+			<div>
+				<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t("license.validation_rules.title") }}</h2>
+				<p class="text-sm text-gray-500 dark:text-gray-400">Rules for subdomains</p>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+			<div class="space-y-1.5">
+				<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.validation_rules.min_length") }}</label>
+				<input
+					formControlName="minLength"
+					type="number"
+					class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+					[placeholder]="t('license.validation_rules.min_length_placeholder')"
+				/>
+			</div>
+			<div class="space-y-1.5">
+				<div class="flex justify-between">
+					<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.validation_rules.max_length") }}</label>
+					<span class="text-xs text-gray-400">{{ t("license.validation_rules.max_length_hint") }}</span>
+				</div>
+				<input
+					formControlName="maxLength"
+					type="number"
+					min="1"
+					max="27"
+					class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+					[placeholder]="t('license.validation_rules.max_length_placeholder')"
+				/>
+				<span *ngIf="formGroup.get('maxLength')?.hasError('max')" class="text-xs text-red-500 pl-1 block mb-1">
+					{{ t("license.validation_rules.max_length_error") }}
+				</span>
+			</div>
+			<div class="space-y-1.5">
+				<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.validation_rules.hold_suffix") }}</label>
+				<input
+					formControlName="holdSuffix"
+					class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-medium"
+					[placeholder]="t('license.validation_rules.hold_suffix_placeholder')"
+				/>
+			</div>
+		</div>
+
+		<!-- Reserved Words -->
+		<div class="mb-8">
+			<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 ml-1">{{
+				t("license.validation_rules.reserved_words")
+			}}</label>
+			<div class="flex flex-wrap gap-2 mb-3">
+				<span
+					*ngFor="let word of reservedWords"
+					class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800"
+				>
+					{{ word }}
+					<button type="button" (click)="removeReservedWord(word)" class="ml-2 text-red-400 hover:text-red-600 transition-colors">
+						<mat-icon class="icon-size-4">close</mat-icon>
+					</button>
+				</span>
+			</div>
+			<div class="flex items-center gap-2 max-w-sm">
+				<input
+					#newReservedWord
+					type="text"
+					[placeholder]="t('license.validation_rules.add_reserved_word')"
+					class="flex-1 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+					(keyup.enter)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
+				/>
+				<button
+					type="button"
+					(click)="addReservedWord(newReservedWord.value); newReservedWord.value = ''"
+					class="p-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+				>
+					<mat-icon class="icon-size-5">add</mat-icon>
+				</button>
+			</div>
+		</div>
+
+		<!-- Content Filter -->
+		<div
+			class="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-red-50/50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-800/30"
+		>
+			<div class="flex items-center gap-3 mb-2 sm:mb-0">
+				<mat-icon class="text-red-500 icon-size-5">block</mat-icon>
+				<div>
+					<h4 class="font-semibold text-gray-900 dark:text-white">{{ t("license.validation_rules.content_filter") }}</h4>
+					<p class="text-sm text-gray-500 dark:text-gray-400">{{ t("license.validation_rules.content_filter_description") }}</p>
+				</div>
+			</div>
+			<mat-slide-toggle formControlName="contentFilterEnabled" [color]="'warn'"></mat-slide-toggle>
+		</div>
+	</div>
+</div>

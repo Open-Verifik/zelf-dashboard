@@ -215,6 +215,8 @@
 			"stripe": "Stripe",
 			"supported_currencies": "Devises supportées",
 			"add_currency": "Ajouter une devise",
+			"no_currencies": "Aucune devise activée. Cliquez sur 'Ajouter une devise' pour en activer une.",
+			"all_currencies_enabled": "Toutes les devises sont activées",
 			"whitelist_title": "Liste blanche (Tarification spéciale)",
 			"add_item": "Ajouter un élément",
 			"tag_name": "Nom d'étiquette",

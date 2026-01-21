@@ -217,6 +217,8 @@
 			"stripe": "Stripe",
 			"supported_currencies": "Monedas Soportadas",
 			"add_currency": "Agregar moneda",
+			"no_currencies": "No hay monedas habilitadas. Haz clic en 'Agregar moneda' para habilitar una.",
+			"all_currencies_enabled": "Todas las monedas están habilitadas",
 			"whitelist_title": "Lista Blanca (Precios Especiales)",
 			"add_item": "Agregar Elemento",
 			"tag_name": "Nombre de Etiqueta",

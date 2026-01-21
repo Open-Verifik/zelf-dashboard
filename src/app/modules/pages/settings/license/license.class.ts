@@ -79,6 +79,9 @@ export interface DomainConfig {
 			walrusEnabled: boolean;
 			backupEnabled?: boolean;
 		};
+		wallet: {
+			networks: { [key: string]: { enabled: boolean } };
+		};
 	};
 	zelfkeys: {
 		plans: any[];
@@ -321,6 +324,11 @@ export class License {
 					walrusEnabled: configData?.tags?.storage?.walrusEnabled ?? true,
 					backupEnabled: configData?.tags?.storage?.backupEnabled || false,
 				},
+				wallet: {
+					networks: this.getSimplifiedNetworks(
+						configData?.tags?.wallet?.networks || configData?.wallet?.networks || this.getDefaultNetworks(),
+					),
+				},
 			},
 			zelfkeys: {
 				plans: configData?.zelfkeys?.plans || [],
@@ -359,6 +367,17 @@ export class License {
 			},
 			themeSettings: configData?.themeSettings || License.getDefaultThemeSettings(),
 		};
+	}
+
+	/**
+	 * Get simplified networks object (only enabled flag)
+	 */
+	private getSimplifiedNetworks(networks: { [key: string]: any }): { [key: string]: { enabled: boolean } } {
+		const simplified: { [key: string]: { enabled: boolean } } = {};
+		Object.keys(networks).forEach((key) => {
+			simplified[key] = { enabled: !!networks[key].enabled };
+		});
+		return simplified;
 	}
 
 	/**
@@ -578,7 +597,7 @@ export class License {
 	getPrice(
 		tagName: string,
 		duration: string = "1",
-		referralTagName: string = ""
+		referralTagName: string = "",
 	): {
 		price: number;
 		currency: string;
@@ -904,6 +923,9 @@ export class License {
 						arweaveEnabled: true,
 						walrusEnabled: true,
 						backupEnabled: false,
+					},
+					wallet: {
+						networks: undefined as any,
 					},
 				},
 				zelfkeys: {

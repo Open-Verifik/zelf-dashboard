@@ -217,6 +217,8 @@
 			"stripe": "Stripe",
 			"supported_currencies": "サポート通貨",
 			"add_currency": "通貨を追加",
+			"no_currencies": "通貨が有効になっていません。「通貨を追加」をクリックして有効にしてください。",
+			"all_currencies_enabled": "すべての通貨が有効です",
 			"whitelist_title": "ホワイトリスト（特別価格）",
 			"add_item": "アイテムを追加",
 			"tag_name": "タグ名",

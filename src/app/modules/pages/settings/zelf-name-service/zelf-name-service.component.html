@@ -1,0 +1,128 @@
+<div class="flex flex-col min-h-screen bg-gray-50/50 dark:bg-gray-900 w-full" *transloco="let t">
+	<!-- Main Content Container -->
+	<div class="flex-auto px-4 py-8 sm:px-6 sm:py-12 md:px-8 w-full max-w-4xl mx-auto">
+		<!-- Alert Messages -->
+		@if (showAlert) {
+			<div class="mb-6 animate-fade-in">
+				<div
+					class="flex items-center justify-between p-4 rounded-2xl shadow-sm border transaction-all duration-300"
+					[class]="
+						alertType === 'success'
+							? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
+							: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+					"
+				>
+					<div class="flex items-center gap-3">
+						<div
+							class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+							[class]="
+								alertType === 'success'
+									? 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200'
+									: 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-200'
+							"
+						>
+							<mat-icon class="icon-size-5">{{ alertType === "success" ? "check" : "priority_high" }}</mat-icon>
+						</div>
+						<span class="font-medium text-sm">{{ alertMessage }}</span>
+					</div>
+				</div>
+			</div>
+		}
+
+		<form [formGroup]="accountForm">
+			<!-- Header -->
+			<div class="mb-8">
+				<h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Zelf Name Service</h2>
+				<div class="text-secondary text-lg mt-1">Manage your Zelf Name Service network settings and license details</div>
+			</div>
+
+			<!-- Field Restrictions Information -->
+			<div class="mb-8 p-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-2xl flex items-start gap-4">
+				<mat-icon class="icon-size-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0">info</mat-icon>
+				<div class="text-sm text-blue-900 dark:text-blue-200">
+					<h3 class="font-semibold mb-1">Field Restrictions</h3>
+					<div class="opacity-90 space-y-1">
+						<p><span class="font-medium">Editable:</span> Domain name, rules, payments, pricing, storage, metadata</p>
+						<p><span class="font-medium">Read-only:</span> Dates, status, limits, Stripe data</p>
+						<p><span class="font-medium">Currencies:</span> BTC, ETH, SOL, USDC, USDT, BDAG, AVAX, ZNS</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Validation Rules Card -->
+			<zns-validation-rules
+				[formGroup]="accountForm"
+				[reservedWords]="reservedWords"
+				[addReservedWord]="addReservedWord.bind(this)"
+				[removeReservedWord]="removeReservedWord.bind(this)"
+			></zns-validation-rules>
+
+			<!-- Blockchain Networks -->
+			<zns-blockchain-networks
+				[networksFormGroup]="walletNetworksFormGroup"
+				[getNetworkLabel]="getNetworkLabel.bind(this)"
+				[getNetworkStyle]="getNetworkStyle.bind(this)"
+				[getNetworkGroup]="getWalletNetworkGroup.bind(this)"
+				[toggleNetwork]="toggleWalletNetwork.bind(this)"
+			></zns-blockchain-networks>
+
+			<!-- Payment Configuration -->
+			<zns-payment-configuration
+				[formGroup]="accountForm"
+				[whitelistItems]="whitelistItems"
+				[removeWhitelistItem]="removeWhitelistItem.bind(this)"
+				[addWhitelistItem]="addWhitelistItem.bind(this)"
+				[newWhitelistItem]="newWhitelistItem"
+				[getWhitelistTypeLabel]="getWhitelistTypeLabel.bind(this)"
+				[networksFormGroup]="networksFormGroup"
+			></zns-payment-configuration>
+
+			<!-- Pricing Table -->
+			<zns-pricing-table [rows]="pricingTableRows" (resetDefault)="resetPricingTable()"></zns-pricing-table>
+
+			<!-- Storage Options (ZNS) -->
+			<zns-storage-options [formGroup]="accountForm"></zns-storage-options>
+
+			<!-- Storage Options (ZelfKeys) -->
+			<zns-storage-options
+				[formGroup]="accountForm"
+				titleKey="license.storage_options.zelfkeys_title"
+				ipfsControlName="zelfkeysIpfsEnabled"
+				arweaveControlName="zelfkeysArweaveEnabled"
+				walrusControlName="zelfkeysWalrusEnabled"
+				keyPrefixControlName="zelfkeysKeyPrefix"
+			></zns-storage-options>
+
+			<!-- Bottom Actions -->
+			<div class="sticky bottom-6 z-10 mx-auto max-w-4xl">
+				<div
+					class="bg-gray-900/90 dark:bg-slate-800/90 backdrop-blur-md rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-white/10"
+				>
+					<button
+						(click)="cancel()"
+						[disabled]="isLoading"
+						class="px-4 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+					>
+						{{ t("license.actions.cancel") }}
+					</button>
+					<div class="flex items-center gap-3">
+						<button
+							(click)="saveLicense()"
+							[disabled]="isLoading || accountForm.invalid"
+							class="px-6 py-2 bg-white text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+						>
+							@if (isLoading) {
+								<mat-icon class="icon-size-4 animate-spin">refresh</mat-icon>
+								<span>{{ t("license.actions.processing") }}</span>
+							} @else {
+								<span>{{ t("license.actions.save_configuration") }}</span>
+							}
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="h-12"></div>
+		</form>
+	</div>
+</div>

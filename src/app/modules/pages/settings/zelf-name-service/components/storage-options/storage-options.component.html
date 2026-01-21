@@ -1,0 +1,64 @@
+<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50" *transloco="let t">
+	<div class="p-8 sm:p-10" [formGroup]="formGroup">
+		<div class="flex items-center gap-3 mb-6">
+			<div
+				class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400"
+			>
+				<mat-icon class="icon-size-5">storage</mat-icon>
+			</div>
+			<div>
+				<h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t(titleKey) }}</h2>
+				<p class="text-sm text-gray-500 dark:text-gray-400">Decentralized storage</p>
+			</div>
+		</div>
+
+		<div class="space-y-6">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<!-- IPFS -->
+				<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors">
+					<div class="flex items-center justify-between mb-2">
+						<div class="flex items-center gap-2">
+							<mat-icon class="icon-size-5 text-blue-500">cloud</mat-icon>
+							<span class="font-medium text-gray-900 dark:text-white">{{ t("license.storage_options.ipfs_title") }}</span>
+						</div>
+						<mat-slide-toggle [formControlName]="ipfsControlName"></mat-slide-toggle>
+					</div>
+					<p class="text-xs text-gray-500">{{ t("license.storage_options.ipfs_description") }}</p>
+				</div>
+
+				<!-- Arweave -->
+				<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors">
+					<div class="flex items-center justify-between mb-2">
+						<div class="flex items-center gap-2">
+							<mat-icon class="icon-size-5 text-green-500">archive</mat-icon>
+							<span class="font-medium text-gray-900 dark:text-white">Arweave</span>
+						</div>
+						<mat-slide-toggle [formControlName]="arweaveControlName"></mat-slide-toggle>
+					</div>
+					<p class="text-xs text-gray-500">{{ t("license.storage_options.arweave_description") }}</p>
+				</div>
+
+				<!-- Walrus -->
+				<div class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-colors">
+					<div class="flex items-center justify-between mb-2">
+						<div class="flex items-center gap-2">
+							<mat-icon class="icon-size-5 text-orange-500">pets</mat-icon>
+							<span class="font-medium text-gray-900 dark:text-white">Walrus</span>
+						</div>
+						<mat-slide-toggle [formControlName]="walrusControlName"></mat-slide-toggle>
+					</div>
+					<p class="text-xs text-gray-500">{{ t("license.storage_options.walrus_description") }}</p>
+				</div>
+			</div>
+
+			<div class="space-y-1.5 max-w-md">
+				<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ t("license.storage_options.key_prefix") }}</label>
+				<input
+					[formControlName]="keyPrefixControlName"
+					class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+					[placeholder]="t('license.storage_options.key_prefix_placeholder')"
+				/>
+			</div>
+		</div>
+	</div>
+</div>
