@@ -1,9 +1,7 @@
 import { Component, ViewEncapsulation, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { MatTableModule } from "@angular/material/table";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
-import { MatDialogModule, MatDialog } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatTooltipModule } from "@angular/material/tooltip";
@@ -12,9 +10,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { FormsModule } from "@angular/forms";
 import { TranslocoModule } from "@jsverse/transloco";
-import { QRCodeModalComponent } from "./qr-code-modal.component";
-import { DetailsModalComponent } from "./details-modal.component";
-import { EditModalComponent } from "./edit-modal.component";
+import { Router } from "@angular/router";
 import { TagsService, TagSearchParams, DomainSearchParams } from "./tags.service";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
 import { DomainConfig, License } from "../pages/settings/license/license.class";
@@ -65,10 +61,8 @@ export interface PurchaseData {
 	encapsulation: ViewEncapsulation.None,
 	imports: [
 		CommonModule,
-		MatTableModule,
 		MatButtonModule,
 		MatIconModule,
-		MatDialogModule,
 		MatCardModule,
 		MatChipsModule,
 		MatTooltipModule,
@@ -116,9 +110,9 @@ export class TagsComponent implements OnInit, OnDestroy {
 	private darkModeObserver?: MutationObserver;
 
 	constructor(
-		private dialog: MatDialog,
 		private tagsService: TagsService,
 		private _licenseService: LicenseService,
+		private _router: Router,
 		private _cdr: ChangeDetectorRef
 	) {}
 
@@ -271,54 +265,16 @@ export class TagsComponent implements OnInit, OnDestroy {
 		return record.name.includes(".hold");
 	}
 
-	openQRCodeModal(record: TagRecord): void {
-		const dialogRef = this.dialog.open(QRCodeModalComponent, {
-			width: "500px",
-			data: record,
-			disableClose: false,
-			panelClass: "custom-dialog-container",
-		});
 
-		dialogRef.afterClosed().subscribe((result) => {
-			if (result) {
-			}
-		});
+
+
+
+	viewTagDetails(record: TagRecord): void {
+		const tagId = record.name.includes(".")
+			? record.name
+			: record.name + "." + (record.publicData?.domain || this.licenseDomain || "");
+		this._router.navigate(["/tags", tagId]);
 	}
-
-	openDetailsModal(record: TagRecord): void {
-		const dialogRef = this.dialog.open(DetailsModalComponent, {
-			width: "700px",
-			maxHeight: "80vh",
-			data: record,
-			disableClose: false,
-			panelClass: "custom-dialog-container",
-		});
-
-		dialogRef.afterClosed().subscribe((result) => {
-			if (result === "openQR") {
-				// Open QR code modal if requested from details modal
-				this.openQRCodeModal(record);
-			}
-		});
-	}
-
-	openEditModal(record: TagRecord): void {
-		const dialogRef = this.dialog.open(EditModalComponent, {
-			width: "500px",
-			data: record,
-			disableClose: false,
-			panelClass: "custom-dialog-container",
-		});
-
-		dialogRef.afterClosed().subscribe((result) => {
-			if (result) {
-				// Here you would typically make an API call to extend the lease
-				this.handleLeaseExtension(result);
-			}
-		});
-	}
-
-	private handleLeaseExtension(extensionData: any): void {}
 
 	deleteRecord(record: TagRecord): void {
 		if (!this.canDelete(record)) {

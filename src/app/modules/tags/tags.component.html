@@ -1,291 +1,330 @@
-<div class="flex min-w-0 flex-auto flex-col">
-	<!-- Main -->
-	<div class="flex-auto p-6 sm:p-10">
+<div class="min-h-screen bg-gray-50/50 dark:bg-gray-900 w-full">
+	<div class="max-w-7xl mx-auto p-6 sm:p-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<h1 class="text-3xl font-bold mb-2" style="color: var(--fuse-text)">{{ "tags.title" | transloco }}</h1>
-			<p style="color: var(--fuse-text-secondary)">{{ "tags.subtitle" | transloco }}</p>
+			<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ "tags.title" | transloco }}</h1>
+			<p class="text-gray-600 dark:text-gray-400">{{ "tags.subtitle" | transloco }}</p>
 		</div>
 
-		<!-- License Not Configured Message -->
-		<div class="license-warning" *ngIf="!isLoadingLicense && !isLicenseConfigured">
-			<div class="warning-card">
-				<mat-icon class="warning-icon">warning</mat-icon>
-				<div class="warning-content">
-					<h2>{{ "tags.licenseWarning.title" | transloco }}</h2>
-					<p>{{ "tags.licenseWarning.message" | transloco }}</p>
+		<!-- License Not Configured Warning -->
+		<div
+			*ngIf="!isLoadingLicense && !isLicenseConfigured"
+			class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-700/50 p-8 mb-8"
+		>
+			<div class="flex items-center gap-4">
+				<div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
+					<mat-icon class="text-orange-600 dark:text-orange-400">warning</mat-icon>
+				</div>
+				<div>
+					<h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">{{ "tags.licenseWarning.title" | transloco }}</h2>
+					<p class="text-gray-600 dark:text-gray-400 text-sm">{{ "tags.licenseWarning.message" | transloco }}</p>
 				</div>
 			</div>
 		</div>
 
-		<!-- Search and Filter Bar -->
-		<div class="search-filter-container" *ngIf="isLicenseConfigured && !isLoadingLicense">
-			<div class="search-controls">
-				<!-- Storage Filter Dropdown -->
-				<mat-form-field appearance="outline" class="storage-filter-field">
-					<mat-label>{{ "tags.filters.storage" | transloco }}</mat-label>
-					<mat-select [(ngModel)]="selectedStorage" name="storage" (selectionChange)="onStorageChange()">
-						<mat-option *ngFor="let storage of availableStorage" [value]="storage">
-							{{ storage }}
-						</mat-option>
-					</mat-select>
-				</mat-form-field>
+		<!-- Search and Filter Card -->
+		<div
+			*ngIf="isLicenseConfigured && !isLoadingLicense"
+			class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-6 mb-6"
+		>
+			<div class="flex flex-wrap items-center gap-4">
+				<!-- Storage Filter -->
+				<div class="filter-input-container">
+					<label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 block">
+						{{ "tags.filters.storage" | transloco }}
+					</label>
+					<div class="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 min-w-[120px]">
+						<select
+							[(ngModel)]="selectedStorage"
+							(change)="onStorageChange()"
+							class="bg-transparent border-none text-gray-900 dark:text-white font-medium w-full focus:ring-0 focus:outline-none cursor-pointer"
+						>
+							<option *ngFor="let storage of availableStorage" [value]="storage">{{ storage }}</option>
+						</select>
+					</div>
+				</div>
 
-				<!-- Search Type Dropdown -->
-				<mat-form-field appearance="outline" class="search-type-field">
-					<mat-label>{{ "tags.filters.filterBy" | transloco }}</mat-label>
-					<mat-select [(ngModel)]="searchType" name="searchType">
-						<mat-option value="all">{{ "tags.filters.all" | transloco }}</mat-option>
-						<mat-option value="name">{{ "tags.filters.tagName" | transloco }}</mat-option>
-						<mat-option value="blockdag">{{ "tags.filters.blockdagAddress" | transloco }}</mat-option>
-						<mat-option value="eth">{{ "tags.filters.ethAddress" | transloco }}</mat-option>
-						<mat-option value="solana">{{ "tags.filters.solanaAddress" | transloco }}</mat-option>
-						<mat-option value="bitcoin">{{ "tags.filters.bitcoinAddress" | transloco }}</mat-option>
-						<mat-option value="sui">{{ "tags.filters.suiAddress" | transloco }}</mat-option>
-					</mat-select>
-				</mat-form-field>
+				<!-- Filter Type -->
+				<div class="filter-input-container">
+					<label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 block">
+						{{ "tags.filters.filterBy" | transloco }}
+					</label>
+					<div class="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 min-w-[140px]">
+						<select
+							[(ngModel)]="searchType"
+							class="bg-transparent border-none text-gray-900 dark:text-white font-medium w-full focus:ring-0 focus:outline-none cursor-pointer"
+						>
+							<option value="all">{{ "tags.filters.all" | transloco }}</option>
+							<option value="name">{{ "tags.filters.tagName" | transloco }}</option>
+							<option value="blockdag">{{ "tags.filters.blockdagAddress" | transloco }}</option>
+							<option value="eth">{{ "tags.filters.ethAddress" | transloco }}</option>
+							<option value="solana">{{ "tags.filters.solanaAddress" | transloco }}</option>
+							<option value="bitcoin">{{ "tags.filters.bitcoinAddress" | transloco }}</option>
+							<option value="sui">{{ "tags.filters.suiAddress" | transloco }}</option>
+						</select>
+					</div>
+				</div>
 
 				<!-- Search Input -->
-				<mat-form-field appearance="outline" class="search-input-field">
-					<mat-label>{{ "tags.filters.searchPlaceholder" | transloco }}</mat-label>
-					<input
-						matInput
-						[(ngModel)]="searchQuery"
-						(input)="onSearchChange()"
-						[placeholder]="'tags.filters.searchInputPlaceholder' | transloco"
-					/>
-					<mat-icon matSuffix *ngIf="!isSearching">search</mat-icon>
-					<mat-icon matSuffix *ngIf="isSearching" class="animate-spin">hourglass_empty</mat-icon>
-				</mat-form-field>
+				<div class="flex-1 min-w-[200px]">
+					<label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 block">
+						{{ "tags.filters.searchPlaceholder" | transloco }}
+					</label>
+					<div
+						class="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 flex items-center gap-2 focus-within:ring-2 focus-within:ring-gray-900 dark:focus-within:ring-gray-100 transition-all"
+					>
+						<input
+							type="text"
+							[(ngModel)]="searchQuery"
+							(input)="onSearchChange()"
+							[placeholder]="'tags.filters.searchInputPlaceholder' | transloco"
+							class="bg-transparent border-none text-gray-900 dark:text-white w-full focus:ring-0 focus:outline-none placeholder-gray-400"
+						/>
+						<mat-icon *ngIf="!isSearching" class="text-gray-400">search</mat-icon>
+						<mat-icon *ngIf="isSearching" class="text-gray-400 animate-spin">hourglass_empty</mat-icon>
+					</div>
+				</div>
 
-				<!-- Clear Filters Button -->
-				<button mat-icon-button class="clear-filters-btn" (click)="clearFilters()" [matTooltip]="'tags.filters.clearAll' | transloco">
-					<mat-icon>clear</mat-icon>
-				</button>
+				<!-- Clear Button -->
+				<div class="self-end">
+					<button
+						(click)="clearFilters()"
+						class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all"
+						[matTooltip]="'tags.filters.clearAll' | transloco"
+					>
+						<mat-icon class="text-gray-600 dark:text-gray-400">clear</mat-icon>
+					</button>
+				</div>
 			</div>
 
-			<!-- Active Filters Display -->
-			<div class="active-filters" *ngIf="hasActiveFilters()">
-				<span class="filters-label">{{ "tags.filters.activeFilters" | transloco }}</span>
-				<div class="filter-chips">
-					<mat-chip *ngIf="selectedStorage !== 'IPFS'" class="filter-chip" (click)="removeStorageFilter()">
-						{{ selectedStorage }}
-						<mat-icon matChipRemove>close</mat-icon>
-					</mat-chip>
-					<mat-chip *ngIf="searchType !== 'all'" class="filter-chip" (click)="removeSearchTypeFilter()">
-						{{ getSearchTypeLabel() | transloco }}
-						<mat-icon matChipRemove>close</mat-icon>
-					</mat-chip>
-					<mat-chip *ngIf="searchQuery" class="filter-chip" (click)="clearSearchQuery()">
-						"{{ searchQuery }}"
-						<mat-icon matChipRemove>close</mat-icon>
-					</mat-chip>
-				</div>
+			<!-- Active Filters -->
+			<div *ngIf="hasActiveFilters()" class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50 flex items-center gap-3 flex-wrap">
+				<span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ "tags.filters.activeFilters" | transloco }}</span>
+				<button
+					*ngIf="selectedStorage !== 'IPFS'"
+					(click)="removeStorageFilter()"
+					class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+				>
+					{{ selectedStorage }}
+					<mat-icon class="text-sm w-4 h-4">close</mat-icon>
+				</button>
+				<button
+					*ngIf="searchType !== 'all'"
+					(click)="removeSearchTypeFilter()"
+					class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+				>
+					{{ getSearchTypeLabel() | transloco }}
+					<mat-icon class="text-sm w-4 h-4">close</mat-icon>
+				</button>
+				<button
+					*ngIf="searchQuery"
+					(click)="clearSearchQuery()"
+					class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+				>
+					"{{ searchQuery }}"
+					<mat-icon class="text-sm w-4 h-4">close</mat-icon>
+				</button>
 			</div>
 		</div>
 
 		<!-- Purchase Message -->
-		<div class="purchase-message" *ngIf="showPurchaseMessage && purchaseData">
-			<div class="purchase-card">
-				<div class="purchase-header">
-					<mat-icon class="purchase-icon">shopping_cart</mat-icon>
-					<h2>{{ "tags.purchase.title" | transloco }}</h2>
+		<div
+			*ngIf="showPurchaseMessage && purchaseData"
+			class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700/50 p-8 mb-6"
+		>
+			<div class="flex flex-col items-center text-center">
+				<div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+					<mat-icon class="text-green-600 dark:text-green-400 text-3xl">shopping_cart</mat-icon>
 				</div>
-				<div class="purchase-content">
-					<div class="tag-info">
-						<span class="tag-name">{{ purchaseData.tagName }}</span>
-						<span class="domain-badge">{{ selectedDomain }}</span>
+				<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ "tags.purchase.title" | transloco }}</h2>
+				<div class="flex items-center gap-2 mb-4">
+					<span class="text-lg font-semibold text-gray-900 dark:text-white">{{ purchaseData.tagName }}</span>
+					<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-sm font-medium">{{ licenseDomain }}</span>
+				</div>
+				<div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 mb-6">
+					<div class="flex items-baseline justify-center gap-2 mb-2">
+						<span class="text-3xl font-bold text-gray-900 dark:text-white">${{ purchaseData.price.price }}</span>
+						<span class="text-gray-500 dark:text-gray-400">{{ purchaseData.price.currency }}</span>
 					</div>
-					<div class="price-info">
-						<div class="price-main">
-							<span class="price">${{ purchaseData.price.price }}</span>
-							<span class="currency">{{ purchaseData.price.currency }}</span>
-						</div>
-						<div class="price-details" *ngIf="purchaseData.price.discount > 0">
-							<span class="original-price">${{ purchaseData.price.priceWithoutDiscount }}</span>
-							<span class="discount">{{ purchaseData.price.discount }}% {{ "tags.purchase.off" | transloco }}</span>
-						</div>
-						<div class="reward-info">
-							<span class="reward">+${{ purchaseData.price.reward }} {{ "tags.purchase.reward" | transloco }}</span>
-						</div>
+					<div *ngIf="purchaseData.price.discount > 0" class="flex items-center justify-center gap-2 mb-2">
+						<span class="text-gray-400 line-through">${{ purchaseData.price.priceWithoutDiscount }}</span>
+						<span class="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold">
+							{{ purchaseData.price.discount }}% {{ "tags.purchase.off" | transloco }}
+						</span>
 					</div>
-					<div class="purchase-actions">
-						<button mat-raised-button color="primary" class="purchase-btn">
-							<mat-icon>shopping_cart</mat-icon>
-							{{ "tags.purchase.purchaseButton" | transloco }}
-						</button>
-						<button mat-stroked-button class="cancel-btn" (click)="clearSearchQuery()">
-							<mat-icon>close</mat-icon>
-							{{ "tags.purchase.cancelButton" | transloco }}
-						</button>
-					</div>
+					<p class="text-green-600 dark:text-green-400 text-sm font-medium">
+						+${{ purchaseData.price.reward }} {{ "tags.purchase.reward" | transloco }}
+					</p>
+				</div>
+				<div class="flex items-center gap-3">
+					<button
+						class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all flex items-center gap-2"
+					>
+						<mat-icon>shopping_cart</mat-icon>
+						{{ "tags.purchase.purchaseButton" | transloco }}
+					</button>
+					<button
+						(click)="clearSearchQuery()"
+						class="px-6 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
+					>
+						<mat-icon>close</mat-icon>
+						{{ "tags.purchase.cancelButton" | transloco }}
+					</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- Table Container -->
-		<div class="tags-container" [ngClass]="{ 'dark-mode': isDarkMode }" *ngIf="isLicenseConfigured && !showPurchaseMessage && !isLoadingLicense">
-			<div class="table-container">
-				<table mat-table [dataSource]="dataSource" class="mat-mdc-table">
-					<!-- Name Column -->
-					<ng-container matColumnDef="name">
-						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.tagName" | transloco }}</th>
-						<td mat-cell *matCellDef="let record">
-							<div class="flex items-center">
+		<!-- Tags Table Card -->
+		<div
+			*ngIf="isLicenseConfigured && !showPurchaseMessage && !isLoadingLicense"
+			class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+		>
+			<!-- Table -->
+			<div class="overflow-x-auto">
+				<table class="w-full">
+					<thead class="bg-gray-50 dark:bg-gray-800/50">
+						<tr>
+							<th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+								{{ "tags.table.tagName" | transloco }}
+							</th>
+							<th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+								{{ "tags.table.domain" | transloco }}
+							</th>
+							<th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+								{{ "tags.table.created" | transloco }}
+							</th>
+							<th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+								{{ "tags.table.size" | transloco }}
+							</th>
+							<th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+								{{ "tags.table.actions" | transloco }}
+							</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
+						<tr
+							*ngFor="let record of dataSource"
+							class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors cursor-pointer"
+							(click)="viewTagDetails(record)"
+						>
+							<td class="px-6 py-4">
+								<div class="flex items-center gap-3">
+									<span
+										class="w-2 h-2 rounded-full flex-shrink-0"
+										[class.bg-green-500]="record.name.includes('.hold')"
+										[class.bg-red-500]="!record.name.includes('.hold')"
+									>
+									</span>
+									<span class="font-semibold text-gray-900 dark:text-white">{{ record.name }}</span>
+								</div>
+							</td>
+							<td class="px-6 py-4">
 								<span
-									class="status-indicator"
-									[class.active]="record.name.includes('.hold')"
-									[class.expired]="!record.name.includes('.hold')"
-								></span>
-								<span class="tag-name">{{ record.name }}</span>
-							</div>
-						</td>
-					</ng-container>
-
-					<!-- Domain Column -->
-					<ng-container matColumnDef="domain">
-						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.domain" | transloco }}</th>
-						<td mat-cell *matCellDef="let record">
-							<span class="domain-chip">{{ licenseDomain || record.publicData?.domain }}</span>
-						</td>
-					</ng-container>
-
-					<!-- Created Date Column -->
-					<ng-container matColumnDef="created_at">
-						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.created" | transloco }}</th>
-						<td mat-cell *matCellDef="let record">
-							<span class="date-text">{{ formatDate(record.created_at) }}</span>
-						</td>
-					</ng-container>
-
-					<!-- Size Column -->
-					<ng-container matColumnDef="size">
-						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.size" | transloco }}</th>
-						<td mat-cell *matCellDef="let record">
-							<span class="size-text">{{ formatFileSize(record.size) }}</span>
-						</td>
-					</ng-container>
-
-					<!-- Actions Column -->
-					<ng-container matColumnDef="actions">
-						<th mat-header-cell *matHeaderCellDef>{{ "tags.table.actions" | transloco }}</th>
-						<td mat-cell *matCellDef="let record">
-							<div class="action-buttons">
-								<!-- QR Code Button -->
+									class="inline-flex px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:text-primary-400 text-xs font-medium"
+								>
+									{{ licenseDomain || record.publicData?.domain }}
+								</span>
+							</td>
+							<td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+								{{ formatDate(record.created_at) }}
+							</td>
+							<td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 font-medium">
+								{{ formatFileSize(record.size) }}
+							</td>
+							<td class="px-6 py-4 text-right">
 								<button
-									mat-icon-button
-									class="action-btn qr-btn"
-									[matTooltip]="'tags.actions.previewQR' | transloco"
-									(click)="openQRCodeModal(record)"
+									(click)="viewTagDetails(record); $event.stopPropagation()"
+									class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-sm"
 								>
-									<mat-icon>qr_code</mat-icon>
+									<mat-icon class="text-lg w-5 h-5">visibility</mat-icon>
+									{{ "tags.actions.viewDetails" | transloco }}
 								</button>
-
-								<!-- Details Button -->
-								<button
-									mat-icon-button
-									class="action-btn details-btn"
-									[matTooltip]="'tags.actions.viewDetails' | transloco"
-									(click)="openDetailsModal(record)"
-								>
-									<mat-icon>visibility</mat-icon>
-								</button>
-
-								<!-- Edit Button -->
-								<!-- <button mat-icon-button class="action-btn edit-btn" matTooltip="Edit Lease" (click)="openEditModal(record)">
-									<mat-icon>edit</mat-icon>
-								</button> -->
-
-								<!-- Delete Button -->
-								<!-- <button
-									mat-icon-button
-									class="action-btn"
-									[class.delete-btn]="canDelete(record)"
-									[class.disabled]="!canDelete(record)"
-									[matTooltip]="canDelete(record) ? 'Delete Tag' : 'Cannot delete - not a .hold tag'"
-									[disabled]="!canDelete(record)"
-									(click)="deleteRecord(record)"
-								>
-									<mat-icon>delete</mat-icon>
-								</button> -->
-							</div>
-						</td>
-					</ng-container>
-
-					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-					<tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+							</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
-			<!-- Pagination -->
-			<div class="pagination-container">
-				<div class="pagination-info">
-					<span class="pagination-text"
-						>{{ "tags.pagination.showing" | transloco }} {{ getStartItem() }}-{{ getEndItem() }} {{ "tags.pagination.of" | transloco }}
-						{{ totalItems }} {{ "tags.pagination.results" | transloco }}</span
-					>
+			<!-- Empty State -->
+			<div *ngIf="dataSource.length === 0" class="p-12 text-center">
+				<div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+					<mat-icon class="text-gray-400 text-3xl">search_off</mat-icon>
 				</div>
-				<div class="pagination-controls">
+				<p class="text-gray-600 dark:text-gray-400">No tags found</p>
+			</div>
+
+			<!-- Pagination -->
+			<div *ngIf="dataSource.length > 0" class="px-6 py-4 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
+				<p class="text-sm text-gray-500 dark:text-gray-400">
+					{{ "tags.pagination.showing" | transloco }}
+					<span class="font-medium text-gray-900 dark:text-white">{{ getStartItem() }}</span
+					>-<span class="font-medium text-gray-900 dark:text-white">{{ getEndItem() }}</span>
+					{{ "tags.pagination.of" | transloco }}
+					<span class="font-medium text-gray-900 dark:text-white">{{ totalItems }}</span>
+				</p>
+
+				<div class="flex items-center gap-2">
 					<button
-						mat-icon-button
-						class="pagination-btn"
-						[disabled]="currentPage === 1"
 						(click)="goToFirstPage()"
-						[matTooltip]="'tags.pagination.firstPage' | transloco"
+						[disabled]="currentPage === 1"
+						class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
 					>
 						<mat-icon>first_page</mat-icon>
 					</button>
 					<button
-						mat-icon-button
-						class="pagination-btn"
-						[disabled]="currentPage === 1"
 						(click)="goToPreviousPage()"
-						[matTooltip]="'tags.pagination.previousPage' | transloco"
+						[disabled]="currentPage === 1"
+						class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
 					>
 						<mat-icon>chevron_left</mat-icon>
 					</button>
 
-					<div class="page-numbers">
+					<div class="flex items-center gap-1">
 						<button
 							*ngFor="let page of visiblePages"
-							mat-icon-button
-							class="pagination-btn page-number"
-							[class.active]="page === currentPage"
-							[disabled]="page === '...'"
 							(click)="goToPage(page)"
+							[disabled]="page === '...'"
+							class="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium transition-all"
+							[class.bg-gray-900]="page === currentPage"
+							[class.dark:bg-white]="page === currentPage"
+							[class.text-white]="page === currentPage"
+							[class.dark:text-gray-900]="page === currentPage"
+							[class.text-gray-600]="page !== currentPage"
+							[class.dark:text-gray-400]="page !== currentPage"
+							[class.hover:bg-gray-100]="page !== currentPage"
+							[class.dark:hover:bg-gray-800]="page !== currentPage"
 						>
 							{{ page }}
 						</button>
 					</div>
 
 					<button
-						mat-icon-button
-						class="pagination-btn"
-						[disabled]="currentPage === totalPages"
 						(click)="goToNextPage()"
-						[matTooltip]="'tags.pagination.nextPage' | transloco"
+						[disabled]="currentPage === totalPages"
+						class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
 					>
 						<mat-icon>chevron_right</mat-icon>
 					</button>
 					<button
-						mat-icon-button
-						class="pagination-btn"
-						[disabled]="currentPage === totalPages"
 						(click)="goToLastPage()"
-						[matTooltip]="'tags.pagination.lastPage' | transloco"
+						[disabled]="currentPage === totalPages"
+						class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
 					>
 						<mat-icon>last_page</mat-icon>
 					</button>
 				</div>
-				<div class="pagination-size">
-					<mat-form-field appearance="outline" class="page-size-selector">
-						<mat-label>{{ "tags.pagination.rowsPerPage" | transloco }}</mat-label>
-						<mat-select [(ngModel)]="pageSize" (selectionChange)="onPageSizeChange()">
-							<mat-option *ngFor="let size of pageSizeOptions" [value]="size">
-								{{ size }}
-							</mat-option>
-						</mat-select>
-					</mat-form-field>
+
+				<div class="flex items-center gap-2">
+					<span class="text-sm text-gray-500 dark:text-gray-400">{{ "tags.pagination.rowsPerPage" | transloco }}</span>
+					<div class="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5">
+						<select
+							[(ngModel)]="pageSize"
+							(change)="onPageSizeChange()"
+							class="bg-transparent border-none text-gray-900 dark:text-white text-sm font-medium focus:ring-0 focus:outline-none cursor-pointer"
+						>
+							<option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+						</select>
+					</div>
 				</div>
 			</div>
 		</div>

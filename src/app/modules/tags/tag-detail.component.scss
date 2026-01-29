@@ -1,0 +1,32 @@
+// Tag Detail Component - Privy.io-inspired design
+// Most styling is done with Tailwind classes in the HTML template
+
+// Animation for loading spinner
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+// Material icon size adjustments
+mat-icon {
+	&.text-4xl {
+		font-size: 32px;
+		width: 32px;
+		height: 32px;
+	}
+	
+	&.text-lg {
+		font-size: 20px;
+		width: 20px;
+		height: 20px;
+	}
+}
+
+// Smooth transitions
+button {
+	transition: all 0.2s ease-in-out;
+}

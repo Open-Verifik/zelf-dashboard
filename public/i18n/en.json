@@ -703,7 +703,8 @@
 		},
 		"actions": {
 			"previewQR": "Preview QR Code",
-			"viewDetails": "View Details"
+			"viewDetails": "View Details",
+			"backToList": "Back to Tags"
 		},
 		"pagination": {
 			"showing": "Showing",
@@ -714,6 +715,23 @@
 			"previousPage": "Previous page",
 			"nextPage": "Next page",
 			"lastPage": "Last page"
+		},
+		"detail": {
+			"loading": "Loading...",
+			"notFound": "Tag not found",
+			"availableForPurchase": "This tag is available for purchase.",
+			"copyAll": "Copy all data",
+			"copyUrl": "Copy URL",
+			"openUrl": "Open URL",
+			"qrCode": "QR Code",
+			"basicInfo": "Basic information",
+			"created": "Created",
+			"size": "Size",
+			"mimeType": "MIME type",
+			"files": "Files",
+			"addresses": "Blockchain addresses",
+			"technical": "Technical",
+			"extraParams": "Extra parameters"
 		}
 	},
 	"biometricVerification": {

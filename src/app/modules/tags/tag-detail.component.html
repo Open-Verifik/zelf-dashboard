@@ -1,0 +1,195 @@
+<div class="min-h-screen bg-gray-50/50 dark:bg-gray-900">
+	<div class="max-w-5xl mx-auto p-6 sm:p-10">
+		<!-- Back Button -->
+		<button (click)="backToList()" 
+			class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6 group">
+			<mat-icon class="group-hover:-translate-x-1 transition-transform">arrow_back</mat-icon>
+			<span class="font-medium">{{ "tags.actions.backToList" | transloco }}</span>
+		</button>
+
+		<!-- Loading State -->
+		@if (isLoading) {
+			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-12 text-center">
+				<mat-icon class="animate-spin text-4xl text-gray-400 dark:text-gray-500 mb-4">hourglass_empty</mat-icon>
+				<p class="text-gray-600 dark:text-gray-400">{{ "tags.detail.loading" | transloco }}</p>
+			</div>
+		}
+
+		<!-- Not Found State -->
+		@else if (isNotFound) {
+			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-12 text-center">
+				<div class="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-6">
+					<mat-icon class="text-gray-400 text-4xl">search_off</mat-icon>
+				</div>
+				<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ "tags.detail.notFound" | transloco }}</h2>
+				<p class="text-gray-600 dark:text-gray-400 mb-6 font-mono">{{ tagId }}</p>
+				<button (click)="backToList()" 
+					class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all">
+					{{ "tags.actions.backToList" | transloco }}
+				</button>
+			</div>
+		}
+
+		<!-- Available for Purchase State -->
+		@else if (isAvailableForPurchase && purchasePrice) {
+			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700/50 p-8 sm:p-10 text-center">
+				<div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+					<mat-icon class="text-green-600 dark:text-green-400 text-4xl">sell</mat-icon>
+				</div>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-mono">{{ tagId }}</h1>
+				<p class="text-gray-600 dark:text-gray-400 mb-6">{{ "tags.detail.availableForPurchase" | transloco }}</p>
+				<div class="inline-block rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-6 mb-6">
+					<div class="flex items-baseline justify-center gap-2">
+						<span class="text-4xl font-bold text-gray-900 dark:text-white">${{ purchasePrice.price }}</span>
+						<span class="text-gray-500 dark:text-gray-400">{{ purchasePrice.currency }}</span>
+					</div>
+					@if (purchasePrice.reward) {
+						<p class="text-green-600 dark:text-green-400 text-sm font-medium mt-2">
+							+${{ purchasePrice.reward }} {{ "tags.purchase.reward" | transloco }}
+						</p>
+					}
+				</div>
+				<div>
+					<button class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all text-lg">
+						{{ "tags.purchase.purchaseButton" | transloco }}
+					</button>
+				</div>
+			</div>
+		}
+
+		<!-- Tag Details -->
+		@else if (record) {
+			<!-- Header Card -->
+			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8 sm:p-10 mb-6">
+				<div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+					<div>
+						<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ record.name }}</h1>
+						<span class="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary dark:text-primary-400 text-sm font-medium">
+							{{ record.publicData?.domain }}
+						</span>
+					</div>
+					<div class="flex items-center gap-2">
+						<span class="w-3 h-3 rounded-full"
+							[class.bg-green-500]="record.name.includes('.hold')"
+							[class.bg-red-500]="!record.name.includes('.hold')">
+						</span>
+						<span class="text-sm font-medium" 
+							[class.text-green-600]="record.name.includes('.hold')"
+							[class.text-red-600]="!record.name.includes('.hold')">
+							{{ record.name.includes('.hold') ? 'Active' : 'Leased' }}
+						</span>
+					</div>
+				</div>
+
+				<!-- Action Buttons -->
+				<div class="flex flex-wrap gap-3">
+					<button (click)="copyAllData()" 
+						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-sm">
+						<mat-icon class="text-lg">content_copy</mat-icon>
+						{{ "tags.detail.copyAll" | transloco }}
+					</button>
+					<button *ngIf="record.url" (click)="copyUrl()" 
+						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+						<mat-icon class="text-lg">link</mat-icon>
+						{{ "tags.detail.copyUrl" | transloco }}
+					</button>
+					<button *ngIf="record.url" (click)="openUrl()" 
+						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+						<mat-icon class="text-lg">open_in_new</mat-icon>
+						{{ "tags.detail.openUrl" | transloco }}
+					</button>
+				</div>
+			</div>
+
+			<!-- QR + Details Grid -->
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				<!-- QR Code Card -->
+				<div *ngIf="record.url" class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8">
+					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">{{ "tags.detail.qrCode" | transloco }}</h3>
+					<div class="flex flex-col items-center">
+						<div class="p-4 bg-white rounded-2xl shadow-inner mb-4">
+							<img [src]="qrImageSrc()" (error)="onQrImageError($event)" alt="QR Code" 
+								class="w-[200px] h-[200px] rounded-lg" />
+						</div>
+						<p class="text-xs text-gray-500 dark:text-gray-400 break-all text-center max-w-[240px] font-mono">
+							{{ record.url }}
+						</p>
+					</div>
+				</div>
+
+				<!-- Details Card -->
+				<div class="lg:col-span-2 rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8">
+					<!-- Basic Info -->
+					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.basicInfo" | transloco }}</h3>
+					<div class="space-y-0 mb-8">
+						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.created" | transloco }}</span>
+							<span class="text-sm text-gray-900 dark:text-white">{{ formatDate(record.created_at) }}</span>
+						</div>
+						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.size" | transloco }}</span>
+							<span class="text-sm text-gray-900 dark:text-white font-medium">{{ formatFileSize(record.size) }}</span>
+						</div>
+						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.mimeType" | transloco }}</span>
+							<span class="text-sm text-gray-900 dark:text-white">{{ record.mime_type || "—" }}</span>
+						</div>
+						<div class="flex justify-between items-center py-3">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.files" | transloco }}</span>
+							<span class="text-sm text-gray-900 dark:text-white">{{ record.number_of_files }}</span>
+						</div>
+					</div>
+
+					<!-- Addresses -->
+					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.addresses" | transloco }}</h3>
+					<div class="space-y-0 mb-8">
+						<div *ngIf="record.publicData?.btcAddress" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Bitcoin</span>
+							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.btcAddress }}</span>
+						</div>
+						<div *ngIf="record.publicData?.ethAddress" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ethereum</span>
+							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.ethAddress }}</span>
+						</div>
+						<div *ngIf="record.publicData?.solanaAddress" class="flex justify-between items-start py-3 gap-4">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Solana</span>
+							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.solanaAddress }}</span>
+						</div>
+					</div>
+
+					<!-- Technical -->
+					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.technical" | transloco }}</h3>
+					<div class="space-y-0">
+						<div *ngIf="record.cid" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">CID</span>
+							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.cid }}</span>
+						</div>
+						<div *ngIf="record.url" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">URL</span>
+							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.url }}</span>
+						</div>
+						<div class="flex justify-between items-center py-3">
+							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">Group ID</span>
+							<span class="text-sm text-gray-900 dark:text-white">{{ record.group_id || "—" }}</span>
+						</div>
+					</div>
+
+					<!-- Extra Params -->
+					@if (extraParams && (extraParams | keyvalue).length) {
+						<h3 class="text-lg font-bold text-gray-900 dark:text-white mt-8 mb-4">{{ "tags.detail.extraParams" | transloco }}</h3>
+						<div class="rounded-xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700">
+							<div *ngFor="let p of extraParams | keyvalue; let last = last" 
+								class="flex justify-between items-center py-2"
+								[class.border-b]="!last"
+								[class.border-gray-200]="!last"
+								[class.dark:border-gray-700]="!last">
+								<span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ p.key }}</span>
+								<span class="text-sm text-gray-900 dark:text-white">{{ p.value }}</span>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+</div>
