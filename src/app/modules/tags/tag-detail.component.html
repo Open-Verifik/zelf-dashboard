@@ -506,10 +506,13 @@
                                 </div>
 
                                 <div class="owner-extend-action">
-                                    <button *ngIf="permissionService.canWrite" class="owner-extend-btn" (click)="ownerExtendLicense()">
+                                    <button *ngIf="permissionService.isAdmin" class="owner-extend-btn" (click)="ownerExtendLicense()">
+                                        Extend as Admin
+                                    </button>
+                                    <button *ngIf="!permissionService.isAdmin && permissionService.canWrite" class="owner-extend-btn" (click)="ownerExtendLicense()">
                                         Extend as Domain Owner
                                     </button>
-                                    <p class="owner-extend-hint">Verify your identity to extend this tag at no cost</p>
+                                    <p class="owner-extend-hint">{{ permissionService.isAdmin ? "Extend license as an administrator" : "Verify your identity to extend this tag at no cost" }}</p>
                                 </div>
                             </div>
                         }
