@@ -6,52 +6,49 @@ import { MatIconModule } from "@angular/material/icon";
 import { environment } from "environments/environment";
 
 @Component({
-	selector: "zelfkeys-success",
-	standalone: true,
-	imports: [RouterLink, MatButtonModule, MatIconModule],
-	templateUrl: "./success.component.html",
-	encapsulation: ViewEncapsulation.None,
+    selector: "zelfkeys-success",
+    standalone: true,
+    imports: [RouterLink, MatButtonModule, MatIconModule],
+    templateUrl: "./success.component.html",
+    encapsulation: ViewEncapsulation.None,
 })
 export class ZelfKeysSuccessComponent implements OnInit {
-	private _sessionId: string | null = null;
-	isLoading = true;
-	message = "Verifying payment...";
+    private _sessionId: string | null = null;
+    isLoading = true;
+    message = "Verifying payment...";
 
-	constructor(
-		private _route: ActivatedRoute,
-		private _http: HttpClient,
-		private _router: Router
-	) {}
+    constructor(
+        private _route: ActivatedRoute,
+        private _http: HttpClient,
+        private _router: Router,
+    ) {}
 
-	ngOnInit(): void {
-		this._sessionId = this._route.snapshot.queryParamMap.get("session_id");
+    ngOnInit(): void {
+        this._sessionId = this._route.snapshot.queryParamMap.get("session_id");
 
-		if (this._sessionId) {
-			this.checkSession(this._sessionId);
-		} else {
-			this.isLoading = false;
-		}
-	}
+        if (this._sessionId) {
+            this.checkSession(this._sessionId);
+        } else {
+            this.isLoading = false;
+        }
+    }
 
-	checkSession(sessionId: string): void {
-		this._http.post(`${environment.apiUrl}/api/subscription/check-session`, { sessionId }).subscribe({
-			next: (response: any) => {
-				this.isLoading = false;
-				if (response.success) {
-					console.log("Payment confirmed via session check:", response);
-				}
-			},
-			error: (err) => {
-				this.isLoading = false;
-				console.error("Error checking session:", err);
-			},
-		});
-	}
+    checkSession(sessionId: string): void {
+        this._http.post(`${environment.apiUrl}/api/subscription/check-session`, { sessionId }).subscribe({
+            next: (response: any) => {
+                this.isLoading = false;
+            },
+            error: (err) => {
+                this.isLoading = false;
+                console.error("Error checking session:", err);
+            },
+        });
+    }
 
-	openExtension(): void {
-		window.postMessage({ type: "OPEN_ZELF_EXTENSION" }, "*");
-		setTimeout(() => {
-			window.close();
-		}, 500);
-	}
+    openExtension(): void {
+        window.postMessage({ type: "OPEN_ZELF_EXTENSION" }, "*");
+        setTimeout(() => {
+            window.close();
+        }, 500);
+    }
 }

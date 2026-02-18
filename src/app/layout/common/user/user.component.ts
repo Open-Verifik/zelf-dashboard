@@ -7,6 +7,8 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Router, RouterLink } from "@angular/router";
+import { TranslocoModule } from "@jsverse/transloco";
+import { AuthService } from "app/core/auth/auth.service";
 import { UserService } from "app/core/user/user.service";
 import { User, ZelfUser } from "app/core/user/user.types";
 import { Subject, takeUntil } from "rxjs";
@@ -17,7 +19,7 @@ import { Subject, takeUntil } from "rxjs";
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	exportAs: "user",
-	imports: [CommonModule, MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink, MatSnackBarModule],
+	imports: [CommonModule, MatButtonModule, MatMenuModule, MatIconModule, NgClass, MatDividerModule, RouterLink, MatSnackBarModule, TranslocoModule],
 })
 export class UserComponent implements OnInit, OnDestroy {
 	/* eslint-disable @typescript-eslint/naming-convention */
@@ -37,9 +39,14 @@ export class UserComponent implements OnInit, OnDestroy {
 	constructor(
 		private _changeDetectorRef: ChangeDetectorRef,
 		private _router: Router,
+		private _authService: AuthService,
 		private _userService: UserService,
 		private _snackBar: MatSnackBar
 	) {}
+
+	get authService(): AuthService {
+		return this._authService;
+	}
 
 	// -----------------------------------------------------------------------------------------------------
 	// @ Lifecycle hooks

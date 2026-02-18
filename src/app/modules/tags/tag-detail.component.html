@@ -1,195 +1,521 @@
-<div class="min-h-screen bg-gray-50/50 dark:bg-gray-900">
-	<div class="max-w-5xl mx-auto p-6 sm:p-10">
-		<!-- Back Button -->
-		<button (click)="backToList()" 
-			class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6 group">
-			<mat-icon class="group-hover:-translate-x-1 transition-transform">arrow_back</mat-icon>
-			<span class="font-medium">{{ "tags.actions.backToList" | transloco }}</span>
-		</button>
+<div class="min-h-screen w-full tag-detail-page" [class.dark-mode]="isDarkMode">
+    <div class="w-full mx-auto p-6 sm:p-10">
+        <!-- Back Button -->
 
-		<!-- Loading State -->
-		@if (isLoading) {
-			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-12 text-center">
-				<mat-icon class="animate-spin text-4xl text-gray-400 dark:text-gray-500 mb-4">hourglass_empty</mat-icon>
-				<p class="text-gray-600 dark:text-gray-400">{{ "tags.detail.loading" | transloco }}</p>
-			</div>
-		}
+        <button (click)="backToList()" class="back-btn group">
+            <mat-icon class="group-hover:-translate-x-1 transition-transform">arrow_back</mat-icon>
+            <span>{{ "tags.actions.backToList" | transloco }}</span>
+        </button>
 
-		<!-- Not Found State -->
-		@else if (isNotFound) {
-			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-12 text-center">
-				<div class="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-6">
-					<mat-icon class="text-gray-400 text-4xl">search_off</mat-icon>
-				</div>
-				<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ "tags.detail.notFound" | transloco }}</h2>
-				<p class="text-gray-600 dark:text-gray-400 mb-6 font-mono">{{ tagId }}</p>
-				<button (click)="backToList()" 
-					class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all">
-					{{ "tags.actions.backToList" | transloco }}
-				</button>
-			</div>
-		}
+        <!-- Loading State -->
+        @if (isLoading) {
+            <div class="crystal-card p-16 text-center">
+                <div class="loading-ring mx-auto mb-6"></div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">{{ "tags.detail.loading" | transloco }}</p>
+            </div>
+        }
 
-		<!-- Available for Purchase State -->
-		@else if (isAvailableForPurchase && purchasePrice) {
-			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700/50 p-8 sm:p-10 text-center">
-				<div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-					<mat-icon class="text-green-600 dark:text-green-400 text-4xl">sell</mat-icon>
-				</div>
-				<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-mono">{{ tagId }}</h1>
-				<p class="text-gray-600 dark:text-gray-400 mb-6">{{ "tags.detail.availableForPurchase" | transloco }}</p>
-				<div class="inline-block rounded-2xl bg-gray-50 dark:bg-gray-900/50 p-6 mb-6">
-					<div class="flex items-baseline justify-center gap-2">
-						<span class="text-4xl font-bold text-gray-900 dark:text-white">${{ purchasePrice.price }}</span>
-						<span class="text-gray-500 dark:text-gray-400">{{ purchasePrice.currency }}</span>
-					</div>
-					@if (purchasePrice.reward) {
-						<p class="text-green-600 dark:text-green-400 text-sm font-medium mt-2">
-							+${{ purchasePrice.reward }} {{ "tags.purchase.reward" | transloco }}
-						</p>
-					}
-				</div>
-				<div>
-					<button class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all text-lg">
-						{{ "tags.purchase.purchaseButton" | transloco }}
-					</button>
-				</div>
-			</div>
-		}
+        <!-- Not Found State -->
+        @else if (isNotFound) {
+            <div class="crystal-card p-12 text-center">
+                <div class="w-20 h-20 rounded-full bg-gray-100/80 dark:bg-gray-800/80 flex items-center justify-center mx-auto mb-6">
+                    <mat-icon class="text-gray-400 text-4xl">search_off</mat-icon>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ "tags.detail.notFound" | transloco }}</h2>
+                <p class="text-gray-500 dark:text-gray-400 mb-6 font-mono text-sm">{{ tagId }}</p>
+                <button (click)="backToList()" class="primary-btn">
+                    {{ "tags.actions.backToList" | transloco }}
+                </button>
+            </div>
+        }
 
-		<!-- Tag Details -->
-		@else if (record) {
-			<!-- Header Card -->
-			<div class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8 sm:p-10 mb-6">
-				<div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-					<div>
-						<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ record.name }}</h1>
-						<span class="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary dark:text-primary-400 text-sm font-medium">
-							{{ record.publicData?.domain }}
-						</span>
-					</div>
-					<div class="flex items-center gap-2">
-						<span class="w-3 h-3 rounded-full"
-							[class.bg-green-500]="record.name.includes('.hold')"
-							[class.bg-red-500]="!record.name.includes('.hold')">
-						</span>
-						<span class="text-sm font-medium" 
-							[class.text-green-600]="record.name.includes('.hold')"
-							[class.text-red-600]="!record.name.includes('.hold')">
-							{{ record.name.includes('.hold') ? 'Active' : 'Leased' }}
-						</span>
-					</div>
-				</div>
+        <!-- Available for Purchase State -->
+        @else if (isAvailableForPurchase && purchasePrice) {
+            <div class="crystal-card crystal-card--green p-8 sm:p-10 text-center">
+                <div class="w-20 h-20 rounded-full bg-emerald-100/80 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-6">
+                    <mat-icon class="text-emerald-500 text-4xl">sell</mat-icon>
+                </div>
+                <h1 class="hero-title text-3xl mb-2">{{ tagId }}</h1>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">{{ "tags.detail.availableForPurchase" | transloco }}</p>
+                <div class="inline-block crystal-card p-6 mb-6">
+                    <div class="flex items-baseline justify-center gap-2">
+                        <span class="text-4xl font-bold text-gray-900 dark:text-white">${{ purchasePrice.price }}</span>
+                        <span class="text-gray-400">{{ purchasePrice.currency }}</span>
+                    </div>
+                    @if (purchasePrice.discount && purchasePrice.discount > 0) {
+                        <div class="flex items-center justify-center gap-2 mt-2">
+                            <span class="text-gray-400 line-through text-sm">${{ purchasePrice.priceWithoutDiscount }}</span>
+                            <span class="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 text-xs font-bold">
+                                {{ purchasePrice.discount }}% OFF
+                            </span>
+                        </div>
+                    }
+                    @if (purchasePrice.reward) {
+                        <p class="text-emerald-500 text-sm font-medium mt-2">+${{ purchasePrice.reward }} {{ "tags.purchase.reward" | transloco }}</p>
+                    }
+                </div>
+                <div>
+                    <button *ngIf="permissionService.isAdmin" class="primary-btn text-lg px-8 py-4">
+                        {{ "tags.purchase.purchaseButton" | transloco }}
+                    </button>
+                </div>
+            </div>
+        }
 
-				<!-- Action Buttons -->
-				<div class="flex flex-wrap gap-3">
-					<button (click)="copyAllData()" 
-						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-sm">
-						<mat-icon class="text-lg">content_copy</mat-icon>
-						{{ "tags.detail.copyAll" | transloco }}
-					</button>
-					<button *ngIf="record.url" (click)="copyUrl()" 
-						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-						<mat-icon class="text-lg">link</mat-icon>
-						{{ "tags.detail.copyUrl" | transloco }}
-					</button>
-					<button *ngIf="record.url" (click)="openUrl()" 
-						class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-						<mat-icon class="text-lg">open_in_new</mat-icon>
-						{{ "tags.detail.openUrl" | transloco }}
-					</button>
-				</div>
-			</div>
+        <!-- Tag Detail View -->
+        @else if (previewData) {
+            <!-- Hero Header -->
+            <div class="crystal-card p-8 sm:p-10 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="hero-title text-3xl sm:text-4xl mb-3">{{ previewData.zelfName || tagId }}</h1>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="domain-badge">.{{ previewData.domain }}</span>
+                            <span
+                                class="status-badge"
+                                [class.status-badge--hold]="previewData.tagType === 'hold'"
+                                [class.status-badge--active]="previewData.tagType === 'purchased'"
+                            >
+                                <span class="status-dot"></span>
+                                {{ previewData.tagType === "hold" ? ("tags.detail.hold" | transloco) : ("tags.detail.purchased" | transloco) }}
+                            </span>
+                            @if (previewData.hasPassword) {
+                                <span class="info-badge">
+                                    <mat-icon class="text-sm w-4 h-4">lock</mat-icon>
+                                    {{ "tags.detail.passwordProtected" | transloco }}
+                                </span>
+                            }
+                            @if (previewData.requireLiveness) {
+                                <span class="info-badge">
+                                    <mat-icon class="text-sm w-4 h-4">face</mat-icon>
+                                    {{ "tags.detail.livenessRequired" | transloco }}
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Quick Actions -->
+                    <div class="flex items-center gap-2">
+                        <button (click)="copyAllData()" class="icon-btn" [class.icon-btn--active]="copiedField === 'all'">
+                            <mat-icon class="text-lg">{{ copiedField === "all" ? "check" : "content_copy" }}</mat-icon>
+                        </button>
+                        @if (previewData.url) {
+                            <button (click)="openUrl(previewData.url)" class="icon-btn">
+                                <mat-icon class="text-lg">open_in_new</mat-icon>
+                            </button>
+                        }
+                        @if (previewData.explorerUrl) {
+                            <button (click)="openUrl(previewData.explorerUrl)" class="icon-btn">
+                                <mat-icon class="text-lg">explore</mat-icon>
+                            </button>
+                        }
+                    </div>
+                </div>
 
-			<!-- QR + Details Grid -->
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				<!-- QR Code Card -->
-				<div *ngIf="record.url" class="rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8">
-					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">{{ "tags.detail.qrCode" | transloco }}</h3>
-					<div class="flex flex-col items-center">
-						<div class="p-4 bg-white rounded-2xl shadow-inner mb-4">
-							<img [src]="qrImageSrc()" (error)="onQrImageError($event)" alt="QR Code" 
-								class="w-[200px] h-[200px] rounded-lg" />
-						</div>
-						<p class="text-xs text-gray-500 dark:text-gray-400 break-all text-center max-w-[240px] font-mono">
-							{{ record.url }}
-						</p>
-					</div>
-				</div>
+                <!-- Lease Expiration Banner -->
+                @if (previewData.leaseExpiresAt) {
+                    <div
+                        class="lease-banner"
+                        [class.lease-banner--warning]="isExpiringSoon() && !isExpired()"
+                        [class.lease-banner--expired]="isExpired()"
+                        [class.lease-banner--ok]="!isExpiringSoon() && !isExpired()"
+                    >
+                        <div class="flex items-center gap-3">
+                            <mat-icon class="text-lg">{{ isExpired() ? "error" : isExpiringSoon() ? "warning" : "schedule" }}</mat-icon>
+                            <div>
+                                <span class="text-sm font-semibold">{{ "tags.detail.leaseExpires" | transloco }}</span>
+                                <span class="text-sm ml-2">{{ formatDate(previewData.leaseExpiresAt) }}</span>
+                                @if (daysUntilExpiry() !== null) {
+                                    <span class="text-xs opacity-70 ml-2">({{ daysUntilExpiry() }} {{ "tags.detail.daysLeft" | transloco }})</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
 
-				<!-- Details Card -->
-				<div class="lg:col-span-2 rounded-3xl shadow-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700/50 p-8">
-					<!-- Basic Info -->
-					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.basicInfo" | transloco }}</h3>
-					<div class="space-y-0 mb-8">
-						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.created" | transloco }}</span>
-							<span class="text-sm text-gray-900 dark:text-white">{{ formatDate(record.created_at) }}</span>
-						</div>
-						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.size" | transloco }}</span>
-							<span class="text-sm text-gray-900 dark:text-white font-medium">{{ formatFileSize(record.size) }}</span>
-						</div>
-						<div class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700/50">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.mimeType" | transloco }}</span>
-							<span class="text-sm text-gray-900 dark:text-white">{{ record.mime_type || "—" }}</span>
-						</div>
-						<div class="flex justify-between items-center py-3">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">{{ "tags.detail.files" | transloco }}</span>
-							<span class="text-sm text-gray-900 dark:text-white">{{ record.number_of_files }}</span>
-						</div>
-					</div>
+            <!-- Content Grid with Left Sidebar -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Sidebar (QR + License Status) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- ZelfProof QR Code -->
+                    @if (previewData.zelfProofQRCode) {
+                        <div class="crystal-card p-6 flex flex-col items-center">
+                            <h3 class="section-title mb-5 self-start">{{ "tags.detail.zelfProofQR" | transloco }}</h3>
+                            <div class="qr-container mb-4">
+                                <img [src]="previewData.zelfProofQRCode" alt="ZelfProof QR Code" class="w-[200px] h-[200px] rounded-xl" />
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if (previewData.url) {
+                                    <button (click)="copyToClipboard(previewData.url, 'url')" class="ghost-btn text-xs">
+                                        <mat-icon class="text-sm w-4 h-4">{{ copiedField === "url" ? "check" : "link" }}</mat-icon>
+                                        {{ copiedField === "url" ? "Copied" : ("tags.detail.copyUrl" | transloco) }}
+                                    </button>
+                                }
+                                @if (previewData.zelfProof) {
+                                    <button (click)="copyToClipboard(previewData.zelfProof, 'zelfProof')" class="ghost-btn text-xs">
+                                        <mat-icon class="text-sm w-4 h-4">{{ copiedField === "zelfProof" ? "check" : "content_copy" }}</mat-icon>
+                                        {{ copiedField === "zelfProof" ? "Copied" : ("tags.detail.copyZelfProof" | transloco) }}
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
 
-					<!-- Addresses -->
-					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.addresses" | transloco }}</h3>
-					<div class="space-y-0 mb-8">
-						<div *ngIf="record.publicData?.btcAddress" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Bitcoin</span>
-							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.btcAddress }}</span>
-						</div>
-						<div *ngIf="record.publicData?.ethAddress" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Ethereum</span>
-							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.ethAddress }}</span>
-						</div>
-						<div *ngIf="record.publicData?.solanaAddress" class="flex justify-between items-start py-3 gap-4">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">Solana</span>
-							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.publicData.solanaAddress }}</span>
-						</div>
-					</div>
+                    <!-- License Status Card -->
+                    @if (previewData.leaseExpiresAt) {
+                        <div class="crystal-card license-card">
+                            <div
+                                class="license-card__icon-wrapper"
+                                [class.license-card__icon-wrapper--warning]="isExpiringSoon() && !isExpired()"
+                                [class.license-card__icon-wrapper--expired]="isExpired()"
+                            >
+                                <mat-icon class="text-4xl">{{ isExpired() ? "error" : isExpiringSoon() ? "warning" : "verified_user" }}</mat-icon>
+                            </div>
 
-					<!-- Technical -->
-					<h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ "tags.detail.technical" | transloco }}</h3>
-					<div class="space-y-0">
-						<div *ngIf="record.cid" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">CID</span>
-							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.cid }}</span>
-						</div>
-						<div *ngIf="record.url" class="flex justify-between items-start py-3 border-b border-gray-100 dark:border-gray-700/50 gap-4">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">URL</span>
-							<span class="text-xs text-gray-900 dark:text-white font-mono break-all text-right">{{ record.url }}</span>
-						</div>
-						<div class="flex justify-between items-center py-3">
-							<span class="text-sm font-semibold text-gray-500 dark:text-gray-400">Group ID</span>
-							<span class="text-sm text-gray-900 dark:text-white">{{ record.group_id || "—" }}</span>
-						</div>
-					</div>
+                            <div class="license-card__value">
+                                {{ formatDate(previewData.leaseExpiresAt) }}
+                            </div>
 
-					<!-- Extra Params -->
-					@if (extraParams && (extraParams | keyvalue).length) {
-						<h3 class="text-lg font-bold text-gray-900 dark:text-white mt-8 mb-4">{{ "tags.detail.extraParams" | transloco }}</h3>
-						<div class="rounded-xl bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700">
-							<div *ngFor="let p of extraParams | keyvalue; let last = last" 
-								class="flex justify-between items-center py-2"
-								[class.border-b]="!last"
-								[class.border-gray-200]="!last"
-								[class.dark:border-gray-700]="!last">
-								<span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ p.key }}</span>
-								<span class="text-sm text-gray-900 dark:text-white">{{ p.value }}</span>
-							</div>
-						</div>
-					}
-				</div>
-			</div>
-		}
-	</div>
+                            <div class="license-card__label">
+                                {{ "tags.detail.leaseExpires" | transloco }}
+                            </div>
+
+                            @if (daysUntilExpiry() !== null) {
+                                <div
+                                    class="license-card__countdown"
+                                    [class.license-card__countdown--warning]="isExpiringSoon() && !isExpired()"
+                                    [class.license-card__countdown--expired]="isExpired()"
+                                >
+                                    <mat-icon class="text-sm w-4 h-4">timer</mat-icon>
+                                    {{ daysUntilExpiry() }} {{ "tags.detail.daysLeft" | transloco }}
+                                </div>
+                            } @else {
+                                <div class="license-card__countdown mobile-hidden">
+                                    <mat-icon class="text-sm w-4 h-4">check_circle</mat-icon>
+                                    {{ "tags.detail.lifetime" | transloco | uppercase }}
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Main Content (Public Data & Actions) -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Public Info -->
+                    <div class="crystal-card p-6">
+                        <h3 class="section-title mb-4">{{ "tags.detail.publicInfo" | transloco }}</h3>
+                        <div class="space-y-0">
+                            @if (previewData.ethAddress) {
+                                <div class="data-row">
+                                    <div class="data-row__label">
+                                        <span class="chain-dot chain-dot--eth"></span>
+                                        Ethereum
+                                    </div>
+                                    <div class="data-row__value">
+                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.ethAddress) }}</span>
+                                        <button (click)="copyToClipboard(previewData.ethAddress!, 'eth'); $event.stopPropagation()" class="copy-btn">
+                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "eth" ? "check" : "content_copy" }}</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            @if (previewData.btcAddress) {
+                                <div class="data-row">
+                                    <div class="data-row__label">
+                                        <span class="chain-dot chain-dot--btc"></span>
+                                        Bitcoin
+                                    </div>
+                                    <div class="data-row__value">
+                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.btcAddress) }}</span>
+                                        <button (click)="copyToClipboard(previewData.btcAddress!, 'btc'); $event.stopPropagation()" class="copy-btn">
+                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "btc" ? "check" : "content_copy" }}</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            @if (previewData.solanaAddress) {
+                                <div class="data-row">
+                                    <div class="data-row__label">
+                                        <span class="chain-dot chain-dot--sol"></span>
+                                        Solana
+                                    </div>
+                                    <div class="data-row__value">
+                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.solanaAddress) }}</span>
+                                        <button
+                                            (click)="copyToClipboard(previewData.solanaAddress!, 'sol'); $event.stopPropagation()"
+                                            class="copy-btn"
+                                        >
+                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "sol" ? "check" : "content_copy" }}</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- EVM Chains -->
+                        @if (getEvmChains().length > 0) {
+                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/30">
+                                <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 block"
+                                    >EVM Chains</span
+                                >
+                                <div class="flex flex-wrap gap-1.5">
+                                    @for (chain of getEvmChains(); track chain) {
+                                        <span class="chain-pill">{{ chain }}</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Technical Details (Collapsible) -->
+                    <div class="crystal-card p-6">
+                        <button (click)="showTechnical = !showTechnical" class="w-full flex items-center justify-between">
+                            <h3 class="section-title">{{ "tags.detail.technical" | transloco }}</h3>
+                            <mat-icon class="text-gray-400 transition-transform" [style.transform]="showTechnical ? 'rotate(180deg)' : 'rotate(0)'">
+                                expand_more
+                            </mat-icon>
+                        </button>
+
+                        @if (showTechnical) {
+                            <div class="mt-4 space-y-0 animate-fade-in">
+                                @if (previewData.id) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">ID</span>
+                                        <div class="data-row__value">
+                                            <span class="font-mono text-xs truncate max-w-[240px]">{{ previewData.id }}</span>
+                                            <button (click)="copyToClipboard(previewData.id!, 'id')" class="copy-btn">
+                                                <mat-icon class="text-sm w-4 h-4">{{ copiedField === "id" ? "check" : "content_copy" }}</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (previewData.url) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">URL</span>
+                                        <div class="data-row__value">
+                                            <span class="font-mono text-xs truncate max-w-[240px]">{{ previewData.url }}</span>
+                                            <button (click)="copyToClipboard(previewData.url!, 'techUrl')" class="copy-btn">
+                                                <mat-icon class="text-sm w-4 h-4">{{
+                                                    copiedField === "techUrl" ? "check" : "content_copy"
+                                                }}</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (previewData.explorerUrl) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">{{ "tags.detail.explorerUrl" | transloco }}</span>
+                                        <div class="data-row__value">
+                                            <button (click)="openUrl(previewData.explorerUrl!)" class="ghost-btn text-xs">
+                                                <mat-icon class="text-sm w-4 h-4">open_in_new</mat-icon>
+                                                {{ "tags.detail.viewOnExplorer" | transloco }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (previewData.size) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">{{ "tags.detail.size" | transloco }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">{{ formatFileSize(previewData.size) }}</span>
+                                    </div>
+                                }
+                                @if (previewData.owner) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">{{ "tags.detail.owner" | transloco }}</span>
+                                        <div class="data-row__value">
+                                            <span class="font-mono text-xs truncate max-w-[240px]">{{ previewData.owner }}</span>
+                                            <button (click)="copyToClipboard(previewData.owner!, 'owner')" class="copy-btn">
+                                                <mat-icon class="text-sm w-4 h-4">{{ copiedField === "owner" ? "check" : "content_copy" }}</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @if (previewData.passwordLayer) {
+                                    <div class="data-row">
+                                        <span class="data-row__label">{{ "tags.detail.passwordLayer" | transloco }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-white">{{ previewData.passwordLayer }}</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Extra Public Data (Improved UI) -->
+                    @if (previewData.extraPublicData && (previewData.extraPublicData | keyvalue).length) {
+                        <div class="crystal-card p-6">
+                            <h3 class="section-title mb-4">{{ "tags.detail.extraParams" | transloco }}</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @for (p of previewData.extraPublicData | keyvalue; track p.key) {
+                                    <div class="extra-data-card">
+                                        <div class="extra-data-card__label">{{ p.key }}</div>
+                                        <div class="extra-data-card__value" [title]="p.value">
+                                            {{ p.value }}
+                                        </div>
+                                        <button (click)="copyToClipboard(p.value + '', p.key)" class="extra-data-card__copy">
+                                            <mat-icon class="text-[14px] w-[14px] h-[14px]">{{
+                                                copiedField === p.key ? "check" : "content_copy"
+                                            }}</mat-icon>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- License / Extend Section (Moved to Bottom) -->
+                    <div class="crystal-card">
+                        <h3 class="section-title mb-4">{{ "tags.detail.extendLicense" | transloco }}</h3>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ "tags.detail.extendDescription" | transloco }}</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @for (opt of durationOptions; track opt.value) {
+                                        <button
+                                            (click)="selectDuration(opt.value)"
+                                            class="duration-chip"
+                                            [class.duration-chip--active]="
+                                                licenseDuration === (+opt.value || opt.value === 'lifetime' ? +opt.value || 0 : -1)
+                                            "
+                                        >
+                                            @if (opt.value === "lifetime") {
+                                                {{ "tags.detail.lifetime" | transloco }}
+                                            } @else {
+                                                {{ opt.label }}
+                                                {{ +opt.label > 1 ? ("tags.detail.years" | transloco) : ("tags.detail.year" | transloco) }}
+                                            }
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Options Result -->
+                        @if (isLoadingPayment) {
+                            <div class="mt-8 flex justify-center py-8">
+                                <div class="loading-ring"></div>
+                            </div>
+                        } @else if (paymentOptions && !paymentOptions.error) {
+                            <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700/30">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    @if (paymentOptions.prices?.ETH) {
+                                        <div
+                                            class="payment-card payment-card--crypto group"
+                                            (click)="toggleAddressReveal('ETH', getPaymentAddress('ETH'))"
+                                        >
+                                            <div class="payment-card__header">
+                                                <span class="payment-card__label">ETH</span>
+                                                <mat-icon class="text-xs group-hover:scale-110 transition-transform">
+                                                    {{ isAddressRevealed("ETH") ? "visibility_off" : "content_copy" }}
+                                                </mat-icon>
+                                            </div>
+
+                                            <div class="payment-card__qr-wrapper mb-4">
+                                                <div #qrContainer id="qr-ETH" class="payment-card__qr"></div>
+                                            </div>
+
+                                            <div class="payment-card__amount">{{ paymentOptions.prices.ETH.amountToSend }}</div>
+                                            <div class="payment-card__rate">${{ paymentOptions.prices.ETH.price }}</div>
+
+                                            <div class="payment-card__footer mt-4">
+                                                <span class="text-[11px] font-mono opacity-60 truncate block w-full text-center">
+                                                    {{ isAddressRevealed("ETH") ? getPaymentAddress("ETH") : "Click to reveal & copy" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (paymentOptions.prices?.SOL) {
+                                        <div
+                                            class="payment-card payment-card--crypto group"
+                                            (click)="toggleAddressReveal('SOL', getPaymentAddress('SOL'))"
+                                        >
+                                            <div class="payment-card__header">
+                                                <span class="payment-card__label">SOL</span>
+                                                <mat-icon class="text-xs group-hover:scale-110 transition-transform">
+                                                    {{ isAddressRevealed("SOL") ? "visibility_off" : "content_copy" }}
+                                                </mat-icon>
+                                            </div>
+
+                                            <div class="payment-card__qr-wrapper mb-4">
+                                                <div #qrContainer id="qr-SOL" class="payment-card__qr"></div>
+                                            </div>
+
+                                            <div class="payment-card__amount">{{ paymentOptions.prices.SOL.amountToSend }}</div>
+                                            <div class="payment-card__rate">${{ paymentOptions.prices.SOL.price }}</div>
+
+                                            <div class="payment-card__footer mt-4">
+                                                <span class="text-[11px] font-mono opacity-60 truncate block w-full text-center">
+                                                    {{ isAddressRevealed("SOL") ? getPaymentAddress("SOL") : "Click to reveal & copy" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (paymentOptions.prices?.AVAX) {
+                                        <div
+                                            class="payment-card payment-card--crypto group"
+                                            (click)="toggleAddressReveal('AVAX', getPaymentAddress('AVAX'))"
+                                        >
+                                            <div class="payment-card__header">
+                                                <span class="payment-card__label">AVAX</span>
+                                                <mat-icon class="text-xs group-hover:scale-110 transition-transform">
+                                                    {{ isAddressRevealed("AVAX") ? "visibility_off" : "content_copy" }}
+                                                </mat-icon>
+                                            </div>
+
+                                            <div class="payment-card__qr-wrapper mb-4">
+                                                <div #qrContainer id="qr-AVAX" class="payment-card__qr"></div>
+                                            </div>
+
+                                            <div class="payment-card__amount">{{ paymentOptions.prices.AVAX.amountToSend }}</div>
+                                            <div class="payment-card__rate">${{ paymentOptions.prices.AVAX.price }}</div>
+
+                                            <div class="payment-card__footer mt-4">
+                                                <span class="text-[11px] font-mono opacity-60 truncate block w-full text-center">
+                                                    {{ isAddressRevealed("AVAX") ? getPaymentAddress("AVAX") : "Click to reveal & copy" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (paymentOptions.coinbase_hosted_url) {
+                                        <div class="payment-card payment-card--coinbase group" (click)="openUrl(paymentOptions.coinbase_hosted_url)">
+                                            <div class="payment-card__header">
+                                                <span class="payment-card__label">COINBASE</span>
+                                                <mat-icon class="text-xs group-hover:translate-x-1 transition-transform">open_in_new</mat-icon>
+                                            </div>
+                                            <div class="payment-card__content flex flex-col items-center justify-center flex-1 py-4">
+                                                <div class="coinbase-logo-wrapper mb-4">
+                                                    <mat-icon class="text-4xl text-blue-600">payment</mat-icon>
+                                                </div>
+                                                <div class="payment-card__amount flex items-center gap-2 text-center w-full justify-center">
+                                                    Pay Now
+                                                </div>
+                                                <div class="payment-card__rate text-center w-full">Secure checkout</div>
+                                            </div>
+                                            <div class="payment-card__footer mt-4">
+                                                <span class="text-[11px] opacity-70 text-center block w-full">Redirect to Coinbase</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Owner Extension Divider -->
+                                <div class="owner-extend-divider">
+                                    <div class="owner-extend-divider__line"></div>
+                                    <span class="owner-extend-divider__text">or extend it for free</span>
+                                    <div class="owner-extend-divider__line"></div>
+                                </div>
+
+                                <div class="owner-extend-action">
+                                    <button *ngIf="permissionService.canWrite" class="owner-extend-btn" (click)="ownerExtendLicense()">
+                                        Extend as Domain Owner
+                                    </button>
+                                    <p class="owner-extend-hint">Verify your identity to extend this tag at no cost</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>

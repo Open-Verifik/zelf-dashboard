@@ -8,186 +8,244 @@ import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-	private _authenticated: boolean = false;
-	private _httpClient = inject(HttpClient);
-	private _userService = inject(UserService);
-	private _httpWrapper = inject(HttpWrapperService);
+    private _authenticated: boolean = false;
+    private _httpClient = inject(HttpClient);
+    private _userService = inject(UserService);
+    private _httpWrapper = inject(HttpWrapperService);
 
-	// -----------------------------------------------------------------------------------------------------
-	// @ Accessors
-	// -----------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------
+    // @ Accessors
+    // -----------------------------------------------------------------------------------------------------
 
-	/**
-	 * Setter & getter for access token
-	 */
-	set accessToken(token: string) {
-		localStorage.setItem("accessToken", token);
-	}
+    /**
+     * Setter & getter for access token
+     */
+    set accessToken(token: string) {
+        localStorage.setItem("accessToken", token);
+    }
 
-	get accessToken(): string {
-		return localStorage.getItem("accessToken") ?? "";
-	}
+    get accessToken(): string {
+        return localStorage.getItem("accessToken") ?? "";
+    }
 
-	/**
-	 * Getter for zelfProof
-	 */
-	get zelfProof(): string {
-		return localStorage.getItem("zelfProof") ?? "";
-	}
+    /**
+     * Get if user is staff
+     */
+    get isStaff(): boolean {
+        const token = this.accessToken;
+        if (!token) return false;
+        try {
+            const payload = AuthUtils.decodeToken(token);
+            return payload?.accountType === "staff";
+        } catch (e) {
+            return false;
+        }
+    }
 
-	/**
-	 * Getter for zelfAccount
-	 */
-	get zelfAccount(): any {
-		const account = localStorage.getItem("zelfAccount");
-		return account ? JSON.parse(account) : null;
-	}
+    /**
+     * Get owner email (for context)
+     */
+    get ownerEmail(): string {
+        const token = this.accessToken;
+        if (!token) return "";
+        try {
+            const payload = AuthUtils.decodeToken(token);
+            return payload?.ownerEmail || payload?.email || "";
+        } catch (e) {
+            return "";
+        }
+    }
 
-	/**
-	 * Getter for wallet
-	 */
-	get wallet(): any {
-		const wallet = localStorage.getItem("wallet");
-		return wallet ? JSON.parse(wallet) : null;
-	}
+    /**
+     * Get user role
+     */
+    get role(): string {
+        const token = this.accessToken;
+        if (!token) return "read";
+        try {
+            const payload = AuthUtils.decodeToken(token);
+            // Owners are implicitly admins
+            if (payload?.accountType !== "staff") return "admin";
+            return payload?.role || "read";
+        } catch (e) {
+            return "read";
+        }
+    }
 
-	// -----------------------------------------------------------------------------------------------------
-	// @ Public methods
-	// -----------------------------------------------------------------------------------------------------
+    /**
+     * Get user account type
+     */
+    get accountType(): string {
+        const token = this.accessToken;
+        if (!token) return "";
+        try {
+            const payload = AuthUtils.decodeToken(token);
+            return payload?.accountType || "";
+        } catch (e) {
+            return "";
+        }
+    }
 
-	/**
-	 * Sign in
-	 *
-	 * @param credentials
-	 */
-	signIn(credentials: {
-		email?: string;
-		countryCode?: string;
-		phone?: string;
-		zelfProof: string;
-		faceBase64: string;
-		masterPassword: string;
-		identificationMethod: string;
-	}): Promise<any> {
-		// Throw error, if the user is already logged in
-		if (this._authenticated) {
-			throwError(() => new Error("User is already logged in."));
-			return Promise.resolve(false);
-		}
+    /**
+     * Getter for zelfProof
+     */
+    get zelfProof(): string {
+        return localStorage.getItem("zelfProof") ?? "";
+    }
 
-		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials);
-	}
+    /**
+     * Getter for zelfAccount
+     */
+    get zelfAccount(): any {
+        const account = localStorage.getItem("zelfAccount");
+        return account ? JSON.parse(account) : null;
+    }
 
-	/**
-	 * Sign out
-	 */
-	signOut(): Observable<any> {
-		// Remove all authentication data from local storage
-		localStorage.removeItem("accessToken");
-		localStorage.removeItem("zelfProof");
-		localStorage.removeItem("zelfAccount");
-		localStorage.removeItem("license");
-		localStorage.removeItem("wallet");
+    /**
+     * Getter for wallet
+     */
+    get wallet(): any {
+        const wallet = localStorage.getItem("wallet");
+        return wallet ? JSON.parse(wallet) : null;
+    }
 
-		// Remove session and account-related data
-		localStorage.removeItem("sessionToken");
-		localStorage.removeItem("subscription");
-		localStorage.removeItem("domainNotificationSettings");
-		localStorage.removeItem("signedDataPrice");
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
 
-		// Set the authenticated flag to false
-		this._authenticated = false;
+    /**
+     * Sign in
+     *
+     * @param credentials
+     */
+    signIn(credentials: {
+        email?: string;
+        countryCode?: string;
+        phone?: string;
+        zelfProof: string;
+        faceBase64: string;
+        masterPassword: string;
+        identificationMethod: string;
+    }): Promise<any> {
+        // Throw error, if the user is already logged in
+        if (this._authenticated) {
+            throwError(() => new Error("User is already logged in."));
+            return Promise.resolve(false);
+        }
 
-		// Return the observable
-		return of(true);
-	}
+        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials);
+    }
 
-	/**
-	 * Sign up
-	 *
-	 * @param user
-	 */
-	signUp(user: {
-		name: string;
-		email: string;
-		password: string;
-		countryCode: string;
-		phone: string;
-		company: string;
-		faceBase64: string;
-		masterPassword: string;
-	}): Promise<any> {
-		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signUp}`, user);
-	}
+    /**
+     * Sign out
+     */
+    signOut(): Observable<any> {
+        // Remove all authentication data from local storage
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("zelfProof");
+        localStorage.removeItem("zelfAccount");
+        localStorage.removeItem("license");
+        localStorage.removeItem("wallet");
 
-	/**
-	 * Validate staff invitation
-	 * @param token
-	 */
-	validateInvite(token: string): Promise<any> {
-		return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/staff/validate-invite?token=${token}`);
-	}
+        // Remove session and account-related data
+        localStorage.removeItem("sessionToken");
+        localStorage.removeItem("subscription");
+        localStorage.removeItem("domainNotificationSettings");
+        localStorage.removeItem("signedDataPrice");
 
-	/**
-	 * Accept staff invitation
-	 * @param data
-	 */
-	acceptInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
-		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/staff/accept-invite`, data);
-	}
+        // Set the authenticated flag to false
+        this._authenticated = false;
 
-	/**
-	 * Unlock session
-	 *
-	 * @param credentials
-	 */
-	unlockSession(credentials: { email: string; password: string }): Observable<any> {
-		return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.unlockSession}`, credentials);
-	}
+        // Return the observable
+        return of(true);
+    }
 
-	/**
-	 * Check if all required authentication data is present
-	 */
-	hasValidSession(): boolean {
-		return !!(this.accessToken && this.zelfProof && this.zelfAccount);
-	}
+    /**
+     * Sign up
+     *
+     * @param user
+     */
+    signUp(user: {
+        name: string;
+        email: string;
+        password: string;
+        countryCode: string;
+        phone: string;
+        company: string;
+        faceBase64: string;
+        masterPassword: string;
+    }): Promise<any> {
+        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signUp}`, user);
+    }
 
-	/**
-	 * Check the authentication status
-	 */
-	check(): Observable<boolean> {
-		// Check if the user is logged in
-		if (this._authenticated) {
-			return of(true);
-		}
+    /**
+     * Validate staff invitation
+     * @param token
+     */
+    validateInvite(token: string): Promise<any> {
+        return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/staff/validate-invite?token=${token}`);
+    }
 
-		// Check if all required session data is present
-		if (!this.hasValidSession()) {
-			return of(false);
-		}
+    /**
+     * Accept staff invitation
+     * @param data
+     */
+    acceptInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
+        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/staff/accept-invite`, data);
+    }
 
-		// Check the access token expire date
-		if (AuthUtils.isTokenExpired(this.accessToken)) {
-			return of(false);
-		}
+    /**
+     * Unlock session
+     *
+     * @param credentials
+     */
+    unlockSession(credentials: { email: string; password: string }): Observable<any> {
+        return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.unlockSession}`, credentials);
+    }
 
-		// For our custom auth system, if we have all required data and token is valid, we're authenticated
-		// No need to call signInUsingToken since we don't have that endpoint
-		this._authenticated = true;
-		return of(true);
-	}
+    /**
+     * Check if all required authentication data is present
+     */
+    hasValidSession(): boolean {
+        return !!(this.accessToken && this.zelfProof && this.zelfAccount);
+    }
 
-	setSession(session: { zelfProof: string; zelfAccount: string }): void {
-		localStorage.setItem("zelfProof", session.zelfProof);
+    /**
+     * Check the authentication status
+     */
+    check(): Observable<boolean> {
+        // Check if the user is logged in
+        if (this._authenticated) {
+            return of(true);
+        }
 
-		localStorage.setItem("zelfAccount", JSON.stringify(session.zelfAccount));
-	}
+        // Check if all required session data is present
+        if (!this.hasValidSession()) {
+            return of(false);
+        }
 
-	setAccessToken(token: string): void {
-		localStorage.setItem("accessToken", token);
-	}
+        // Check the access token expire date
+        if (AuthUtils.isTokenExpired(this.accessToken)) {
+            return of(false);
+        }
 
-	verifyClientExists(user: { email: string; phone: string }): Observable<any> {
-		return this._httpClient.get(`${environment.apiUrl}${environment.endpoints.auth.verifyClientExists}`, { params: user });
-	}
+        // For our custom auth system, if we have all required data and token is valid, we're authenticated
+        // No need to call signInUsingToken since we don't have that endpoint
+        this._authenticated = true;
+        return of(true);
+    }
+
+    setSession(session: { zelfProof: string; zelfAccount: string }): void {
+        localStorage.setItem("zelfProof", session.zelfProof);
+
+        localStorage.setItem("zelfAccount", JSON.stringify(session.zelfAccount));
+    }
+
+    setAccessToken(token: string): void {
+        localStorage.setItem("accessToken", token);
+    }
+
+    verifyClientExists(user: { email: string; phone: string }): Observable<any> {
+        return this._httpClient.get(`${environment.apiUrl}${environment.endpoints.auth.verifyClientExists}`, { params: user });
+    }
 }

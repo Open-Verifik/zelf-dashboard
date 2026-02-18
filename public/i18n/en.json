@@ -1,764 +1,812 @@
 {
-	"welcome-back": "Welcome back",
-	"Project": "Project",
-	"Analytics": "Analytics",
-	"signUp": {
-		"title": "Sign up",
-		"alreadyHaveAccount": "Already have an account?",
-		"signIn": "Sign in",
-		"fullName": "Full name",
-		"emailAddress": "Email address",
-		"country": "Country",
-		"phoneNumber": "Phone number",
-		"password": "Password",
-		"masterPassword": "Master Password",
-		"companyName": "Company name",
-		"agreements": "I agree with",
-		"terms": "Terms",
-		"and": "and",
-		"privacyPolicy": "Privacy Policy",
-		"createAccount": "Create your free account",
-		"phoneRequired": "Phone number is required",
-		"phonePattern": "Please enter a valid phone number (10-15 digits)",
-		"nameRequired": "Full name is required",
-		"emailRequired": "Email address is required",
-		"emailInvalid": "Please enter a valid email address",
-		"passwordRequired": "Password is required",
-		"masterPasswordRequired": "Master Password is required",
-		"companyRequired": "Company name is required",
-		"countryRequired": "Country code is required"
-	},
-	"signIn": {
-		"title": "Sign in",
-		"dontHaveAccount": "Don't have an account?",
-		"signUp": "Sign up",
-		"email": "Email",
-		"phone": "Phone",
-		"emailAddress": "Email address",
-		"emailRequired": "Email address is required",
-		"emailInvalid": "Please enter a valid email address",
-		"country": "Country",
-		"countryRequired": "Country required",
-		"phoneNumber": "Phone number",
-		"phoneRequired": "Phone number is required",
-		"phonePattern": "Please enter a valid phone number",
-		"masterPassword": "Master Password",
-		"masterPasswordRequired": "Master Password is required",
-		"rememberMe": "Remember my credentials",
-		"signInButton": "Sign in",
-		"termsAgreement": "By signing in, you agree to our",
-		"termsOfUse": "Terms of Use",
-		"and": "and",
-		"privacyPolicy": "Privacy Policy"
-	},
-	"errors": {
-		"phone_already_exists": "This phone number is already registered. Please use a different phone number or try signing in.",
-		"email_already_exists": "This email address is already registered. Please use a different email or try signing in.",
-		"client_not_found": "No account found with the provided credentials. Please check your information and try again.",
-		"client_invalid_api_key": "Invalid API key. Please contact support.",
-		"invalid_password": "The provided password is invalid.",
-		"unknown_error": "Something went wrong, please try again.",
-		"network_error": "Network error. Please check your connection and try again.",
-		"validation_error": "Please check your information and try again.",
-		"incomplete_auth_data": "Incomplete authentication data received. Please try again."
-	},
-	"saving_operations": {
-		"confirm_changes": "Confirm Changes",
-		"enter_password_proceed": "Please enter your master password to proceed",
-		"password_encrypt_data": "This password will be used to encrypt your {{itemName}} data.",
-		"verify_identity": "Please verify your identity to {{action}} the {{itemName}} for:",
-		"created_successfully": "{{itemName}} created successfully!",
-		"updated_successfully": "{{itemName}} updated successfully!",
-		"processing": "Processing...",
-		"please_wait": "Please wait while we process your request",
-		"continue": "Continue",
-		"cancel": "Cancel",
-		"success": "Success!",
-		"redirecting": "Redirecting you back...",
-		"domain": "Domain",
-		"status": "Status",
-		"action": "Action",
-		"name": "Name",
-		"email": "Email",
-		"role": "Role",
-		"load_api_key_label": "Load API Key",
-		"change_password_label": "Change Password",
-		"invite_member": "Invite Member",
-		"remove_member": "Remove Member",
-		"update_role": "Update Role",
-		"continue_with_passkey": "Continue with Passkey",
-		"or_use_password": "Or use password",
-		"master_password_label": "Master Password",
-		"enter_master_password": "Enter your master password",
-		"phone": "Phone",
-		"updated": "UPDATED",
-		"company": "Company",
-		"theme_settings_updated_successfully": "Theme settings updated successfully!",
-		"license_configuration": {
-			"title": "Confirm License Configuration",
-			"description": "Please enter your master password to proceed with saving the license configuration",
-			"action": "saving",
-			"itemName": "license configuration"
-		},
-		"security_settings": {
-			"title": "Confirm Security Changes",
-			"description": "Please enter your master password to proceed with updating your security settings",
-			"action": "updating",
-			"itemName": "security settings"
-		},
-		"password_change": {
-			"title": "Confirm Password Change",
-			"description": "Please enter your master password to proceed with changing your password",
-			"action": "changing",
-			"itemName": "password"
-		},
-		"load_api_key": {
-			"title": "Confirm API Key Loading",
-			"description": "Please enter your master password to proceed with loading your API key",
-			"action": "loading",
-			"itemName": "API key"
-		},
-		"password_changed_successfully": "{{itemName}} changed successfully!",
-		"api_key_loaded_successfully": "{{itemName}} loaded successfully!",
-		"team_permissions": {
-			"title": "Confirm Team Changes",
-			"description": "Please enter your master password to proceed with modifying team permissions",
-			"action": "modifying",
-			"itemName": "team permissions"
-		},
-		"plan_billing": {
-			"title": "Confirm Plan & Billing Changes",
-			"description": "Please enter your master password to proceed with updating your subscription plan",
-			"action": "updating",
-			"itemName": "subscription plan"
-		},
-		"plan_billing_page": {
-			"loading_title": "Loading subscription details...",
-			"loading_description": "Please wait while we fetch your plan information",
-			"active_subscription": {
-				"title": "Current Plan",
-				"per": "per"
-			},
-			"details": {
-				"title": "Subscription Details",
-				"next_billing": "Next Billing Date",
-				"current_period": "Current Period",
-				"subscription_id": "Subscription ID"
-			},
-			"actions": {
-				"title": "Actions",
-				"manage_billing": "Manage Billing",
-				"cancel_plan": "Cancel Plan"
-			},
-			"limits": {
-				"title": "Plan Limits",
-				"subtitle": "Your current usage limits",
-				"tags": "Tags",
-				"zelfkeys": "ZelfKeys",
-				"zelfproofs": "ZelfProofs"
-			},
-			"available_upgrades": {
-				"title": "Available Upgrades",
-				"cancel": "Cancel Upgrade"
-			},
-			"select_plan": "Select a Plan",
-			"selected": "SELECTED",
-			"upgrade": "Upgrade",
-			"processing": "Processing...",
-			"get_started": "Get Started",
-			"billing_history": {
-				"title": "Billing History"
-			},
-			"features": {
-				"active_users": "active users",
-				"encryptions_mo": "encryptions/mo",
-				"encryptions": "encryptions",
-				"priority_support": "Priority Support",
-				"advanced_analytics": "Advanced Analytics",
-				"users": "users",
-				"dedicated_infra": "Dedicated Infra",
-				"unlimited": "Unlimited"
-			}
-		},
-		"notifications": {
-			"title": "Confirm Notification Settings",
-			"description": "Please enter your master password to proceed with updating your notification preferences",
-			"action": "updating",
-			"itemName": "notification preferences"
-		},
-		"profile_update": {
-			"title": "Confirm Profile Update",
-			"description": "Please enter your master password to proceed with updating your profile information",
-			"action": "updating",
-			"itemName": "profile"
-		},
-		"theme_settings": {
-			"title": "Confirm Theme Settings",
-			"description": "Please enter your master password to proceed with updating your theme settings",
-			"action": "updating",
-			"itemName": "theme settings"
-		}
-	},
-	"save_confirmation": {
-		"master_password": "Master Password",
-		"master_password_placeholder": "Enter your master password",
-		"toggle_password_visibility": "Toggle password visibility",
-		"cancel": "Cancel",
-		"processing": "Processing...",
-		"continue": "Continue",
-		"biometric_verification": "Biometric Verification",
-		"biometrics_disabled_debugging": "Biometrics temporarily disabled for debugging."
-	},
-	"license": {
-		"title": "Domain Configuration",
-		"subtitle": "Configure your custom domain settings for the Zelf ecosystem",
-		"basic_information": {
-			"title": "Basic Information",
-			"domain_name": "Domain Name",
-			"domain_prefix": "domain.",
-			"domain_placeholder": "mycompany",
-			"domain_required": "Domain is required",
-			"domain_pattern_error": "Domain must contain only letters, numbers, and hyphens",
-			"domain_type": "Domain Type",
-			"domain_type_official": "Official",
-			"domain_type_custom": "Custom",
-			"domain_type_community": "Community",
-			"domain_type_enterprise": "Enterprise",
-			"status": "Status",
-			"status_active": "Active",
-			"status_inactive": "Inactive",
-			"status_maintenance": "Maintenance",
-			"status_beta": "Beta",
-			"owner": "Owner",
-			"owner_placeholder": "zelf-team",
-			"start_date": "Start Date",
-			"end_date": "End Date",
-			"description": "Description",
-			"description_placeholder": "Official Zelf domain"
-		},
-		"features": {
-			"title": "Features",
-			"zns_title": "Zelf Name Service (ZNS)",
-			"zns_description": "Encryptions, Decryptions, previews of ZelfProofs",
-			"zns_enabled": "Enabled",
-			"zns_disabled_title": "ZNS Configuration Disabled",
-			"zns_disabled_description": "Tag validation rules, payment settings, and pricing configuration are only available when Zelf Name Service (ZNS) is enabled.",
-			"zns_disabled_enable": "Enable ZNS above to configure tag-related settings.",
-			"zelfkeys_title": "Zelf Keys",
-			"zelfkeys_description": "Passwords, Notes, Credit Cards, etc.",
-			"zelfkeys_enabled": "Enabled"
-		},
-		"validation_rules": {
-			"title": "Validation Rules",
-			"min_length": "Minimum Length",
-			"min_length_placeholder": "3",
-			"max_length": "Maximum Length",
-			"max_length_placeholder": "27",
-			"max_length_hint": "Maximum 27 characters",
-			"max_length_error": "Maximum length cannot exceed 27 characters",
-			"hold_suffix": "Hold Suffix",
-			"hold_suffix_placeholder": ".hold",
-			"reserved_words": "Reserved Words",
-			"add_reserved_word": "Add reserved word",
-			"content_filter": "Content Filter",
-			"content_filter_description": "Automatically block inappropriate words like \"dick\", \"vagina\", etc."
-		},
-		"storage_options": {
-			"title": "Storage Options",
-			"zelfkeys_title": "Storage Options (ZelfKeys)",
-			"ipfs_title": "IPFS",
-			"ipfs_description": "Used for .hold suffix tag domains",
-			"arweave_title": "Arweave",
-			"arweave_description": "For already purchased domains",
-			"walrus_title": "Walrus",
-			"walrus_description": "Alternative storage option",
-			"key_prefix": "Key Prefix",
-			"key_prefix_placeholder": "tagName"
-		},
-		"payment_settings": {
-			"title": "Payment Settings",
-			"accepted_methods": "Accepted Methods",
-			"whitelist": "Whitelist",
-			"domain_placeholder": "miguel.zelf",
-			"add_to_whitelist": "Add to Whitelist",
-			"no_whitelist": "No whitelist items added yet.",
-			"payment_methods": "Payment Methods",
-			"coinbase": "Coinbase",
-			"crypto_payments": "Crypto Payments",
-			"stripe": "Stripe",
-			"supported_currencies": "Supported Currencies",
-			"add_currency": "Add currency",
-			"no_currencies": "No currencies enabled. Click 'Add currency' to enable one.",
-			"all_currencies_enabled": "All currencies are enabled",
-			"whitelist_title": "Whitelist (Special Pricing)",
-			"add_item": "Add Item",
-			"tag_name": "Tag Name",
-			"discount": "Discount",
-			"type": "Type",
-			"percentage": "Percentage (%)",
-			"fixed_amount": "Fixed Amount ($)",
-			"no_items": "No whitelist items yet. Click \"Add Item\" to get started.",
-			"examples": "Examples:",
-			"example_1": "miguel.zelf with 25 and % = 25% discount",
-			"example_2": "vip.avax with 50 and $ = $50 discount"
-		},
-		"pricing_table": {
-			"title": "Pricing Table",
-			"reset_default": "Reset to Default",
-			"description": "Configure pricing for different tag lengths and subscription durations. Prices are in cents (e.g., 240 = $2.40).",
-			"length": "Length",
-			"one_year": "1 Year",
-			"two_years": "2 Years",
-			"three_years": "3 Years",
-			"four_years": "4 Years",
-			"five_years": "5 Years",
-			"lifetime": "Lifetime",
-			"pricing_info": "Pricing Information",
-			"pricing_info_1": "• Prices are displayed in dollars",
-			"pricing_info_2": "• The \"6-15\" row applies to tag names with 6-15 characters",
-			"pricing_info_3": "• Individual length rows (16-27) override the range pricing",
-			"pricing_info_4": "• Changes are automatically saved when you update the form"
-		},
-		"limits": {
-			"title": "Limits",
-			"max_tags": "Max Tags",
-			"max_tags_placeholder": "10000",
-			"max_zelfkeys": "Max ZelfKeys",
-			"max_zelfkeys_placeholder": "10000",
-			"info_title": "Limits Information",
-			"info_description": "Domain limits are automatically managed based on your subscription plan.",
-			"info_subscription": "To modify limits, please upgrade or change your subscription plan in the Plan & Billing section."
-		},
-		"metadata": {
-			"title": "Metadata",
-			"launch_date": "Launch Date",
-			"version": "Version",
-			"version_placeholder": "1.0.0",
-			"documentation_url": "Documentation URL",
-			"documentation_placeholder": "https://docs.example.com",
-			"community": "Community",
-			"community_placeholder": "avalanche",
-			"enterprise": "Enterprise",
-			"enterprise_placeholder": "blockDAG",
-			"support_level": "Support Level",
-			"support_standard": "Standard",
-			"support_premium": "Premium",
-			"support_enterprise": "Enterprise"
-		},
-		"current_license": {
-			"title": "Current License",
-			"domain": "Domain:",
-			"created": "Created:",
-			"ipfs_hash": "IPFS Hash:"
-		},
-		"actions": {
-			"cancel": "Cancel",
-			"save": "Save Domain Configuration",
-			"save_configuration": "Save Configuration",
-			"processing": "Processing..."
-		}
-	},
-	"analytics": {
-		"title": "Analytics Dashboard",
-		"description": "Monitor tag domain creation, subscriptions and activity metrics",
-		"tagDomainsOverview": {
-			"title": "Tag Domains Overview",
-			"subtitle": "Number of tag domains created (free and premium)",
-			"thisMonth": "This Month",
-			"previousMonth": "Previous Month"
-		},
-		"paidTags": {
-			"title": "Paid Tags",
-			"subtitle": "Number of premium tag domains created"
-		},
-		"zelfkeySubscriptions": {
-			"title": "ZelfKey Subscriptions",
-			"subtitle": "Number of ZelfKey subscriptions"
-		},
-		"activeTags": {
-			"title": "Active Tags",
-			"subtitle": "Number of currently active tag domains"
-		},
-		"allTagsVsPaidTags": {
-			"title": "All Tags vs. Paid Tags",
-			"subtitle": "Comparison between total and paid tag domains"
-		},
-		"metrics": {
-			"conversionRate": {
-				"title": "Conversion Rate",
-				"description": "Conversion rate shows the percentage of total tag registrations that convert to paid/premium tags. Higher is better."
-			},
-			"premiumAdoption": {
-				"title": "Premium Adoption",
-				"description": "Premium Adoption shows the percentage of users who upgrade to paid tag features. Higher indicates better monetization."
-			},
-			"revenuePotential": {
-				"title": "Revenue Potential",
-				"description": "Revenue Potential shows the projected conversion rate based on current trends and user behavior patterns."
-			}
-		},
-		"zelfUsers": {
-			"title": "Zelf Users",
-			"subtitle": "Demographic properties of Zelf platform users"
-		},
-		"tagLeaseLengths": {
-			"title": "Tag Lease Lengths",
-			"subtitle": "Distribution of tag domain lease durations"
-		},
-		"domainLength": {
-			"title": "Domain Length",
-			"subtitle": "Distribution of tag domain character lengths"
-		},
-		"origin": {
-			"title": "Origin",
-			"subtitle": "Platform distribution of Zelf users"
-		},
-		"timePeriods": {
-			"30days": "30 days",
-			"3months": "3 months",
-			"9months": "9 months"
-		},
-		"chart": {
-			"total": "Total",
-			"dateFormat": "dd MMM",
-			"allTags": "All Tags",
-			"paidTags": "Paid Tags",
-			"tag": "tag",
-			"tags": "tags",
-			"chars": "chars",
-			"tooltip": {
-				"colon": ":",
-				"percentage": "%"
-			}
-		},
-		"chartLabels": {
-			"tagLeaseLengths": {
-				"1year": "1 Year",
-				"2years": "2 Years",
-				"3years": "3 Years",
-				"4years": "4 Years",
-				"5years": "5 Years",
-				"lifetime": "Lifetime"
-			},
-			"domainLength": {
-				"1to3": "1-3",
-				"4to10": "4-10",
-				"11to20": "11-20",
-				"21to27": "21-27"
-			},
-			"origin": {
-				"extension": "Extension",
-				"android": "Android",
-				"ios": "iOS"
-			}
-		},
-		"stats": {
-			"peak": "Peak",
-			"low": "Low",
-			"total": "Total",
-			"tags": "tags",
-			"records": "records",
-			"on": "on",
-			"belowTarget": "below target",
-			"comingSoon": "coming soon",
-			"unknown": "Unknown"
-		},
-		"chartData": {
-			"total": "Total",
-			"allTags": "All Tags",
-			"paidTags": "Paid Tags",
-			"tag": "tag",
-			"tags": "tags",
-			"chars": "chars"
-		}
-	},
-	"profile": {
-		"loading": "Loading profile...",
-		"photo": "Photo",
-		"status": "STATUS",
-		"menu": {
-			"profile": "Profile",
-			"settings": "Settings",
-			"license": "License",
-			"support": "Support"
-		},
-		"information": {
-			"title": "Profile Information",
-			"name": "Name",
-			"name_placeholder": "Enter your name",
-			"name_required": "Name is required",
-			"name_minlength": "Name must be at least 2 characters",
-			"company": "Company",
-			"company_placeholder": "Enter your company",
-			"company_required": "Company is required",
-			"email": "Email",
-			"email_placeholder": "Enter your email",
-			"email_required": "Email is required",
-			"email_invalid": "Please enter a valid email address",
-			"country": "Country",
-			"country_required": "Country is required",
-			"phone": "Phone",
-			"phone_placeholder": "Enter your phone number",
-			"phone_required": "Phone number is required",
-			"phone_invalid": "Please enter a valid phone number"
-		},
-		"account": {
-			"title": "Account Information",
-			"created_at": "Created At",
-			"subscription": "Subscription"
-		},
-		"edit": "Edit",
-		"save": "Save",
-		"cancel": "Cancel",
-		"license": {
-			"title": "License Details",
-			"type": "License Type",
-			"status": "Status",
-			"created": "Created",
-			"features": "Features",
-			"all_features": "All Features",
-			"included_features": "Included Features",
-			"feature_analytics": "Advanced Analytics Dashboard",
-			"feature_processing": "Real-time Data Processing",
-			"feature_support": "Priority Support",
-			"feature_api": "API Access",
-			"feature_integrations": "Custom Integrations",
-			"renew": "Renew License",
-			"download": "Download"
-		}
-	},
-	"theme_settings": {
-		"title": "Theme Settings",
-		"subtitle": "Customize the appearance of your ZNS Wallet and ZelfKeys interfaces",
-		"zns_wallet": {
-			"title": "ZNS Wallet Theme",
-			"description": "Customize colors for your ZNS Wallet interface",
-			"dark_mode": "Dark Mode",
-			"dark_mode_description": "Toggle between light and dark themes",
-			"reset": "Reset",
-			"primary_colors": "Primary Colors",
-			"background_colors": "Background Colors",
-			"text_colors": "Text Colors",
-			"header_colors": "Header Colors",
-			"button_colors": "Button Colors",
-			"status_colors": "Status Colors",
-			"primary": "Primary",
-			"secondary": "Secondary",
-			"background": "Background",
-			"secondary_background": "Secondary Background",
-			"primary_text": "Primary Text",
-			"secondary_text": "Secondary Text",
-			"muted_text": "Muted Text",
-			"header_background": "Header Background",
-			"header_text": "Header Text",
-			"primary_button": "Primary Button",
-			"button_text": "Button Text",
-			"button_hover": "Button Hover",
-			"success": "Success",
-			"warning": "Warning",
-			"error": "Error"
-		},
-		"zelfkeys": {
-			"title": "ZelfKeys Theme",
-			"description": "Customize colors for your ZelfKeys password manager interface",
-			"dark_mode": "Dark Mode",
-			"dark_mode_description": "Toggle between light and dark themes",
-			"reset": "Reset",
-			"primary_colors": "Primary Colors",
-			"background_colors": "Background Colors",
-			"text_colors": "Text Colors",
-			"header_colors": "Header Colors",
-			"button_colors": "Button Colors",
-			"status_colors": "Status Colors",
-			"primary": "Primary",
-			"secondary": "Secondary",
-			"background": "Background",
-			"secondary_background": "Secondary Background",
-			"primary_text": "Primary Text",
-			"secondary_text": "Secondary Text",
-			"muted_text": "Muted Text",
-			"header_background": "Header Background",
-			"header_text": "Header Text",
-			"primary_button": "Primary Button",
-			"button_text": "Button Text",
-			"button_hover": "Button Hover",
-			"success": "Success",
-			"warning": "Warning",
-			"error": "Error"
-		},
-		"actions": {
-			"cancel": "Cancel",
-			"save": "Save Theme Settings",
-			"updating_colors": "Updating colors...",
-			"loading": "Loading theme settings...",
-			"failed_to_load": "Failed to load theme settings",
-			"invalid_settings": "Invalid theme settings. Please check all color values.",
-			"fill_required": "Please fill in all required fields correctly"
-		}
-	},
-	"payment": {
-		"title": "PURCHASE A NEW TAG NAME",
-		"searchTag": "Search tag",
-		"searching": "Searching...",
-		"greatNews": "Great news, this tag name is available!",
-		"tagAvailable": "The tag name",
-		"isAvailable": "is available and can be claimed right now in our app or extension!",
-		"installExtension": "Install Extension",
-		"downloadApp": "Download App",
-		"orderDetails": "Order details",
-		"domainToPurchase": "Domain to purchase",
-		"charactersLength": "characters length",
-		"lease": "lease",
-		"totalCost": "total cost",
-		"totalCostUSD": "USD",
-		"domainPriceLength": "Domain price length",
-		"knowMore": "Know more",
-		"leaseAgreement": "Lease agreement",
-		"year": "Year",
-		"years": "Years",
-		"lifetime": "Lifetime",
-		"total": "Total",
-		"ourPurchaseRate": "Our purchase rate",
-		"payWithCoinbase": "Pay with Coinbase",
-		"choosePaymentMethod": "Choose payment method",
-		"lowFees": "LOW FEES",
-		"purchaseNow": "Purchase now",
-		"howToRegister": "How to Register Your Domain",
-		"step1Title": "Login in Zelf from our extension in your browser or download the mobile app.",
-		"step2Title": "Search the tag that you want to register with the desired domain.",
-		"step3Title": "Complete all the security steps and the biometric authentication.",
-		"step4Title": "Finally, comeback to this page and finalize the domain purchase.",
-		"pleaseEnterTagName": "Please enter a tag name"
-	},
-	"checkout": {
-		"backToPaymentOptions": "Back to payment options",
-		"orderDetails": "Order details",
-		"domainToPurchase": "Domain to purchase",
-		"charactersLength": "characters length",
-		"lease": "lease",
-		"totalCost": "total cost",
-		"domainPriceLength": "Domain price length",
-		"knowMore": "Know more",
-		"leaseAgreement": "Lease agreement",
-		"total": "Total",
-		"paymentMethod": "Payment method",
-		"congratulations": "Congratulations!",
-		"tagActive": "Your new ZNS tag",
-		"isNowActive": "is now active.",
-		"enjoyBenefits": "Enjoy the benefits of ZNS — your face is your key.",
-		"keepReceipt": "Would you like to keep a receipt of your payment?",
-		"enterYourEmail": "Enter your email",
-		"sendReceipt": "Send receipt",
-		"sending": "Sending...",
-		"payWith": "Pay with",
-		"coinbasePaymentUrl": "Coinbase payment URL",
-		"uniquePaymentAddress": "Unique payment address",
-		"copy": "COPY",
-		"openLink": "Open link",
-		"amountToPay": "Amount to pay",
-		"expiresIn": "Expires in",
-		"transactionStatus": "Transaction status",
-		"success": "SUCCESS",
-		"checking": "Checking...",
-		"pending": "PENDING",
-		"checkingPaymentStatus": "Checking payment status every 10 seconds...",
-		"paymentConfirmed": "Payment confirmed successfully!",
-		"amountDetected": "Amount detected"
-	},
-	"tags": {
-		"title": "Tags Management",
-		"subtitle": "Manage your blockchain tags and QR codes",
-		"licenseWarning": {
-			"title": "License Not Configured",
-			"message": "Please configure your license in the Settings section to view and manage your tags."
-		},
-		"filters": {
-			"storage": "Storage",
-			"filterBy": "Filter by",
-			"all": "All",
-			"tagName": "Tag Name",
-			"blockdagAddress": "BlockDAG Address",
-			"ethAddress": "ETH Address",
-			"solanaAddress": "Solana Address",
-			"bitcoinAddress": "Bitcoin Address",
-			"suiAddress": "SUI Address",
-			"searchPlaceholder": "Search tags...",
-			"searchInputPlaceholder": "Enter search term",
-			"clearAll": "Clear all filters",
-			"activeFilters": "Active filters:"
-		},
-		"purchase": {
-			"title": "Tag Available for Purchase",
-			"off": "OFF",
-			"reward": "reward",
-			"purchaseButton": "Purchase Tag",
-			"cancelButton": "Cancel"
-		},
-		"table": {
-			"tagName": "Tag Name",
-			"domain": "Domain",
-			"created": "Created",
-			"size": "Size",
-			"actions": "Actions"
-		},
-		"actions": {
-			"previewQR": "Preview QR Code",
-			"viewDetails": "View Details",
-			"backToList": "Back to Tags"
-		},
-		"pagination": {
-			"showing": "Showing",
-			"of": "of",
-			"results": "results",
-			"rowsPerPage": "Rows per page",
-			"firstPage": "First page",
-			"previousPage": "Previous page",
-			"nextPage": "Next page",
-			"lastPage": "Last page"
-		},
-		"detail": {
-			"loading": "Loading...",
-			"notFound": "Tag not found",
-			"availableForPurchase": "This tag is available for purchase.",
-			"copyAll": "Copy all data",
-			"copyUrl": "Copy URL",
-			"openUrl": "Open URL",
-			"qrCode": "QR Code",
-			"basicInfo": "Basic information",
-			"created": "Created",
-			"size": "Size",
-			"mimeType": "MIME type",
-			"files": "Files",
-			"addresses": "Blockchain addresses",
-			"technical": "Technical",
-			"extraParams": "Extra parameters"
-		}
-	},
-	"biometricVerification": {
-		"title": "Verify Identity",
-		"verifyingAs": "Verifying as",
-		"newAccount": "New Account",
-		"account": "Account",
-		"verificationFailed": "Verification Failed",
-		"tryAgain": "Try Again",
-		"cancel": "Cancel",
-		"processingData": "Processing your biometric data...",
-		"initializingCamera": "Initializing safe camera...",
-		"positionFace": "Position your face in the center",
-		"lookAtCamera": "Look directly at the camera and stay still",
-		"verifyInstruction": "Please look at the camera to verify your identity and complete your account registration",
-		"cameraNotAvailable": "Camera not available",
-		"cameraAccessible": "Please ensure your camera is enabled and accessible for biometric verification",
-		"permissionRequired": "Camera Permission Required",
-		"allowAccess": "Please allow camera access to continue with biometric verification"
-	},
-	"acceptInvite": {
-		"title": "Accept Invitation",
-		"invitedToJoin": "You've been invited to join",
-		"createMasterPassword": "Create Master Password",
-		"verifyIdentity": "Verify Identity",
-		"biometricsProtected": "Protected by Zelf Biometrics",
-		"verifyingInvitation": "Verifying invitation...",
-		"faceVerification": "Face Verification"
-	}
+    "common": {
+        "staff": "Staff"
+    },
+    "welcome-back": "Welcome back",
+    "Project": "Project",
+    "Analytics": "Analytics",
+    "signUp": {
+        "title": "Sign up",
+        "alreadyHaveAccount": "Already have an account?",
+        "signIn": "Sign in",
+        "fullName": "Full name",
+        "emailAddress": "Email address",
+        "country": "Country",
+        "phoneNumber": "Phone number",
+        "password": "Password",
+        "masterPassword": "Master Password",
+        "companyName": "Company name",
+        "agreements": "I agree with",
+        "terms": "Terms",
+        "and": "and",
+        "privacyPolicy": "Privacy Policy",
+        "createAccount": "Create your free account",
+        "phoneRequired": "Phone number is required",
+        "phonePattern": "Please enter a valid phone number (10-15 digits)",
+        "nameRequired": "Full name is required",
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "masterPasswordRequired": "Master Password is required",
+        "companyRequired": "Company name is required",
+        "countryRequired": "Country code is required"
+    },
+    "signIn": {
+        "title": "Sign in",
+        "dontHaveAccount": "Don't have an account?",
+        "signUp": "Sign up",
+        "email": "Email",
+        "phone": "Phone",
+        "emailAddress": "Email address",
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Please enter a valid email address",
+        "country": "Country",
+        "countryRequired": "Country required",
+        "phoneNumber": "Phone number",
+        "phoneRequired": "Phone number is required",
+        "phonePattern": "Please enter a valid phone number",
+        "masterPassword": "Master Password",
+        "masterPasswordRequired": "Master Password is required",
+        "rememberMe": "Remember my credentials",
+        "signInButton": "Sign in",
+        "termsAgreement": "By signing in, you agree to our",
+        "termsOfUse": "Terms of Use",
+        "and": "and",
+        "privacyPolicy": "Privacy Policy"
+    },
+    "errors": {
+        "phone_already_exists": "This phone number is already registered. Please use a different phone number or try signing in.",
+        "email_already_exists": "This email address is already registered. Please use a different email or try signing in.",
+        "client_not_found": "No account found with the provided credentials. Please check your information and try again.",
+        "client_invalid_api_key": "Invalid API key. Please contact support.",
+        "invalid_password": "The provided password is invalid.",
+        "unknown_error": "Something went wrong, please try again.",
+        "network_error": "Network error. Please check your connection and try again.",
+        "validation_error": "Please check your information and try again.",
+        "incomplete_auth_data": "Incomplete authentication data received. Please try again."
+    },
+    "saving_operations": {
+        "confirm_changes": "Confirm Changes",
+        "enter_password_proceed": "Please enter your master password to proceed",
+        "password_encrypt_data": "This password will be used to encrypt your {{itemName}} data.",
+        "verify_identity": "Please verify your identity to {{action}} the {{itemName}} for:",
+        "created_successfully": "{{itemName}} created successfully!",
+        "updated_successfully": "{{itemName}} updated successfully!",
+        "processing": "Processing...",
+        "please_wait": "Please wait while we process your request",
+        "continue": "Continue",
+        "cancel": "Cancel",
+        "success": "Success!",
+        "redirecting": "Redirecting you back...",
+        "domain": "Domain",
+        "status": "Status",
+        "tag": "Tag",
+        "duration": "Duration",
+        "lifetime": "Lifetime",
+        "years": "Year(s)",
+        "tag_license": "Tag License",
+        "action": "Action",
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "load_api_key_label": "Load API Key",
+        "change_password_label": "Change Password",
+        "invite_member": "Invite Member",
+        "remove_member": "Remove Member",
+        "update_role": "Update Role",
+        "continue_with_passkey": "Continue with Passkey",
+        "or_use_password": "Or use password",
+        "master_password_label": "Master Password",
+        "enter_master_password": "Enter your master password",
+        "phone": "Phone",
+        "updated": "UPDATED",
+        "company": "Company",
+        "theme_settings_updated_successfully": "Theme settings updated successfully!",
+        "license_configuration": {
+            "title": "Confirm License Configuration",
+            "description": "Please enter your master password to proceed with saving the license configuration",
+            "action": "saving",
+            "itemName": "license configuration"
+        },
+        "security_settings": {
+            "title": "Confirm Security Changes",
+            "description": "Please enter your master password to proceed with updating your security settings",
+            "action": "updating",
+            "itemName": "security settings"
+        },
+        "password_change": {
+            "title": "Confirm Password Change",
+            "description": "Please enter your master password to proceed with changing your password",
+            "action": "changing",
+            "itemName": "password"
+        },
+        "load_api_key": {
+            "title": "Confirm API Key Loading",
+            "description": "Please enter your master password to proceed with loading your API key",
+            "action": "loading",
+            "itemName": "API key"
+        },
+        "password_changed_successfully": "{{itemName}} changed successfully!",
+        "api_key_loaded_successfully": "{{itemName}} loaded successfully!",
+        "team_permissions": {
+            "title": "Confirm Team Changes",
+            "description": "Please enter your master password to proceed with modifying team permissions",
+            "action": "modifying",
+            "itemName": "team permissions"
+        },
+        "plan_billing": {
+            "title": "Confirm Plan & Billing Changes",
+            "description": "Please enter your master password to proceed with updating your subscription plan",
+            "action": "updating",
+            "itemName": "subscription plan"
+        },
+        "plan_billing_page": {
+            "loading_title": "Loading subscription details...",
+            "loading_description": "Please wait while we fetch your plan information",
+            "active_subscription": {
+                "title": "Current Plan",
+                "per": "per"
+            },
+            "details": {
+                "title": "Subscription Details",
+                "next_billing": "Next Billing Date",
+                "current_period": "Current Period",
+                "subscription_id": "Subscription ID"
+            },
+            "actions": {
+                "title": "Actions",
+                "manage_billing": "Manage Billing",
+                "cancel_plan": "Cancel Plan"
+            },
+            "limits": {
+                "title": "Plan Limits",
+                "subtitle": "Your current usage limits",
+                "tags": "Tags",
+                "zelfkeys": "ZelfKeys",
+                "zelfproofs": "ZelfProofs"
+            },
+            "available_upgrades": {
+                "title": "Available Upgrades",
+                "cancel": "Cancel Upgrade"
+            },
+            "select_plan": "Select a Plan",
+            "selected": "SELECTED",
+            "upgrade": "Upgrade",
+            "processing": "Processing...",
+            "get_started": "Get Started",
+            "billing_history": {
+                "title": "Billing History"
+            },
+            "features": {
+                "active_users": "active users",
+                "encryptions_mo": "encryptions/mo",
+                "encryptions": "encryptions",
+                "priority_support": "Priority Support",
+                "advanced_analytics": "Advanced Analytics",
+                "users": "users",
+                "dedicated_infra": "Dedicated Infra",
+                "unlimited": "Unlimited"
+            }
+        },
+        "notifications": {
+            "title": "Confirm Notification Settings",
+            "description": "Please enter your master password to proceed with updating your notification preferences",
+            "action": "updating",
+            "itemName": "notification preferences"
+        },
+        "profile_update": {
+            "title": "Confirm Profile Update",
+            "description": "Please enter your master password to proceed with updating your profile information",
+            "action": "updating",
+            "itemName": "profile"
+        },
+        "theme_settings": {
+            "title": "Confirm Theme Settings",
+            "description": "Please enter your master password to proceed with updating your theme settings",
+            "action": "updating",
+            "itemName": "theme settings"
+        }
+    },
+    "save_confirmation": {
+        "master_password": "Master Password",
+        "master_password_placeholder": "Enter your master password",
+        "toggle_password_visibility": "Toggle password visibility",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "continue": "Continue",
+        "biometric_verification": "Biometric Verification",
+        "biometrics_disabled_debugging": "Biometrics temporarily disabled for debugging."
+    },
+    "license": {
+        "title": "Domain Configuration",
+        "subtitle": "Configure your custom domain settings for the Zelf ecosystem",
+        "basic_information": {
+            "title": "Basic Information",
+            "domain_name": "Domain Name",
+            "domain_prefix": "domain.",
+            "domain_placeholder": "mycompany",
+            "domain_required": "Domain is required",
+            "domain_pattern_error": "Domain must contain only letters, numbers, and hyphens",
+            "domain_type": "Domain Type",
+            "domain_type_official": "Official",
+            "domain_type_custom": "Custom",
+            "domain_type_community": "Community",
+            "domain_type_enterprise": "Enterprise",
+            "status": "Status",
+            "status_active": "Active",
+            "status_inactive": "Inactive",
+            "status_maintenance": "Maintenance",
+            "status_beta": "Beta",
+            "owner": "Owner",
+            "owner_placeholder": "zelf-team",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "description": "Description",
+            "description_placeholder": "Official Zelf domain"
+        },
+        "features": {
+            "title": "Features",
+            "zns_title": "Zelf Name Service (ZNS)",
+            "zns_description": "Encryptions, Decryptions, previews of ZelfProofs",
+            "zns_enabled": "Enabled",
+            "zns_disabled_title": "ZNS Configuration Disabled",
+            "zns_disabled_description": "Tag validation rules, payment settings, and pricing configuration are only available when Zelf Name Service (ZNS) is enabled.",
+            "zns_disabled_enable": "Enable ZNS above to configure tag-related settings.",
+            "zelfkeys_title": "Zelf Keys",
+            "zelfkeys_description": "Passwords, Notes, Credit Cards, etc.",
+            "zelfkeys_enabled": "Enabled"
+        },
+        "validation_rules": {
+            "title": "Validation Rules",
+            "min_length": "Minimum Length",
+            "min_length_placeholder": "3",
+            "max_length": "Maximum Length",
+            "max_length_placeholder": "27",
+            "max_length_hint": "Maximum 27 characters",
+            "max_length_error": "Maximum length cannot exceed 27 characters",
+            "hold_suffix": "Hold Suffix",
+            "hold_suffix_placeholder": ".hold",
+            "reserved_words": "Reserved Words",
+            "add_reserved_word": "Add reserved word",
+            "content_filter": "Content Filter",
+            "content_filter_description": "Automatically block inappropriate words like \"dick\", \"vagina\", etc."
+        },
+        "storage_options": {
+            "title": "Storage Options",
+            "zelfkeys_title": "Storage Options (ZelfKeys)",
+            "ipfs_title": "IPFS",
+            "ipfs_description": "Used for .hold suffix tag domains",
+            "arweave_title": "Arweave",
+            "arweave_description": "For already purchased domains",
+            "walrus_title": "Walrus",
+            "walrus_description": "Alternative storage option",
+            "key_prefix": "Key Prefix",
+            "key_prefix_placeholder": "tagName"
+        },
+        "payment_settings": {
+            "title": "Payment Settings",
+            "accepted_methods": "Accepted Methods",
+            "whitelist": "Whitelist",
+            "domain_placeholder": "miguel.zelf",
+            "add_to_whitelist": "Add to Whitelist",
+            "no_whitelist": "No whitelist items added yet.",
+            "payment_methods": "Payment Methods",
+            "coinbase": "Coinbase",
+            "crypto_payments": "Crypto Payments",
+            "stripe": "Stripe",
+            "supported_currencies": "Supported Currencies",
+            "add_currency": "Add currency",
+            "no_currencies": "No currencies enabled. Click 'Add currency' to enable one.",
+            "all_currencies_enabled": "All currencies are enabled",
+            "whitelist_title": "Whitelist (Special Pricing)",
+            "add_item": "Add Item",
+            "tag_name": "Tag Name",
+            "discount": "Discount",
+            "type": "Type",
+            "percentage": "Percentage (%)",
+            "fixed_amount": "Fixed Amount ($)",
+            "no_items": "No whitelist items yet. Click \"Add Item\" to get started.",
+            "examples": "Examples:",
+            "example_1": "miguel.zelf with 25 and % = 25% discount",
+            "example_2": "vip.avax with 50 and $ = $50 discount"
+        },
+        "pricing_table": {
+            "title": "Pricing Table",
+            "reset_default": "Reset to Default",
+            "description": "Configure pricing for different tag lengths and subscription durations. Prices are in cents (e.g., 240 = $2.40).",
+            "length": "Length",
+            "one_year": "1 Year",
+            "two_years": "2 Years",
+            "three_years": "3 Years",
+            "four_years": "4 Years",
+            "five_years": "5 Years",
+            "lifetime": "Lifetime",
+            "pricing_info": "Pricing Information",
+            "pricing_info_1": "• Prices are displayed in dollars",
+            "pricing_info_2": "• The \"6-15\" row applies to tag names with 6-15 characters",
+            "pricing_info_3": "• Individual length rows (16-27) override the range pricing",
+            "pricing_info_4": "• Changes are automatically saved when you update the form"
+        },
+        "limits": {
+            "title": "Limits",
+            "max_tags": "Max Tags",
+            "max_tags_placeholder": "10000",
+            "max_zelfkeys": "Max ZelfKeys",
+            "max_zelfkeys_placeholder": "10000",
+            "info_title": "Limits Information",
+            "info_description": "Domain limits are automatically managed based on your subscription plan.",
+            "info_subscription": "To modify limits, please upgrade or change your subscription plan in the Plan & Billing section."
+        },
+        "metadata": {
+            "title": "Metadata",
+            "launch_date": "Launch Date",
+            "version": "Version",
+            "version_placeholder": "1.0.0",
+            "documentation_url": "Documentation URL",
+            "documentation_placeholder": "https://docs.example.com",
+            "community": "Community",
+            "community_placeholder": "avalanche",
+            "enterprise": "Enterprise",
+            "enterprise_placeholder": "blockDAG",
+            "support_level": "Support Level",
+            "support_standard": "Standard",
+            "support_premium": "Premium",
+            "support_enterprise": "Enterprise"
+        },
+        "current_license": {
+            "title": "Current License",
+            "domain": "Domain:",
+            "created": "Created:",
+            "ipfs_hash": "IPFS Hash:"
+        },
+        "actions": {
+            "cancel": "Cancel",
+            "save": "Save Domain Configuration",
+            "save_configuration": "Save Configuration",
+            "processing": "Processing..."
+        }
+    },
+    "analytics": {
+        "title": "Analytics Dashboard",
+        "description": "Monitor tag domain creation, subscriptions and activity metrics",
+        "tagDomainsOverview": {
+            "title": "Tag Domains Overview",
+            "subtitle": "Number of tag domains created (free and premium)",
+            "thisMonth": "This Month",
+            "previousMonth": "Previous Month"
+        },
+        "paidTags": {
+            "title": "Paid Tags",
+            "subtitle": "Number of premium tag domains created"
+        },
+        "zelfkeySubscriptions": {
+            "title": "ZelfKey Subscriptions",
+            "subtitle": "Number of ZelfKey subscriptions"
+        },
+        "activeTags": {
+            "title": "Active Tags",
+            "subtitle": "Number of currently active tag domains"
+        },
+        "allTagsVsPaidTags": {
+            "title": "All Tags vs. Paid Tags",
+            "subtitle": "Comparison between total and paid tag domains"
+        },
+        "metrics": {
+            "conversionRate": {
+                "title": "Conversion Rate",
+                "description": "Conversion rate shows the percentage of total tag registrations that convert to paid/premium tags. Higher is better."
+            },
+            "premiumAdoption": {
+                "title": "Premium Adoption",
+                "description": "Premium Adoption shows the percentage of users who upgrade to paid tag features. Higher indicates better monetization."
+            },
+            "revenuePotential": {
+                "title": "Revenue Potential",
+                "description": "Revenue Potential shows the projected conversion rate based on current trends and user behavior patterns."
+            }
+        },
+        "zelfUsers": {
+            "title": "Zelf Users",
+            "subtitle": "Demographic properties of Zelf platform users"
+        },
+        "tagLeaseLengths": {
+            "title": "Tag Lease Lengths",
+            "subtitle": "Distribution of tag domain lease durations"
+        },
+        "domainLength": {
+            "title": "Domain Length",
+            "subtitle": "Distribution of tag domain character lengths"
+        },
+        "origin": {
+            "title": "Origin",
+            "subtitle": "Platform distribution of Zelf users"
+        },
+        "timePeriods": {
+            "30days": "30 days",
+            "3months": "3 months",
+            "9months": "9 months"
+        },
+        "chart": {
+            "total": "Total",
+            "dateFormat": "dd MMM",
+            "allTags": "All Tags",
+            "paidTags": "Paid Tags",
+            "tag": "tag",
+            "tags": "tags",
+            "chars": "chars",
+            "tooltip": {
+                "colon": ":",
+                "percentage": "%"
+            }
+        },
+        "chartLabels": {
+            "tagLeaseLengths": {
+                "1year": "1 Year",
+                "2years": "2 Years",
+                "3years": "3 Years",
+                "4years": "4 Years",
+                "5years": "5 Years",
+                "lifetime": "Lifetime"
+            },
+            "domainLength": {
+                "1to3": "1-3",
+                "4to10": "4-10",
+                "11to20": "11-20",
+                "21to27": "21-27"
+            },
+            "origin": {
+                "extension": "Extension",
+                "android": "Android",
+                "ios": "iOS"
+            }
+        },
+        "stats": {
+            "peak": "Peak",
+            "low": "Low",
+            "total": "Total",
+            "tags": "tags",
+            "records": "records",
+            "on": "on",
+            "belowTarget": "below target",
+            "comingSoon": "coming soon",
+            "unknown": "Unknown"
+        },
+        "chartData": {
+            "total": "Total",
+            "allTags": "All Tags",
+            "paidTags": "Paid Tags",
+            "tag": "tag",
+            "tags": "tags",
+            "chars": "chars"
+        }
+    },
+    "profile": {
+        "loading": "Loading profile...",
+        "photo": "Photo",
+        "status": "STATUS",
+        "menu": {
+            "profile": "Profile",
+            "settings": "Settings",
+            "license": "License",
+            "support": "Support"
+        },
+        "information": {
+            "title": "Profile Information",
+            "name": "Name",
+            "name_placeholder": "Enter your name",
+            "name_required": "Name is required",
+            "name_minlength": "Name must be at least 2 characters",
+            "company": "Company",
+            "company_placeholder": "Enter your company",
+            "company_required": "Company is required",
+            "email": "Email",
+            "email_placeholder": "Enter your email",
+            "email_required": "Email is required",
+            "email_invalid": "Please enter a valid email address",
+            "country": "Country",
+            "country_required": "Country is required",
+            "phone": "Phone",
+            "phone_placeholder": "Enter your phone number",
+            "phone_required": "Phone number is required",
+            "phone_invalid": "Please enter a valid phone number"
+        },
+        "account": {
+            "title": "Account Information",
+            "created_at": "Created At",
+            "subscription": "Subscription"
+        },
+        "accountAccess": {
+            "title": "Account access",
+            "accountType": "Account type",
+            "role": "Role",
+            "permissions": "Permissions",
+            "accountType_staff": "Staff",
+            "accountType_owner": "Owner",
+            "accountType_client": "Client",
+            "role_admin": "Admin",
+            "role_write": "Editor",
+            "role_read": "Viewer",
+            "permission_read": "Can view",
+            "permission_write": "Can edit",
+            "permission_admin": "Full access"
+        },
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "license": {
+            "title": "License Details",
+            "type": "License Type",
+            "status": "Status",
+            "created": "Created",
+            "features": "Features",
+            "all_features": "All Features",
+            "included_features": "Included Features",
+            "feature_analytics": "Advanced Analytics Dashboard",
+            "feature_processing": "Real-time Data Processing",
+            "feature_support": "Priority Support",
+            "feature_api": "API Access",
+            "feature_integrations": "Custom Integrations",
+            "renew": "Renew License",
+            "download": "Download"
+        }
+    },
+    "theme_settings": {
+        "title": "Theme Settings",
+        "subtitle": "Customize the appearance of your ZNS Wallet and ZelfKeys interfaces",
+        "zns_wallet": {
+            "title": "ZNS Wallet Theme",
+            "description": "Customize colors for your ZNS Wallet interface",
+            "dark_mode": "Dark Mode",
+            "dark_mode_description": "Toggle between light and dark themes",
+            "reset": "Reset",
+            "primary_colors": "Primary Colors",
+            "background_colors": "Background Colors",
+            "text_colors": "Text Colors",
+            "header_colors": "Header Colors",
+            "button_colors": "Button Colors",
+            "status_colors": "Status Colors",
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "background": "Background",
+            "secondary_background": "Secondary Background",
+            "primary_text": "Primary Text",
+            "secondary_text": "Secondary Text",
+            "muted_text": "Muted Text",
+            "header_background": "Header Background",
+            "header_text": "Header Text",
+            "primary_button": "Primary Button",
+            "button_text": "Button Text",
+            "button_hover": "Button Hover",
+            "success": "Success",
+            "warning": "Warning",
+            "error": "Error"
+        },
+        "zelfkeys": {
+            "title": "ZelfKeys Theme",
+            "description": "Customize colors for your ZelfKeys password manager interface",
+            "dark_mode": "Dark Mode",
+            "dark_mode_description": "Toggle between light and dark themes",
+            "reset": "Reset",
+            "primary_colors": "Primary Colors",
+            "background_colors": "Background Colors",
+            "text_colors": "Text Colors",
+            "header_colors": "Header Colors",
+            "button_colors": "Button Colors",
+            "status_colors": "Status Colors",
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "background": "Background",
+            "secondary_background": "Secondary Background",
+            "primary_text": "Primary Text",
+            "secondary_text": "Secondary Text",
+            "muted_text": "Muted Text",
+            "header_background": "Header Background",
+            "header_text": "Header Text",
+            "primary_button": "Primary Button",
+            "button_text": "Button Text",
+            "button_hover": "Button Hover",
+            "success": "Success",
+            "warning": "Warning",
+            "error": "Error"
+        },
+        "actions": {
+            "cancel": "Cancel",
+            "save": "Save Theme Settings",
+            "updating_colors": "Updating colors...",
+            "loading": "Loading theme settings...",
+            "failed_to_load": "Failed to load theme settings",
+            "invalid_settings": "Invalid theme settings. Please check all color values.",
+            "fill_required": "Please fill in all required fields correctly"
+        }
+    },
+    "payment": {
+        "title": "PURCHASE A NEW TAG NAME",
+        "searchTag": "Search tag",
+        "searching": "Searching...",
+        "greatNews": "Great news, this tag name is available!",
+        "tagAvailable": "The tag name",
+        "isAvailable": "is available and can be claimed right now in our app or extension!",
+        "installExtension": "Install Extension",
+        "downloadApp": "Download App",
+        "orderDetails": "Order details",
+        "domainToPurchase": "Domain to purchase",
+        "charactersLength": "characters length",
+        "lease": "lease",
+        "totalCost": "total cost",
+        "totalCostUSD": "USD",
+        "domainPriceLength": "Domain price length",
+        "knowMore": "Know more",
+        "leaseAgreement": "Lease agreement",
+        "year": "Year",
+        "years": "Years",
+        "lifetime": "Lifetime",
+        "total": "Total",
+        "ourPurchaseRate": "Our purchase rate",
+        "payWithCoinbase": "Pay with Coinbase",
+        "choosePaymentMethod": "Choose payment method",
+        "lowFees": "LOW FEES",
+        "purchaseNow": "Purchase now",
+        "howToRegister": "How to Register Your Domain",
+        "step1Title": "Login in Zelf from our extension in your browser or download the mobile app.",
+        "step2Title": "Search the tag that you want to register with the desired domain.",
+        "step3Title": "Complete all the security steps and the biometric authentication.",
+        "step4Title": "Finally, comeback to this page and finalize the domain purchase.",
+        "pleaseEnterTagName": "Please enter a tag name"
+    },
+    "checkout": {
+        "backToPaymentOptions": "Back to payment options",
+        "orderDetails": "Order details",
+        "domainToPurchase": "Domain to purchase",
+        "charactersLength": "characters length",
+        "lease": "lease",
+        "totalCost": "total cost",
+        "domainPriceLength": "Domain price length",
+        "knowMore": "Know more",
+        "leaseAgreement": "Lease agreement",
+        "total": "Total",
+        "paymentMethod": "Payment method",
+        "congratulations": "Congratulations!",
+        "tagActive": "Your new ZNS tag",
+        "isNowActive": "is now active.",
+        "enjoyBenefits": "Enjoy the benefits of ZNS — your face is your key.",
+        "keepReceipt": "Would you like to keep a receipt of your payment?",
+        "enterYourEmail": "Enter your email",
+        "sendReceipt": "Send receipt",
+        "sending": "Sending...",
+        "payWith": "Pay with",
+        "coinbasePaymentUrl": "Coinbase payment URL",
+        "uniquePaymentAddress": "Unique payment address",
+        "copy": "COPY",
+        "openLink": "Open link",
+        "amountToPay": "Amount to pay",
+        "expiresIn": "Expires in",
+        "transactionStatus": "Transaction status",
+        "success": "SUCCESS",
+        "checking": "Checking...",
+        "pending": "PENDING",
+        "checkingPaymentStatus": "Checking payment status every 10 seconds...",
+        "paymentConfirmed": "Payment confirmed successfully!",
+        "amountDetected": "Amount detected"
+    },
+    "tags": {
+        "title": "Tags Management",
+        "subtitle": "Manage your blockchain tags and QR codes",
+        "licenseWarning": {
+            "title": "License Not Configured",
+            "message": "Please configure your license in the Settings section to view and manage your tags."
+        },
+        "filters": {
+            "storage": "Storage",
+            "filterBy": "Filter by",
+            "all": "All",
+            "tagName": "Tag Name",
+            "blockdagAddress": "BlockDAG Address",
+            "ethAddress": "ETH Address",
+            "solanaAddress": "Solana Address",
+            "bitcoinAddress": "Bitcoin Address",
+            "suiAddress": "SUI Address",
+            "searchPlaceholder": "Search tags...",
+            "searchInputPlaceholder": "Enter search term",
+            "clearAll": "Clear all filters",
+            "activeFilters": "Active filters:"
+        },
+        "purchase": {
+            "title": "Tag Available for Purchase",
+            "off": "OFF",
+            "reward": "reward",
+            "purchaseButton": "Purchase Tag",
+            "cancelButton": "Cancel"
+        },
+        "table": {
+            "tagName": "Tag Name",
+            "domain": "Domain",
+            "created": "Created",
+            "size": "Size",
+            "actions": "Actions"
+        },
+        "actions": {
+            "previewQR": "Preview QR Code",
+            "viewDetails": "View Details",
+            "backToList": "Back to Tags"
+        },
+        "pagination": {
+            "showing": "Showing",
+            "of": "of",
+            "results": "results",
+            "rowsPerPage": "Rows per page",
+            "firstPage": "First page",
+            "previousPage": "Previous page",
+            "nextPage": "Next page",
+            "lastPage": "Last page"
+        },
+        "detail": {
+            "loading": "Loading...",
+            "notFound": "Tag not found",
+            "availableForPurchase": "This tag is available for purchase.",
+            "copyAll": "Copy all data",
+            "copyUrl": "Copy URL",
+            "copyZelfProof": "Copy ZelfProof",
+            "openUrl": "Open URL",
+            "zelfProof": "ZelfProof",
+            "zelfProofQR": "ZelfProof QR",
+            "downloadQR": "Download QR",
+            "publicInfo": "Public Information",
+            "basicInfo": "Basic information",
+            "created": "Created",
+            "size": "Size",
+            "mimeType": "MIME type",
+            "files": "Files",
+            "addresses": "Blockchain addresses",
+            "technical": "Technical Details",
+            "extraParams": "Extra Parameters",
+            "leaseExpires": "Lease expires",
+            "daysLeft": "days left",
+            "status": "Status",
+            "purchased": "Active",
+            "hold": "Reserved",
+            "extendLicense": "Extend License",
+            "extendDescription": "Add more time to your tag lease",
+            "extend_license_summary": "Extend {{tagName}}.{{domain}} for {{duration}}",
+            "duration": "Duration",
+            "year": "Year",
+            "years": "Years",
+            "lifetime": "Lifetime",
+            "getPaymentOptions": "Get Payment Options",
+            "payWithCoinbase": "Pay with Coinbase",
+            "explorerUrl": "Explorer",
+            "viewOnExplorer": "View on Explorer",
+            "passwordProtected": "Password",
+            "passwordLayer": "Password Layer",
+            "livenessRequired": "Liveness",
+            "owner": "Owner",
+            "qrCode": "QR Code"
+        }
+    },
+    "biometricVerification": {
+        "title": "Verify Identity",
+        "verifyingAs": "Verifying as",
+        "newAccount": "New Account",
+        "account": "Account",
+        "verificationFailed": "Verification Failed",
+        "tryAgain": "Try Again",
+        "cancel": "Cancel",
+        "processingData": "Processing your biometric data...",
+        "initializingCamera": "Initializing safe camera...",
+        "positionFace": "Position your face in the center",
+        "lookAtCamera": "Look directly at the camera and stay still",
+        "verifyInstruction": "Please look at the camera to verify your identity and complete your account registration",
+        "cameraNotAvailable": "Camera not available",
+        "cameraAccessible": "Please ensure your camera is enabled and accessible for biometric verification",
+        "permissionRequired": "Camera Permission Required",
+        "allowAccess": "Please allow camera access to continue with biometric verification"
+    },
+    "acceptInvite": {
+        "title": "Accept Invitation",
+        "invitedToJoin": "You've been invited to join",
+        "createMasterPassword": "Create Master Password",
+        "verifyIdentity": "Verify Identity",
+        "biometricsProtected": "Protected by Zelf Biometrics",
+        "verifyingInvitation": "Verifying invitation...",
+        "faceVerification": "Face Verification"
+    }
 }

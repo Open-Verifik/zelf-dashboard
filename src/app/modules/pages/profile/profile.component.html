@@ -291,7 +291,44 @@
 			</div>
 		</div>
 
+		<!-- Account access (role & permissions) -->
+		<div *ngIf="!loading" class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
+			<div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700">
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "profile.accountAccess.title" | transloco }}</h3>
+			</div>
+			<div class="px-8 py-6 space-y-4">
+				<div class="flex flex-wrap items-center gap-4">
+					<div>
+						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.accountType" | transloco }}</span>
+						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ accountTypeLabel | transloco }}</p>
+					</div>
+					<div>
+						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.role" | transloco }}</span>
+						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ roleLabel | transloco }}</p>
+					</div>
+				</div>
+				<div>
+					<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.permissions" | transloco }}</span>
+					<div class="mt-2 flex flex-wrap gap-3">
+						<span *ngIf="permissionService.canRead" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm font-medium">
+							<mat-icon class="icon-size-4">check_circle</mat-icon>
+							{{ "profile.accountAccess.permission_read" | transloco }}
+						</span>
+						<span *ngIf="permissionService.canWrite" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-sm font-medium">
+							<mat-icon class="icon-size-4">check_circle</mat-icon>
+							{{ "profile.accountAccess.permission_write" | transloco }}
+						</span>
+						<span *ngIf="permissionService.isAdmin" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 text-sm font-medium">
+							<mat-icon class="icon-size-4">check_circle</mat-icon>
+							{{ "profile.accountAccess.permission_admin" | transloco }}
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- License Card (Premium Only) -->
+
 		<div
 			*ngIf="isPremium && !loading"
 			class="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl shadow-xl overflow-hidden text-white relative"

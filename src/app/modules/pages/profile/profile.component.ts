@@ -10,6 +10,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { Router } from "@angular/router";
 import { AuthService } from "app/core/auth/auth.service";
+import { PermissionService } from "app/core/auth/permission.service";
 import { CommonModule } from "@angular/common";
 import { ZelfUser } from "app/core/user/user.types";
 import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
@@ -77,6 +78,7 @@ export class ProfileComponent implements OnInit {
 	 */
 	constructor(
 		private _authService: AuthService,
+		private _permissionService: PermissionService,
 		private _formBuilder: FormBuilder,
 		private _router: Router,
 		private _translocoService: TranslocoService,
@@ -92,6 +94,31 @@ export class ProfileComponent implements OnInit {
 			phone: ["", [Validators.required, Validators.pattern(/^\d+$/)]],
 			company: ["", [Validators.required]],
 		});
+	}
+
+	get authService(): AuthService {
+		return this._authService;
+	}
+
+	get permissionService(): PermissionService {
+		return this._permissionService;
+	}
+
+	/** Human-readable account type for display (Staff, Owner, Client) */
+	get accountTypeLabel(): string {
+		const t = this._authService.accountType;
+		if (!t) return "";
+		if (t === "staff" || t === "staff_account") return "profile.accountAccess.accountType_staff";
+		if (t === "client_account") return "profile.accountAccess.accountType_client";
+		return "profile.accountAccess.accountType_owner";
+	}
+
+	/** Human-readable role for display (Admin, Editor, Viewer) */
+	get roleLabel(): string {
+		const r = this._authService.role;
+		if (r === "admin") return "profile.accountAccess.role_admin";
+		if (r === "write") return "profile.accountAccess.role_write";
+		return "profile.accountAccess.role_read";
 	}
 
 	ngOnInit(): void {
