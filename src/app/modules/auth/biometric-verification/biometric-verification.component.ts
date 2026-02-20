@@ -17,7 +17,7 @@ export interface BiometricData {
 
 import { fadeIn } from "@fuse/animations";
 
-import { TranslocoModule } from "@jsverse/transloco";
+import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
 
 @Component({
     selector: "app-data-biometrics",
@@ -107,6 +107,7 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _biometricService: BiometricService,
+        private _transloco: TranslocoService,
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -214,18 +215,18 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         // Check for specific error messages
         if (error?.message) {
             if (error.message.includes("Multiple face were detected")) {
-                this.apiError = "Multiple faces detected in the image. Please ensure only one person is visible in the camera frame.";
+                this.apiError = this._transloco.translate("biometricVerification.multipleFacesDetected");
             } else if (error.message.includes("No face detected")) {
-                this.apiError = "No face detected. Please look directly at the camera.";
+                this.apiError = this._transloco.translate("biometricVerification.noFaceDetectedMessage");
             } else if (error.message.includes("Face not recognized")) {
-                this.apiError = "Face not recognized. Please try again or contact support.";
+                this.apiError = this._transloco.translate("biometricVerification.faceNotRecognized");
             } else if (error.message.includes("LIVENESS") || error.message.toLowerCase().includes("liveness")) {
-                this.apiError = "Liveness check failed. Please follow the on-screen head turn instructions and try again.";
+                this.apiError = this._transloco.translate("biometricVerification.livenessCheckFailed");
             } else {
                 this.apiError = error.message;
             }
         } else {
-            this.apiError = "Biometric verification failed. Please try again.";
+            this.apiError = this._transloco.translate("biometricVerification.biometricVerificationFailed");
         }
 
         this.hasApiError = true;
@@ -339,7 +340,7 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
      */
     private _handleLivenessFailure(reason: string): void {
         this.hasApiError = true;
-        this.apiError = reason || "Liveness check failed. Please follow the instructions and try again.";
+        this.apiError = reason || this._transloco.translate("biometricVerification.livenessCheckFailedReason");
         this.response.isLoading = false;
         this.response.base64Image = "";
         // Ensure detection loop restarts so user can try again without reloading
@@ -577,8 +578,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
         this.errorFace = {
             canvas: direction,
-            subtitle: "Center your face in the oval",
-            title: "Center your face",
+            subtitle: this._transloco.translate("biometricVerification.centerFaceSubtitle"),
+            title: this._transloco.translate("biometricVerification.centerFace"),
         };
     }
 
@@ -590,8 +591,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
         if (faceProportion < this.face.threshold || landmarks.imageHeight < this.face.minPixels || landmarks.imageWidth < this.face.minPixels) {
             this.errorFace = {
-                title: "Get closer",
-                subtitle: "Move your face closer to the camera",
+                title: this._transloco.translate("biometricVerification.getCloser"),
+                subtitle: this._transloco.translate("biometricVerification.getCloserSubtitle"),
             };
         }
     }
@@ -660,8 +661,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
             } else {
                 this.face.successPosition = 0;
                 this.errorFace = {
-                    title: "No face detected",
-                    subtitle: "Please look at the camera",
+                    title: this._transloco.translate("biometricVerification.noFaceDetected"),
+                    subtitle: this._transloco.translate("biometricVerification.noFaceDetectedSubtitle"),
                 };
                 // Draw red oval if no face detected
                 this._drawStatusOval(context, false);

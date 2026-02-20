@@ -140,7 +140,9 @@
             "description": "테마 설정을 업데이트하려면 마스터 비밀번호를 입력해주세요",
             "action": "업데이트 중",
             "itemName": "테마 설정"
-        }
+        },
+        "phone": "전화",
+        "countryCode": "국가 코드"
     },
     "save_confirmation": {
         "master_password": "마스터 비밀번호",
@@ -150,7 +152,8 @@
         "processing": "처리 중...",
         "continue": "계속",
         "biometric_verification": "생체 인증",
-        "biometrics_disabled_debugging": "디버깅을 위해 생체 인증이 일시적으로 비활성화되었습니다."
+        "biometrics_disabled_debugging": "디버깅을 위해 생체 인증이 일시적으로 비활성화되었습니다.",
+        "secure": "보안"
     },
     "license": {
         "title": "도메인 설정",
@@ -436,7 +439,11 @@
             "phone": "전화",
             "phone_placeholder": "전화번호를 입력하세요",
             "phone_required": "전화번호는 필수입니다",
-            "phone_invalid": "유효한 전화번호를 입력하세요"
+            "phone_invalid": "유효한 전화번호를 입력하세요",
+            "fullName": "성명",
+            "yourName": "이름",
+            "phoneCode": "코드",
+            "phonePlaceholder": "전화번호"
         },
         "account": {
             "title": "계정 정보",
@@ -475,8 +482,36 @@
             "role_read": "뷰어",
             "permission_read": "보기 가능",
             "permission_write": "편집 가능",
-            "permission_admin": "전체 액세스"
-        }
+            "permission_admin": "전체 액세스",
+            "license": "면허"
+        },
+        "lawyer": {
+            "title": "변호사 프로필",
+            "subtitle": "전문 프로필 및 자격증 관리",
+            "badge": "변호사",
+            "label": "변호사",
+            "professionalDetails": "전문 세부정보",
+            "zelfName": "Zelf 이름",
+            "licenseNumber": "면허 번호",
+            "professionalId": "전문 ID",
+            "hourlyRate": "시간당 요금 (USD)",
+            "city": "도시",
+            "country": "국가",
+            "specializations": "전문 분야",
+            "bio": "소개",
+            "contactEmail": "연락처 이메일",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "뉴욕",
+            "placeholder_country": "미국",
+            "placeholder_bio": "경험과 전문성을 클라이언트에게 알려주세요...",
+            "placeholder_contactEmail": "lawyer@firm.com",
+            "placeholder_specialization": "예: 기업법"
+        },
+        "subtitle": "계정 설정 및 환경설정 관리",
+        "loadingShort": "로딩 중..."
     },
     "theme_settings": {
         "title": "테마 설정",
@@ -673,5 +708,109 @@
             "year": "년",
             "years": "년"
         }
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "변호사",
+        "subtitle": "변호사를 검색, 관리 및 초대",
+        "inviteLawyer": "변호사 초대",
+        "searchPlaceholder": "이름, 전문 분야, zelfName으로 검색...",
+        "search": "검색",
+        "filters": {
+            "city": "도시",
+            "country": "국가",
+            "maxRate": "최대 요금 (USD/h)",
+            "more": "필터 더 보기",
+            "hide": "필터 숨기기"
+        },
+        "tab": "변호사",
+        "loading": "변호사 로딩 중...",
+        "empty": {
+            "title": "아직 변호사가 없습니다",
+            "subtitle": "Zelf Legacy를 시작하려면 변호사를 초대하세요",
+            "invite": "변호사 초대"
+        },
+        "table": {
+            "lawyer": "변호사",
+            "specialization": "전문 분야",
+            "location": "위치",
+            "status": "상태",
+            "actions": "작업"
+        },
+        "actions": {
+            "view": "보기",
+            "remove": "제거"
+        },
+        "pending": {
+            "title": "대기 중인 초대",
+            "loading": "초대 로딩 중...",
+            "empty": {
+                "title": "대기 중인 초대가 없습니다",
+                "subtitle": "모든 초대가 수락되었거나 아직 전송되지 않았습니다"
+            },
+            "invitedLawyer": "초대된 변호사",
+            "invited": "초대일",
+            "status": "대기 중",
+            "resend": "초대 다시 보내기",
+            "count": "{{count}}건의 초대 대기 중",
+            "count_plural": "{{count}}건의 초대 대기 중"
+        },
+        "detail": {
+            "title": "변호사 프로필",
+            "reputation": "온체인 평판",
+            "rating": "평점",
+            "reviews": "리뷰",
+            "verified": "인증됨"
+        },
+        "invite": {
+            "title": "변호사 초대",
+            "description": "변호사가 등록을 완료하기 위한 링크가 포함된 이메일을 받습니다",
+            "emailLabel": "이메일 주소",
+            "fullNameLabel": "성명"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "변호사로 참여",
+        "invitedToJoin": "다음에 초대되었습니다",
+        "asLawyer": "변호사로",
+        "domain": "도메인에 참여",
+        "lawyer": "변호사",
+        "verifying": "초대 확인 중...",
+        "verifyingAccount": "계정 확인 중",
+        "faceVerification": "얼굴 인증",
+        "secure": "보안",
+        "createMasterPassword": "마스터 비밀번호 생성",
+        "verifyIdentityJoin": "신원 확인 후 참여",
+        "protectedByBiometrics": "생체 인증으로 보호됨"
+    },
+    "biometricVerification": {
+        "title": "신원 확인",
+        "verifyingAs": "확인 중",
+        "newAccount": "새 계정",
+        "account": "계정",
+        "verificationFailed": "인증 실패",
+        "tryAgain": "다시 시도",
+        "cancel": "취소",
+        "processingData": "생체 데이터 처리 중...",
+        "initializingCamera": "카메라 초기화 중...",
+        "positionFace": "얼굴을 중앙에 배치하세요",
+        "lookAtCamera": "카메라를 직접 보고 가만히 있으세요",
+        "verifyInstruction": "신원 확인을 위해 카메라를 보고 계정 등록을 완료해 주세요",
+        "cameraNotAvailable": "카메라를 사용할 수 없습니다",
+        "cameraAccessible": "생체 인증을 위해 카메라가 활성화되어 있는지 확인하세요",
+        "permissionRequired": "카메라 권한이 필요합니다",
+        "allowAccess": "생체 인증을 계속하려면 카메라 접근을 허용해 주세요",
+        "noFaceDetected": "얼굴이 감지되지 않았습니다",
+        "noFaceDetectedSubtitle": "카메라를 보세요",
+        "noFaceDetectedMessage": "얼굴이 감지되지 않았습니다. 카메라를 직접 보세요.",
+        "multipleFacesDetected": "여러 얼굴이 감지되었습니다. 카메라에 한 사람만 보이도록 하세요.",
+        "faceNotRecognized": "얼굴을 인식할 수 없습니다. 다시 시도하거나 지원팀에 문의하세요.",
+        "livenessCheckFailed": "라이브니스 확인에 실패했습니다. 화면의 안내에 따라 다시 시도하세요.",
+        "biometricVerificationFailed": "생체 인증에 실패했습니다. 다시 시도하세요.",
+        "centerFace": "얼굴을 중앙에",
+        "centerFaceSubtitle": "타원 안에 얼굴을 중앙에 배치하세요",
+        "getCloser": "가까이 오세요",
+        "getCloserSubtitle": "얼굴을 카메라에 가까이 대세요",
+        "livenessCheckFailedReason": "라이브니스 확인에 실패했습니다. 안내에 따라 다시 시도하세요."
     }
 }

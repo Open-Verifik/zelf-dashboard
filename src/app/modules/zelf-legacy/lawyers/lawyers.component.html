@@ -1,0 +1,211 @@
+<div class="flex flex-col w-full min-h-screen p-4 sm:p-8">
+	<div class="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
+		<!-- Header -->
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+			<div>
+				<div class="flex items-center gap-2 text-sm text-gray-400 mb-1">
+					<mat-icon class="icon-size-4">gavel</mat-icon>
+					<span>{{ 'lawyers.zelfLegacy' | transloco }}</span>
+				</div>
+				<h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{{ 'lawyers.title' | transloco }}</h2>
+				<p class="text-gray-500 dark:text-gray-400 mt-1">{{ 'lawyers.subtitle' | transloco }}</p>
+			</div>
+			<button mat-flat-button (click)="openInviteDialog()" class="!rounded-xl !px-6 !py-2.5 !bg-gray-900 dark:!bg-white !text-white dark:!text-gray-900 !font-bold hover:opacity-90 transition-opacity">
+				<mat-icon class="icon-size-5 mr-2">person_add</mat-icon>
+				{{ 'lawyers.inviteLawyer' | transloco }}
+			</button>
+		</div>
+
+		<!-- Search Bar -->
+		<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 p-4">
+			<div class="flex flex-col sm:flex-row gap-3">
+				<mat-form-field class="flex-1" appearance="outline" [subscriptSizing]="'dynamic'">
+					<mat-icon matPrefix class="mr-2 text-gray-400">search</mat-icon>
+					<mat-label>{{ 'lawyers.searchPlaceholder' | transloco }}</mat-label>
+					<input matInput [(ngModel)]="searchQuery" (keyup.enter)="performSearch()" />
+				</mat-form-field>
+				<button mat-flat-button (click)="performSearch()" class="!rounded-xl !px-6 !bg-blue-600 !text-white !font-semibold h-[56px]">{{ 'lawyers.search' | transloco }}</button>
+			</div>
+			@if (showFilters) {
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+					<mat-form-field appearance="outline" [subscriptSizing]="'dynamic'"><mat-label>{{ 'lawyers.filters.city' | transloco }}</mat-label><input matInput [(ngModel)]="filterCity" /></mat-form-field>
+					<mat-form-field appearance="outline" [subscriptSizing]="'dynamic'"><mat-label>{{ 'lawyers.filters.country' | transloco }}</mat-label><input matInput [(ngModel)]="filterCountry" /></mat-form-field>
+					<mat-form-field appearance="outline" [subscriptSizing]="'dynamic'"><mat-label>{{ 'lawyers.filters.maxRate' | transloco }}</mat-label><input matInput type="number" [(ngModel)]="filterMaxRate" /></mat-form-field>
+				</div>
+			}
+			<button mat-button (click)="showFilters = !showFilters" class="!text-sm !text-gray-500 mt-1">
+				<mat-icon class="icon-size-4 mr-1">{{ showFilters ? 'expand_less' : 'tune' }}</mat-icon>
+				{{ showFilters ? ('lawyers.filters.hide' | transloco) : ('lawyers.filters.more' | transloco) }}
+			</button>
+		</div>
+
+		<!-- Tabs: Lawyers / {{ 'lawyers.pending.title' | transloco }} -->
+		<mat-tab-group [(selectedIndex)]="activeTab" class="lawyer-tabs">
+			<!-- Lawyers Tab -->
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<mat-icon class="mr-2 icon-size-5">people</mat-icon>
+					{{ 'lawyers.tab' | transloco }}
+					@if (lawyers.length) {
+						<span class="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-xs font-bold">{{ lawyers.length }}</span>
+					}
+				</ng-template>
+
+				<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden mt-4">
+					@if (isLoading) {
+						<div class="flex flex-col items-center justify-center p-12 space-y-4">
+							<mat-spinner diameter="40"></mat-spinner>
+							<p class="text-gray-500">{{ 'lawyers.loading' | transloco }}</p>
+						</div>
+					} @else if (!lawyers.length) {
+						<div class="flex flex-col items-center justify-center p-16 text-center">
+							<div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+								<mat-icon class="icon-size-10 text-gray-400">gavel</mat-icon>
+							</div>
+							<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ 'lawyers.empty.title' | transloco }}</h3>
+							<p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8">{{ 'lawyers.empty.subtitle' | transloco }}</p>
+							<button mat-stroked-button (click)="openInviteDialog()" class="!rounded-xl !px-6 !border-gray-300 dark:!border-gray-600">{{ 'lawyers.empty.invite' | transloco }}</button>
+						</div>
+					} @else {
+						<div class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 text-xs font-semibold uppercase text-gray-500 tracking-wider">
+							<div class="col-span-12 sm:col-span-4">{{ 'lawyers.table.lawyer' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-2">{{ 'lawyers.table.specialization' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-2">{{ 'lawyers.table.location' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-2">{{ 'lawyers.table.status' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-2 text-right">{{ 'lawyers.table.actions' | transloco }}</div>
+						</div>
+						@for (lawyer of lawyers; track trackByFn($index, lawyer)) {
+							<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors cursor-pointer" (click)="viewLawyer(lawyer)">
+								<div class="col-span-12 sm:col-span-4 flex items-center gap-4">
+									<div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold uppercase">{{ (lawyer.publicData?.lawyerName || 'L').charAt(0) }}</div>
+									<div class="min-w-0">
+										<div class="font-semibold text-gray-900 dark:text-white truncate">{{ lawyer.publicData?.lawyerName || 'Unknown' }}</div>
+										<div class="text-sm text-gray-500 truncate">{{ lawyer.publicData?.lawyerZelfName || lawyer.publicData?.lawyerEmail || '' }}</div>
+									</div>
+								</div>
+								<div class="col-span-6 sm:col-span-2">
+									@if (lawyer.publicData?.lawyerSpecialization) {
+										<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">{{ lawyer.publicData.lawyerSpecialization.split(',')[0] }}</span>
+									} @else { <span class="text-gray-400 text-sm">--</span> }
+								</div>
+								<div class="col-span-6 sm:col-span-2 text-sm text-gray-500">{{ lawyer.publicData?.lawyerCity ? lawyer.publicData.lawyerCity + ', ' + lawyer.publicData.lawyerCountry : '--' }}</div>
+								<div class="col-span-6 sm:col-span-2">
+									<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">{{ lawyer.publicData?.lawyerStatus || 'active' }}</span>
+								</div>
+								<div class="col-span-6 sm:col-span-2 flex justify-end gap-1" (click)="$event.stopPropagation()">
+									<button mat-icon-button [matTooltip]="'lawyers.actions.view' | transloco" (click)="viewLawyer(lawyer)" class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-blue-600"><mat-icon class="icon-size-4">visibility</mat-icon></button>
+									<button mat-icon-button [matTooltip]="'lawyers.actions.remove' | transloco" (click)="initiateRemove(lawyer)" class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-red-600"><mat-icon class="icon-size-4">delete_outline</mat-icon></button>
+								</div>
+							</div>
+						}
+					}
+				</div>
+			</mat-tab>
+
+			<!-- {{ 'lawyers.pending.title' | transloco }} Tab -->
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<mat-icon class="mr-2 icon-size-5">mail_outline</mat-icon>
+					{{ 'lawyers.pending.title' | transloco }}
+					@if (invitations.length) {
+						<span class="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100 text-xs font-bold">{{ invitations.length }}</span>
+					}
+				</ng-template>
+
+				<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden mt-4">
+					@if (isLoading) {
+						<div class="flex flex-col items-center justify-center p-12 space-y-4">
+							<mat-spinner diameter="40"></mat-spinner>
+							<p class="text-gray-500">{{ 'lawyers.pending.loading' | transloco }}</p>
+						</div>
+					} @else if (!invitations.length) {
+						<div class="flex flex-col items-center justify-center p-16 text-center">
+							<div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+								<mat-icon class="icon-size-10 text-gray-400">mark_email_read</mat-icon>
+							</div>
+							<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ 'lawyers.pending.empty.title' | transloco }}</h3>
+							<p class="text-gray-500 dark:text-gray-400 max-w-sm mb-8">{{ 'lawyers.pending.empty.subtitle' | transloco }}</p>
+							<button mat-stroked-button (click)="openInviteDialog()" class="!rounded-xl !px-6 !border-gray-300 dark:!border-gray-600">{{ 'lawyers.empty.invite' | transloco }}</button>
+						</div>
+					} @else {
+						<div class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 text-xs font-semibold uppercase text-gray-500 tracking-wider">
+							<div class="col-span-12 sm:col-span-4">{{ 'lawyers.pending.invitedLawyer' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-3">Email</div>
+							<div class="col-span-6 sm:col-span-2">Domain</div>
+							<div class="col-span-6 sm:col-span-1">{{ 'lawyers.table.status' | transloco }}</div>
+							<div class="col-span-6 sm:col-span-2 text-right">{{ 'lawyers.table.actions' | transloco }}</div>
+						</div>
+						@for (inv of invitations; track trackByFn($index, inv)) {
+							<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
+								<div class="col-span-12 sm:col-span-4 flex items-center gap-4">
+									<div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400 font-bold uppercase">
+										{{ (inv.publicData?.lawyerName || 'L').charAt(0) }}
+									</div>
+									<div class="min-w-0">
+										<div class="font-semibold text-gray-900 dark:text-white truncate">
+											{{ inv.publicData?.lawyerName || 'Unknown' }}
+										</div>
+										<div class="text-xs text-gray-400">Invited {{ inv.created_at | date:'mediumDate' }}</div>
+									</div>
+								</div>
+								<div class="col-span-6 sm:col-span-3 text-sm text-gray-500 truncate">{{ inv.publicData?.lawyerEmail }}</div>
+								<div class="col-span-6 sm:col-span-2">
+									<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300">.{{ inv.publicData?.lawyerDomain || 'zelf' }}</span>
+								</div>
+								<div class="col-span-6 sm:col-span-1">
+									<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">{{ 'lawyers.pending.status' | transloco }}</span>
+								</div>
+								<div class="col-span-6 sm:col-span-2 flex justify-end gap-1">
+									<button mat-icon-button [matTooltip]="'lawyers.pending.resend' | transloco" (click)="initiateResend(inv)" class="!w-8 !h-8 !leading-8 text-gray-400 hover:text-blue-600 transition-colors">
+										<mat-icon class="icon-size-4">send</mat-icon>
+									</button>
+								</div>
+							</div>
+						}
+						<div class="px-6 py-3 bg-gray-50/50 dark:bg-gray-900/50 text-sm text-gray-500 border-t border-gray-100 dark:border-gray-700/50">
+							{{ (invitations.length === 1 ? 'lawyers.pending.count' : 'lawyers.pending.count_plural') | transloco:{ count: invitations.length } }}
+						</div>
+					}
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+	</div>
+</div>
+
+<!-- Lawyer Detail Drawer -->
+@if (selectedLawyer) {
+	<div class="fixed inset-0 z-50 flex justify-end" (click)="selectedLawyer = null">
+		<div class="absolute inset-0 bg-black/40"></div>
+		<div class="relative w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl overflow-y-auto" (click)="$event.stopPropagation()">
+			<div class="sticky top-0 bg-white dark:bg-slate-800 z-10 px-6 py-4 border-b border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
+				<h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ 'lawyers.detail.title' | transloco }}</h3>
+				<button mat-icon-button (click)="selectedLawyer = null"><mat-icon>close</mat-icon></button>
+			</div>
+			<div class="p-6 space-y-6">
+				<div class="text-center">
+					<div class="w-20 h-20 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-2xl font-bold mx-auto mb-3">{{ (selectedLawyer.publicData?.lawyerName || 'L').charAt(0) }}</div>
+					<h4 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedLawyer.publicData?.lawyerName }}</h4>
+					@if (selectedLawyer.publicData?.lawyerZelfName) { <p class="text-sm text-indigo-500">{{ selectedLawyer.publicData.lawyerZelfName }}</p> }
+				</div>
+				<div class="space-y-3">
+					@if (selectedLawyer.publicData?.lawyerEmail) { <div class="flex items-center gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400">email</mat-icon><span class="text-gray-700 dark:text-gray-300">{{ selectedLawyer.publicData.lawyerEmail }}</span></div> }
+					@if (selectedLawyer.publicData?.lawyerSpecialization) { <div class="flex items-start gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400 mt-0.5">school</mat-icon><div class="flex flex-wrap gap-1">@for (spec of selectedLawyer.publicData.lawyerSpecialization.split(','); track spec) { <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">{{ spec.trim() }}</span> }</div></div> }
+					@if (selectedLawyer.publicData?.lawyerCity) { <div class="flex items-center gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400">location_on</mat-icon><span class="text-gray-700 dark:text-gray-300">{{ selectedLawyer.publicData.lawyerCity }}, {{ selectedLawyer.publicData.lawyerCountry }}</span></div> }
+					@if (selectedLawyer.publicData?.lawyerHourlyRate && selectedLawyer.publicData.lawyerHourlyRate !== '0') { <div class="flex items-center gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400">payments</mat-icon><span class="text-gray-700 dark:text-gray-300">${{ selectedLawyer.publicData.lawyerHourlyRate }}/hr</span></div> }
+					@if (selectedLawyer.publicData?.lawyerLicenseNumber) { <div class="flex items-center gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400">badge</mat-icon><span class="text-gray-700 dark:text-gray-300">License: {{ selectedLawyer.publicData.lawyerLicenseNumber }}</span></div> }
+					@if (selectedLawyer.publicData?.lawyerWalletAddress) { <div class="flex items-center gap-3 text-sm"><mat-icon class="icon-size-5 text-gray-400">account_balance_wallet</mat-icon><span class="text-gray-700 dark:text-gray-300 truncate font-mono text-xs">{{ selectedLawyer.publicData.lawyerWalletAddress }}</span></div> }
+				</div>
+				@if (selectedLawyerReputation) {
+					<div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4">
+						<h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{{ 'lawyers.detail.reputation' | transloco }}</h5>
+						<div class="grid grid-cols-3 gap-4 text-center">
+							<div><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedLawyerReputation.averageRating | number:'1.1-1' }}</div><div class="text-xs text-gray-500">{{ 'lawyers.detail.rating' | transloco }}</div></div>
+							<div><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedLawyerReputation.totalFeedbacks }}</div><div class="text-xs text-gray-500">{{ 'lawyers.detail.reviews' | transloco }}</div></div>
+							<div><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedLawyerReputation.verifiedFeedbacks }}</div><div class="text-xs text-gray-500">{{ 'lawyers.detail.verified' | transloco }}</div></div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+}

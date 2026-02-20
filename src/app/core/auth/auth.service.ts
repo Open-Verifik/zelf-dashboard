@@ -195,6 +195,34 @@ export class AuthService {
     }
 
     /**
+     * Get if user is a lawyer
+     */
+    get isLawyer(): boolean {
+        const token = this.accessToken;
+        if (!token) return false;
+        try {
+            const payload = AuthUtils.decodeToken(token);
+            return payload?.accountType === "lawyer";
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate lawyer invitation
+     */
+    validateLawyerInvite(token: string): Promise<any> {
+        return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/lawyers/validate-invite?token=${token}`);
+    }
+
+    /**
+     * Accept lawyer invitation
+     */
+    acceptLawyerInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
+        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/lawyers/accept-invite`, data);
+    }
+
+    /**
      * Unlock session
      *
      * @param credentials

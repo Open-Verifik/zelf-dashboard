@@ -205,7 +205,8 @@
             "description": "Please enter your master password to proceed with updating your theme settings",
             "action": "updating",
             "itemName": "theme settings"
-        }
+        },
+        "countryCode": "Country Code"
     },
     "save_confirmation": {
         "master_password": "Master Password",
@@ -215,7 +216,8 @@
         "processing": "Processing...",
         "continue": "Continue",
         "biometric_verification": "Biometric Verification",
-        "biometrics_disabled_debugging": "Biometrics temporarily disabled for debugging."
+        "biometrics_disabled_debugging": "Biometrics temporarily disabled for debugging.",
+        "secure": "SECURE"
     },
     "license": {
         "title": "Domain Configuration",
@@ -508,7 +510,11 @@
             "phone": "Phone",
             "phone_placeholder": "Enter your phone number",
             "phone_required": "Phone number is required",
-            "phone_invalid": "Please enter a valid phone number"
+            "phone_invalid": "Please enter a valid phone number",
+            "fullName": "Full Name",
+            "yourName": "Your name",
+            "phoneCode": "Code",
+            "phonePlaceholder": "Phone number"
         },
         "account": {
             "title": "Account Information",
@@ -528,7 +534,8 @@
             "role_read": "Viewer",
             "permission_read": "Can view",
             "permission_write": "Can edit",
-            "permission_admin": "Full access"
+            "permission_admin": "Full access",
+            "license": "License"
         },
         "edit": "Edit",
         "save": "Save",
@@ -548,7 +555,34 @@
             "feature_integrations": "Custom Integrations",
             "renew": "Renew License",
             "download": "Download"
-        }
+        },
+        "lawyer": {
+            "title": "Lawyer Profile",
+            "subtitle": "Manage your professional profile and credentials",
+            "badge": "LAWYER",
+            "label": "Lawyer",
+            "professionalDetails": "Professional Details",
+            "zelfName": "Zelf Name",
+            "licenseNumber": "License Number",
+            "professionalId": "Professional ID",
+            "hourlyRate": "Hourly Rate (USD)",
+            "city": "City",
+            "country": "Country",
+            "specializations": "Specializations",
+            "bio": "Bio",
+            "contactEmail": "Contact Email",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "New York",
+            "placeholder_country": "United States",
+            "placeholder_bio": "Tell clients about your experience and expertise...",
+            "placeholder_contactEmail": "lawyer@firm.com",
+            "placeholder_specialization": "e.g. Corporate Law"
+        },
+        "subtitle": "Manage your account settings and preferences",
+        "loadingShort": "Loading..."
     },
     "theme_settings": {
         "title": "Theme Settings",
@@ -798,7 +832,19 @@
         "cameraNotAvailable": "Camera not available",
         "cameraAccessible": "Please ensure your camera is enabled and accessible for biometric verification",
         "permissionRequired": "Camera Permission Required",
-        "allowAccess": "Please allow camera access to continue with biometric verification"
+        "allowAccess": "Please allow camera access to continue with biometric verification",
+        "noFaceDetected": "No face detected",
+        "noFaceDetectedSubtitle": "Please look at the camera",
+        "noFaceDetectedMessage": "No face detected. Please look directly at the camera.",
+        "multipleFacesDetected": "Multiple faces detected in the image. Please ensure only one person is visible in the camera frame.",
+        "faceNotRecognized": "Face not recognized. Please try again or contact support.",
+        "livenessCheckFailed": "Liveness check failed. Please follow the on-screen head turn instructions and try again.",
+        "biometricVerificationFailed": "Biometric verification failed. Please try again.",
+        "centerFace": "Center your face",
+        "centerFaceSubtitle": "Center your face in the oval",
+        "getCloser": "Get closer",
+        "getCloserSubtitle": "Move your face closer to the camera",
+        "livenessCheckFailedReason": "Liveness check failed. Please follow the instructions and try again."
     },
     "acceptInvite": {
         "title": "Accept Invitation",
@@ -808,5 +854,79 @@
         "biometricsProtected": "Protected by Zelf Biometrics",
         "verifyingInvitation": "Verifying invitation...",
         "faceVerification": "Face Verification"
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "Lawyers",
+        "subtitle": "Find, manage and invite lawyers to your domain",
+        "inviteLawyer": "Invite Lawyer",
+        "searchPlaceholder": "Search lawyers by name, specialization, zelfName...",
+        "search": "Search",
+        "filters": {
+            "city": "City",
+            "country": "Country",
+            "maxRate": "Max Rate (USD/hr)",
+            "more": "More filters",
+            "hide": "Hide filters"
+        },
+        "tab": "Lawyers",
+        "loading": "Loading lawyers...",
+        "empty": {
+            "title": "No lawyers yet",
+            "subtitle": "Invite lawyers to get started with Zelf Legacy",
+            "invite": "Invite a lawyer"
+        },
+        "table": {
+            "lawyer": "Lawyer",
+            "specialization": "Specialization",
+            "location": "Location",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "view": "View",
+            "remove": "Remove"
+        },
+        "pending": {
+            "title": "Pending Invitations",
+            "loading": "Loading invitations...",
+            "empty": {
+                "title": "No pending invitations",
+                "subtitle": "All invitations have been accepted or none have been sent yet"
+            },
+            "invitedLawyer": "Invited Lawyer",
+            "invited": "Invited",
+            "status": "Pending",
+            "resend": "Resend invitation",
+            "count": "{{count}} pending invitation",
+            "count_plural": "{{count}} pending invitations"
+        },
+        "detail": {
+            "title": "Lawyer Profile",
+            "reputation": "On-Chain Reputation",
+            "rating": "Rating",
+            "reviews": "Reviews",
+            "verified": "Verified"
+        },
+        "invite": {
+            "title": "Invite Lawyer",
+            "description": "The lawyer will receive an email with a link to complete registration",
+            "emailLabel": "Email Address",
+            "fullNameLabel": "Full Name"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "Join as Lawyer",
+        "invitedToJoin": "You've been invited to join",
+        "asLawyer": "as a lawyer on the",
+        "domain": "domain",
+        "lawyer": "Lawyer",
+        "verifying": "Verifying invitation...",
+        "verifyingAccount": "Verifying Account",
+        "faceVerification": "Face Verification",
+        "secure": "SECURE",
+        "createMasterPassword": "Create Master Password",
+        "verifyIdentityJoin": "Verify Identity & Join",
+        "protectedByBiometrics": "Protected by biometric verification"
     }
 }

@@ -15,6 +15,7 @@ import { HttpWrapperService } from "../../../http-wrapper.service";
 import { PasskeyService } from "../../../core/services/passkey.service";
 import { AuthService } from "../../../core/auth/auth.service";
 import { StaffService } from "../../../core/services/staff.service";
+import { LawyerService } from "../../../modules/zelf-legacy/lawyers/lawyer.service";
 import { ClientService } from "../../../core/services/client.service";
 import { environment } from "../../../../environments/environment";
 import { License } from "../settings/license/license.class";
@@ -66,6 +67,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
         private translocoService: TranslocoService,
         private passkeyService: PasskeyService,
         private staffService: StaffService,
+        private lawyerService: LawyerService,
         private clientService: ClientService,
         private tagsService: TagsService,
     ) {}
@@ -413,6 +415,12 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 case "removeStaff":
                     await this.removeStaff(staffData);
                     break;
+                case "inviteLawyer":
+                    await this.inviteLawyer(staffData);
+                    break;
+                case "removeLawyer":
+                    await this.removeLawyer(staffData);
+                    break;
                 case "updateRole":
                     await this.updateStaffRole(staffData);
                     break;
@@ -420,21 +428,26 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                     throw new Error("Unknown staff operation");
             }
         } catch (error) {
-            let errorMessage = "Failed to complete staff operation. Please try again.";
+            const apiMessage = error?.error?.message || error?.message || "";
+            let errorMessage = "Failed to complete operation. Please try again.";
 
-            if (error?.message) {
-                if (error.message.includes("FACE IS NOT CENTRAL")) {
+            if (apiMessage) {
+                if (apiMessage.includes("LIVENESS")) {
+                    errorMessage = "Liveness check failed. Please ensure your face is clearly visible, well-lit, and centered.";
+                } else if (apiMessage.includes("FACE IS NOT CENTRAL")) {
                     errorMessage = "Face is not central. Please use an image with a central face.";
-                } else if (error.message.includes("error_decrypting_zelf_account")) {
+                } else if (apiMessage.includes("error_decrypting_zelf_account")) {
                     errorMessage = "Biometric verification failed. Please check your face image and master password.";
-                } else if (error.message.includes("staff_already_exists")) {
-                    errorMessage = "This staff member already exists.";
-                } else if (error.message.includes("staff_not_found")) {
-                    errorMessage = "Staff member not found.";
-                } else if (error.message.includes("verification_failed")) {
+                } else if (apiMessage.includes("staff_already_exists") || apiMessage.includes("lawyer_already_exists")) {
+                    errorMessage = "This member already exists.";
+                } else if (apiMessage.includes("staff_not_found") || apiMessage.includes("lawyer_not_found")) {
+                    errorMessage = "Member not found.";
+                } else if (apiMessage.includes("client_not_found")) {
+                    errorMessage = "Client account not found. Please verify your credentials.";
+                } else if (apiMessage.includes("verification_failed")) {
                     errorMessage = "Verification failed. Please try again.";
                 } else {
-                    errorMessage = error.message;
+                    errorMessage = apiMessage;
                 }
             }
 
@@ -605,12 +618,13 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
             let response;
 
             const isStaff = this.authService.zelfAccount?.publicData?.accountType === "staff_account";
+            const isLawyer = this.authService.isLawyer;
 
-            if (isStaff) {
-                // Use StaffService for staff accounts
+            if (isLawyer) {
+                response = await this.lawyerService.updateProfile(requestData);
+            } else if (isStaff) {
                 response = await this.staffService.updateProfile(requestData);
             } else {
-                // Use standard client update
                 response = await this.clientService.updateProfile(requestData);
             }
 
@@ -699,6 +713,42 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
         }, 2000);
     }
 
+
+    /**
+     * Invite lawyer
+     */
+    private async inviteLawyer(staffData: any): Promise<void> {
+        await this.lawyerService.inviteLawyer({
+            lawyerEmail: staffData.staffEmail,
+            lawyerPhone: staffData.staffPhone,
+            lawyerCountryCode: staffData.staffCountryCode,
+            lawyerName: staffData.staffName,
+            domain: "zelf",
+            faceBase64: staffData.faceBase64,
+            masterPassword: staffData.masterPassword,
+        });
+
+        this.showSuccess("Lawyer invitation sent successfully!");
+        setTimeout(() => {
+            this.router.navigate([this.saveData?.redirectUrl || "/zelf-legacy/lawyers"]);
+        }, 2000);
+    }
+
+    /**
+     * Remove lawyer
+     */
+    private async removeLawyer(staffData: any): Promise<void> {
+        await this.lawyerService.removeLawyer({
+            lawyerEmail: staffData.staffEmail,
+            faceBase64: staffData.faceBase64,
+            masterPassword: staffData.masterPassword,
+        });
+
+        this.showSuccess("Lawyer removed successfully!");
+        setTimeout(() => {
+            this.router.navigate([this.saveData?.redirectUrl || "/zelf-legacy/lawyers"]);
+        }, 2000);
+    }
     /**
      * Update staff member role
      */

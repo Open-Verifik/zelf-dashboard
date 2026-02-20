@@ -174,18 +174,27 @@
                                             "saving_operations.email" | transloco
                                         }}</span>
                                         <span class="text-sm font-bold text-gray-900 dark:text-white">{{
-                                            saveData.profileData.email || saveData.profileData.staffEmail
+                                            saveData.profileData.email || saveData.profileData.staffEmail || saveData.profileData.contactEmail
                                         }}</span>
                                     </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{{
-                                            "saving_operations.phone" | transloco
-                                        }}</span>
-                                        <span class="text-sm font-bold text-gray-900 dark:text-white">
-                                            {{ saveData.profileData.countryCode || saveData.profileData.staffCountryCode }}
-                                            {{ saveData.profileData.phone || saveData.profileData.staffPhone }}
-                                        </span>
-                                    </div>
+                                    @if (saveData.profileData.countryCode || saveData.profileData.staffCountryCode || saveData.profileData.phone || saveData.profileData.staffPhone) {
+                                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-800">
+                                            <span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{{
+                                                "saving_operations.countryCode" | transloco
+                                            }}</span>
+                                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{
+                                                saveData.profileData.countryCode || saveData.profileData.staffCountryCode || "—"
+                                            }}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{{
+                                                "saving_operations.phone" | transloco
+                                            }}</span>
+                                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{
+                                                saveData.profileData.phone || saveData.profileData.staffPhone || "—"
+                                            }}</span>
+                                        </div>
+                                    }
                                     @if (saveData.profileData.company) {
                                         <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-800">
                                             <span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{{
@@ -328,10 +337,10 @@
                                     class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide flex items-center gap-1"
                                 >
                                     <mat-icon class="icon-size-3">lock</mat-icon>
-                                    <span>SECURE</span>
+                                    <span>{{ "save_confirmation.secure" | transloco }}</span>
                                 </div>
                                 <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                    {{ saveData?.domainConfig?.name || saveData?.operation?.itemName || "configuration" }}
+                                    {{ (saveData?.operation?.itemName === "profile" ? ("profile.menu.profile" | transloco) : saveData?.domainConfig?.name || saveData?.operation?.itemName) || "configuration" }}
                                 </span>
                             </div>
                         </div>

@@ -2,6 +2,7 @@ import { Route } from "@angular/router";
 import { environment } from "environments/environment";
 import { initialDataResolver } from "app/app.resolvers";
 import { AuthGuard } from "app/core/auth/guards/auth.guard";
+import { NotLawyerGuard } from "app/core/auth/guards/not-lawyer.guard";
 import { NoAuthGuard } from "app/core/auth/guards/noAuth.guard";
 import { LayoutComponent } from "app/layout/layout.component";
 
@@ -21,7 +22,7 @@ export const appRoutes: Route[] = [
 	// After the user signs in, the sign-in page will redirect the user to the 'signed-in-redirect'
 	// path. Below is another redirection for that path to redirect the user to the desired
 	// location. This is a small convenience to keep all main routes together here on this file.
-	{ path: "signed-in-redirect", pathMatch: "full", redirectTo: "analytics" },
+	{ path: "signed-in-redirect", pathMatch: "full", loadComponent: () => import("app/root-redirect.component").then((m) => m.RootRedirectComponent) },
 
 	// Auth routes for guests
 	{
@@ -39,6 +40,7 @@ export const appRoutes: Route[] = [
 			{ path: "sign-in", loadChildren: () => import("app/modules/auth/sign-in/sign-in.routes") },
 			{ path: "sign-up", loadChildren: () => import("app/modules/auth/sign-up/sign-up.routes") },
 			{ path: "auth/accept-invite", loadChildren: () => import("app/modules/auth/accept-invite/accept-invite.routes") },
+			{ path: "auth/accept-lawyer-invite", loadChildren: () => import("app/modules/auth/accept-lawyer-invite/accept-lawyer-invite.routes") },
 			{ path: "biometric-verification", loadChildren: () => import("app/modules/auth/biometric-verification/biometric-verification.routes") },
 		],
 	},
@@ -133,13 +135,14 @@ export const appRoutes: Route[] = [
 			initialData: initialDataResolver,
 		},
 		children: [
-			{ path: "analytics", loadChildren: () => import("app/modules/dashboards/analytics/analytics.routes") },
-			{ path: "portfolio", loadChildren: () => import("app/modules/dashboards/portfolio/portfolio.routes") },
-			{ path: "tags", loadChildren: () => import("app/modules/tags/tags.routes") },
-			{ path: "zelfkeys", loadChildren: () => import("app/modules/zelfkeys/zelfkeys.routes") },
+			{ path: "analytics", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/dashboards/analytics/analytics.routes") },
+			{ path: "portfolio", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/dashboards/portfolio/portfolio.routes") },
+			{ path: "tags", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/tags/tags.routes") },
+			{ path: "zelfkeys", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/zelfkeys/zelfkeys.routes") },
 			{ path: "profile", loadChildren: () => import("app/modules/pages/profile/profile.routes") },
-			{ path: "play-area", loadChildren: () => import("app/modules/play-area/play-area.routes") },
-			{ path: "settings", loadChildren: () => import("app/modules/pages/settings/settings.routes") },
+			{ path: "play-area", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/play-area/play-area.routes") },
+			{ path: "settings", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/pages/settings/settings.routes") },
+			{ path: "zelf-legacy", loadChildren: () => import("app/modules/zelf-legacy/zelf-legacy.routes") },
 			{ path: "example", loadChildren: () => import("app/modules/admin/example/example.routes") },
 		],
 	},

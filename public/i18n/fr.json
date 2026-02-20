@@ -139,7 +139,9 @@
             "description": "Veuillez entrer votre mot de passe maître pour procéder à la mise à jour de vos paramètres de thème",
             "action": "mise à jour",
             "itemName": "paramètres de thème"
-        }
+        },
+        "phone": "Téléphone",
+        "countryCode": "Indicatif pays"
     },
     "save_confirmation": {
         "master_password": "Mot de passe maître",
@@ -148,7 +150,8 @@
         "cancel": "Annuler",
         "processing": "Traitement en cours...",
         "continue": "Continuer",
-        "biometric_verification": "Vérification biométrique"
+        "biometric_verification": "Vérification biométrique",
+        "secure": "SÉCURISÉ"
     },
     "license": {
         "title": "Configuration de domaine",
@@ -426,7 +429,11 @@
             "phone": "Téléphone",
             "phone_placeholder": "Entrez votre numéro de téléphone",
             "phone_required": "Le numéro de téléphone est requis",
-            "phone_invalid": "Veuillez entrer un numéro de téléphone valide"
+            "phone_invalid": "Veuillez entrer un numéro de téléphone valide",
+            "fullName": "Nom Complet",
+            "yourName": "Votre nom",
+            "phoneCode": "Code",
+            "phonePlaceholder": "Numéro de téléphone"
         },
         "account": {
             "title": "Informations du Compte",
@@ -465,8 +472,36 @@
             "role_read": "Lecteur",
             "permission_read": "Peut voir",
             "permission_write": "Peut modifier",
-            "permission_admin": "Accès complet"
-        }
+            "permission_admin": "Accès complet",
+            "license": "Licence"
+        },
+        "lawyer": {
+            "title": "Profil Avocat",
+            "subtitle": "Gérez votre profil professionnel et vos credentials",
+            "badge": "AVOCAT",
+            "label": "Avocat",
+            "professionalDetails": "Détails Professionnels",
+            "zelfName": "Nom Zelf",
+            "licenseNumber": "Numéro de Licence",
+            "professionalId": "ID Professionnel",
+            "hourlyRate": "Taux Horaire (USD)",
+            "city": "Ville",
+            "country": "Pays",
+            "specializations": "Spécialisations",
+            "bio": "Biographie",
+            "contactEmail": "Email de Contact",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "New York",
+            "placeholder_country": "États-Unis",
+            "placeholder_bio": "Parlez de votre expérience et expertise aux clients...",
+            "placeholder_contactEmail": "avocat@cabinet.com",
+            "placeholder_specialization": "ex. Droit des Sociétés"
+        },
+        "subtitle": "Gérez les paramètres et préférences de votre compte",
+        "loadingShort": "Chargement..."
     },
     "theme_settings": {
         "title": "Paramètres de Thème",
@@ -663,5 +698,109 @@
             "year": "An",
             "years": "Ans"
         }
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "Avocats",
+        "subtitle": "Trouvez, gérez et invitez des avocats à votre domaine",
+        "inviteLawyer": "Inviter un Avocat",
+        "searchPlaceholder": "Rechercher des avocats par nom, spécialisation, zelfName...",
+        "search": "Rechercher",
+        "filters": {
+            "city": "Ville",
+            "country": "Pays",
+            "maxRate": "Taux Max (USD/h)",
+            "more": "Plus de filtres",
+            "hide": "Masquer les filtres"
+        },
+        "tab": "Avocats",
+        "loading": "Chargement des avocats...",
+        "empty": {
+            "title": "Aucun avocat pour l'instant",
+            "subtitle": "Invitez des avocats pour commencer avec Zelf Legacy",
+            "invite": "Inviter un avocat"
+        },
+        "table": {
+            "lawyer": "Avocat",
+            "specialization": "Spécialisation",
+            "location": "Localisation",
+            "status": "Statut",
+            "actions": "Actions"
+        },
+        "actions": {
+            "view": "Voir",
+            "remove": "Supprimer"
+        },
+        "pending": {
+            "title": "Invitations en Attente",
+            "loading": "Chargement des invitations...",
+            "empty": {
+                "title": "Aucune invitation en attente",
+                "subtitle": "Toutes les invitations ont été acceptées ou aucune n'a été envoyée"
+            },
+            "invitedLawyer": "Avocat Invité",
+            "invited": "Invité",
+            "status": "En attente",
+            "resend": "Renvoyer l'invitation",
+            "count": "{{count}} invitation en attente",
+            "count_plural": "{{count}} invitations en attente"
+        },
+        "detail": {
+            "title": "Profil Avocat",
+            "reputation": "Réputation On-Chain",
+            "rating": "Note",
+            "reviews": "Avis",
+            "verified": "Vérifié"
+        },
+        "invite": {
+            "title": "Inviter un Avocat",
+            "description": "L'avocat recevra un email avec un lien pour terminer l'inscription",
+            "emailLabel": "Adresse email",
+            "fullNameLabel": "Nom complet"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "Rejoindre en tant qu'Avocat",
+        "invitedToJoin": "Vous avez été invité à rejoindre",
+        "asLawyer": "en tant qu'avocat sur le domaine",
+        "domain": "",
+        "lawyer": "Avocat",
+        "verifying": "Vérification de l'invitation...",
+        "verifyingAccount": "Vérification du Compte",
+        "faceVerification": "Vérification Faciale",
+        "secure": "SÉCURISÉ",
+        "createMasterPassword": "Créer un Mot de Passe Principal",
+        "verifyIdentityJoin": "Vérifier l'Identité et Rejoindre",
+        "protectedByBiometrics": "Protégé par vérification biométrique"
+    },
+    "biometricVerification": {
+        "title": "Vérifier l'identité",
+        "verifyingAs": "Vérification en tant que",
+        "newAccount": "Nouveau compte",
+        "account": "Compte",
+        "verificationFailed": "Vérification échouée",
+        "tryAgain": "Réessayer",
+        "cancel": "Annuler",
+        "processingData": "Traitement de vos données biométriques...",
+        "initializingCamera": "Initialisation de la caméra sécurisée...",
+        "positionFace": "Positionnez votre visage au centre",
+        "lookAtCamera": "Regardez directement la caméra et restez immobile",
+        "verifyInstruction": "Veuillez regarder la caméra pour vérifier votre identité et terminer l'inscription",
+        "cameraNotAvailable": "Caméra non disponible",
+        "cameraAccessible": "Assurez-vous que votre caméra est activée et accessible pour la vérification biométrique",
+        "permissionRequired": "Autorisation de la caméra requise",
+        "allowAccess": "Veuillez autoriser l'accès à la caméra pour continuer la vérification biométrique",
+        "noFaceDetected": "Aucun visage détecté",
+        "noFaceDetectedSubtitle": "Veuillez regarder la caméra",
+        "noFaceDetectedMessage": "Aucun visage détecté. Veuillez regarder directement la caméra.",
+        "multipleFacesDetected": "Plusieurs visages détectés. Assurez-vous qu'une seule personne soit visible.",
+        "faceNotRecognized": "Visage non reconnu. Réessayez ou contactez le support.",
+        "livenessCheckFailed": "Vérification de vivacité échouée. Suivez les instructions à l'écran et réessayez.",
+        "biometricVerificationFailed": "Vérification biométrique échouée. Réessayez.",
+        "centerFace": "Centrez votre visage",
+        "centerFaceSubtitle": "Centrez votre visage dans l'ovale",
+        "getCloser": "Rapprochez-vous",
+        "getCloserSubtitle": "Rapprochez votre visage de la caméra",
+        "livenessCheckFailedReason": "Vérification de vivacité échouée. Suivez les instructions et réessayez."
     }
 }

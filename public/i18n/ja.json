@@ -140,7 +140,9 @@
             "description": "テーマ設定を更新するには、マスターパスワードを入力してください",
             "action": "更新中",
             "itemName": "テーマ設定"
-        }
+        },
+        "phone": "電話",
+        "countryCode": "国コード"
     },
     "save_confirmation": {
         "master_password": "マスターパスワード",
@@ -150,7 +152,8 @@
         "processing": "処理中...",
         "continue": "続行",
         "biometric_verification": "生体認証",
-        "biometrics_disabled_debugging": "デバッグのため生体認証が一時的に無効になっています。"
+        "biometrics_disabled_debugging": "デバッグのため生体認証が一時的に無効になっています。",
+        "secure": "セキュア"
     },
     "license": {
         "title": "ドメイン設定",
@@ -436,7 +439,11 @@
             "phone": "電話",
             "phone_placeholder": "電話番号を入力してください",
             "phone_required": "電話番号は必須です",
-            "phone_invalid": "有効な電話番号を入力してください"
+            "phone_invalid": "有効な電話番号を入力してください",
+            "fullName": "氏名",
+            "yourName": "お名前",
+            "phoneCode": "コード",
+            "phonePlaceholder": "電話番号"
         },
         "account": {
             "title": "アカウント情報",
@@ -475,8 +482,36 @@
             "role_read": "閲覧者",
             "permission_read": "閲覧可",
             "permission_write": "編集可",
-            "permission_admin": "フルアクセス"
-        }
+            "permission_admin": "フルアクセス",
+            "license": "免許"
+        },
+        "lawyer": {
+            "title": "弁護士プロフィール",
+            "subtitle": "専門プロフィールと資格を管理",
+            "badge": "弁護士",
+            "label": "弁護士",
+            "professionalDetails": "専門詳細",
+            "zelfName": "Zelf名",
+            "licenseNumber": "免許番号",
+            "professionalId": "専門ID",
+            "hourlyRate": "時給（USD）",
+            "city": "都市",
+            "country": "国",
+            "specializations": "専門分野",
+            "bio": "経歴",
+            "contactEmail": "連絡先メール",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "ニューヨーク",
+            "placeholder_country": "アメリカ",
+            "placeholder_bio": "経験と専門知識をクライアントに伝えてください...",
+            "placeholder_contactEmail": "lawyer@firm.com",
+            "placeholder_specialization": "例：企業法"
+        },
+        "subtitle": "アカウント設定と環境設定を管理",
+        "loadingShort": "読み込み中..."
     },
     "theme_settings": {
         "title": "テーマ設定",
@@ -673,5 +708,109 @@
             "year": "年",
             "years": "年"
         }
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "弁護士",
+        "subtitle": "弁護士を検索、管理、招待",
+        "inviteLawyer": "弁護士を招待",
+        "searchPlaceholder": "名前、専門分野、zelfNameで検索...",
+        "search": "検索",
+        "filters": {
+            "city": "都市",
+            "country": "国",
+            "maxRate": "最大時給（USD/h）",
+            "more": "フィルターを追加",
+            "hide": "フィルターを非表示"
+        },
+        "tab": "弁護士",
+        "loading": "弁護士を読み込み中...",
+        "empty": {
+            "title": "弁護士がいません",
+            "subtitle": "Zelf Legacyを始めるには弁護士を招待してください",
+            "invite": "弁護士を招待"
+        },
+        "table": {
+            "lawyer": "弁護士",
+            "specialization": "専門分野",
+            "location": "所在地",
+            "status": "ステータス",
+            "actions": "操作"
+        },
+        "actions": {
+            "view": "表示",
+            "remove": "削除"
+        },
+        "pending": {
+            "title": "保留中の招待",
+            "loading": "招待を読み込み中...",
+            "empty": {
+                "title": "保留中の招待はありません",
+                "subtitle": "すべての招待が承認されたか、まだ送信されていません"
+            },
+            "invitedLawyer": "招待された弁護士",
+            "invited": "招待日",
+            "status": "保留中",
+            "resend": "招待を再送信",
+            "count": "{{count}}件の招待が保留中",
+            "count_plural": "{{count}}件の招待が保留中"
+        },
+        "detail": {
+            "title": "弁護士プロフィール",
+            "reputation": "オンチェーン評判",
+            "rating": "評価",
+            "reviews": "レビュー",
+            "verified": "検証済み"
+        },
+        "invite": {
+            "title": "弁護士を招待",
+            "description": "弁護士は登録を完了するためのリンク付きメールを受け取ります",
+            "emailLabel": "メールアドレス",
+            "fullNameLabel": "氏名"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "弁護士として参加",
+        "invitedToJoin": "以下の招待を受けました",
+        "asLawyer": "弁護士として",
+        "domain": "ドメインに参加",
+        "lawyer": "弁護士",
+        "verifying": "招待を確認中...",
+        "verifyingAccount": "アカウント確認中",
+        "faceVerification": "顔認証",
+        "secure": "セキュア",
+        "createMasterPassword": "マスターパスワードを作成",
+        "verifyIdentityJoin": "本人確認して参加",
+        "protectedByBiometrics": "生体認証で保護"
+    },
+    "biometricVerification": {
+        "title": "本人確認",
+        "verifyingAs": "確認中",
+        "newAccount": "新規アカウント",
+        "account": "アカウント",
+        "verificationFailed": "認証失敗",
+        "tryAgain": "再試行",
+        "cancel": "キャンセル",
+        "processingData": "生体データを処理中...",
+        "initializingCamera": "カメラを初期化中...",
+        "positionFace": "顔を中央に配置してください",
+        "lookAtCamera": "カメラを直接見て、動かないでください",
+        "verifyInstruction": "本人確認のため、カメラを見てアカウント登録を完了してください",
+        "cameraNotAvailable": "カメラが利用できません",
+        "cameraAccessible": "生体認証のためカメラが有効でアクセス可能であることを確認してください",
+        "permissionRequired": "カメラの許可が必要です",
+        "allowAccess": "生体認証を続行するにはカメラへのアクセスを許可してください",
+        "noFaceDetected": "顔が検出されませんでした",
+        "noFaceDetectedSubtitle": "カメラを見てください",
+        "noFaceDetectedMessage": "顔が検出されませんでした。カメラを直接見てください。",
+        "multipleFacesDetected": "複数の顔が検出されました。カメラに1人だけ映るようにしてください。",
+        "faceNotRecognized": "顔が認識されませんでした。再試行するかサポートにお問い合わせください。",
+        "livenessCheckFailed": "ライブネスチェックに失敗しました。画面の指示に従って再試行してください。",
+        "biometricVerificationFailed": "生体認証に失敗しました。再試行してください。",
+        "centerFace": "顔を中央に",
+        "centerFaceSubtitle": "楕円内に顔を中央に配置してください",
+        "getCloser": "近づいてください",
+        "getCloserSubtitle": "顔をカメラに近づけてください",
+        "livenessCheckFailedReason": "ライブネスチェックに失敗しました。指示に従って再試行してください。"
     }
 }

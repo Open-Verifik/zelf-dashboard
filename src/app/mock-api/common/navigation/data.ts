@@ -39,6 +39,21 @@ export const defaultNavigation: FuseNavigationItem[] = [
 		],
 	},
 	{
+		id: "zelf-legacy",
+		title: "Zelf Legacy",
+		type: "collapsable",
+		icon: "heroicons_outline:scale",
+		children: [
+			{
+				id: "zelf-legacy.lawyers",
+				title: "Lawyers",
+				type: "basic",
+				icon: "heroicons_outline:user-group",
+				link: "/zelf-legacy/lawyers",
+			},
+		],
+	},
+	{
 		id: "settings",
 		title: "Settings",
 		type: "basic",
@@ -108,6 +123,21 @@ export const horizontalNavigation: FuseNavigationItem[] = [
 				type: "basic",
 				icon: "heroicons_outline:shield-check",
 				link: "/play-area/zelfproofs",
+			},
+		],
+	},
+	{
+		id: "zelf-legacy",
+		title: "Zelf Legacy",
+		type: "collapsable",
+		icon: "heroicons_outline:scale",
+		children: [
+			{
+				id: "zelf-legacy.lawyers",
+				title: "Lawyers",
+				type: "basic",
+				icon: "heroicons_outline:user-group",
+				link: "/zelf-legacy/lawyers",
 			},
 		],
 	},

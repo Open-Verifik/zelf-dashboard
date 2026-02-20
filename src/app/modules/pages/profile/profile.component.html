@@ -1,288 +1,197 @@
 <div class="flex flex-col min-h-screen bg-gray-50/50 dark:bg-gray-900 w-full">
-	<!-- Main Content Container -->
 	<div class="flex-auto px-4 py-8 sm:px-6 sm:py-12 md:px-8 w-full max-w-4xl mx-auto">
 		<!-- Header -->
 		<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{{ "profile.menu.profile" | transloco }}</h1>
-				<p class="mt-2 text-base text-gray-500 dark:text-gray-400">Manage your account settings and preferences</p>
+				<h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{{ isLawyer ? ('profile.lawyer.title' | transloco) : ('profile.menu.profile' | transloco) }}</h1>
+				<p class="mt-2 text-base text-gray-500 dark:text-gray-400">{{ isLawyer ? ('profile.lawyer.subtitle' | transloco) : ('profile.subtitle' | transloco) }}</p>
 			</div>
-
-			<!-- Account Status Badge -->
 			<div class="mt-4 sm:mt-0 flex items-center space-x-3">
-				<div
-					class="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5"
-				>
+				<div class="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5">
 					<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
 					<span>{{ accountStatus }}</span>
 				</div>
-				<div
-					*ngIf="isPremium"
-					class="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5"
-				>
-					<mat-icon class="icon-size-3.5">star</mat-icon>
-					<span>PREMIUM</span>
+				<div *ngIf="isLawyer" class="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5">
+					<mat-icon class="icon-size-3.5">gavel</mat-icon>
+					<span>{{ 'profile.lawyer.badge' | transloco }}</span>
 				</div>
 			</div>
 		</div>
 
-		<!-- Alert Messages -->
+		<!-- Alert -->
 		@if (showAlert) {
 			<div class="mb-6 animate-fade-in">
-				<div
-					class="flex items-center justify-between p-4 rounded-2xl shadow-sm border transaction-all duration-300"
-					[class]="
-						alertType === 'success'
-							? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
-							: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
-					"
-				>
+				<div class="flex items-center justify-between p-4 rounded-2xl shadow-sm border"
+					[class]="alertType === 'success' ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'">
 					<div class="flex items-center gap-3">
-						<div
-							class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-							[class]="
-								alertType === 'success'
-									? 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200'
-									: 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-200'
-							"
-						>
-							<mat-icon class="icon-size-5">{{ alertType === "success" ? "check" : "priority_high" }}</mat-icon>
-						</div>
+						<mat-icon class="icon-size-5">{{ alertType === 'success' ? 'check' : 'priority_high' }}</mat-icon>
 						<span class="font-medium text-sm">{{ alertMessage }}</span>
 					</div>
-					<button
-						mat-icon-button
-						(click)="clearAlert()"
-						[class]="alertType === 'success' ? 'text-green-500 hover:text-green-700' : 'text-red-500 hover:text-red-700'"
-					>
-						<mat-icon class="icon-size-4">close</mat-icon>
-					</button>
+					<button mat-icon-button (click)="clearAlert()"><mat-icon class="icon-size-4">close</mat-icon></button>
 				</div>
 			</div>
 		}
 
 		<!-- Profile Card -->
 		<div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
-			<!-- Loading State -->
 			<div *ngIf="loading" class="flex flex-col items-center justify-center h-96">
 				<mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
-				<span class="mt-4 text-gray-500 font-medium">{{ "profile.loading" | transloco }}</span>
+				<span class="mt-4 text-gray-500 font-medium">{{ 'profile.loadingShort' | transloco }}</span>
 			</div>
 
 			<div *ngIf="!loading">
-				<!-- Cover / Avatar Section -->
+				<!-- Cover / Avatar -->
 				<div class="relative bg-gray-50 dark:bg-gray-800/50 px-8 py-10 border-b border-gray-100 dark:border-gray-700">
 					<div class="flex flex-col sm:flex-row items-center sm:items-end gap-6">
-						<!-- Avatar -->
 						<div class="relative shrink-0">
-							<div
-								class="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-white dark:ring-slate-800 overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl font-bold text-gray-500 dark:text-gray-400"
-							>
-								<img
-									*ngIf="photoPreviewUrl || userPhoto"
-									[src]="photoPreviewUrl || userPhoto"
-									class="w-full h-full object-cover"
-									[alt]="displayName"
-								/>
+							<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-white dark:ring-slate-800 overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl font-bold text-gray-500 dark:text-gray-400">
+								<img *ngIf="photoPreviewUrl || userPhoto" [src]="photoPreviewUrl || userPhoto" class="w-full h-full object-cover" [alt]="displayName" />
 								<span *ngIf="!photoPreviewUrl && !userPhoto">{{ user?.name?.[0] || displayName[0] }}</span>
 							</div>
-							<!-- Hidden file input -->
 							<input type="file" id="photoInput" accept="image/*" (change)="onPhotoSelected($event)" class="hidden" />
-							<!-- Edit Avatar Button -->
-							<button
-								*ngIf="isEditing"
-								(click)="triggerPhotoUpload()"
-								type="button"
-								class="absolute bottom-0 right-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors shadow-md"
-							>
+							<button *ngIf="isEditing" (click)="triggerPhotoUpload()" type="button" class="absolute bottom-0 right-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors shadow-md">
 								<mat-icon class="icon-size-4">camera_alt</mat-icon>
 							</button>
 						</div>
-
-						<!-- User Info -->
 						<div class="text-center sm:text-left flex-1 min-w-0 pb-2">
 							<h2 class="text-2xl font-bold text-gray-900 dark:text-white truncate">{{ displayName }}</h2>
 							<p class="text-gray-500 dark:text-gray-400 truncate">{{ displayEmail }}</p>
 							<div class="flex items-center justify-center sm:justify-start gap-2 mt-2">
-								<div
-									class="bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded text-xs font-semibold border border-primary-100 dark:border-primary-800"
-								>
-									{{ displayCompany }}
+								<div class="bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded text-xs font-semibold border border-primary-100 dark:border-primary-800">
+									{{ isLawyer ? ('.' + (profileForm.get('zelfName')?.value || 'zelf')) : displayCompany }}
 								</div>
 							</div>
 						</div>
-
-						<!-- Action Buttons -->
 						<div class="flex items-center gap-3 mt-4 sm:mt-0 pb-2">
-							<button
-								*ngIf="!isEditing"
-								(click)="toggleEditMode()"
-								class="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl font-medium text-sm transition-all shadow-sm flex items-center gap-2"
-							>
-								<mat-icon class="icon-size-4">edit</mat-icon>
-								<span>{{ "profile.edit" | transloco }}</span>
+							<button *ngIf="!isEditing" (click)="toggleEditMode()" class="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl font-medium text-sm transition-all shadow-sm flex items-center gap-2">
+								<mat-icon class="icon-size-4">edit</mat-icon><span>{{ 'profile.edit' | transloco }}</span>
 							</button>
-
 							<ng-container *ngIf="isEditing">
-								<button
-									(click)="toggleEditMode()"
-									class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-transparent dark:border-gray-600 dark:text-white dark:hover:bg-gray-800 text-gray-700 rounded-xl font-medium text-sm transition-all flex items-center gap-2"
-								>
-									<span>{{ "profile.cancel" | transloco }}</span>
-								</button>
-								<button
-									*ngIf="hasChanges"
-									(click)="saveProfile()"
-									class="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl font-medium text-sm transition-all shadow-lg shadow-gray-200 dark:shadow-none flex items-center gap-2"
-								>
-									<mat-icon class="icon-size-4">check</mat-icon>
-									<span>{{ "profile.save" | transloco }}</span>
+								<button (click)="toggleEditMode()" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 dark:bg-transparent dark:border-gray-600 dark:text-white dark:hover:bg-gray-800 text-gray-700 rounded-xl font-medium text-sm transition-all flex items-center gap-2"><span>{{ 'profile.cancel' | transloco }}</span></button>
+								<button *ngIf="hasChanges" (click)="saveProfile()" class="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl font-medium text-sm transition-all shadow-lg flex items-center gap-2">
+									<mat-icon class="icon-size-4">check</mat-icon><span>{{ 'profile.save' | transloco }}</span>
 								</button>
 							</ng-container>
 						</div>
 					</div>
 				</div>
 
-				<!-- Form Section -->
+				<!-- Form -->
 				<div class="p-8 sm:p-10">
 					<form [formGroup]="profileForm">
+						<!-- Basic Info -->
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-							<!-- Name -->
 							<div class="space-y-1.5">
-								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
-									"profile.information.name" | transloco
-								}}</label>
-								<input
-									type="text"
-									formControlName="name"
-									(input)="onFormChange()"
-									class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-									[placeholder]="'profile.information.name_placeholder' | transloco"
-								/>
-								<div class="h-3 ml-1">
-									<span
-										class="text-xs text-red-500 font-medium"
-										*ngIf="profileForm.get('name')?.hasError('required') && profileForm.get('name')?.touched"
-									>
-										{{ "profile.information.name_required" | transloco }}
-									</span>
-								</div>
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.information.fullName' | transloco }}</label>
+								<input type="text" formControlName="name" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.information.yourName' | transloco }}" />
 							</div>
-
-							<!-- Company (Only for client accounts) -->
-							<div class="space-y-1.5" *ngIf="user?.accountType !== 'staff_account'">
-								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
-									"profile.information.company" | transloco
-								}}</label>
-								<input
-									type="text"
-									formControlName="company"
-									(input)="onFormChange()"
-									class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-									[placeholder]="'profile.information.company_placeholder' | transloco"
-								/>
-								<div class="h-3 ml-1"></div>
+							<div class="space-y-1.5" *ngIf="!isLawyer && user?.accountType !== 'staff_account'">
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.information.company' | transloco }}</label>
+								<input type="text" formControlName="company" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" [placeholder]="'profile.information.company_placeholder' | transloco" />
 							</div>
-
-							<!-- Phone Section -->
+							<!-- Contact Email for lawyers -->
+							<div class="space-y-1.5" *ngIf="isLawyer">
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.contactEmail' | transloco }}</label>
+								<input type="email" formControlName="contactEmail" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_contactEmail' | transloco }}" />
+							</div>
+							<!-- Phone -->
 							<div class="md:col-span-2 space-y-1.5">
-								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
-									"profile.information.phone" | transloco
-								}}</label>
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.information.phone' | transloco }}</label>
 								<div class="flex gap-3">
-									<!-- Country Code -->
 									<div class="w-36 relative country-code-field">
 										<div class="relative">
-											<input
-												#countryInput
-												type="text"
-												formControlName="countryCode"
-												[(ngModel)]="countryCodeSearchTerm"
-												(input)="filterCountryCodes(); onFormChange()"
-												(focus)="toggleCountryDropdown()"
-												placeholder="Code"
-												class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-											/>
-											<div
-												class="absolute right-3 top-3 text-gray-400 cursor-pointer"
-												(click)="countryInput.focus(); toggleCountryDropdown()"
-											>
-												<mat-icon class="icon-size-5">keyboard_arrow_down</mat-icon>
-											</div>
+											<input #countryInput type="text" formControlName="countryCode" [(ngModel)]="countryCodeSearchTerm" (input)="filterCountryCodes(); onFormChange()" (focus)="toggleCountryDropdown()" [placeholder]="'profile.information.phoneCode' | transloco" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" />
+											<div class="absolute right-3 top-3 text-gray-400 cursor-pointer" (click)="countryInput.focus(); toggleCountryDropdown()"><mat-icon class="icon-size-5">keyboard_arrow_down</mat-icon></div>
 										</div>
-
-										<!-- Dropdown -->
-										<div
-											*ngIf="showCountryDropdown && filteredCountryCodes.length > 0"
-											class="absolute z-50 w-64 mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl max-h-60 overflow-y-auto py-2"
-										>
-											<button
-												type="button"
-												*ngFor="let country of filteredCountryCodes"
-												(click)="selectCountryCode(country)"
-												class="w-full px-4 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center gap-3 transition-colors"
-											>
+										<div *ngIf="showCountryDropdown && filteredCountryCodes.length > 0" class="absolute z-50 w-64 mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl max-h-60 overflow-y-auto py-2">
+											<button type="button" *ngFor="let country of filteredCountryCodes" (click)="selectCountryCode(country)" class="w-full px-4 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center gap-3 transition-colors">
 												<span class="text-xl">{{ country.flag }}</span>
 												<span class="text-sm font-semibold text-gray-900 dark:text-gray-200">{{ country.code }}</span>
 												<span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ country.country }}</span>
 											</button>
 										</div>
 									</div>
-
-									<!-- Phone Number -->
 									<div class="flex-1">
-										<input
-											type="tel"
-											formControlName="phone"
-											(input)="onFormChange()"
-											class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-											[placeholder]="'profile.information.phone_placeholder' | transloco"
-										/>
+										<input type="tel" formControlName="phone" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" [placeholder]="'profile.information.phone_placeholder' | transloco" />
 									</div>
 								</div>
-								<div class="h-3 ml-1">
-									<span class="text-xs text-red-500 font-medium" *ngIf="profileForm.get('phone')?.hasError('pattern')">
-										{{ "profile.information.phone_invalid" | transloco }}
-									</span>
-								</div>
 							</div>
-
-							<!-- Email -->
-							<div class="space-y-1.5 md:col-span-2">
-								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{
-									"profile.information.email" | transloco
-								}}</label>
+							<!-- Email (account email, not editable for lawyers) -->
+							<div class="space-y-1.5 md:col-span-2" *ngIf="!isLawyer">
+								<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.information.email' | transloco }}</label>
 								<div class="relative">
 									<mat-icon class="absolute left-4 top-3.5 icon-size-5 text-gray-400">mail</mat-icon>
-									<input
-										type="email"
-										formControlName="email"
-										(input)="onFormChange()"
-										class="w-full pl-12 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-										[placeholder]="'profile.information.email_placeholder' | transloco"
-									/>
+									<input type="email" formControlName="email" (input)="onFormChange()" class="w-full pl-12 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" [placeholder]="'profile.information.email_placeholder' | transloco" />
 								</div>
-								<div class="h-3 ml-1">
-									<span
-										class="text-xs text-red-500 font-medium"
-										*ngIf="profileForm.get('email')?.hasError('email') && profileForm.get('email')?.touched"
-									>
-										{{ "profile.information.email_invalid" | transloco }}
-									</span>
+							</div>
+						</div>
+
+						<!-- Lawyer Professional Details -->
+						<div *ngIf="isLawyer" class="mt-10">
+							<div class="flex items-center gap-3 mb-6">
+								<div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center"><mat-icon class="icon-size-5 text-indigo-600 dark:text-indigo-400">gavel</mat-icon></div>
+								<h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ 'profile.lawyer.professionalDetails' | transloco }}</h3>
+							</div>
+
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+								<!-- Zelf Name -->
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.zelfName' | transloco }}</label>
+									<input type="text" formControlName="zelfName" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_zelfName' | transloco }}" />
+								</div>
+								<!-- License Number -->
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.licenseNumber' | transloco }}</label>
+									<input type="text" formControlName="licenseNumber" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_license' | transloco }}" />
+								</div>
+								<!-- Professional ID -->
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.professionalId' | transloco }}</label>
+									<input type="text" formControlName="professionalId" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_professionalId' | transloco }}" />
+								</div>
+								<!-- Hourly Rate -->
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.hourlyRate' | transloco }}</label>
+									<input type="number" formControlName="hourlyRate" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_hourlyRate' | transloco }}" />
+								</div>
+								<!-- Location -->
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.city' | transloco }}</label>
+									<input type="text" formControlName="locationCity" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_city' | transloco }}" />
+								</div>
+								<div class="space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.country' | transloco }}</label>
+									<input type="text" formControlName="locationCountry" (input)="onFormChange()" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed" placeholder="{{ 'profile.lawyer.placeholder_country' | transloco }}" />
+								</div>
+								<!-- Specializations -->
+								<div class="md:col-span-2 space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.specializations' | transloco }}</label>
+									<div class="flex flex-wrap gap-2 mb-2">
+										@for (spec of profileForm.get('specialization')?.value || []; track spec) {
+											<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 text-sm font-medium">
+												{{ spec }}
+												<button *ngIf="isEditing" type="button" (click)="removeSpecialization(spec)" class="ml-1 text-blue-400 hover:text-blue-600"><mat-icon class="icon-size-3.5">close</mat-icon></button>
+											</span>
+										}
+									</div>
+									<div *ngIf="isEditing" class="flex gap-2">
+										<input type="text" [(ngModel)]="specializationInput" [ngModelOptions]="{ standalone: true }" (keyup.enter)="addSpecialization()" class="flex-1 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium" placeholder="{{ 'profile.lawyer.placeholder_specialization' | transloco }}" />
+										<button type="button" (click)="addSpecialization()" class="px-4 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"><mat-icon class="icon-size-4">add</mat-icon></button>
+									</div>
+								</div>
+								<!-- Bio -->
+								<div class="md:col-span-2 space-y-1.5">
+									<label class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">{{ 'profile.lawyer.bio' | transloco }}</label>
+									<textarea formControlName="bio" (input)="onFormChange()" rows="4" class="w-full bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 transition-all font-medium disabled:opacity-60 disabled:cursor-not-allowed resize-none" placeholder="{{ 'profile.lawyer.placeholder_bio' | transloco }}"></textarea>
 								</div>
 							</div>
 						</div>
 					</form>
 				</div>
 
-				<!-- Footer / Meta Info -->
-				<div
-					class="px-8 py-6 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-gray-500 font-medium"
-				>
-					<div>
-						{{ "profile.account.created_at" | transloco }}:
-						<span class="text-gray-900 dark:text-gray-300 ml-1">{{ accountCreatedAt }}</span>
-					</div>
+				<!-- Footer -->
+				<div class="px-8 py-6 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-gray-500 font-medium">
+					<div>Account created: <span class="text-gray-900 dark:text-gray-300 ml-1">{{ accountCreatedAt }}</span></div>
 					<div class="flex gap-4">
 						<a href="#" class="hover:underline">Terms of Service</a>
 						<a href="#" class="hover:underline">Privacy Policy</a>
@@ -291,93 +200,29 @@
 			</div>
 		</div>
 
-		<!-- Account access (role & permissions) -->
+		<!-- Account Access Card -->
 		<div *ngIf="!loading" class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100 dark:border-gray-700/50">
 			<div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ "profile.accountAccess.title" | transloco }}</h3>
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ 'profile.accountAccess.title' | transloco }}</h3>
 			</div>
 			<div class="px-8 py-6 space-y-4">
-				<div class="flex flex-wrap items-center gap-4">
+				<div class="flex flex-wrap items-center gap-8">
 					<div>
-						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.accountType" | transloco }}</span>
-						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ accountTypeLabel | transloco }}</p>
+						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ 'profile.accountAccess.accountType' | transloco }}</span>
+						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ isLawyer ? ('profile.lawyer.label' | transloco) : (accountTypeLabel | transloco) }}</p>
 					</div>
 					<div>
-						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.role" | transloco }}</span>
-						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ roleLabel | transloco }}</p>
+						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ 'profile.accountAccess.role' | transloco }}</span>
+						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ isLawyer ? ('profile.lawyer.label' | transloco) : (roleLabel | transloco) }}</p>
 					</div>
-				</div>
-				<div>
-					<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ "profile.accountAccess.permissions" | transloco }}</span>
-					<div class="mt-2 flex flex-wrap gap-3">
-						<span *ngIf="permissionService.canRead" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm font-medium">
-							<mat-icon class="icon-size-4">check_circle</mat-icon>
-							{{ "profile.accountAccess.permission_read" | transloco }}
-						</span>
-						<span *ngIf="permissionService.canWrite" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-sm font-medium">
-							<mat-icon class="icon-size-4">check_circle</mat-icon>
-							{{ "profile.accountAccess.permission_write" | transloco }}
-						</span>
-						<span *ngIf="permissionService.isAdmin" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 text-sm font-medium">
-							<mat-icon class="icon-size-4">check_circle</mat-icon>
-							{{ "profile.accountAccess.permission_admin" | transloco }}
-						</span>
+					<div *ngIf="isLawyer && profileForm.get('licenseNumber')?.value">
+						<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ 'profile.accountAccess.license' | transloco }}</span>
+						<p class="mt-1 text-gray-900 dark:text-gray-100 font-medium">{{ profileForm.get('licenseNumber')?.value }}</p>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- License Card (Premium Only) -->
-
-		<div
-			*ngIf="isPremium && !loading"
-			class="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-indigo-900 dark:to-slate-900 rounded-3xl shadow-xl overflow-hidden text-white relative"
-		>
-			<!-- Decorative Pattern -->
-			<div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-			<div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"></div>
-
-			<div class="p-8 sm:p-10 relative z-10">
-				<div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
-					<div>
-						<div class="flex items-center gap-2 mb-2">
-							<mat-icon class="icon-size-5 text-indigo-300">verified</mat-icon>
-							<span class="text-indigo-200 font-semibold tracking-wide text-sm uppercase">{{
-								"profile.license.title" | transloco
-							}}</span>
-						</div>
-						<h3 class="text-3xl font-bold text-white mb-2">{{ subscriptionType }} Plan</h3>
-						<p class="text-gray-300 max-w-md">{{ "profile.license.all_features" | transloco }}</p>
-
-						<div class="flex flex-wrap gap-3 mt-6">
-							<div
-								*ngFor="let feature of ['Analytics', 'API Access', 'Priority Support']"
-								class="px-3 py-1 bg-white/10 rounded-lg text-sm font-medium border border-white/10"
-							>
-								{{ feature }}
-							</div>
-						</div>
-					</div>
-
-					<div class="flex flex-col gap-3 min-w-[200px]">
-						<button
-							class="w-full py-3 px-4 bg-white text-gray-900 hover:bg-gray-100 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2"
-						>
-							<mat-icon class="icon-size-5">autorenew</mat-icon>
-							<span>{{ "profile.license.renew" | transloco }}</span>
-						</button>
-						<button
-							class="w-full py-3 px-4 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-						>
-							<mat-icon class="icon-size-5">download</mat-icon>
-							<span>{{ "profile.license.download" | transloco }}</span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Bottom padding -->
 		<div class="h-12"></div>
 	</div>
 </div>
