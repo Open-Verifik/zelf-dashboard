@@ -140,7 +140,9 @@
             "description": "请输入您的主密码以继续更新您的主题设置",
             "action": "更新",
             "itemName": "主题设置"
-        }
+        },
+        "phone": "电话",
+        "countryCode": "国家代码"
     },
     "save_confirmation": {
         "master_password": "主密码",
@@ -150,7 +152,8 @@
         "processing": "处理中...",
         "continue": "继续",
         "biometric_verification": "生物识别验证",
-        "biometrics_disabled_debugging": "生物识别已暂时禁用以进行调试。"
+        "biometrics_disabled_debugging": "生物识别已暂时禁用以进行调试。",
+        "secure": "安全"
     },
     "license": {
         "title": "域名配置",
@@ -436,7 +439,11 @@
             "phone": "电话",
             "phone_placeholder": "请输入您的电话号码",
             "phone_required": "电话号码是必填项",
-            "phone_invalid": "请输入有效的电话号码"
+            "phone_invalid": "请输入有效的电话号码",
+            "fullName": "全名",
+            "yourName": "您的姓名",
+            "phoneCode": "代码",
+            "phonePlaceholder": "电话号码"
         },
         "account": {
             "title": "账户信息",
@@ -475,8 +482,36 @@
             "role_read": "查看者",
             "permission_read": "可查看",
             "permission_write": "可编辑",
-            "permission_admin": "完全访问"
-        }
+            "permission_admin": "完全访问",
+            "license": "执照"
+        },
+        "lawyer": {
+            "title": "律师档案",
+            "subtitle": "管理您的专业档案和资质",
+            "badge": "律师",
+            "label": "律师",
+            "professionalDetails": "专业详情",
+            "zelfName": "Zelf 名称",
+            "licenseNumber": "执照编号",
+            "professionalId": "专业 ID",
+            "hourlyRate": "时薪（美元）",
+            "city": "城市",
+            "country": "国家",
+            "specializations": "专业领域",
+            "bio": "简介",
+            "contactEmail": "联系邮箱",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "纽约",
+            "placeholder_country": "美国",
+            "placeholder_bio": "向客户介绍您的经验和专长...",
+            "placeholder_contactEmail": "lawyer@firm.com",
+            "placeholder_specialization": "例如：公司法"
+        },
+        "subtitle": "管理您的账户设置和偏好",
+        "loadingShort": "加载中..."
     },
     "theme_settings": {
         "title": "主题设置",
@@ -673,5 +708,109 @@
             "year": "年",
             "years": "年"
         }
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "律师",
+        "subtitle": "搜索、管理和邀请律师",
+        "inviteLawyer": "邀请律师",
+        "searchPlaceholder": "按姓名、专业领域、zelfName 搜索...",
+        "search": "搜索",
+        "filters": {
+            "city": "城市",
+            "country": "国家",
+            "maxRate": "最高时薪（美元/小时）",
+            "more": "更多筛选",
+            "hide": "隐藏筛选"
+        },
+        "tab": "律师",
+        "loading": "加载律师中...",
+        "empty": {
+            "title": "暂无律师",
+            "subtitle": "邀请律师以开始使用 Zelf Legacy",
+            "invite": "邀请律师"
+        },
+        "table": {
+            "lawyer": "律师",
+            "specialization": "专业领域",
+            "location": "位置",
+            "status": "状态",
+            "actions": "操作"
+        },
+        "actions": {
+            "view": "查看",
+            "remove": "移除"
+        },
+        "pending": {
+            "title": "待处理邀请",
+            "loading": "加载邀请中...",
+            "empty": {
+                "title": "无待处理邀请",
+                "subtitle": "所有邀请已接受或尚未发送"
+            },
+            "invitedLawyer": "已邀请律师",
+            "invited": "邀请日期",
+            "status": "待处理",
+            "resend": "重新发送邀请",
+            "count": "{{count}} 个待处理邀请",
+            "count_plural": "{{count}} 个待处理邀请"
+        },
+        "detail": {
+            "title": "律师档案",
+            "reputation": "链上声誉",
+            "rating": "评分",
+            "reviews": "评价",
+            "verified": "已验证"
+        },
+        "invite": {
+            "title": "邀请律师",
+            "description": "律师将收到一封包含完成注册链接的电子邮件",
+            "emailLabel": "电子邮箱",
+            "fullNameLabel": "全名"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "以律师身份加入",
+        "invitedToJoin": "您已被邀请加入",
+        "asLawyer": "作为律师加入",
+        "domain": "域名",
+        "lawyer": "律师",
+        "verifying": "验证邀请中...",
+        "verifyingAccount": "验证账户中",
+        "faceVerification": "人脸验证",
+        "secure": "安全",
+        "createMasterPassword": "创建主密码",
+        "verifyIdentityJoin": "验证身份并加入",
+        "protectedByBiometrics": "受生物识别验证保护"
+    },
+    "biometricVerification": {
+        "title": "验证身份",
+        "verifyingAs": "正在验证",
+        "newAccount": "新账户",
+        "account": "账户",
+        "verificationFailed": "验证失败",
+        "tryAgain": "重试",
+        "cancel": "取消",
+        "processingData": "正在处理您的生物识别数据...",
+        "initializingCamera": "正在初始化安全摄像头...",
+        "positionFace": "请将面部置于中央",
+        "lookAtCamera": "请直视摄像头并保持静止",
+        "verifyInstruction": "请看向摄像头以验证您的身份并完成账户注册",
+        "cameraNotAvailable": "摄像头不可用",
+        "cameraAccessible": "请确保您的摄像头已启用并可用于生物识别验证",
+        "permissionRequired": "需要摄像头权限",
+        "allowAccess": "请允许摄像头访问以继续生物识别验证",
+        "noFaceDetected": "未检测到人脸",
+        "noFaceDetectedSubtitle": "请看向摄像头",
+        "noFaceDetectedMessage": "未检测到人脸。请直视摄像头。",
+        "multipleFacesDetected": "检测到多张人脸。请确保画面中只有一人。",
+        "faceNotRecognized": "人脸未识别。请重试或联系支持。",
+        "livenessCheckFailed": "活体检测失败。请按照屏幕指示转动头部后重试。",
+        "biometricVerificationFailed": "生物识别验证失败。请重试。",
+        "centerFace": "将面部置于中央",
+        "centerFaceSubtitle": "将面部置于椭圆中央",
+        "getCloser": "靠近一些",
+        "getCloserSubtitle": "请将面部靠近摄像头",
+        "livenessCheckFailedReason": "活体检测失败。请按照指示重试。"
     }
 }

@@ -140,7 +140,9 @@
             "description": "Por favor ingresa tu contraseña maestra para proceder con la actualización de tu configuración de temas",
             "action": "actualizando",
             "itemName": "configuración de temas"
-        }
+        },
+        "phone": "Teléfono",
+        "countryCode": "Código de país"
     },
     "save_confirmation": {
         "master_password": "Contraseña Maestra",
@@ -150,7 +152,8 @@
         "processing": "Procesando...",
         "continue": "Continuar",
         "biometric_verification": "Verificación Biométrica",
-        "biometrics_disabled_debugging": "Biometría temporalmente deshabilitada para depuración."
+        "biometrics_disabled_debugging": "Biometría temporalmente deshabilitada para depuración.",
+        "secure": "SEGURO"
     },
     "license": {
         "title": "Configuración de Dominio",
@@ -436,7 +439,11 @@
             "phone": "Teléfono",
             "phone_placeholder": "Ingresa tu número de teléfono",
             "phone_required": "El número de teléfono es requerido",
-            "phone_invalid": "Por favor ingresa un número de teléfono válido"
+            "phone_invalid": "Por favor ingresa un número de teléfono válido",
+            "fullName": "Nombre Completo",
+            "yourName": "Tu nombre",
+            "phoneCode": "Código",
+            "phonePlaceholder": "Número de teléfono"
         },
         "account": {
             "title": "Información de la Cuenta",
@@ -475,8 +482,36 @@
             "role_read": "Visor",
             "permission_read": "Puede ver",
             "permission_write": "Puede editar",
-            "permission_admin": "Acceso completo"
-        }
+            "permission_admin": "Acceso completo",
+            "license": "Licencia"
+        },
+        "lawyer": {
+            "title": "Perfil de Abogado",
+            "subtitle": "Gestiona tu perfil profesional y credenciales",
+            "badge": "ABOGADO",
+            "label": "Abogado",
+            "professionalDetails": "Detalles Profesionales",
+            "zelfName": "Nombre Zelf",
+            "licenseNumber": "Número de Licencia",
+            "professionalId": "ID Profesional",
+            "hourlyRate": "Tarifa por Hora (USD)",
+            "city": "Ciudad",
+            "country": "País",
+            "specializations": "Especializaciones",
+            "bio": "Biografía",
+            "contactEmail": "Email de Contacto",
+            "placeholder_zelfName": "carlos.zelf",
+            "placeholder_license": "NY-123456",
+            "placeholder_professionalId": "PRO-789",
+            "placeholder_hourlyRate": "250",
+            "placeholder_city": "Nueva York",
+            "placeholder_country": "Estados Unidos",
+            "placeholder_bio": "Cuéntale a los clientes sobre tu experiencia y expertise...",
+            "placeholder_contactEmail": "abogado@bufete.com",
+            "placeholder_specialization": "ej. Derecho Corporativo"
+        },
+        "subtitle": "Gestiona la configuración y preferencias de tu cuenta",
+        "loadingShort": "Cargando..."
     },
     "theme_settings": {
         "title": "Configuración de Temas",
@@ -682,5 +717,109 @@
         "biometricsProtected": "Protegido por Zelf Biometrics",
         "verifyingInvitation": "Verificando invitación...",
         "faceVerification": "Verificación Facial"
+    },
+    "lawyers": {
+        "zelfLegacy": "Zelf Legacy",
+        "title": "Abogados",
+        "subtitle": "Busca, gestiona e invita abogados a tu dominio",
+        "inviteLawyer": "Invitar Abogado",
+        "searchPlaceholder": "Buscar abogados por nombre, especialización, zelfName...",
+        "search": "Buscar",
+        "filters": {
+            "city": "Ciudad",
+            "country": "País",
+            "maxRate": "Tarifa Máx (USD/h)",
+            "more": "Más filtros",
+            "hide": "Ocultar filtros"
+        },
+        "tab": "Abogados",
+        "loading": "Cargando abogados...",
+        "empty": {
+            "title": "Aún no hay abogados",
+            "subtitle": "Invita abogados para comenzar con Zelf Legacy",
+            "invite": "Invitar un abogado"
+        },
+        "table": {
+            "lawyer": "Abogado",
+            "specialization": "Especialización",
+            "location": "Ubicación",
+            "status": "Estado",
+            "actions": "Acciones"
+        },
+        "actions": {
+            "view": "Ver",
+            "remove": "Eliminar"
+        },
+        "pending": {
+            "title": "Invitaciones Pendientes",
+            "loading": "Cargando invitaciones...",
+            "empty": {
+                "title": "No hay invitaciones pendientes",
+                "subtitle": "Todas las invitaciones han sido aceptadas o no se han enviado aún"
+            },
+            "invitedLawyer": "Abogado Invitado",
+            "invited": "Invitado",
+            "status": "Pendiente",
+            "resend": "Reenviar invitación",
+            "count": "{{count}} invitación pendiente",
+            "count_plural": "{{count}} invitaciones pendientes"
+        },
+        "detail": {
+            "title": "Perfil de Abogado",
+            "reputation": "Reputación On-Chain",
+            "rating": "Valoración",
+            "reviews": "Reseñas",
+            "verified": "Verificado"
+        },
+        "invite": {
+            "title": "Invitar Abogado",
+            "description": "El abogado recibirá un correo con un enlace para completar el registro",
+            "emailLabel": "Correo electrónico",
+            "fullNameLabel": "Nombre completo"
+        }
+    },
+    "acceptLawyerInvite": {
+        "title": "Unirse como Abogado",
+        "invitedToJoin": "Has sido invitado a unirte a",
+        "asLawyer": "como abogado en el dominio",
+        "domain": "",
+        "lawyer": "Abogado",
+        "verifying": "Verificando invitación...",
+        "verifyingAccount": "Verificando Cuenta",
+        "faceVerification": "Verificación Facial",
+        "secure": "SEGURO",
+        "createMasterPassword": "Crear Contraseña Maestra",
+        "verifyIdentityJoin": "Verificar Identidad y Unirse",
+        "protectedByBiometrics": "Protegido por verificación biométrica"
+    },
+    "biometricVerification": {
+        "title": "Verificar identidad",
+        "verifyingAs": "Verificando como",
+        "newAccount": "Nueva cuenta",
+        "account": "Cuenta",
+        "verificationFailed": "Verificación fallida",
+        "tryAgain": "Intentar de nuevo",
+        "cancel": "Cancelar",
+        "processingData": "Procesando tus datos biométricos...",
+        "initializingCamera": "Iniciando cámara segura...",
+        "positionFace": "Coloca tu rostro en el centro",
+        "lookAtCamera": "Mira directamente a la cámara y permanece quieto",
+        "verifyInstruction": "Por favor mira a la cámara para verificar tu identidad y completar el registro de tu cuenta",
+        "cameraNotAvailable": "Cámara no disponible",
+        "cameraAccessible": "Asegúrate de que tu cámara esté habilitada y accesible para la verificación biométrica",
+        "permissionRequired": "Permiso de cámara requerido",
+        "allowAccess": "Permite el acceso a la cámara para continuar con la verificación biométrica",
+        "noFaceDetected": "No se detectó rostro",
+        "noFaceDetectedSubtitle": "Por favor mira a la cámara",
+        "noFaceDetectedMessage": "No se detectó rostro. Por favor mira directamente a la cámara.",
+        "multipleFacesDetected": "Se detectaron varias caras en la imagen. Asegúrate de que solo una persona sea visible en el encuadre.",
+        "faceNotRecognized": "Rostro no reconocido. Intenta de nuevo o contacta soporte.",
+        "livenessCheckFailed": "Verificación de vida fallida. Sigue las instrucciones de movimiento de cabeza en pantalla e intenta de nuevo.",
+        "biometricVerificationFailed": "Verificación biométrica fallida. Intenta de nuevo.",
+        "centerFace": "Centra tu rostro",
+        "centerFaceSubtitle": "Centra tu rostro en el óvalo",
+        "getCloser": "Acércate más",
+        "getCloserSubtitle": "Acerca tu rostro a la cámara",
+        "livenessCheckFailedReason": "Verificación de vida fallida. Sigue las instrucciones e intenta de nuevo."
     }
 }
