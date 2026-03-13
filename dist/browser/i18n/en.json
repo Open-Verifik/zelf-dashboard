@@ -248,7 +248,7 @@
             "logo": "Logo",
             "upload_logo": "Upload Logo",
             "remove_logo": "Remove",
-            "logo_hint": "PNG, JPEG or WebP. Recommended: 128×128 or 256×256px"
+            "logo_hint": "PNG, JPEG, WebP or SVG. Recommended: 128×128 or 256×256px"
         },
         "features": {
             "title": "Features",
