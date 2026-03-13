@@ -773,6 +773,41 @@
         "verifyIdentityJoin": "Vérifier l'Identité et Rejoindre",
         "protectedByBiometrics": "Protégé par vérification biométrique"
     },
+    "zelfkeys": {
+        "title": "ZelfKeys",
+        "subtitle": "Gérez vos mots de passe, notes, ZOTP et cartes bancaires",
+        "viewingFor": "Affichage des clés pour",
+        "loading": "Chargement des ZelfKeys...",
+        "empty": "Aucune ZelfKey trouvée. Ajoutez des éléments depuis l'extension pour commencer.",
+        "filters": {
+            "category": "Catégorie",
+            "all": "Tous",
+            "password": "Mot de passe",
+            "notes": "Notes",
+            "zotp": "ZOTP",
+            "credit_card": "Carte bancaire",
+            "contact": "Contact"
+        },
+        "table": {
+            "type": "Type",
+            "name": "Nom",
+            "created": "Créé",
+            "actions": "Actions"
+        },
+        "actions": {
+            "viewDetails": "Voir les détails",
+            "refresh": "Actualiser",
+            "retry": "Réessayer"
+        },
+        "error": {
+            "title": "Échec du chargement des ZelfKeys"
+        },
+        "noIdentifier": {
+            "title": "Configurez votre licence pour voir les ZelfKeys",
+            "message": "Les ZelfKeys sont affichés par utilisateur (identifiant). Configurez votre licence dans Paramètres ou ajoutez ?identifier=utilisateur.domaine à l'URL.",
+            "hint": "Exemple : /zelfkeys?identifier=miguel.zelf"
+        }
+    },
     "biometricVerification": {
         "title": "Vérifier l'identité",
         "verifyingAs": "Vérification en tant que",

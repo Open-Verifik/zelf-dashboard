@@ -783,6 +783,41 @@
         "verifyIdentityJoin": "验证身份并加入",
         "protectedByBiometrics": "受生物识别验证保护"
     },
+    "zelfkeys": {
+        "title": "ZelfKeys",
+        "subtitle": "管理您的密码、笔记、ZOTP 和信用卡",
+        "viewingFor": "查看密钥",
+        "loading": "正在加载 ZelfKeys...",
+        "empty": "未找到 ZelfKeys。请从扩展程序添加项目以开始使用。",
+        "filters": {
+            "category": "类别",
+            "all": "全部",
+            "password": "密码",
+            "notes": "笔记",
+            "zotp": "ZOTP",
+            "credit_card": "信用卡",
+            "contact": "联系人"
+        },
+        "table": {
+            "type": "类型",
+            "name": "名称",
+            "created": "创建时间",
+            "actions": "操作"
+        },
+        "actions": {
+            "viewDetails": "查看详情",
+            "refresh": "刷新",
+            "retry": "重试"
+        },
+        "error": {
+            "title": "加载 ZelfKeys 失败"
+        },
+        "noIdentifier": {
+            "title": "配置许可证以查看 ZelfKeys",
+            "message": "ZelfKeys 按用户（标识符）显示。请在设置中配置许可证，或在 URL 中添加 ?identifier=用户.域名。",
+            "hint": "示例：/zelfkeys?identifier=miguel.zelf"
+        }
+    },
     "biometricVerification": {
         "title": "验证身份",
         "verifyingAs": "正在验证",

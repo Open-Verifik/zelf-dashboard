@@ -106,14 +106,23 @@ export const appRoutes: Route[] = [
 		],
 	},
 
-	// Public ZelfKeys routes (no authentication required)
+	// ZelfKeys routes: list requires auth, success/cancel are public (Stripe redirects)
 	{
 		path: "zelfkeys",
 		component: LayoutComponent,
 		data: {
-			layout: "empty",
+			layout: "centered",
+		},
+		resolve: {
+			initialData: initialDataResolver,
 		},
 		children: [
+			{
+				path: "",
+				canActivate: [AuthGuard],
+				canActivateChild: [NotLawyerGuard],
+				loadChildren: () => import("app/modules/zelfkeys/zelfkeys.routes"),
+			},
 			{
 				path: "success",
 				loadComponent: () => import("app/modules/zelfkeys/success/success.component").then((m) => m.ZelfKeysSuccessComponent),
@@ -138,7 +147,6 @@ export const appRoutes: Route[] = [
 			{ path: "analytics", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/dashboards/analytics/analytics.routes") },
 			{ path: "portfolio", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/dashboards/portfolio/portfolio.routes") },
 			{ path: "tags", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/tags/tags.routes") },
-			{ path: "zelfkeys", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/zelfkeys/zelfkeys.routes") },
 			{ path: "profile", loadChildren: () => import("app/modules/pages/profile/profile.routes") },
 			{ path: "play-area", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/play-area/play-area.routes") },
 			{ path: "settings", canActivate: [NotLawyerGuard], loadChildren: () => import("app/modules/pages/settings/settings.routes") },

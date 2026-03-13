@@ -1,1 +1,53 @@
-// ZelfKeys component styles
+// ZelfKeys Component - Matches tags component design patterns
+// Most styling is done with Tailwind classes in the HTML template
+
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// Custom select styling for dropdowns
+select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0 center;
+	padding-right: 20px;
+
+	option {
+		background: white;
+		color: #1f2937;
+	}
+}
+
+.dark select option {
+	background: #1e293b;
+	color: #f1f5f9;
+}
+
+// Material icon size adjustments
+mat-icon {
+	&.text-3xl {
+		font-size: 28px;
+		width: 28px;
+		height: 28px;
+	}
+
+	&.text-lg {
+		font-size: 20px;
+	}
+
+	&.text-sm {
+		font-size: 14px;
+	}
+}

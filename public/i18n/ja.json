@@ -783,6 +783,41 @@
         "verifyIdentityJoin": "本人確認して参加",
         "protectedByBiometrics": "生体認証で保護"
     },
+    "zelfkeys": {
+        "title": "ZelfKeys",
+        "subtitle": "パスワード、メモ、ZOTP、クレジットカードを管理",
+        "viewingFor": "表示中のキー",
+        "loading": "ZelfKeysを読み込み中...",
+        "empty": "ZelfKeysが見つかりません。拡張機能から項目を追加して開始してください。",
+        "filters": {
+            "category": "カテゴリ",
+            "all": "すべて",
+            "password": "パスワード",
+            "notes": "メモ",
+            "zotp": "ZOTP",
+            "credit_card": "クレジットカード",
+            "contact": "連絡先"
+        },
+        "table": {
+            "type": "タイプ",
+            "name": "名前",
+            "created": "作成日",
+            "actions": "操作"
+        },
+        "actions": {
+            "viewDetails": "詳細を見る",
+            "refresh": "更新",
+            "retry": "再試行"
+        },
+        "error": {
+            "title": "ZelfKeysの読み込みに失敗しました"
+        },
+        "noIdentifier": {
+            "title": "ZelfKeysを表示するにはライセンスを設定してください",
+            "message": "ZelfKeysはユーザー（識別子）ごとに表示されます。設定でライセンスを設定するか、URLに?identifier=ユーザー.ドメインを追加してください。",
+            "hint": "例：/zelfkeys?identifier=miguel.zelf"
+        }
+    },
     "biometricVerification": {
         "title": "本人確認",
         "verifyingAs": "確認中",

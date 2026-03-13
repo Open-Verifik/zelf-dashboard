@@ -816,6 +816,41 @@
             "qrCode": "QR Code"
         }
     },
+    "zelfkeys": {
+        "title": "ZelfKeys",
+        "subtitle": "Manage your passwords, notes, ZOTP, and credit cards",
+        "viewingFor": "Viewing keys for",
+        "loading": "Loading ZelfKeys...",
+        "empty": "No ZelfKeys found. Add items from the extension to get started.",
+        "filters": {
+            "category": "Category",
+            "all": "All",
+            "password": "Password",
+            "notes": "Notes",
+            "zotp": "ZOTP",
+            "credit_card": "Credit Card",
+            "contact": "Contact"
+        },
+        "table": {
+            "type": "Type",
+            "name": "Name",
+            "created": "Created",
+            "actions": "Actions"
+        },
+        "actions": {
+            "viewDetails": "View Details",
+            "refresh": "Refresh",
+            "retry": "Try Again"
+        },
+        "error": {
+            "title": "Failed to load ZelfKeys"
+        },
+        "noIdentifier": {
+            "title": "Configure your license to view ZelfKeys",
+            "message": "ZelfKeys are shown per user (identifier). Configure your license in Settings to derive the identifier, or add ?identifier=user.domain to the URL.",
+            "hint": "Example: /zelfkeys?identifier=miguel.zelf"
+        }
+    },
     "biometricVerification": {
         "title": "Verify Identity",
         "verifyingAs": "Verifying as",
