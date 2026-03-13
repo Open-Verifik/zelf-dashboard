@@ -313,6 +313,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 domainConfig: this.saveData.domainConfig,
                 faceBase64: biometricData.faceBase64,
                 masterPassword: biometricData.password || this.masterPassword,
+                ...(this.saveData.logoBase64 ? { logoBase64: this.saveData.logoBase64 } : {}),
             };
 
             await this.createLicense(licenseData);
@@ -339,6 +340,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 domainConfig: this.saveData.domainConfig,
                 faceBase64: biometricData.faceBase64,
                 masterPassword: biometricData.password || this.masterPassword,
+                ...(this.saveData.logoBase64 ? { logoBase64: this.saveData.logoBase64 } : {}),
             };
 
             await this.createLicense(updateData);

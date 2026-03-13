@@ -5,6 +5,7 @@ import { DomainConfig } from "../../modules/pages/settings/license/license.class
 export interface SaveConfirmationData {
     domain: string | null;
     domainConfig: DomainConfig | null;
+    logoBase64?: string;
     redirectUrl: string;
     operation: {
         title: string;

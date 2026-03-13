@@ -117,6 +117,7 @@ export interface DomainConfig {
 		community?: string;
 		enterprise?: string;
 		support: string;
+		logo?: string;
 	};
 	themeSettings?: ThemeSettings;
 }
@@ -364,6 +365,7 @@ export class License {
 				community: configData?.metadata?.community,
 				enterprise: configData?.metadata?.enterprise,
 				support: configData?.metadata?.support || "standard",
+				logo: configData?.metadata?.logo,
 			},
 			themeSettings: configData?.themeSettings || License.getDefaultThemeSettings(),
 		};

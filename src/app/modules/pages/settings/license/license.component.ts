@@ -41,6 +41,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	alertType: "success" | "error" = "success";
 	currentLicense: License | null = null;
 	isLoading: boolean = false;
+	logoBase64: string | null = null;
+	logoPreviewUrl: string | null = null;
 	pricingTableRows: PricingRow[] = [];
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
 	showAlert: boolean = false;
@@ -248,6 +250,40 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			this.accountForm.removeControl(`whitelistDiscount_${index}`);
 			this.accountForm.removeControl(`whitelistType_${index}`);
 		});
+	}
+
+	/**
+	 * Handle logo file selection
+	 */
+	onLogoFileSelected(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const file = input?.files?.[0];
+		if (!file) return;
+
+		const validTypes = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+		if (!validTypes.includes(file.type)) {
+			this.showError("Please select a PNG, JPEG, WebP, or SVG image");
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			const dataUrl = reader.result as string;
+			this.logoBase64 = dataUrl;
+			this.logoPreviewUrl = dataUrl;
+			this._cdr.detectChanges();
+		};
+		reader.readAsDataURL(file);
+		input.value = "";
+	}
+
+	/**
+	 * Clear logo
+	 */
+	clearLogo(): void {
+		this.logoBase64 = null;
+		this.logoPreviewUrl = null;
+		this._cdr.detectChanges();
 	}
 
 	/**
@@ -463,6 +499,11 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (currentConfig.metadata.enterprise !== formValue.enterprise) return true;
 		if (currentConfig.metadata.support !== formValue.support) return true;
 
+		// Check logo: new upload, cleared, or unchanged
+		const currentLogo = currentConfig.metadata?.logo || null;
+		const newLogo = this.logoBase64 ? "(new)" : this.logoPreviewUrl && this.logoPreviewUrl.startsWith("http") ? this.logoPreviewUrl : null;
+		if (currentLogo !== newLogo) return true;
+
 		return false; // No changes detected
 	}
 
@@ -566,16 +607,16 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	}
 
 	private getMetadataChanges(currentConfig: DomainConfig, formValue: any, changes: string[]): void {
-		if (currentConfig.metadata.launchDate !== formValue.launchDate)
-			changes.push(`Launch Date: ${currentConfig.metadata.launchDate} → ${formValue.launchDate}`);
-		if (currentConfig.metadata.version !== formValue.version) changes.push(`Version: ${currentConfig.metadata.version} → ${formValue.version}`);
-		if (currentConfig.metadata.documentation !== formValue.documentation)
-			changes.push(`Documentation: ${currentConfig.metadata.documentation} → ${formValue.documentation}`);
-		if (currentConfig.metadata.community !== formValue.community)
-			changes.push(`Community: ${currentConfig.metadata.community} → ${formValue.community}`);
-		if (currentConfig.metadata.enterprise !== formValue.enterprise)
-			changes.push(`Enterprise: ${currentConfig.metadata.enterprise} → ${formValue.enterprise}`);
-		if (currentConfig.metadata.support !== formValue.support) changes.push(`Support: ${currentConfig.metadata.support} → ${formValue.support}`);
+		const meta = currentConfig.metadata;
+		if (meta?.launchDate !== formValue.launchDate) changes.push(`Launch Date: ${meta?.launchDate} → ${formValue.launchDate}`);
+		if (meta?.version !== formValue.version) changes.push(`Version: ${meta?.version} → ${formValue.version}`);
+		if (meta?.documentation !== formValue.documentation) changes.push(`Documentation: ${meta?.documentation} → ${formValue.documentation}`);
+		if (meta?.community !== formValue.community) changes.push(`Community: ${meta?.community} → ${formValue.community}`);
+		if (meta?.enterprise !== formValue.enterprise) changes.push(`Enterprise: ${meta?.enterprise} → ${formValue.enterprise}`);
+		if (meta?.support !== formValue.support) changes.push(`Support: ${meta?.support} → ${formValue.support}`);
+		const currentLogo = currentConfig.metadata?.logo || null;
+		const newLogo = this.logoBase64 ? "(new upload)" : this.logoPreviewUrl && this.logoPreviewUrl.startsWith("http") ? this.logoPreviewUrl : null;
+		if (currentLogo !== newLogo) changes.push(`Logo: ${currentLogo ? "present" : "none"} → ${newLogo ? "updated" : "removed"}`);
 	}
 
 	/**
@@ -713,6 +754,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				community: formValue.community || undefined,
 				enterprise: formValue.enterprise || undefined,
 				support: formValue.support,
+				// Include existing logo URL when not uploading new (backend adds from logoBase64 when provided)
+				...(this.logoPreviewUrl?.startsWith("http") && !this.logoBase64 ? { logo: this.logoPreviewUrl } : {}),
 			},
 		};
 	}
@@ -895,6 +938,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		this.accountForm.get("community")?.setValue(config.metadata?.community || "");
 		this.accountForm.get("enterprise")?.setValue(config.metadata?.enterprise || "");
 		this.accountForm.get("support")?.setValue(config.metadata?.support || "standard");
+		this.logoPreviewUrl = config.metadata?.logo && config.metadata.logo.startsWith("http") ? config.metadata.logo : null;
+		this.logoBase64 = null;
 	}
 
 	/**
@@ -929,10 +974,11 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		// Build domain configuration
 		const domainConfig = this.buildDomainConfig();
 
-		// Set save data in service - pass domain and domainConfig
+		// Set save data in service - pass domain, domainConfig, and optional logoBase64
 		this._saveConfirmationService.setSaveData({
 			domain: domainConfig.name,
 			domainConfig,
+			logoBase64: this.logoBase64 || undefined,
 			redirectUrl: "/settings/license",
 			operation: {
 				title: this._translocoService.translate("saving_operations.license_configuration.title"),
