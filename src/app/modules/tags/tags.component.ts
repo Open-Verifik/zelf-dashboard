@@ -247,6 +247,45 @@ export class TagsComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * IPFS rows include `name` and `created_at`; Arweave (and similar) use `publicData.zelfName`
+	 * and `publicData.registeredAt` without a top-level `name`.
+	 */
+	private normalizeDomainSearchRow(raw: any): TagRecord {
+		const pd = raw?.publicData ?? {};
+		const name =
+			(typeof raw?.name === "string" && raw.name) ||
+			(typeof pd?.zelfName === "string" && pd.zelfName) ||
+			(typeof pd?.avaxName === "string" && pd.avaxName) ||
+			"";
+
+		const sizeRaw = raw?.size ?? pd?.size;
+		const sizeNum = typeof sizeRaw === "number" && !Number.isNaN(sizeRaw) ? sizeRaw : parseInt(String(sizeRaw ?? "0"), 10) || 0;
+
+		const createdRaw = raw?.created_at ?? pd?.registeredAt ?? pd?.renewedAt ?? "";
+		const created_at = typeof createdRaw === "string" ? createdRaw : String(createdRaw ?? "");
+
+		return {
+			id: String(raw?.id ?? raw?.cid ?? ""),
+			name,
+			cid: String(raw?.cid ?? raw?.id ?? ""),
+			size: sizeNum,
+			number_of_files: raw?.number_of_files ?? 1,
+			mime_type: raw?.mime_type ?? pd?.["Content-Type"] ?? "",
+			group_id: raw?.group_id ?? null,
+			created_at,
+			url: String(raw?.url ?? ""),
+			publicData: {
+				avaxName: pd?.avaxName ?? "",
+				btcAddress: pd?.btcAddress ?? "",
+				domain: pd?.domain ?? "",
+				ethAddress: pd?.ethAddress ?? "",
+				extraParams: pd?.extraParams ?? "",
+				solanaAddress: pd?.solanaAddress ?? "",
+			},
+		};
+	}
+
 	formatFileSize(bytes: number): string {
 		if (bytes === 0) return "0 Bytes";
 		const k = 1024;
@@ -266,7 +305,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 	}
 
 	canDelete(record: TagRecord): boolean {
-		return record.name.includes(".hold");
+		return (record.name || "").includes(".hold");
 	}
 
 
@@ -274,9 +313,10 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 
 	viewTagDetails(record: TagRecord): void {
-		const tagId = record.name.includes(".")
-			? record.name
-			: record.name + "." + (record.publicData?.domain || this.licenseDomain || "");
+		const label = record.name || "";
+		const tagId = label.includes(".")
+			? label
+			: label + "." + (record.publicData?.domain || this.licenseDomain || "");
 		this._router.navigate(["/tags", tagId]);
 	}
 
@@ -481,7 +521,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 			.then((response) => {
 				if (response.data && Array.isArray(response.data)) {
 					this.lastNamePatternFetchKey = key;
-					this.lastNamePatternRows = response.data;
+					this.lastNamePatternRows = response.data.map((row) => this.normalizeDomainSearchRow(row));
 					this.showPurchaseMessage = false;
 					this.purchaseData = null;
 					this.applyNamePatternPaging();
@@ -578,7 +618,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 			.searchByDomain(domainParams)
 			.then((response) => {
 				if (response.data && Array.isArray(response.data)) {
-					this.dataSource = response.data;
+					this.dataSource = response.data.map((row) => this.normalizeDomainSearchRow(row));
 
 					// Update pagination info if provided
 					if (response.total !== undefined) {

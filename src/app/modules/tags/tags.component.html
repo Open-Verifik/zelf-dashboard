@@ -212,8 +212,8 @@
 								<div class="flex items-center gap-3">
 									<span
 										class="w-2 h-2 rounded-full flex-shrink-0"
-										[class.bg-green-500]="record.name.includes('.hold')"
-										[class.bg-red-500]="!record.name.includes('.hold')"
+										[class.bg-green-500]="record.name?.includes('.hold')"
+										[class.bg-red-500]="!record.name?.includes('.hold')"
 									>
 									</span>
 									<span class="font-semibold text-gray-900 dark:text-white">{{ record.name }}</span>
