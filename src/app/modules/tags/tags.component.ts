@@ -100,6 +100,10 @@ export class TagsComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();
 	isSearching: boolean = false;
 
+	/** Client-side paging for IPFS name-pattern search (single fetch up to limit) */
+	private lastNamePatternFetchKey: string | null = null;
+	private lastNamePatternRows: TagRecord[] = [];
+
 	// Purchase message properties
 	showPurchaseMessage: boolean = false;
 	purchaseData: PurchaseData | null = null;
@@ -389,6 +393,13 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 	onStorageChange(): void {
 		this.currentPage = 1; // Reset to first page when storage changes
+		this.clearNamePatternCache();
+		this.performSearch();
+	}
+
+	onSearchTypeChange(): void {
+		this.currentPage = 1;
+		this.clearNamePatternCache();
 		this.performSearch();
 	}
 
@@ -401,13 +412,94 @@ export class TagsComponent implements OnInit, OnDestroy {
 		// Clear loading state
 		this.isSearching = false;
 
-		// If we have a search query, use the search endpoint
-		if (this.searchQuery.trim()) {
+		const q = this.searchQuery.trim();
+
+		if (q && this.shouldSearchByNamePattern()) {
+			this.searchByDomainNamePattern();
+			return;
+		}
+
+		this.clearNamePatternCache();
+
+		if (q) {
 			this.searchByTagName();
 		} else {
-			// Otherwise, use the domain search endpoint
 			this.searchByDomain();
 		}
+	}
+
+	/** IPFS list by pin name (e.g. `.zelfpay`); exact tag lookup stays on /tags/search */
+	private shouldSearchByNamePattern(): boolean {
+		if (this.selectedStorage !== "IPFS") {
+			return false;
+		}
+		const query = this.searchQuery.trim();
+		return this.searchType === "name" || query.startsWith(".");
+	}
+
+	private clearNamePatternCache(): void {
+		this.lastNamePatternFetchKey = null;
+		this.lastNamePatternRows = [];
+	}
+
+	private namePatternFetchKey(): string {
+		return `${this.licenseDomain}|${this.selectedStorage}|${this.searchQuery.trim()}`;
+	}
+
+	private applyNamePatternPaging(): void {
+		const start = (this.currentPage - 1) * this.pageSize;
+		this.dataSource = this.lastNamePatternRows.slice(start, start + this.pageSize);
+		this.totalItems = this.lastNamePatternRows.length;
+		this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize) || 1);
+		this.updateVisiblePages();
+	}
+
+	private searchByDomainNamePattern(): void {
+		if (!this.licenseDomain) {
+			return;
+		}
+
+		const key = this.namePatternFetchKey();
+		if (this.lastNamePatternFetchKey === key) {
+			this.applyNamePatternPaging();
+			return;
+		}
+
+		const namePattern = this.searchQuery.trim();
+		const fetchCap = 1000;
+
+		const domainParams: DomainSearchParams = {
+			domain: this.licenseDomain,
+			storage: this.selectedStorage,
+			limit: fetchCap,
+			offset: 0,
+			name: namePattern,
+		};
+
+		this.tagsService
+			.searchByDomain(domainParams)
+			.then((response) => {
+				if (response.data && Array.isArray(response.data)) {
+					this.lastNamePatternFetchKey = key;
+					this.lastNamePatternRows = response.data;
+					this.showPurchaseMessage = false;
+					this.purchaseData = null;
+					this.applyNamePatternPaging();
+				} else {
+					this.clearNamePatternCache();
+					this.dataSource = [];
+					this.totalItems = 0;
+					this.totalPages = 1;
+					this.updateVisiblePages();
+				}
+			})
+			.catch(() => {
+				this.clearNamePatternCache();
+				this.dataSource = [];
+				this.totalItems = 0;
+				this.totalPages = 1;
+				this.updateVisiblePages();
+			});
 	}
 
 	private searchByTagName(): void {
@@ -542,13 +634,16 @@ export class TagsComponent implements OnInit, OnDestroy {
 		this.currentPage = 1;
 		this.showPurchaseMessage = false;
 		this.purchaseData = null;
+		this.clearNamePatternCache();
 		this.performSearch();
 	}
 
 	removeSearchTypeFilter(): void {
 		this.searchType = "all";
+		this.currentPage = 1;
 		this.showPurchaseMessage = false;
 		this.purchaseData = null;
+		this.clearNamePatternCache();
 		this.performSearch();
 	}
 
@@ -559,6 +654,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 		this.currentPage = 1;
 		this.showPurchaseMessage = false;
 		this.purchaseData = null;
+		this.clearNamePatternCache();
 		this.performSearch();
 	}
 

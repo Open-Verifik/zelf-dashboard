@@ -16,6 +16,8 @@ export interface DomainSearchParams {
     storage: string;
     limit?: number;
     offset?: number;
+    /** Pinata pin name filter (substring / LIKE-style), IPFS only */
+    name?: string;
 }
 
 export interface TagSearchResponse {
@@ -182,7 +184,11 @@ export class TagsService {
      * @returns Promise of domain search response
      */
     searchByDomain(params: DomainSearchParams): Promise<DomainSearchResponse> {
-        const queryParams = this.buildQueryParams(params);
+        const { offset, ...rest } = params;
+        const queryParams = this.buildQueryParams({
+            ...rest,
+            ...(offset !== undefined ? { pageOffset: offset } : {}),
+        });
         return this.httpWrapper.sendRequest("get", `${this.baseUrl}/search-by-domain`, queryParams);
     }
 
