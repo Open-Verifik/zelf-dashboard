@@ -421,6 +421,65 @@
     }
 }
 
+.data-row__value--col {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.data-row__addr-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.data-row__balance-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+
+    .dark-mode & {
+        color: #94a3b8;
+    }
+}
+
+.data-row__balance-line .balance-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.625rem;
+}
+
+.balance-skeleton {
+    display: inline-block;
+    height: 10px;
+    width: 5.5rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0.2));
+    background-size: 200% 100%;
+    animation: balance-shimmer 1.2s ease-in-out infinite;
+
+    .dark-mode & {
+        background: linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(148, 163, 184, 0.22), rgba(148, 163, 184, 0.12));
+        background-size: 200% 100%;
+    }
+}
+
+@keyframes balance-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+.wallet-balances-refresh.mat-mdc-outlined-button {
+    border-radius: 10px;
+}
+
 // ============================================
 // Chain indicators
 // ============================================
@@ -441,6 +500,14 @@
 
 .chain-dot--sol {
     background: linear-gradient(135deg, #9945ff, #14f195);
+}
+
+.chain-dot--avax {
+    background: linear-gradient(135deg, #e84142, #ff6b35);
+}
+
+.chain-dot--bdag {
+    background: linear-gradient(135deg, #0ea5e9, #22c55e);
 }
 
 .chain-pill {

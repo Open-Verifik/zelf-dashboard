@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { FormsModule } from "@angular/forms";
 import { TranslocoModule } from "@jsverse/transloco";
 import { TagsService, TagPreviewResponse } from "./tags.service";
+import { TagsWalletBalancesService, TagWalletBalancesData, WalletBalanceSlot } from "./tags-wallet-balances.service";
 import { SaveConfirmationService } from "../../core/services/save-confirmation.service";
 import { FuseConfigService } from "@fuse/services/config";
 import { TranslocoService } from "@jsverse/transloco";
@@ -87,6 +88,10 @@ export class TagDetailComponent implements OnInit, OnDestroy {
     isLoadingPayment = false;
     showTechnical = false;
 
+    walletBalances: TagWalletBalancesData | null = null;
+    walletBalancesLoading = false;
+    walletBalancesError: string | null = null;
+
     // Reveal state for addresses
     revealedAddresses: Set<string> = new Set();
 
@@ -102,6 +107,7 @@ export class TagDetailComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private tagsService: TagsService,
+        private tagsWalletBalancesService: TagsWalletBalancesService,
         private cdr: ChangeDetectorRef,
         private snackBar: MatSnackBar,
         private _fuseConfigService: FuseConfigService,
@@ -111,6 +117,8 @@ export class TagDetailComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
+        this.mergeWalletBalanceTranslations();
+
         this._fuseConfigService.config$.pipe(takeUntil(this.destroy$)).subscribe((config) => {
             this.isDarkMode = config.scheme === "dark" || (config.scheme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
@@ -166,6 +174,9 @@ export class TagDetailComponent implements OnInit, OnDestroy {
         this.isAvailableForPurchase = false;
         this.previewData = null;
         this.purchasePrice = null;
+        this.walletBalances = null;
+        this.walletBalancesError = null;
+        this.walletBalancesLoading = false;
 
         const domain = this.domain || undefined;
         this.tagsService
@@ -246,6 +257,7 @@ export class TagDetailComponent implements OnInit, OnDestroy {
 
                 // Trigger payment options fetch automatically on load
                 this.extendLicense();
+                this.loadWalletBalances();
             })
             .catch(() => {
                 this.isNotFound = true;
@@ -374,6 +386,76 @@ export class TagDetailComponent implements OnInit, OnDestroy {
             .split(",")
             .map((c) => c.trim())
             .filter(Boolean);
+    }
+
+    hasAnyPublicAddress(): boolean {
+        const p = this.previewData;
+        if (!p) return false;
+        return Boolean(p.ethAddress || p.btcAddress || p.solanaAddress);
+    }
+
+    loadWalletBalances(): void {
+        if (!this.previewData || this.isAvailableForPurchase) return;
+        const eth = this.previewData.ethAddress?.trim();
+        const btc = this.previewData.btcAddress?.trim();
+        const sol = this.previewData.solanaAddress?.trim();
+        if (!eth && !btc && !sol) return;
+
+        this.walletBalancesLoading = true;
+        this.walletBalancesError = null;
+        this.cdr.markForCheck();
+
+        this.tagsWalletBalancesService
+            .getWalletBalances({
+                ...(eth ? { ethAddress: eth } : {}),
+                ...(btc ? { btcAddress: btc } : {}),
+                ...(sol ? { solanaAddress: sol } : {}),
+            })
+            .then((res) => {
+                this.walletBalances = res?.data ?? null;
+            })
+            .catch(() => {
+                this.walletBalances = null;
+                this.walletBalancesError = "tags.detail.walletBalancesError";
+            })
+            .finally(() => {
+                this.walletBalancesLoading = false;
+                this.cdr.markForCheck();
+            });
+    }
+
+    refreshWalletBalances(): void {
+        this.loadWalletBalances();
+    }
+
+    formatWalletBalanceLine(slot: WalletBalanceSlot | undefined): string {
+        if (!slot) return "—";
+        if (slot.error) {
+            return this.translocoService.translate("tags.detail.walletBalanceUnavailable");
+        }
+        if (slot.value === null || slot.value === undefined || slot.value === "") {
+            return "—";
+        }
+        return `${slot.value} ${slot.unit}`;
+    }
+
+    /** Merges tag-detail wallet strings when host `public/i18n/*.json` cannot be patched in this environment. */
+    private mergeWalletBalanceTranslations(): void {
+        const payload = {
+            tags: {
+                detail: {
+                    balance: "Balance",
+                    refreshBalances: "Refresh balances",
+                    sameEvmAddress: "Same address as Ethereum (C-chain / BlockDAG)",
+                    walletBalancesError: "Could not load balances. Try refresh.",
+                    walletBalanceUnavailable: "Unavailable",
+                },
+            },
+        };
+        const active = this.translocoService.getActiveLang();
+        for (const lang of [...new Set(["en", active])]) {
+            this.translocoService.setTranslation(payload, lang, { merge: true });
+        }
     }
 
     async extendLicense(): Promise<void> {

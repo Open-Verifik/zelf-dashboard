@@ -203,7 +203,24 @@
                 <div class="lg:col-span-8 space-y-6">
                     <!-- Public Info -->
                     <div class="crystal-card p-6">
-                        <h3 class="section-title mb-4">{{ "tags.detail.publicInfo" | transloco }}</h3>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <h3 class="section-title mb-0">{{ "tags.detail.publicInfo" | transloco }}</h3>
+                            @if (hasAnyPublicAddress()) {
+                                <button
+                                    type="button"
+                                    mat-stroked-button
+                                    class="wallet-balances-refresh !min-h-8 !px-3 text-xs"
+                                    (click)="refreshWalletBalances()"
+                                    [disabled]="walletBalancesLoading"
+                                >
+                                    <mat-icon class="!w-4 !h-4 !text-base mr-1 inline-block align-middle">refresh</mat-icon>
+                                    <span class="align-middle">{{ "tags.detail.refreshBalances" | transloco }}</span>
+                                </button>
+                            }
+                        </div>
+                        @if (walletBalancesError) {
+                            <p class="text-sm text-amber-600 dark:text-amber-400/90 mb-3">{{ walletBalancesError | transloco }}</p>
+                        }
                         <div class="space-y-0">
                             @if (previewData.ethAddress) {
                                 <div class="data-row">
@@ -211,11 +228,21 @@
                                         <span class="chain-dot chain-dot--eth"></span>
                                         Ethereum
                                     </div>
-                                    <div class="data-row__value">
-                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.ethAddress) }}</span>
-                                        <button (click)="copyToClipboard(previewData.ethAddress!, 'eth'); $event.stopPropagation()" class="copy-btn">
-                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "eth" ? "check" : "content_copy" }}</mat-icon>
-                                        </button>
+                                    <div class="data-row__value data-row__value--col">
+                                        <div class="data-row__addr-line">
+                                            <span class="font-mono text-xs">{{ truncateAddress(previewData.ethAddress) }}</span>
+                                            <button (click)="copyToClipboard(previewData.ethAddress!, 'eth'); $event.stopPropagation()" class="copy-btn">
+                                                <mat-icon class="text-sm w-4 h-4">{{ copiedField === "eth" ? "check" : "content_copy" }}</mat-icon>
+                                            </button>
+                                        </div>
+                                        <div class="data-row__balance-line">
+                                            <span class="balance-label">{{ "tags.detail.balance" | transloco }}:</span>
+                                            @if (walletBalancesLoading) {
+                                                <span class="balance-skeleton" aria-hidden="true"></span>
+                                            } @else {
+                                                <span class="balance-value font-mono text-xs">{{ formatWalletBalanceLine(walletBalances?.eth) }}</span>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -225,11 +252,21 @@
                                         <span class="chain-dot chain-dot--btc"></span>
                                         Bitcoin
                                     </div>
-                                    <div class="data-row__value">
-                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.btcAddress) }}</span>
-                                        <button (click)="copyToClipboard(previewData.btcAddress!, 'btc'); $event.stopPropagation()" class="copy-btn">
-                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "btc" ? "check" : "content_copy" }}</mat-icon>
-                                        </button>
+                                    <div class="data-row__value data-row__value--col">
+                                        <div class="data-row__addr-line">
+                                            <span class="font-mono text-xs">{{ truncateAddress(previewData.btcAddress) }}</span>
+                                            <button (click)="copyToClipboard(previewData.btcAddress!, 'btc'); $event.stopPropagation()" class="copy-btn">
+                                                <mat-icon class="text-sm w-4 h-4">{{ copiedField === "btc" ? "check" : "content_copy" }}</mat-icon>
+                                            </button>
+                                        </div>
+                                        <div class="data-row__balance-line">
+                                            <span class="balance-label">{{ "tags.detail.balance" | transloco }}:</span>
+                                            @if (walletBalancesLoading) {
+                                                <span class="balance-skeleton" aria-hidden="true"></span>
+                                            } @else {
+                                                <span class="balance-value font-mono text-xs">{{ formatWalletBalanceLine(walletBalances?.btc) }}</span>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -239,14 +276,64 @@
                                         <span class="chain-dot chain-dot--sol"></span>
                                         Solana
                                     </div>
-                                    <div class="data-row__value">
-                                        <span class="font-mono text-xs">{{ truncateAddress(previewData.solanaAddress) }}</span>
-                                        <button
-                                            (click)="copyToClipboard(previewData.solanaAddress!, 'sol'); $event.stopPropagation()"
-                                            class="copy-btn"
-                                        >
-                                            <mat-icon class="text-sm w-4 h-4">{{ copiedField === "sol" ? "check" : "content_copy" }}</mat-icon>
-                                        </button>
+                                    <div class="data-row__value data-row__value--col">
+                                        <div class="data-row__addr-line">
+                                            <span class="font-mono text-xs">{{ truncateAddress(previewData.solanaAddress) }}</span>
+                                            <button
+                                                (click)="copyToClipboard(previewData.solanaAddress!, 'sol'); $event.stopPropagation()"
+                                                class="copy-btn"
+                                            >
+                                                <mat-icon class="text-sm w-4 h-4">{{ copiedField === "sol" ? "check" : "content_copy" }}</mat-icon>
+                                            </button>
+                                        </div>
+                                        <div class="data-row__balance-line">
+                                            <span class="balance-label">{{ "tags.detail.balance" | transloco }}:</span>
+                                            @if (walletBalancesLoading) {
+                                                <span class="balance-skeleton" aria-hidden="true"></span>
+                                            } @else {
+                                                <span class="balance-value font-mono text-xs">{{ formatWalletBalanceLine(walletBalances?.sol) }}</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (previewData.ethAddress) {
+                                <div class="data-row">
+                                    <div class="data-row__label">
+                                        <span class="chain-dot chain-dot--avax"></span>
+                                        Avalanche
+                                    </div>
+                                    <div class="data-row__value data-row__value--col">
+                                        <div class="text-xs text-slate-500 dark:text-slate-400 text-right max-w-[min(100%,280px)] ml-auto leading-snug">
+                                            {{ "tags.detail.sameEvmAddress" | transloco }}
+                                        </div>
+                                        <div class="data-row__balance-line">
+                                            <span class="balance-label">{{ "tags.detail.balance" | transloco }}:</span>
+                                            @if (walletBalancesLoading) {
+                                                <span class="balance-skeleton" aria-hidden="true"></span>
+                                            } @else {
+                                                <span class="balance-value font-mono text-xs">{{ formatWalletBalanceLine(walletBalances?.avax) }}</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="data-row">
+                                    <div class="data-row__label">
+                                        <span class="chain-dot chain-dot--bdag"></span>
+                                        BlockDAG
+                                    </div>
+                                    <div class="data-row__value data-row__value--col">
+                                        <div class="text-xs text-slate-500 dark:text-slate-400 text-right max-w-[min(100%,280px)] ml-auto leading-snug">
+                                            {{ "tags.detail.sameEvmAddress" | transloco }}
+                                        </div>
+                                        <div class="data-row__balance-line">
+                                            <span class="balance-label">{{ "tags.detail.balance" | transloco }}:</span>
+                                            @if (walletBalancesLoading) {
+                                                <span class="balance-skeleton" aria-hidden="true"></span>
+                                            } @else {
+                                                <span class="balance-value font-mono text-xs">{{ formatWalletBalanceLine(walletBalances?.bdag) }}</span>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             }
