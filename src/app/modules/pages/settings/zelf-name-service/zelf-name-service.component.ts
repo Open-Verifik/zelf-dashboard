@@ -160,7 +160,6 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			zelfkeysKeyPrefix: ["tagName", Validators.required],
 
 			// Payment Settings
-			coinbaseEnabled: [true],
 			cryptoEnabled: [true],
 			stripeEnabled: [true],
 			networks: this.createNetworksFormGroup(),
@@ -322,12 +321,10 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 	togglePaymentMethod(method: string): void {
 		const currentMethods = this.getPaymentMethods();
 		if (currentMethods.includes(method)) {
-			if (method === "coinbase") this.accountForm.get("coinbaseEnabled")?.setValue(false);
-			else if (method === "crypto") this.accountForm.get("cryptoEnabled")?.setValue(false);
+			if (method === "crypto") this.accountForm.get("cryptoEnabled")?.setValue(false);
 			else if (method === "stripe") this.accountForm.get("stripeEnabled")?.setValue(false);
 		} else {
-			if (method === "coinbase") this.accountForm.get("coinbaseEnabled")?.setValue(true);
-			else if (method === "crypto") this.accountForm.get("cryptoEnabled")?.setValue(true);
+			if (method === "crypto") this.accountForm.get("cryptoEnabled")?.setValue(true);
 			else if (method === "stripe") this.accountForm.get("stripeEnabled")?.setValue(true);
 		}
 	}
@@ -376,7 +373,6 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 
 	getPaymentMethods(): string[] {
 		const methods: string[] = [];
-		if (this.accountForm.get("coinbaseEnabled")?.value) methods.push("coinbase");
 		if (this.accountForm.get("cryptoEnabled")?.value) methods.push("crypto");
 		if (this.accountForm.get("stripeEnabled")?.value) methods.push("stripe");
 		return methods;
@@ -407,9 +403,8 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 
 	private cleanupInvalidData(): void {
 		const paymentMethods = this.getPaymentMethods();
-		const validMethods = paymentMethods.filter((method) => ["coinbase", "crypto", "stripe"].includes(method));
+		const validMethods = paymentMethods.filter((method) => ["crypto", "stripe"].includes(method));
 		if (validMethods.length !== paymentMethods.length) {
-			this.accountForm.get("coinbaseEnabled")?.setValue(validMethods.includes("coinbase"));
 			this.accountForm.get("cryptoEnabled")?.setValue(validMethods.includes("crypto"));
 			this.accountForm.get("stripeEnabled")?.setValue(validMethods.includes("stripe"));
 		}
@@ -418,9 +413,9 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 	private validateDataBeforeSend(): { valid: boolean; errors: string[] } {
 		const errors: string[] = [];
 		const paymentMethods = this.getPaymentMethods();
-		const invalidMethods = paymentMethods.filter((method) => !["coinbase", "crypto", "stripe"].includes(method));
+		const invalidMethods = paymentMethods.filter((method) => !["crypto", "stripe"].includes(method));
 		if (invalidMethods.length > 0) {
-			errors.push(`Invalid payment methods: ${invalidMethods.join(", ")}. Allowed: coinbase, crypto, stripe`);
+			errors.push(`Invalid payment methods: ${invalidMethods.join(", ")}. Allowed: crypto, stripe`);
 		}
 		return { valid: errors.length === 0, errors };
 	}
@@ -548,7 +543,6 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			this.accountForm.get("zelfkeysKeyPrefix")?.setValue(config.zelfkeys?.storage?.keyPrefix || "tagName");
 
 			// Payment
-			this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
 			this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
 			this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
 
