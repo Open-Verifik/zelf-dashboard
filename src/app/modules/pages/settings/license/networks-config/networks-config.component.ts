@@ -50,7 +50,7 @@ export class NetworksConfigComponent implements OnInit {
 			bitcoin: "Bitcoin",
 			blockdag: "BlockDAG",
 			avalanche: "Avalanche",
-			binance: "Binance Smart Chain",
+			bsc: "Binance Smart Chain",
 			polygon: "Polygon",
 			sui: "Sui",
 		};

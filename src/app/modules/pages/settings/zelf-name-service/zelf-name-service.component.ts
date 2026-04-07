@@ -197,7 +197,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			bitcoin: "Bitcoin",
 			blockdag: "BlockDAG",
 			avalanche: "Avalanche",
-			binance: "BSC",
+			bsc: "BSC",
 			polygon: "Polygon",
 			sui: "Sui",
 		};
@@ -211,7 +211,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			bitcoin: { colorClass: "text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-300", initials: "BTC" },
 			blockdag: { colorClass: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300", initials: "BDAG" },
 			avalanche: { colorClass: "text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-300", initials: "AVAX" },
-			binance: { colorClass: "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300", initials: "BSC" },
+			bsc: { colorClass: "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300", initials: "BSC" },
 			polygon: { colorClass: "text-violet-600 bg-violet-100 dark:bg-violet-900/30 dark:text-violet-300", initials: "POL" },
 			sui: { colorClass: "text-cyan-600 bg-cyan-100 dark:bg-cyan-900/30 dark:text-cyan-300", initials: "SUI" },
 		};

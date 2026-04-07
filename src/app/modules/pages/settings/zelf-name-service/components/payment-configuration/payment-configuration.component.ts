@@ -35,7 +35,7 @@ export class PaymentConfigurationComponent {
 		bitcoin: "Bitcoin",
 		blockdag: "BlockDAG",
 		avalanche: "Avalanche",
-		binance: "BSC",
+		bsc: "BSC",
 		polygon: "Polygon",
 		sui: "Sui",
 	};
@@ -46,7 +46,7 @@ export class PaymentConfigurationComponent {
 		bitcoin: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300",
 		blockdag: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300",
 		avalanche: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300",
-		binance: "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300",
+		bsc: "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300",
 		polygon: "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-300",
 		sui: "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-300",
 	};

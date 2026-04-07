@@ -280,15 +280,15 @@ export class License {
 
 		// Helper to get networks configuration
 		const getNetworksConfig = () => {
+			let raw: { [key: string]: any };
 			if (configData?.tags?.payment?.networks) {
-				return configData.tags.payment.networks;
+				raw = { ...configData.tags.payment.networks };
+			} else if (configData?.tags?.payment?.currencies && Array.isArray(configData.tags.payment.currencies)) {
+				raw = this.migrateCurrenciesToNetworks(configData.tags.payment.currencies);
+			} else {
+				raw = this.getDefaultNetworks();
 			}
-			// Migration: Check for old currencies array
-			if (configData?.tags?.payment?.currencies && Array.isArray(configData.tags.payment.currencies)) {
-				return this.migrateCurrenciesToNetworks(configData.tags.payment.currencies);
-			}
-			// Default
-			return this.getDefaultNetworks();
+			return this.normalizePaymentNetworks(raw);
 		};
 
 		return {
@@ -383,6 +383,31 @@ export class License {
 	}
 
 	/**
+	 * Align persisted payment.networks with backend tag-pay gates (`bsc`, Polygon native `POL`).
+	 * Migrates legacy `binance` → `bsc` and `MATIC` → `POL` on load.
+	 */
+	private normalizePaymentNetworks(networks: { [key: string]: any }): { [key: string]: any } {
+		if (!networks || typeof networks !== "object") {
+			return networks;
+		}
+		const out: { [key: string]: any } = { ...networks };
+		if (out["binance"] && !out["bsc"]) {
+			out["bsc"] = out["binance"];
+			delete out["binance"];
+		}
+		if (out["polygon"]?.nativeCurrency?.code === "MATIC") {
+			out["polygon"] = {
+				...out["polygon"],
+				nativeCurrency: {
+					...out["polygon"].nativeCurrency,
+					code: "POL",
+				},
+			};
+		}
+		return out;
+	}
+
+	/**
 	 * Get default networks configuration
 	 */
 	private getDefaultNetworks(): { [key: string]: NetworkConfig } {
@@ -412,14 +437,14 @@ export class License {
 				nativeCurrency: { enabled: true, code: "AVAX" },
 				altCoins: { enabled: true, standard: "ERC-20" },
 			},
-			binance: {
+			bsc: {
 				enabled: true,
 				nativeCurrency: { enabled: true, code: "BNB" },
 				altCoins: { enabled: true, standard: "BEP-20" },
 			},
 			polygon: {
 				enabled: true,
-				nativeCurrency: { enabled: true, code: "MATIC" },
+				nativeCurrency: { enabled: true, code: "POL" },
 				altCoins: { enabled: true, standard: "ERC-20" },
 			},
 			sui: {
@@ -894,14 +919,14 @@ export class License {
 								nativeCurrency: { enabled: true, code: "AVAX" },
 								altCoins: { enabled: true, standard: "ERC-20" },
 							},
-							binance: {
+							bsc: {
 								enabled: true,
 								nativeCurrency: { enabled: true, code: "BNB" },
 								altCoins: { enabled: true, standard: "BEP-20" },
 							},
 							polygon: {
 								enabled: true,
-								nativeCurrency: { enabled: true, code: "MATIC" },
+								nativeCurrency: { enabled: true, code: "POL" },
 								altCoins: { enabled: true, standard: "ERC-20" },
 							},
 							sui: {
