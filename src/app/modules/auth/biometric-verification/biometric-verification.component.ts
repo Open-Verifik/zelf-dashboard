@@ -40,6 +40,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
     private unsubscriber$: Subject<void> = new Subject<void>();
     private _takePicture: Subject<void> = new Subject<void>();
     private _intervals: any = {};
+    private _resizeObserver?: ResizeObserver;
+    private _onWindowResize = () => this._handleResize();
 
     // Camera and face detection properties
     camera = {
@@ -124,12 +126,43 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
             clearInterval(this._intervals.checkNgxVideo);
         }
 
+        this._teardownResizeListener();
+
         // Stop camera stream
         this._stopCamera();
 
         // Complete observables
         this.unsubscriber$.next();
         this.unsubscriber$.complete();
+    }
+
+    private _setupResizeListener(videoElement: HTMLVideoElement): void {
+        this._teardownResizeListener();
+
+        if (typeof ResizeObserver !== "undefined") {
+            this._resizeObserver = new ResizeObserver(() => this._handleResize());
+            this._resizeObserver.observe(videoElement);
+        }
+
+        window.addEventListener("resize", this._onWindowResize, { passive: true });
+        window.addEventListener("orientationchange", this._onWindowResize, { passive: true });
+    }
+
+    private _teardownResizeListener(): void {
+        if (this._resizeObserver) {
+            this._resizeObserver.disconnect();
+            this._resizeObserver = undefined;
+        }
+        window.removeEventListener("resize", this._onWindowResize);
+        window.removeEventListener("orientationchange", this._onWindowResize);
+    }
+
+    private _handleResize(): void {
+        const videoNgx = this.webcamRef?.nativeVideoElement;
+        if (!videoNgx) return;
+        if (!videoNgx.clientWidth || !videoNgx.clientHeight) return;
+        this._setVideoDimensions(videoNgx);
+        this._drawOvalCenterAndMask();
     }
 
     get takePicture$(): Observable<void> {
@@ -436,6 +469,7 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
                 this._setVideoDimensions(videoNgx);
                 this._drawOvalCenterAndMask();
+                this._setupResizeListener(videoNgx);
             },
             { once: true },
         );

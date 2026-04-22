@@ -6,8 +6,8 @@
 			fxLayout="column"
 			fxLayoutAlign="center center"
 		>
-			<!-- Camera View - Much Larger Now -->
-			<div class="camera-view" [style.width.px]="camera.dimensions.video.width" [style.height.px]="camera.dimensions.video.height">
+			<!-- Camera View - responsive, sized by CSS so the mask canvas can mirror clientWidth/clientHeight -->
+			<div class="camera-view">
 				<webcam
 					(imageCapture)="processImage($event)"
 					(initError)="cameraError($event)"
@@ -23,12 +23,7 @@
 					mirrorImage="always"
 				></webcam>
 
-				<canvas
-					[style.height.px]="response.base64Image ? camera.dimensions.result.height : camera.dimensions.video.height"
-					[style.width.px]="response.base64Image ? camera.dimensions.result.width : camera.dimensions.video.width"
-					#maskResult
-					class="face-mask-canvas"
-				></canvas>
+				<canvas #maskResult class="face-mask-canvas"></canvas>
 
 				<canvas #toSend hidden="true"></canvas>
 			</div>
@@ -66,7 +61,7 @@
 		</div>
 
 		<div
-			class="flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 w-full h-[600px]"
+			class="flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 w-full flex-1 min-h-[40vh] max-h-[70vh] py-12"
 			*ngIf="(response.base64Image || camera.isLoading) && !hasApiError"
 			[@fadeIn]="true"
 		>

@@ -1,10 +1,10 @@
 <!-- Biometric Verification Modal Overlay -->
 <div
 	*ngIf="showBiometricVerification && !showPasskeyPrompt"
-	class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+	class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-2 sm:p-4 transition-opacity duration-300"
 >
 	<div
-		class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl transform transition-all scale-100 flex flex-col"
+		class="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl w-full max-w-5xl h-[min(100dvh-1rem,920px)] sm:h-[min(100dvh-2rem,920px)] overflow-hidden shadow-2xl transform transition-all scale-100 flex flex-col"
 	>
 		<!-- Header -->
 		<div class="px-6 py-5 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-800">
@@ -34,7 +34,7 @@
 			</button>
 		</div>
 
-		<div class="p-0 pt-4 pb-8 overflow-y-auto flex-1 flex flex-col justify-center items-center w-full">
+		<div class="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0 flex flex-col justify-center items-center w-full">
 			<!-- Biometric Component -->
 			<app-data-biometrics
 				#biometricVerification

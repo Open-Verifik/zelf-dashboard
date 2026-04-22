@@ -9,19 +9,28 @@
 		min-height: auto;
 		background: transparent;
 		padding: 0;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
 
 		.biometrics-content {
-			min-height: auto;
+			min-height: 0;
 			padding: 0;
+			width: 100%;
+			flex: 1 1 auto;
 
 			.camera-container {
 				max-width: 100%;
 				width: 100%;
+				padding: 0;
 
 				.camera-view {
-					width: 100% !important;
-					max-width: 600px;
-					margin: 0 auto;
+					width: 100%;
+					max-width: 720px;
+					aspect-ratio: 4 / 3;
+					height: auto;
+					margin: 0 auto 20px;
 				}
 			}
 		}
@@ -41,20 +50,36 @@
 
 			.camera-view {
 				position: relative;
+				width: 100%;
+				max-width: 720px;
+				aspect-ratio: 4 / 3;
 				margin: 0 auto 24px;
 				border-radius: 16px;
 				overflow: hidden;
 				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+				background: #000;
 
 				webcam {
 					display: block;
+					width: 100%;
+					height: 100%;
 					border-radius: 16px;
+
+					::ng-deep video {
+						display: block;
+						width: 100% !important;
+						height: 100% !important;
+						object-fit: cover;
+						border-radius: 16px;
+					}
 				}
 
 				.face-mask-canvas {
 					position: absolute;
 					top: 0;
 					left: 0;
+					width: 100%;
+					height: 100%;
 					pointer-events: none;
 					border-radius: 16px;
 				}
@@ -108,6 +133,10 @@
 					color: #666;
 					font-size: 14px;
 					margin: 0;
+
+					:host-context(.dark) & {
+						color: #9ca3af;
+					}
 				}
 			}
 
@@ -382,9 +411,8 @@
 				padding: 0 8px;
 
 				.camera-view {
-					width: 100% !important;
+					width: 100%;
 					max-width: 100%;
-					height: auto !important;
 					margin: 0 auto 16px;
 					border-radius: 12px;
 				}
@@ -505,8 +533,7 @@
 
 					.camera-view {
 						max-width: 100%;
-						width: 100% !important;
-						height: auto !important;
+						width: 100%;
 						margin: 0 auto;
 						border-radius: 8px;
 					}
