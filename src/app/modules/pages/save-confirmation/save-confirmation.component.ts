@@ -791,8 +791,13 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
         }
 
         try {
+            const ext = this.saveData.tagExtensionData;
+            const duration =
+                ext.duration === 0 || ext.duration === "0" ? "lifetime" : ext.duration;
+
             const extensionData = {
-                ...this.saveData.tagExtensionData,
+                ...ext,
+                duration,
                 faceBase64: biometricData.faceBase64,
                 password: biometricData.password || this.masterPassword,
             };

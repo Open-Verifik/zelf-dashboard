@@ -8,272 +8,274 @@ import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-    private _authenticated: boolean = false;
-    private _httpClient = inject(HttpClient);
-    private _userService = inject(UserService);
-    private _httpWrapper = inject(HttpWrapperService);
+	private _authenticated: boolean = false;
+	private _httpClient = inject(HttpClient);
+	private _userService = inject(UserService);
+	private _httpWrapper = inject(HttpWrapperService);
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------------------------------
+	// @ Accessors
+	// -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Setter & getter for access token
-     */
-    set accessToken(token: string) {
-        localStorage.setItem("accessToken", token);
-    }
+	/**
+	 * Setter & getter for access token
+	 */
+	set accessToken(token: string) {
+		localStorage.setItem("accessToken", token);
+	}
 
-    get accessToken(): string {
-        return localStorage.getItem("accessToken") ?? "";
-    }
+	get accessToken(): string {
+		return localStorage.getItem("accessToken") ?? "";
+	}
 
-    /**
-     * Get if user is staff
-     */
-    get isStaff(): boolean {
-        const token = this.accessToken;
-        if (!token) return false;
-        try {
-            const payload = AuthUtils.decodeToken(token);
-            return payload?.accountType === "staff";
-        } catch (e) {
-            return false;
-        }
-    }
+	/**
+	 * Get if user is staff
+	 */
+	get isStaff(): boolean {
+		const token = this.accessToken;
 
-    /**
-     * Get owner email (for context)
-     */
-    get ownerEmail(): string {
-        const token = this.accessToken;
-        if (!token) return "";
-        try {
-            const payload = AuthUtils.decodeToken(token);
-            return payload?.ownerEmail || payload?.email || "";
-        } catch (e) {
-            return "";
-        }
-    }
+		if (!token) return false;
 
-    /**
-     * Get user role
-     */
-    get role(): string {
-        const token = this.accessToken;
-        if (!token) return "read";
-        try {
-            const payload = AuthUtils.decodeToken(token);
-            // Owners are implicitly admins
-            if (payload?.accountType !== "staff") return "admin";
-            return payload?.role || "read";
-        } catch (e) {
-            return "read";
-        }
-    }
+		try {
+			const payload = AuthUtils.decodeToken(token);
+			return payload?.accountType === "staff" || payload?.accountType === "staff_account";
+		} catch (e) {
+			return false;
+		}
+	}
 
-    /**
-     * Get user account type
-     */
-    get accountType(): string {
-        const token = this.accessToken;
-        if (!token) return "";
-        try {
-            const payload = AuthUtils.decodeToken(token);
-            return payload?.accountType || "";
-        } catch (e) {
-            return "";
-        }
-    }
+	/**
+	 * Get owner email (for context)
+	 */
+	get ownerEmail(): string {
+		const token = this.accessToken;
+		if (!token) return "";
+		try {
+			const payload = AuthUtils.decodeToken(token);
+			return payload?.ownerEmail || payload?.email || "";
+		} catch (e) {
+			return "";
+		}
+	}
 
-    /**
-     * Getter for zelfProof
-     */
-    get zelfProof(): string {
-        return localStorage.getItem("zelfProof") ?? "";
-    }
+	/**
+	 * Get user role
+	 */
+	get role(): string {
+		const token = this.accessToken;
+		if (!token) return "read";
+		try {
+			const payload = AuthUtils.decodeToken(token);
+			const isStaff = payload?.accountType === "staff" || payload?.accountType === "staff_account";
+			if (!isStaff) return "admin";
+			return payload?.role || "read";
+		} catch (e) {
+			return "read";
+		}
+	}
 
-    /**
-     * Getter for zelfAccount
-     */
-    get zelfAccount(): any {
-        const account = localStorage.getItem("zelfAccount");
-        return account ? JSON.parse(account) : null;
-    }
+	/**
+	 * Get user account type
+	 */
+	get accountType(): string {
+		const token = this.accessToken;
+		if (!token) return "";
+		try {
+			const payload = AuthUtils.decodeToken(token);
+			return payload?.accountType || "";
+		} catch (e) {
+			return "";
+		}
+	}
 
-    /**
-     * Getter for wallet
-     */
-    get wallet(): any {
-        const wallet = localStorage.getItem("wallet");
-        return wallet ? JSON.parse(wallet) : null;
-    }
+	/**
+	 * Getter for zelfProof
+	 */
+	get zelfProof(): string {
+		return localStorage.getItem("zelfProof") ?? "";
+	}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
+	/**
+	 * Getter for zelfAccount
+	 */
+	get zelfAccount(): any {
+		const account = localStorage.getItem("zelfAccount");
+		return account ? JSON.parse(account) : null;
+	}
 
-    /**
-     * Sign in
-     *
-     * @param credentials
-     */
-    signIn(credentials: {
-        email?: string;
-        countryCode?: string;
-        phone?: string;
-        zelfProof: string;
-        faceBase64: string;
-        masterPassword: string;
-        identificationMethod: string;
-    }): Promise<any> {
-        // Throw error, if the user is already logged in
-        if (this._authenticated) {
-            throwError(() => new Error("User is already logged in."));
-            return Promise.resolve(false);
-        }
+	/**
+	 * Getter for wallet
+	 */
+	get wallet(): any {
+		const wallet = localStorage.getItem("wallet");
+		return wallet ? JSON.parse(wallet) : null;
+	}
 
-        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials);
-    }
+	// -----------------------------------------------------------------------------------------------------
+	// @ Public methods
+	// -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Sign out
-     */
-    signOut(): Observable<any> {
-        // Remove all authentication data from local storage
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("zelfProof");
-        localStorage.removeItem("zelfAccount");
-        localStorage.removeItem("license");
-        localStorage.removeItem("wallet");
+	/**
+	 * Sign in
+	 *
+	 * @param credentials
+	 */
+	signIn(credentials: {
+		email?: string;
+		countryCode?: string;
+		phone?: string;
+		zelfProof: string;
+		faceBase64: string;
+		masterPassword: string;
+		identificationMethod: string;
+	}): Promise<any> {
+		// Throw error, if the user is already logged in
+		if (this._authenticated) {
+			throwError(() => new Error("User is already logged in."));
+			return Promise.resolve(false);
+		}
 
-        // Remove session and account-related data
-        localStorage.removeItem("sessionToken");
-        localStorage.removeItem("subscription");
-        localStorage.removeItem("domainNotificationSettings");
-        localStorage.removeItem("signedDataPrice");
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signIn}`, credentials);
+	}
 
-        // Set the authenticated flag to false
-        this._authenticated = false;
+	/**
+	 * Sign out
+	 */
+	signOut(): Observable<any> {
+		// Remove all authentication data from local storage
+		localStorage.removeItem("accessToken");
+		localStorage.removeItem("zelfProof");
+		localStorage.removeItem("zelfAccount");
+		localStorage.removeItem("license");
+		localStorage.removeItem("wallet");
 
-        // Return the observable
-        return of(true);
-    }
+		// Remove session and account-related data
+		localStorage.removeItem("sessionToken");
+		localStorage.removeItem("subscription");
+		localStorage.removeItem("domainNotificationSettings");
+		localStorage.removeItem("signedDataPrice");
 
-    /**
-     * Sign up
-     *
-     * @param user
-     */
-    signUp(user: {
-        name: string;
-        email: string;
-        password: string;
-        countryCode: string;
-        phone: string;
-        company: string;
-        faceBase64: string;
-        masterPassword: string;
-    }): Promise<any> {
-        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signUp}`, user);
-    }
+		// Set the authenticated flag to false
+		this._authenticated = false;
 
-    /**
-     * Validate staff invitation
-     * @param token
-     */
-    validateInvite(token: string): Promise<any> {
-        return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/staff/validate-invite?token=${token}`);
-    }
+		// Return the observable
+		return of(true);
+	}
 
-    /**
-     * Accept staff invitation
-     * @param data
-     */
-    acceptInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
-        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/staff/accept-invite`, data);
-    }
+	/**
+	 * Sign up
+	 *
+	 * @param user
+	 */
+	signUp(user: {
+		name: string;
+		email: string;
+		password: string;
+		countryCode: string;
+		phone: string;
+		company: string;
+		faceBase64: string;
+		masterPassword: string;
+	}): Promise<any> {
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}${environment.endpoints.auth.signUp}`, user);
+	}
 
-    /**
-     * Get if user is a lawyer
-     */
-    get isLawyer(): boolean {
-        const token = this.accessToken;
-        if (!token) return false;
-        try {
-            const payload = AuthUtils.decodeToken(token);
-            return payload?.accountType === "lawyer";
-        } catch (e) {
-            return false;
-        }
-    }
+	/**
+	 * Validate staff invitation
+	 * @param token
+	 */
+	validateInvite(token: string): Promise<any> {
+		return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/staff/validate-invite?token=${token}`);
+	}
 
-    /**
-     * Validate lawyer invitation
-     */
-    validateLawyerInvite(token: string): Promise<any> {
-        return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/lawyers/validate-invite?token=${token}`);
-    }
+	/**
+	 * Accept staff invitation
+	 * @param data
+	 */
+	acceptInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/staff/accept-invite`, data);
+	}
 
-    /**
-     * Accept lawyer invitation
-     */
-    acceptLawyerInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
-        return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/lawyers/accept-invite`, data);
-    }
+	/**
+	 * Get if user is a lawyer
+	 */
+	get isLawyer(): boolean {
+		const token = this.accessToken;
+		if (!token) return false;
+		try {
+			const payload = AuthUtils.decodeToken(token);
+			return payload?.accountType === "lawyer";
+		} catch (e) {
+			return false;
+		}
+	}
 
-    /**
-     * Unlock session
-     *
-     * @param credentials
-     */
-    unlockSession(credentials: { email: string; password: string }): Observable<any> {
-        return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.unlockSession}`, credentials);
-    }
+	/**
+	 * Validate lawyer invitation
+	 */
+	validateLawyerInvite(token: string): Promise<any> {
+		return this._httpWrapper.sendRequest("get", `${environment.apiUrl}/api/lawyers/validate-invite?token=${token}`);
+	}
 
-    /**
-     * Check if all required authentication data is present
-     */
-    hasValidSession(): boolean {
-        return !!(this.accessToken && this.zelfProof && this.zelfAccount);
-    }
+	/**
+	 * Accept lawyer invitation
+	 */
+	acceptLawyerInvite(data: { invitationToken: string; masterPassword: string; faceBase64: string }): Promise<any> {
+		return this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/lawyers/accept-invite`, data);
+	}
 
-    /**
-     * Check the authentication status
-     */
-    check(): Observable<boolean> {
-        // Check if the user is logged in
-        if (this._authenticated) {
-            return of(true);
-        }
+	/**
+	 * Unlock session
+	 *
+	 * @param credentials
+	 */
+	unlockSession(credentials: { email: string; password: string }): Observable<any> {
+		return this._httpClient.post(`${environment.apiUrl}${environment.endpoints.auth.unlockSession}`, credentials);
+	}
 
-        // Check if all required session data is present
-        if (!this.hasValidSession()) {
-            return of(false);
-        }
+	/**
+	 * Check if all required authentication data is present
+	 */
+	hasValidSession(): boolean {
+		return !!(this.accessToken && this.zelfProof && this.zelfAccount);
+	}
 
-        // Check the access token expire date
-        if (AuthUtils.isTokenExpired(this.accessToken)) {
-            return of(false);
-        }
+	/**
+	 * Check the authentication status
+	 */
+	check(): Observable<boolean> {
+		// Check if the user is logged in
+		if (this._authenticated) {
+			return of(true);
+		}
 
-        // For our custom auth system, if we have all required data and token is valid, we're authenticated
-        // No need to call signInUsingToken since we don't have that endpoint
-        this._authenticated = true;
-        return of(true);
-    }
+		// Check if all required session data is present
+		if (!this.hasValidSession()) {
+			return of(false);
+		}
 
-    setSession(session: { zelfProof: string; zelfAccount: string }): void {
-        localStorage.setItem("zelfProof", session.zelfProof);
+		// Check the access token expire date
+		if (AuthUtils.isTokenExpired(this.accessToken)) {
+			return of(false);
+		}
 
-        localStorage.setItem("zelfAccount", JSON.stringify(session.zelfAccount));
-    }
+		// For our custom auth system, if we have all required data and token is valid, we're authenticated
+		// No need to call signInUsingToken since we don't have that endpoint
+		this._authenticated = true;
+		return of(true);
+	}
 
-    setAccessToken(token: string): void {
-        localStorage.setItem("accessToken", token);
-    }
+	setSession(session: { zelfProof: string; zelfAccount: string }): void {
+		localStorage.setItem("zelfProof", session.zelfProof);
 
-    verifyClientExists(user: { email: string; phone: string }): Observable<any> {
-        return this._httpClient.get(`${environment.apiUrl}${environment.endpoints.auth.verifyClientExists}`, { params: user });
-    }
+		localStorage.setItem("zelfAccount", JSON.stringify(session.zelfAccount));
+	}
+
+	setAccessToken(token: string): void {
+		localStorage.setItem("accessToken", token);
+	}
+
+	verifyClientExists(user: { email: string; phone: string }): Observable<any> {
+		return this._httpClient.get(`${environment.apiUrl}${environment.endpoints.auth.verifyClientExists}`, { params: user });
+	}
 }
