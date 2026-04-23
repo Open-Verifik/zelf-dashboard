@@ -63,7 +63,14 @@
         "unknown_error": "Algo salió mal, por favor intenta de nuevo.",
         "network_error": "Error de red. Por favor verifica tu conexión e intenta de nuevo.",
         "validation_error": "Por favor verifica tu información e intenta de nuevo.",
-        "incomplete_auth_data": "Se recibieron datos de autenticación incompletos. Por favor intenta de nuevo."
+        "incomplete_auth_data": "Se recibieron datos de autenticación incompletos. Por favor intenta de nuevo.",
+        "api": {
+            "ERR_LIVENESS_FAILED": "Verificación de vida fallida. Sigue las instrucciones de movimiento de cabeza en pantalla e intenta de nuevo.",
+            "ERR_FACE_VERIFICATION": "No pudimos verificar tu rostro. Mejora la luz, centra el rostro e intenta de nuevo.",
+            "ERR_INVALID_IMAGE": "No se pudo leer la foto. Intenta de nuevo con una imagen clara.",
+            "ERR_INVALID_SENSEPRINT_BYTES": "No se pudieron procesar los datos biométricos. Intenta de nuevo.",
+            "ERR_PASSWORD_REQUIRED": "Esta cuenta requiere contraseña."
+        }
     },
     "saving_operations": {
         "confirm_changes": "Confirmar Cambios",

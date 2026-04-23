@@ -63,7 +63,14 @@
         "unknown_error": "Something went wrong, please try again.",
         "network_error": "Network error. Please check your connection and try again.",
         "validation_error": "Please check your information and try again.",
-        "incomplete_auth_data": "Incomplete authentication data received. Please try again."
+        "incomplete_auth_data": "Incomplete authentication data received. Please try again.",
+        "api": {
+            "ERR_LIVENESS_FAILED": "Liveness check failed. Please follow the on-screen head turn instructions and try again.",
+            "ERR_FACE_VERIFICATION": "We could not verify your face. Please adjust lighting, center your face, and try again.",
+            "ERR_INVALID_IMAGE": "The photo could not be read. Please try again with a clear image.",
+            "ERR_INVALID_SENSEPRINT_BYTES": "Your biometric data could not be processed. Please try again.",
+            "ERR_PASSWORD_REQUIRED": "Password is required for this account."
+        }
     },
     "saving_operations": {
         "confirm_changes": "Confirm Changes",

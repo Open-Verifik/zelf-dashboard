@@ -18,6 +18,7 @@ export interface BiometricData {
 import { fadeIn } from "@fuse/animations";
 
 import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
+import { translocoKeyForApiErrorCode } from "app/core/i18n/api-error-codes";
 
 @Component({
     selector: "app-data-biometrics",
@@ -240,24 +241,59 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Read API error body from Angular HttpErrorResponse (message lives in error.error, not error.message).
+     */
+    private _apiErrorTextAndCode(error: any): { text: string; code?: string } {
+        const body = error?.error;
+        if (body && typeof body === "object" && !Array.isArray(body)) {
+            return {
+                text: typeof body.message === "string" ? body.message : "",
+                code: typeof body.code === "string" ? body.code : undefined,
+            };
+        }
+        if (typeof body === "string") {
+            try {
+                const parsed = JSON.parse(body);
+                if (parsed && typeof parsed === "object") {
+                    return {
+                        text: typeof parsed.message === "string" ? parsed.message : "",
+                        code: typeof parsed.code === "string" ? parsed.code : undefined,
+                    };
+                }
+            } catch {
+                return { text: body };
+            }
+        }
+        return {
+            text: typeof error?.message === "string" ? error.message : "",
+            code: typeof error?.code === "string" ? error.code : undefined,
+        };
+    }
+
+    /**
      * Handle API errors from parent component
      */
     handleApiError(error: any): void {
         console.error("API Error in biometric verification:", error);
 
-        // Check for specific error messages
-        if (error?.message) {
-            if (error.message.includes("Multiple face were detected")) {
-                this.apiError = this._transloco.translate("biometricVerification.multipleFacesDetected");
-            } else if (error.message.includes("No face detected")) {
-                this.apiError = this._transloco.translate("biometricVerification.noFaceDetectedMessage");
-            } else if (error.message.includes("Face not recognized")) {
-                this.apiError = this._transloco.translate("biometricVerification.faceNotRecognized");
-            } else if (error.message.includes("LIVENESS") || error.message.toLowerCase().includes("liveness")) {
-                this.apiError = this._transloco.translate("biometricVerification.livenessCheckFailed");
-            } else {
-                this.apiError = error.message;
-            }
+        const { text: msg, code } = this._apiErrorTextAndCode(error);
+        const lower = msg.toLowerCase();
+
+        const apiKey = translocoKeyForApiErrorCode(code);
+        if (apiKey) {
+            this.apiError = this._transloco.translate(apiKey);
+        } else if (lower.includes("liveness")) {
+            this.apiError = this._transloco.translate("errors.api.ERR_LIVENESS_FAILED");
+        } else if (lower.includes("multiple face")) {
+            this.apiError = this._transloco.translate("biometricVerification.multipleFacesDetected");
+        } else if (lower.includes("no face detected")) {
+            this.apiError = this._transloco.translate("biometricVerification.noFaceDetectedMessage");
+        } else if (lower.includes("face not recognized")) {
+            this.apiError = this._transloco.translate("biometricVerification.faceNotRecognized");
+        } else if (lower.includes("biometric") || lower.includes("face quality") || lower.includes("face is not central") || lower.includes("not central")) {
+            this.apiError = this._transloco.translate("biometricVerification.biometricVerificationFailed");
+        } else if (msg && !msg.startsWith("Http failure response")) {
+            this.apiError = msg;
         } else {
             this.apiError = this._transloco.translate("biometricVerification.biometricVerificationFailed");
         }

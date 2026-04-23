@@ -63,7 +63,14 @@
         "unknown_error": "エラーが発生しました。もう一度お試しください。",
         "network_error": "ネットワークエラー。接続を確認してもう一度お試しください。",
         "validation_error": "情報を確認してもう一度お試しください。",
-        "incomplete_auth_data": "不完全な認証データが受信されました。もう一度お試しください。"
+        "incomplete_auth_data": "不完全な認証データが受信されました。もう一度お試しください。",
+        "api": {
+            "ERR_LIVENESS_FAILED": "ライブネス確認に失敗しました。画面の頭を動かす指示に従って再度お試しください。",
+            "ERR_FACE_VERIFICATION": "顔を確認できませんでした。明るさを調整し、顔を中央に置いて再度お試しください。",
+            "ERR_INVALID_IMAGE": "写真を読み取れませんでした。鮮明な画像でもう一度お試しください。",
+            "ERR_INVALID_SENSEPRINT_BYTES": "生体認証データを処理できませんでした。もう一度お試しください。",
+            "ERR_PASSWORD_REQUIRED": "このアカウントではパスワードが必要です。"
+        }
     },
     "saving_operations": {
         "confirm_changes": "変更を確認",

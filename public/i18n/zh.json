@@ -63,7 +63,14 @@
         "unknown_error": "出现错误，请重试。",
         "network_error": "网络错误。请检查您的连接并重试。",
         "validation_error": "请检查您的信息并重试。",
-        "incomplete_auth_data": "收到不完整的认证数据。请重试。"
+        "incomplete_auth_data": "收到不完整的认证数据。请重试。",
+        "api": {
+            "ERR_LIVENESS_FAILED": "活体检测失败。请按照屏幕上的转头说明重试。",
+            "ERR_FACE_VERIFICATION": "无法验证您的面部。请改善光线、将面部置于中央后重试。",
+            "ERR_INVALID_IMAGE": "无法读取照片。请使用清晰图像重试。",
+            "ERR_INVALID_SENSEPRINT_BYTES": "无法处理生物识别数据。请重试。",
+            "ERR_PASSWORD_REQUIRED": "此账户需要密码。"
+        }
     },
     "saving_operations": {
         "confirm_changes": "确认更改",

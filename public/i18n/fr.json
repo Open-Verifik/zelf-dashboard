@@ -62,7 +62,14 @@
         "unknown_error": "Quelque chose s'est mal passé, veuillez réessayer.",
         "network_error": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
         "validation_error": "Veuillez vérifier vos informations et réessayer.",
-        "incomplete_auth_data": "Données d'authentification incomplètes reçues. Veuillez réessayer."
+        "incomplete_auth_data": "Données d'authentification incomplètes reçues. Veuillez réessayer.",
+        "api": {
+            "ERR_LIVENESS_FAILED": "Échec de la détection de vivacité. Suivez les instructions de rotation de la tête à l'écran et réessayez.",
+            "ERR_FACE_VERIFICATION": "Nous n'avons pas pu vérifier votre visage. Améliorez l'éclairage, centrez votre visage et réessayez.",
+            "ERR_INVALID_IMAGE": "La photo n'a pas pu être lue. Réessayez avec une image nette.",
+            "ERR_INVALID_SENSEPRINT_BYTES": "Les données biométriques n'ont pas pu être traitées. Réessayez.",
+            "ERR_PASSWORD_REQUIRED": "Un mot de passe est requis pour ce compte."
+        }
     },
     "saving_operations": {
         "confirm_changes": "Confirmer les modifications",

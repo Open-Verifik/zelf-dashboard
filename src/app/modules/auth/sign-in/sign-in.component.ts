@@ -18,6 +18,7 @@ import { PasskeyPromptModalComponent } from "../passkey-prompt-modal/passkey-pro
 import { DataBiometricsComponent, BiometricData } from "../biometric-verification/biometric-verification.component";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { cleanedCountryCodes } from "app/core/cleaned_country_codes";
+import { translocoKeyForApiErrorCode } from "app/core/i18n/api-error-codes";
 
 @Component({
 	selector: "auth-sign-in",
@@ -409,22 +410,24 @@ export class AuthSignInComponent implements OnInit {
 			(error) => {
 				console.error("Sign in error:", error);
 
-				// Check if this is a biometric-related error
-				if (
-					error?.message &&
-					(error.message.includes("Multiple face were detected") ||
-						error.message.includes("No face detected") ||
-						error.message.includes("Face not recognized") ||
-						error.message.includes("biometric") ||
-						error.message.includes("face") ||
-						error.message.includes("LIVENESS") ||
-						error.message.includes("liveness"))
-				) {
-					// Handle biometric-specific errors in the biometric component
-					if (this.biometricVerification) {
-						this.biometricVerification.handleApiError(error);
-					}
-					return; // Don't show the general error alert
+				const { message: apiMessage, code: apiCode } = this._httpErrorBody(error);
+				const apiLower = apiMessage.toLowerCase();
+				const isBiometricError =
+					!!apiMessage &&
+					(apiLower.includes("multiple face") ||
+						apiLower.includes("no face detected") ||
+						apiLower.includes("face not recognized") ||
+						apiLower.includes("biometric") ||
+						apiLower.includes("face quality") ||
+						apiLower.includes("face is not central") ||
+						apiLower.includes("not central") ||
+						apiMessage.includes("LIVENESS") ||
+						apiLower.includes("liveness") ||
+						(!!apiCode && (apiCode === "ERR_LIVENESS_FAILED" || apiCode.includes("FACE_"))));
+
+				if (isBiometricError && this.biometricVerification) {
+					this.biometricVerification.handleApiError(error);
+					return;
 				}
 
 				// Re-enable the form
@@ -495,13 +498,52 @@ export class AuthSignInComponent implements OnInit {
 	}
 
 	/**
+	 * Parse JSON error body from HttpClient (Angular puts API body on error.error).
+	 */
+	private _httpErrorBody(error: any): { message: string; code?: string } {
+		const body = error?.error;
+		if (body && typeof body === "object" && !Array.isArray(body)) {
+			return {
+				message: typeof body.message === "string" ? body.message : "",
+				code: typeof body.code === "string" ? body.code : undefined,
+			};
+		}
+		if (typeof body === "string") {
+			try {
+				const parsed = JSON.parse(body);
+				if (parsed && typeof parsed === "object") {
+					return {
+						message: typeof parsed.message === "string" ? parsed.message : "",
+						code: typeof parsed.code === "string" ? parsed.code : undefined,
+					};
+				}
+			} catch {
+				return { message: body };
+			}
+		}
+		return {
+			message: typeof error?.message === "string" ? error.message : "",
+			code: typeof error?.code === "string" ? error.code : undefined,
+		};
+	}
+
+	/**
 	 * Map error codes to translated messages
 	 */
 	private getErrorMessage(error: any): string {
-		// Extract error code from error response
-		// Backend returns: { status, message, code } or HttpErrorResponse with nested error structure
-		const errorCode = error?.error?.code || error?.code || error?.error?.message || error?.message || "unknown_error";
-		const errorMessage = error?.error?.message || error?.message || "";
+		const { message: errorMessage, code: apiCode } = this._httpErrorBody(error);
+		const errorCode = apiCode || error?.error?.code || error?.code || "unknown_error";
+
+		const apiTransKey = translocoKeyForApiErrorCode(apiCode);
+		if (apiTransKey) {
+			return this._translocoService.translate(apiTransKey);
+		}
+		if (errorMessage.toUpperCase().includes("LIVENESS")) {
+			return this._translocoService.translate("errors.api.ERR_LIVENESS_FAILED");
+		}
+		if (/face (quality|too small|too large)/i.test(errorMessage)) {
+			return this._translocoService.translate("errors.api.ERR_FACE_VERIFICATION");
+		}
 
 		// Map error codes to translation keys
 		const errorMapping: { [key: string]: string } = {
@@ -533,6 +575,12 @@ export class AuthSignInComponent implements OnInit {
 			}
 			if (errorMessage.includes("Incomplete authentication data received")) {
 				return this._translocoService.translate("errors.incomplete_auth_data");
+			}
+			// Backend may return only a numeric status as message; avoid showing raw "422" as user text
+			if (/^\d{3}$/.test(errorMessage.trim()) && apiCode) {
+				const fromApiCode = translocoKeyForApiErrorCode(apiCode);
+				if (fromApiCode) return this._translocoService.translate(fromApiCode);
+				if (errorMapping[apiCode]) return this._translocoService.translate(errorMapping[apiCode]);
 			}
 		}
 
