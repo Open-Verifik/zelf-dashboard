@@ -1,0 +1,8 @@
+{
+    "saving_operations": {
+        "plan_billing_page": {
+            "pricing_model": "Usage is priced in ZNS at {{rewardPriceFormatted}} USD per token. Encryption: {{encryptUsdFormatted}} USD ({{encryptTokens}} ZNS). Each active Zelf ID with monthly liveness checks: {{activeUserMonthlyUsdFormatted}} USD/month ({{activeUserMonthlyTokens}} ZNS). Decryption: the first {{decryptIncludedPerMonth}} decrypts per month are included when liveness applies; after that, {{decryptWithLivenessUsdFormatted}} USD ({{decryptWithLivenessTokens}} ZNS) per decrypt with liveness, or {{decryptNoLivenessUsdFormatted}} USD ({{decryptNoLivenessTokens}} ZNS) per decrypt without liveness on decryption.",
+            "pricing_monthly_zns": "Estimated monthly ZNS credit at this tier (rounded up): {{tokens}} ZNS."
+        }
+    }
+}

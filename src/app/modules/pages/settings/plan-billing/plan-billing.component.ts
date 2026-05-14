@@ -1,16 +1,37 @@
 import { CommonModule, NgClass } from "@angular/common";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from "@angular/core";
-import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
-import { MatOptionModule } from "@angular/material/core";
-import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatRadioModule } from "@angular/material/radio";
-import { MatSelectModule } from "@angular/material/select";
-import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
-import { Price, SubscribeRequest, SubscriptionPlan, SubscriptionPlansService } from "app/core/services/subscription-plans.service";
+import { TranslocoModule } from "@jsverse/transloco";
+import { AuthService } from "app/core/auth/auth.service";
+import { SolanaService } from "app/core/services/solana.service";
+import {
+	Price,
+	SubscribeRequest,
+	SubscriptionPlan,
+	SubscriptionPlansService,
+	SubscriptionPricingMeta,
+} from "app/core/services/subscription-plans.service";
+import { getPlanFeatureRows, isHighlightedPlanTier } from "./plan-billing-plan-features";
+import { PlanBillingActiveSubscriptionComponent } from "./plan-billing-active-subscription.component";
+import { PlanBillingPlanCardComponent } from "./plan-billing-plan-card.component";
+import { PlanBillingPlanGridComponent } from "./plan-billing-plan-grid.component";
+import { PlanBillingZnsBalanceComponent } from "./plan-billing-zns-balance.component";
+import {
+	PlanBillingPricingCreditRow,
+	PlanBillingZnsPricingSectionComponent,
+} from "./plan-billing-zns-pricing-section.component";
+
+/** Persist auto reconcile attempts per logged-in user + Stripe subscription (not manual Refresh). */
+const ZNS_AUTO_RECONCILE_STORAGE_KEY = "planBillingZnsAutoReconcile";
+const MAX_AUTO_RECONCILE_ATTEMPTS = 3;
+
+interface ZnsAutoReconcilePersist {
+	subscriptionId: string;
+	autoAttempts: number;
+}
 
 @Component({
     selector: "settings-plan-billing",
@@ -19,23 +40,26 @@ import { Price, SubscribeRequest, SubscriptionPlan, SubscriptionPlansService } f
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,
-        FormsModule,
         ReactiveFormsModule,
-        MatRadioModule,
         NgClass,
         MatIconModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatOptionModule,
         MatButtonModule,
         TranslocoModule,
+        PlanBillingActiveSubscriptionComponent,
+        PlanBillingPlanGridComponent,
+        PlanBillingPlanCardComponent,
+        PlanBillingZnsBalanceComponent,
+        PlanBillingZnsPricingSectionComponent,
     ],
 })
 export class SettingsPlanBillingComponent implements OnInit {
     planBillingForm: UntypedFormGroup;
     plans: SubscriptionPlan[] = [];
+    pricingMeta: SubscriptionPricingMeta | null = null;
     loading: boolean = false;
+    znsBalance: number | null = null;
+    znsBalanceLoading: boolean = false;
+    solanaAddress: string | null = null;
     subscribing: boolean = false;
     error: string | null = null;
     hasSubscription: boolean = false;
@@ -45,31 +69,27 @@ export class SettingsPlanBillingComponent implements OnInit {
     showBillingHistory: boolean = false;
     billingHistory: any[] = [];
     initialLoading: boolean = true;
+    subscribingPlanId: string | null = null;
 
-    /**
-     * Constructor
-     */
+    readonly featureRowsForPlan = getPlanFeatureRows;
+    readonly isHighlightedTier = isHighlightedPlanTier;
+
     constructor(
         private _formBuilder: UntypedFormBuilder,
         private _subscriptionPlansService: SubscriptionPlansService,
         private _cdr: ChangeDetectorRef,
-        private _translocoService: TranslocoService,
         private _activatedRoute: ActivatedRoute,
-        private _router: Router,
+        private _authService: AuthService,
+        private _solanaService: SolanaService,
     ) {}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
+    get plansToShow(): SubscriptionPlan[] {
+        return this.hasSubscription ? this.getUpgradePlans() : this.plans;
+    }
 
-    /**
-     * On init
-     */
     async ngOnInit(): Promise<void> {
-        // Check if user has a subscription
         this.checkSubscriptionStatus();
 
-        // Create the form
         this.planBillingForm = this._formBuilder.group({
             plan: [""],
             cardHolder: ["Brian Hughes"],
@@ -81,16 +101,17 @@ export class SettingsPlanBillingComponent implements OnInit {
         });
 
         try {
-            // Check for session_id (return from Stripe checkout)
             const sessionId = this._activatedRoute.snapshot.queryParamMap.get("session_id");
 
             if (sessionId) await this.handleSessionVerification(sessionId);
 
-            // Load subscription data (always reload to get fresh state)
             await this.loadMyPlan();
 
-            // Then load subscription plans
             await this.loadSubscriptionPlans();
+
+            await this.reconcileZnsGrant({ force: false });
+
+            this.refreshZnsBalance();
         } catch (err) {
             console.error("Error initializing plan billing:", err);
         } finally {
@@ -100,16 +121,106 @@ export class SettingsPlanBillingComponent implements OnInit {
     }
 
     /**
-     * Handle session verification
+     * Ask the backend to reconcile monthly ZNS grants for the active subscription.
+     * Automatic calls (page load) are capped per subscription via localStorage — manual
+     * Refresh passes `force: true` and always POSTs.
      */
+    async reconcileZnsGrant(options?: { force?: boolean }): Promise<void> {
+        const force = options?.force === true;
+
+        if (!this.hasSubscription) {
+            console.info("[plan-billing] reconcileZnsGrant skipped", {
+                reason: "hasSubscription_false",
+                stripeStatus: this.mySubscription?.subscription?.status ?? null,
+                hint: "Dashboard only reconciles when GET my-subscription reports status active",
+            });
+            return;
+        }
+
+        const subscriptionId = this.mySubscription?.subscription?.id ?? null;
+
+        if (!force && subscriptionId) {
+            const attempts = this.getZnsAutoReconcileAttempts(subscriptionId);
+            if (attempts >= MAX_AUTO_RECONCILE_ATTEMPTS) {
+                console.info("[plan-billing] reconcileZnsGrant skipped (auto attempts exhausted)", {
+                    subscriptionId,
+                    attempts,
+                    max: MAX_AUTO_RECONCILE_ATTEMPTS,
+                    hint: "Use Refresh on the ZNS card to reconcile again, or clear localStorage planBillingZnsAutoReconcile",
+                });
+                return;
+            }
+        }
+
+        console.info("[plan-billing] reconcileZnsGrant calling POST …/subscription-plans/reconcile-zns", {
+            force,
+            subscriptionId,
+        });
+
+        try {
+            const payload = await this._subscriptionPlansService.reconcileZnsGrant();
+            console.info("[plan-billing] reconcileZnsGrant response", payload);
+        } catch (err) {
+            console.warn("[plan-billing] reconcileZnsGrant request threw", err);
+        } finally {
+            if (!force && subscriptionId) {
+                this.bumpZnsAutoReconcileAttempts(subscriptionId);
+            }
+        }
+    }
+
+    private znsReconcileStorageEmailKey(): string | null {
+        const email = this._authService.ownerEmail?.trim().toLowerCase();
+        return email && email.length > 0 ? email : null;
+    }
+
+    private readZnsReconcileBucket(): Record<string, ZnsAutoReconcilePersist> {
+        try {
+            const raw = localStorage.getItem(ZNS_AUTO_RECONCILE_STORAGE_KEY);
+            if (!raw) return {};
+            const parsed = JSON.parse(raw) as Record<string, ZnsAutoReconcilePersist>;
+            return parsed && typeof parsed === "object" ? parsed : {};
+        } catch {
+            return {};
+        }
+    }
+
+    private writeZnsReconcileBucket(bucket: Record<string, ZnsAutoReconcilePersist>): void {
+        try {
+            localStorage.setItem(ZNS_AUTO_RECONCILE_STORAGE_KEY, JSON.stringify(bucket));
+        } catch {
+            /* ignore quota / private mode */
+        }
+    }
+
+    /** Attempt count for this Stripe subscription only; resets when subscriptionId changes. */
+    private getZnsAutoReconcileAttempts(subscriptionId: string): number {
+        const emailKey = this.znsReconcileStorageEmailKey();
+        if (!emailKey) return 0;
+        const row = this.readZnsReconcileBucket()[emailKey];
+        if (!row || row.subscriptionId !== subscriptionId) return 0;
+        return typeof row.autoAttempts === "number" && row.autoAttempts >= 0 ? row.autoAttempts : 0;
+    }
+
+    private bumpZnsAutoReconcileAttempts(subscriptionId: string): void {
+        const emailKey = this.znsReconcileStorageEmailKey();
+        if (!emailKey) return;
+        const bucket = this.readZnsReconcileBucket();
+        const prev = bucket[emailKey];
+        const base =
+            prev && prev.subscriptionId === subscriptionId && typeof prev.autoAttempts === "number"
+                ? prev.autoAttempts
+                : 0;
+        bucket[emailKey] = { subscriptionId, autoAttempts: base + 1 };
+        this.writeZnsReconcileBucket(bucket);
+    }
+
     async handleSessionVerification(sessionId: string): Promise<void> {
         this.initialLoading = true;
         this._cdr.detectChanges();
 
-        // Wait 3 seconds to allow webhook to process (if it beats us)
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        // Verify session if needed
         try {
             await this._subscriptionPlansService.verifySession(sessionId);
         } catch (err) {
@@ -118,9 +229,6 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Load my plan from API
-     */
     async loadMyPlan(): Promise<void> {
         try {
             this.mySubscription = await this._subscriptionPlansService.getMySubscription();
@@ -132,42 +240,33 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Load subscription plans from API
-     */
     async loadSubscriptionPlans(): Promise<void> {
         this.loading = true;
         this.error = null;
 
         try {
-            const plans = await this._subscriptionPlansService.getSubscriptionPlans();
+            const { plans, pricingMeta } = await this._subscriptionPlansService.getSubscriptionPlans();
 
-            // Sort plans by price (cheapest to expensive)
+            this.pricingMeta = pricingMeta;
             this.plans = plans.sort((a, b) => {
                 const priceA = this.getCheapestPrice(a)?.unit_amount || 0;
                 const priceB = this.getCheapestPrice(b)?.unit_amount || 0;
                 return priceA - priceB;
             });
 
-            // Set default plan if available
             if (plans.length > 0) {
                 this.planBillingForm.patchValue({ plan: plans[0].id });
             }
 
-            // Manually trigger change detection
             this._cdr.detectChanges();
-        } catch (error) {
+        } catch (error: any) {
             this.error = `Failed to load subscription plans: ${error.message || "Unknown error"}`;
         } finally {
             this.loading = false;
-            // Trigger change detection after loading is complete
             this._cdr.detectChanges();
         }
     }
 
-    /**
-     * Check if user has a subscription in localStorage
-     */
     checkSubscriptionStatus(): void {
         try {
             const subscription = localStorage.getItem("subscription");
@@ -177,23 +276,10 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
     trackByFn(index: number, item: SubscriptionPlan): any {
         return item.id || index;
     }
 
-    /**
-     * Format price for display
-     */
     formatPrice(unitAmount: number, currency: string): string {
         return new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -202,24 +288,108 @@ export class SettingsPlanBillingComponent implements OnInit {
     }
 
     /**
-     * Get the cheapest price from a plan's prices array
+     * Resolve the current logged-in client's Solana address.
+     * The dashboard header reads `localStorage.wallet`, while the auth payload stores
+     * the address under `publicData`/`keyvalues`. Try both so the balance card mirrors
+     * whatever the user already sees in the header.
      */
+    private resolveSolanaAddress(): string | null {
+        const account = this._authService.zelfAccount;
+        const pub = account?.publicData ?? account?.keyvalues ?? {};
+        const fromAuth = pub?.solanaAddress;
+        if (typeof fromAuth === "string" && fromAuth.length > 0) return fromAuth;
+
+        try {
+            const raw = localStorage.getItem("wallet");
+            if (!raw) return null;
+            const wallet = JSON.parse(raw) ?? {};
+            const fromWallet = wallet?.solanaAddress;
+            return typeof fromWallet === "string" && fromWallet.length > 0 ? fromWallet : null;
+        } catch {
+            return null;
+        }
+    }
+
+    /** Public refresh: reconcile grants (if subscribed), then re-fetch ZNS balance from the indexer-backed API. */
+    async refreshZnsBalance(): Promise<void> {
+        console.info("[plan-billing] refreshZnsBalance start", {
+            hasSubscription: this.hasSubscription,
+            stripeStatus: this.mySubscription?.subscription?.status ?? null,
+        });
+
+        if (this.hasSubscription) {
+            await this.reconcileZnsGrant({ force: true });
+        }
+
+        const address = this.resolveSolanaAddress();
+        this.solanaAddress = address;
+
+        if (!address) {
+            console.info("[plan-billing] refreshZnsBalance stop: no Solana address (checked zelfAccount + localStorage.wallet)");
+            this.znsBalance = null;
+            this.znsBalanceLoading = false;
+            this._cdr.detectChanges();
+            return;
+        }
+
+        console.info("[plan-billing] refreshZnsBalance fetching indexer balance", {
+            solanaPreview: `${address.slice(0, 4)}…${address.slice(-4)}`,
+        });
+
+        this.znsBalanceLoading = true;
+        this._cdr.detectChanges();
+
+        try {
+            this.znsBalance = await this._solanaService.getZnsBalance(address);
+            console.info("[plan-billing] refreshZnsBalance balance result", { znsBalance: this.znsBalance });
+        } catch (err) {
+            console.error("Failed to load ZNS balance:", err);
+            this.znsBalance = 0;
+        } finally {
+            this.znsBalanceLoading = false;
+            this._cdr.detectChanges();
+        }
+    }
+
+    /** Monthly ZNS credited ≈ ceil(subscription USD / rewardPrice); uses Stripe list price. */
+    getEstimatedMonthlyZns(price: Price | null): number | null {
+        if (!price?.unit_amount || !this.pricingMeta?.rewardPrice) return null;
+        const rp = this.pricingMeta.rewardPrice;
+        if (!(rp > 0)) return null;
+        return Math.ceil(price.unit_amount / 100 / rp);
+    }
+
+    /** Per-tier estimated monthly ZNS rows for the pricing section's credit table. */
+    getCreditRows(): PlanBillingPricingCreditRow[] {
+        if (!this.pricingMeta) return [];
+
+        return this.plansToShow
+            .map((plan) => {
+                const price = this.getCheapestPrice(plan);
+                if (!price) return null;
+
+                return {
+                    planLabel: this.getPlanDisplayName(plan.metadata.zelfPlan),
+                    priceLabel: this.formatPrice(price.unit_amount, price.currency),
+                    estimatedZns: this.getEstimatedMonthlyZns(price),
+                };
+            })
+            .filter((row): row is PlanBillingPricingCreditRow => row !== null);
+    }
+
     getCheapestPrice(plan: SubscriptionPlan): Price | null {
         if (!plan.prices || plan.prices.length === 0) return null;
 
-        // Filter active prices and sort by price
         const validPrices = plan.prices.filter((price) => price.active && price.unit_amount > 0).sort((a, b) => a.unit_amount - b.unit_amount);
 
         return validPrices.length > 0 ? validPrices[0] : null;
     }
 
-    /**
-     * Get plan display name
-     */
     getPlanDisplayName(zelfPlan: string): string {
         const planNames: { [key: string]: string } = {
             zelfBasic: "BASIC",
             ZelfGold: "GOLD",
+            zelfGold: "GOLD",
             zelfBusiness: "BUSINESS",
             zelfStartUp: "STARTUP",
             zelfEnterprise: "ENTERPRISE",
@@ -227,38 +397,22 @@ export class SettingsPlanBillingComponent implements OnInit {
         return planNames[zelfPlan] || zelfPlan.toUpperCase();
     }
 
-    /**
-     * Select a plan
-     */
     selectPlan(planId: string): void {
         this.planBillingForm.patchValue({ plan: planId });
         this._cdr.detectChanges();
     }
 
-    /**
-     * Check if a plan is selected
-     */
     isPlanSelected(planId: string): boolean {
         return this.planBillingForm.get("plan")?.value === planId;
     }
 
-    /**
-     * Handle subscribe button click
-     */
-    subscribingPlanId: string | null = null;
-
-    /**
-     * Handle subscribe button click
-     */
     async onSubscribe(planId: string): Promise<void> {
         if (!planId) return;
 
-        // Find the selected plan
         const selectedPlan = this.plans.find((plan) => plan.id === planId);
 
         if (!selectedPlan) return;
 
-        // Get the cheapest price for the selected plan
         const cheapestPrice = this.getCheapestPrice(selectedPlan);
 
         if (!cheapestPrice) return;
@@ -274,20 +428,19 @@ export class SettingsPlanBillingComponent implements OnInit {
             const subscribeRequest: SubscribeRequest = {
                 productId: selectedPlan.id,
                 priceId: cheapestPrice.id,
-                customerEmail: null, // You can get this from user profile if needed
+                customerEmail: null,
             };
 
             const response = await this._subscriptionPlansService.subscribe(subscribeRequest);
 
             if (response && response.success && response.url) {
-                // Redirect to Stripe checkout
                 window.location.href = response.url;
 
                 return;
             }
 
             throw new Error("Failed to create checkout session");
-        } catch (error) {
+        } catch (error: any) {
             this.error = `Failed to create checkout session: ${error.message || "Unknown error"}`;
         } finally {
             this.subscribing = false;
@@ -296,25 +449,16 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Get current plan details
-     */
     getCurrentPlan(): any {
         if (!this.mySubscription || !this.mySubscription.product) return null;
         return this.mySubscription.product;
     }
 
-    /**
-     * Get current subscription details
-     */
     getCurrentSubscription(): any {
         if (!this.mySubscription || !this.mySubscription.subscription) return null;
         return this.mySubscription.subscription;
     }
 
-    /**
-     * Format date for display
-     */
     formatDate(timestamp: number): string {
         return new Date(timestamp * 1000).toLocaleDateString("en-US", {
             year: "numeric",
@@ -323,27 +467,6 @@ export class SettingsPlanBillingComponent implements OnInit {
         });
     }
 
-    /**
-     * Get subscription status color
-     */
-    getStatusColor(status: string): string {
-        switch (status) {
-            case "active":
-                return "text-green-600";
-            case "canceled":
-                return "text-red-600";
-            case "past_due":
-                return "text-yellow-600";
-            case "unpaid":
-                return "text-red-600";
-            default:
-                return "text-gray-600";
-        }
-    }
-
-    /**
-     * Get subscription status badge color
-     */
     getStatusBadgeColor(status: string): string {
         switch (status) {
             case "active":
@@ -359,27 +482,18 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Show plan comparison for upgrade
-     */
     showUpgradeComparison(plan: SubscriptionPlan): void {
         this.selectedUpgradePlan = plan;
         this.showPlanComparison = true;
         this._cdr.detectChanges();
     }
 
-    /**
-     * Hide plan comparison
-     */
     hidePlanComparison(): void {
         this.showPlanComparison = false;
         this.selectedUpgradePlan = null;
         this._cdr.detectChanges();
     }
 
-    /**
-     * Get available upgrade plans (plans with higher price than current)
-     */
     getUpgradePlans(): SubscriptionPlan[] {
         if (!this.mySubscription || !this.mySubscription.subscription) return this.plans;
 
@@ -390,29 +504,22 @@ export class SettingsPlanBillingComponent implements OnInit {
         });
     }
 
-    /**
-     * Open Stripe customer portal for subscription management
-     */
     async openStripePortal(): Promise<void> {
         try {
             const response = await this._subscriptionPlansService.createStripePortalSession();
 
             if (response && response.success && response.url) {
-                // Redirect to Stripe customer portal
                 window.location.href = response.url;
                 return;
             }
 
             throw new Error("Failed to create portal session");
-        } catch (error) {
+        } catch (error: any) {
             this.error = `Failed to open billing portal: ${error.message || "Unknown error"}`;
             this._cdr.detectChanges();
         }
     }
 
-    /**
-     * Cancel subscription
-     */
     async cancelSubscription(): Promise<void> {
         if (!confirm("Are you sure you want to cancel your subscription? This action cannot be undone.")) {
             return;
@@ -427,21 +534,17 @@ export class SettingsPlanBillingComponent implements OnInit {
             const response = await this._subscriptionPlansService.cancelSubscription(subscription.id);
 
             if (response && response.success) {
-                // Reload subscription data
                 await this.loadMyPlan();
                 alert("Subscription cancelled successfully.");
             } else {
                 throw new Error(response?.message || "Failed to cancel subscription");
             }
-        } catch (error) {
+        } catch (error: any) {
             this.error = `Failed to cancel subscription: ${error.message || "Unknown error"}`;
             this._cdr.detectChanges();
         }
     }
 
-    /**
-     * Upgrade to a specific plan
-     */
     async upgradeToPlan(plan: SubscriptionPlan): Promise<void> {
         try {
             const subscription = this.getCurrentSubscription();
@@ -457,21 +560,17 @@ export class SettingsPlanBillingComponent implements OnInit {
             const response = await this._subscriptionPlansService.upgradeSubscription(subscription.id, cheapestPrice.id);
 
             if (response && response.success && response.url) {
-                // Redirect to Stripe checkout for upgrade
                 window.location.href = response.url;
                 return;
             }
 
             throw new Error("Failed to create upgrade session");
-        } catch (error) {
+        } catch (error: any) {
             this.error = `Failed to upgrade plan: ${error.message || "Unknown error"}`;
             this._cdr.detectChanges();
         }
     }
 
-    /**
-     * Toggle billing history visibility
-     */
     toggleBillingHistory(): void {
         this.showBillingHistory = !this.showBillingHistory;
         if (this.showBillingHistory && this.billingHistory.length === 0) {
@@ -480,12 +579,8 @@ export class SettingsPlanBillingComponent implements OnInit {
         this._cdr.detectChanges();
     }
 
-    /**
-     * Load billing history (mock data for now)
-     */
     async loadBillingHistory(): Promise<void> {
         try {
-            // Mock billing history data - replace with actual API call
             this.billingHistory = [
                 {
                     id: "in_1SIBhPFO6i3ofqGHMzmmHGNA",
@@ -502,9 +597,6 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Get plan usage information
-     */
     getPlanUsage(): any {
         if (!this.mySubscription || !this.mySubscription.domainConfig) return null;
 
@@ -517,9 +609,6 @@ export class SettingsPlanBillingComponent implements OnInit {
         };
     }
 
-    /**
-     * Get active user limit based on plan
-     */
     getActiveUserLimit(): number {
         const plan = this.getCurrentPlan();
         if (!plan) return 0;
@@ -532,6 +621,7 @@ export class SettingsPlanBillingComponent implements OnInit {
             case "zelfBusiness":
                 return 1250;
             case "zelfGold":
+            case "ZelfGold":
                 return 3000;
             case "zelfEnterprise":
                 return 10000;
@@ -540,9 +630,6 @@ export class SettingsPlanBillingComponent implements OnInit {
         }
     }
 
-    /**
-     * Get encryption limit based on plan
-     */
     getEncryptionLimit(): number | string {
         const plan = this.getCurrentPlan();
         if (!plan) return 0;

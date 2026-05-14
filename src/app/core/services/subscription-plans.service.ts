@@ -31,6 +31,25 @@ export interface SubscriptionPlan {
 	prices: Price[];
 }
 
+/** Mirrors `pricingMeta` from GET /api/subscription-plans (backend Core/buildSubscriptionPricingMeta). */
+export interface SubscriptionPricingMeta {
+	rewardPrice: number;
+	rewardPriceFormatted: string;
+	encryptUsd: number;
+	encryptUsdFormatted: string;
+	activeUserMonthlyUsd: number;
+	activeUserMonthlyUsdFormatted: string;
+	decryptWithLivenessUsd: number;
+	decryptWithLivenessUsdFormatted: string;
+	decryptNoLivenessUsd: number;
+	decryptNoLivenessUsdFormatted: string;
+	decryptIncludedPerMonth: number;
+	encryptTokens: number;
+	activeUserMonthlyTokens: number;
+	decryptWithLivenessTokens: number;
+	decryptNoLivenessTokens: number;
+}
+
 export interface Price {
 	id: string;
 	object: string;
@@ -90,9 +109,9 @@ export class SubscriptionPlansService {
 	private _httpWrapper = inject(HttpWrapperService);
 
 	/**
-	 * Get all subscription plans
+	 * Get all subscription plans (includes `pricingMeta` when supported by the API).
 	 */
-	async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+	async getSubscriptionPlans(): Promise<{ plans: SubscriptionPlan[]; pricingMeta: SubscriptionPricingMeta | null }> {
 		try {
 			// Add timeout to prevent hanging
 			const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Request timeout after 10 seconds")), 10000));
@@ -100,7 +119,9 @@ export class SubscriptionPlansService {
 			const requestPromise = this._httpWrapper.sendRequest("get", `${environment.apiUrl}${environment.endpoints.subscriptionPlans.list}`);
 
 			const response = await Promise.race([requestPromise, timeoutPromise]);
-			return response.data || [];
+			const plans = response?.data ?? [];
+			const pricingMeta = response?.pricingMeta ?? null;
+			return { plans, pricingMeta };
 		} catch (error) {
 			throw error;
 		}
@@ -218,9 +239,68 @@ export class SubscriptionPlansService {
 			throw error;
 		}
 	}
+
+	/**
+	 * Reconcile monthly ZNS grants for the active subscription against Stripe paid invoices
+	 * and the local ledger. Backend retries failed/stale-pending transfers and reports the
+	 * resulting on-chain balance for context.
+	 */
+	async reconcileZnsGrant(): Promise<ReconcileZnsResponse | null> {
+		try {
+			const url = `${environment.apiUrl}${environment.endpoints.subscriptionPlans.reconcileZns}`;
+			const response = await this._httpWrapper.sendRequest("post", url);
+			const payload = (response?.data ?? response) as ReconcileZnsResponse;
+
+			if (!payload || typeof payload !== "object") {
+				console.warn("[subscription-plans] reconcileZnsGrant unexpected response shape", { response });
+				return null;
+			}
+
+			console.info("[subscription-plans] reconcileZnsGrant OK", {
+				url,
+				reconciled: payload.reconciled,
+				skippedReason: payload.skippedReason,
+				actionCount: payload.actions?.length ?? 0,
+			});
+
+			return payload;
+		} catch (error: any) {
+			console.warn("[subscription-plans] reconcileZnsGrant HTTP error", {
+				url: `${environment.apiUrl}${environment.endpoints.subscriptionPlans.reconcileZns}`,
+				status: error?.status,
+				message: error?.message,
+				body: error?.error ?? error,
+			});
+			return null;
+		}
+	}
 }
 
 export interface VerifySessionResponse {
 	success: boolean;
 	record: any;
+	znsGrant?: ReconcileGrantAction | null;
+}
+
+export interface ReconcileGrantAction {
+	invoiceId: string;
+	amountPaid?: number;
+	ledgerStatus: "completed" | "failed" | "pending" | null;
+	granted: boolean;
+	retried?: boolean;
+	signature?: string | null;
+	skippedReason?: string | null;
+	tokenAmount?: number | null;
+	planCode?: string | null;
+}
+
+export interface ReconcileZnsResponse {
+	reconciled: boolean;
+	actions: ReconcileGrantAction[];
+	latestInvoiceId: string | null;
+	ledgerSnapshots: { invoiceId: string; status: string | null; signature: string | null }[];
+	onChainZnsBalance: number | null;
+	ataAddress: string | null;
+	solanaAddress: string | null;
+	skippedReason: string | null;
 }

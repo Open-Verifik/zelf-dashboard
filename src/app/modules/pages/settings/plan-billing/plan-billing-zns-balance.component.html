@@ -1,0 +1,57 @@
+<section class="mb-8 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-slate-900">
+	<div class="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+		<div class="flex items-start gap-4">
+			<div
+				class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+			>
+				<mat-icon class="icon-size-6">account_balance_wallet</mat-icon>
+			</div>
+			<div class="min-w-0">
+				<h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+					{{ i18nPrefix + ".title" | transloco }}
+				</h2>
+				<div class="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+					@if (loading && znsBalance == null) {
+						<span class="text-2xl font-semibold text-gray-400 dark:text-gray-500">—</span>
+					} @else {
+						<span class="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
+							{{ znsBalance ?? 0 | number: "1.0-2" }}
+						</span>
+					}
+					<span class="text-sm font-medium text-gray-500 dark:text-gray-400">ZNS</span>
+					@if (usdEquivalent != null) {
+						<span class="text-xs text-gray-500 dark:text-gray-400">
+							{{ i18nPrefix + ".usd_equivalent" | transloco: { usd: usdEquivalent | number: "1.2-2" } }}
+						</span>
+					}
+				</div>
+				@if (solanaAddress) {
+					<p class="mt-2 font-mono text-xs text-gray-500 dark:text-gray-500" [title]="solanaAddress">
+						{{ i18nPrefix + ".wallet_label" | transloco }} {{ truncatedAddress }}
+					</p>
+				} @else {
+					<p class="mt-2 text-xs text-gray-500 dark:text-gray-500">
+						{{ i18nPrefix + ".missing_wallet" | transloco }}
+					</p>
+				}
+			</div>
+		</div>
+
+		<div class="flex shrink-0 items-center gap-2 self-start lg:self-center">
+			<button
+				mat-stroked-button
+				type="button"
+				class="!rounded-lg"
+				[disabled]="loading || !solanaAddress"
+				(click)="onRefresh()"
+			>
+				@if (loading) {
+					<mat-icon class="mr-2 animate-spin">refresh</mat-icon>
+				} @else {
+					<mat-icon class="mr-2">refresh</mat-icon>
+				}
+				{{ i18nPrefix + ".refresh" | transloco }}
+			</button>
+		</div>
+	</div>
+</section>
