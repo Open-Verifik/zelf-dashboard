@@ -14,8 +14,9 @@ import { LicenseService } from "../license/license.service";
 import { ValidationRulesComponent } from "./components/validation-rules/validation-rules.component";
 import { BlockchainNetworksComponent } from "./components/blockchain-networks/blockchain-networks.component";
 import { PaymentConfigurationComponent } from "./components/payment-configuration/payment-configuration.component";
-import { PricingTableComponent } from "./components/pricing-table/pricing-table.component";
+import { PricingColumnKey, PricingTableComponent, PricingTableTab } from "./components/pricing-table/pricing-table.component";
 import { StorageOptionsComponent } from "./components/storage-options/storage-options.component";
+import { AnalyticsOnboardingService } from "app/modules/dashboards/analytics/analytics-onboarding.service";
 
 export interface PricingRow {
 	length: string;
@@ -60,6 +61,10 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 	currentLicense: License | null = null;
 	isLoading: boolean = false;
 	pricingTableRows: PricingRow[] = [];
+	premiumPricingRows: PricingRow[] = [];
+	unlimitedPricingRows: PricingRow[] = [];
+	pricingTableTab: PricingTableTab = "tags";
+	pricingDirty = false;
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
 	showAlert: boolean = false;
 	whitelistItems: WhitelistItem[] = [];
@@ -107,6 +112,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 		private _cdr: ChangeDetectorRef,
 		private _licenseService: LicenseService,
 		private _httpWrapper: HttpWrapperService,
+		private _analyticsOnboardingService: AnalyticsOnboardingService
 	) {}
 
 	get networksFormGroup(): UntypedFormGroup {
@@ -118,6 +124,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 	}
 
 	ngOnInit(): void {
+		this._analyticsOnboardingService.markVisited("zelfNameService");
 		this.initializeWhitelistItems();
 		this.initializePricingTable();
 		this.createEmptyForm();
@@ -449,7 +456,11 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 					discounts: { yearly: 0.1, lifetime: 0.2 },
 					rewardPrice: 10,
 					whitelist: whitelist,
-					pricingTable: this.getPricingTableFromRows(),
+					pricingTable: this.getPricingTableFromRows(this.pricingTableRows),
+					planPricing: {
+						premium: this.getPricingTableFromRows(this.premiumPricingRows),
+						unlimited: this.getPricingTableFromRows(this.unlimitedPricingRows),
+					},
 				},
 				storage: {
 					keyPrefix: formValue.keyPrefix,
@@ -482,6 +493,16 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 		};
 	}
 
+	private loadCurrentLicenseFromStorage(): void {
+		const storedLicense = localStorage.getItem("license");
+		if (!storedLicense) return;
+		try {
+			this.currentLicense = License.fromJSON(JSON.parse(storedLicense));
+		} catch (error) {
+			console.error("Error parsing stored license:", error);
+		}
+	}
+
 	async fetchLicenseFromBackend(): Promise<void> {
 		try {
 			this.isLoading = true;
@@ -492,7 +513,11 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 				return;
 			}
 
-			this.currentLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
+			const remoteLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
+			if (License.isRemoteLicenseStale(this.currentLicense?.domainConfig, remoteLicense.domainConfig)) {
+				return;
+			}
+			this.currentLicense = remoteLicense;
 			localStorage.setItem("license", JSON.stringify(this.currentLicense.toJSON()));
 		} catch (error) {
 			console.error("Error fetching license from backend:", error);
@@ -506,9 +531,8 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 	}
 
 	async loadLicense(): Promise<void> {
-		if (!this.currentLicense?.domain) {
-			await this.fetchLicenseFromBackend();
-		}
+		this.loadCurrentLicenseFromStorage();
+		await this.fetchLicenseFromBackend();
 	}
 
 	populateFormFromLicense(): void {
@@ -558,6 +582,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			if (config.tags?.payment?.pricingTable) {
 				this.loadPricingTableFromConfig(config.tags.payment.pricingTable);
 			}
+			this.loadPlanPricingFromConfig(config.tags?.payment?.planPricing, config.tags?.payment?.pricingTable);
 
 			this.populateWhitelist(config);
 
@@ -655,59 +680,60 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 		return whitelist;
 	}
 
+	get activePricingRows(): PricingRow[] {
+		if (this.pricingTableTab === "premium") return this.premiumPricingRows;
+		if (this.pricingTableTab === "unlimited") return this.unlimitedPricingRows;
+		return this.pricingTableRows;
+	}
+
+	onPricingTableTabChange(tab: PricingTableTab): void {
+		this.pricingTableTab = tab;
+		this._cdr.markForCheck();
+	}
+
+	onPricingCellChange(change: { length: string; column: PricingColumnKey; value: number }): void {
+		const rows = this.activePricingRows;
+		const row = rows.find((item) => item.length === change.length);
+		if (!row) return;
+		row[change.column] = Number.isFinite(change.value) ? change.value : 0;
+		this.pricingDirty = true;
+		this.accountForm.markAsDirty();
+		this._cdr.markForCheck();
+	}
+
 	initializePricingTable(): void {
 		const defaultPricing = this.getDefaultPricingTable();
-		this.pricingTableRows = [];
-		for (let i = 1; i <= 5; i++) {
-			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
-				length: i.toString(),
-				oneYear: prices[1],
-				twoYears: prices[2],
-				threeYears: prices[3],
-				fourYears: prices[4],
-				fiveYears: prices[5],
-				lifetime: prices.lifetime,
-			});
-		}
-		const rangePrices = defaultPricing["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-		this.pricingTableRows.push({
-			length: "6-15",
-			oneYear: rangePrices[1],
-			twoYears: rangePrices[2],
-			threeYears: rangePrices[3],
-			fourYears: rangePrices[4],
-			fiveYears: rangePrices[5],
-			lifetime: rangePrices.lifetime,
-		});
-		for (let i = 16; i <= 27; i++) {
-			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
-				length: i.toString(),
-				oneYear: prices[1],
-				twoYears: prices[2],
-				threeYears: prices[3],
-				fourYears: prices[4],
-				fiveYears: prices[5],
-				lifetime: prices.lifetime,
-			});
-		}
+		this.pricingTableRows = this.rowsFromPricingTable(defaultPricing);
+		this.premiumPricingRows = this.clonePricingRows(this.pricingTableRows);
+		this.unlimitedPricingRows = this.clonePricingRows(this.pricingTableRows);
+		this.pricingDirty = false;
 	}
 
 	resetPricingTable(): void {
-		this.initializePricingTable();
+		const defaultPricing = this.getDefaultPricingTable();
+		const defaults = this.rowsFromPricingTable(defaultPricing);
+		if (this.pricingTableTab === "premium") {
+			this.premiumPricingRows = defaults;
+		} else if (this.pricingTableTab === "unlimited") {
+			this.unlimitedPricingRows = defaults;
+		} else {
+			this.pricingTableRows = defaults;
+		}
+		this.pricingDirty = true;
+		this.accountForm.markAsDirty();
+		this._cdr.markForCheck();
 	}
 
-	getPricingTableFromRows(): { [key: string]: { [key: string]: number } } {
+	getPricingTableFromRows(rows: PricingRow[] = this.pricingTableRows): { [key: string]: { [key: string]: number } } {
 		const pricingTable: { [key: string]: { [key: string]: number } } = {};
-		this.pricingTableRows.forEach((row) => {
+		rows.forEach((row) => {
 			pricingTable[row.length] = {
-				1: row.oneYear,
-				2: row.twoYears,
-				3: row.threeYears,
-				4: row.fourYears,
-				5: row.fiveYears,
-				lifetime: row.lifetime,
+				1: Number(row.oneYear) || 0,
+				2: Number(row.twoYears) || 0,
+				3: Number(row.threeYears) || 0,
+				4: Number(row.fourYears) || 0,
+				5: Number(row.fiveYears) || 0,
+				lifetime: Number(row.lifetime) || 0,
 			};
 		});
 		return pricingTable;
@@ -718,12 +744,41 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			this.initializePricingTable();
 			return;
 		}
-		this.pricingTableRows = [];
-		// Same logic as initialize but loading from pricingTable param... I will skip repeating the for-loops logic here for brevity in thinking but the code must act.
-		// Copying exact logic from license.component.ts lines 1114-1152
+		this.pricingTableRows = this.rowsFromPricingTable(pricingTable);
+	}
+
+	loadPlanPricingFromConfig(
+		planPricing?: {
+			premium?: { [key: string]: { [key: string]: number } };
+			unlimited?: { [key: string]: { [key: string]: number } };
+		},
+		fallback?: { [key: string]: { [key: string]: number } },
+	): void {
+		const fallbackRows = this.pricingTableRows.length
+			? this.clonePricingRows(this.pricingTableRows)
+			: this.rowsFromPricingTable(fallback || this.getDefaultPricingTable());
+		this.premiumPricingRows = this.isEmptyPricingTable(planPricing?.premium)
+			? this.clonePricingRows(fallbackRows)
+			: this.rowsFromPricingTable(planPricing?.premium);
+		this.unlimitedPricingRows = this.isEmptyPricingTable(planPricing?.unlimited)
+			? this.clonePricingRows(fallbackRows)
+			: this.rowsFromPricingTable(planPricing?.unlimited);
+		this.pricingDirty = false;
+	}
+
+	private isEmptyPricingTable(pricingTable?: { [key: string]: { [key: string]: number } }): boolean {
+		return !pricingTable || Object.keys(pricingTable).length === 0;
+	}
+
+	private clonePricingRows(rows: PricingRow[]): PricingRow[] {
+		return rows.map((row) => ({ ...row }));
+	}
+
+	private rowsFromPricingTable(pricingTable: { [key: string]: { [key: string]: number } }): PricingRow[] {
+		const rows: PricingRow[] = [];
 		for (let i = 1; i <= 5; i++) {
 			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
+			rows.push({
 				length: i.toString(),
 				oneYear: prices[1] || 0,
 				twoYears: prices[2] || 0,
@@ -734,7 +789,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 			});
 		}
 		const rangePrices = pricingTable["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-		this.pricingTableRows.push({
+		rows.push({
 			length: "6-15",
 			oneYear: rangePrices[1] || 0,
 			twoYears: rangePrices[2] || 0,
@@ -745,7 +800,7 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 		});
 		for (let i = 16; i <= 27; i++) {
 			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
+			rows.push({
 				length: i.toString(),
 				oneYear: prices[1] || 0,
 				twoYears: prices[2] || 0,
@@ -755,5 +810,6 @@ export class SettingsZelfNameServiceComponent implements OnInit, AfterViewInit {
 				lifetime: prices.lifetime || 0,
 			});
 		}
+		return rows;
 	}
 }

@@ -1,0 +1,218 @@
+<div class="zp-play-area flex flex-col w-full">
+	<app-human-authn-play-header
+		title="Preview a HumanAuthn"
+		subtitle="No face. Paste the zelfID from Create and read publicData only."
+		[method]="previewMethod"
+		[path]="previewPath"
+		[currentStep]="playStep"
+	></app-human-authn-play-header>
+
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+		<mat-card class="zp-panel">
+			<mat-card-content>
+				<form [formGroup]="form" class="space-y-8 mt-2">
+					<app-human-authn-step-card
+						[step]="1"
+						title="Paste zelfID"
+						field="zelfProof"
+						hint="This is the long string Create returned as zelfID. Preview never unlocks secrets."
+					>
+						<mat-form-field class="w-full" appearance="outline">
+							<mat-label>zelfID</mat-label>
+							<textarea
+								matInput
+								formControlName="zelfProof"
+								rows="8"
+								placeholder="Paste the zelfID from Create"
+							></textarea>
+						</mat-form-field>
+					</app-human-authn-step-card>
+
+					<app-human-authn-step-card
+						[step]="2"
+						title="Verifier key"
+						field="verifierKey"
+						hint="Optional. Leave empty unless your integration uses a verifier key."
+					>
+						<mat-form-field class="w-full" appearance="outline">
+							<mat-label>Verifier key (optional)</mat-label>
+							<input matInput formControlName="verifierKey" />
+						</mat-form-field>
+					</app-human-authn-step-card>
+
+					<button mat-raised-button color="primary" class="w-full py-3 zp-btn-primary" type="button" (click)="runPreview()" [disabled]="loading">
+						@if (loading) {
+							<span class="zp-submit-label">
+								<mat-spinner diameter="20" class="zp-submit-spinner"></mat-spinner>
+								Processing...
+							</span>
+						} @else {
+							<span class="zp-submit-label">
+								<mat-icon class="zp-submit-icon">send</mat-icon>
+								Run preview
+							</span>
+						}
+					</button>
+				</form>
+			</mat-card-content>
+		</mat-card>
+
+		<div class="space-y-8 lg:sticky lg:top-6 lg:self-start">
+			@if (humanPay.paymentRequired && humanPay.paymentDetails) {
+				<mat-card class="zp-panel zp-status zp-status-payment">
+					<mat-card-header class="zp-panel-header zp-status-head">
+						<mat-card-title class="flex items-center gap-2 font-medium">
+							<span class="zp-status-dot zp-status-dot--amber"></span>
+							<mat-icon class="text-zinc-400 dark:text-zinc-500 icon-size-5">payment</mat-icon>
+							Step 3 — Pay with ZNS, then we retry preview
+							<span class="text-zinc-400 dark:text-zinc-500 font-normal text-sm font-mono">402</span>
+						</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-5">
+						<div class="zp-inset p-4 rounded-xl">
+							<h3 class="text-[13px] font-medium text-zinc-800 dark:text-zinc-200 mb-3">Payment details</h3>
+							<div class="space-y-2.5 text-sm">
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-zinc-500 dark:text-zinc-500">Cost</span>
+									<span class="font-mono font-semibold text-base text-zinc-900 dark:text-zinc-100 tabular-nums">
+										{{ humanPay.paymentDetails.paymentDetails?.cost }} ZNS
+									</span>
+								</div>
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-zinc-500 dark:text-zinc-500">Token</span>
+									<span class="font-mono text-zinc-800 dark:text-zinc-200 truncate text-right">{{ humanPay.paymentDetails.paymentDetails?.token }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="space-y-4">
+							@if (!showPasswordStep) {
+								<div class="zp-callout p-4 rounded-xl space-y-3">
+									<button
+										mat-raised-button
+										color="primary"
+										class="w-full py-3 text-base zp-btn-primary"
+										type="button"
+										(click)="startPaymentFlow()"
+										[disabled]="humanPay.paymentProcessing"
+									>
+										<div class="flex items-center justify-center">
+											<mat-icon class="mr-2">fingerprint</mat-icon>
+											Pay with ZNS
+										</div>
+									</button>
+								</div>
+							} @else {
+								<div class="zp-inset p-4 rounded-xl space-y-4">
+									@if (hasPasskey) {
+										<button
+											type="button"
+											(click)="onPasskeyLogin()"
+											[disabled]="humanPay.paymentProcessing"
+											class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium bg-zinc-100 text-zinc-900 hover:bg-zinc-200/90 dark:bg-white/[0.08] dark:text-zinc-100 dark:hover:bg-white/[0.12] ring-1 ring-zinc-200/80 dark:ring-white/[0.08]"
+										>
+											@if (humanPay.paymentProcessing) {
+												<mat-spinner diameter="20" class="mr-2"></mat-spinner>
+											} @else {
+												<mat-icon class="icon-size-5">fingerprint</mat-icon>
+											}
+											Continue with passkey
+										</button>
+									}
+									<div class="space-y-1">
+										<label class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Master password (optional)</label>
+										<div
+											class="flex items-center w-full bg-white dark:bg-white/[0.04] border border-zinc-200/90 dark:border-white/[0.08] rounded-full px-3"
+										>
+											<input
+												[(ngModel)]="masterPassword"
+												[ngModelOptions]="{ standalone: true }"
+												[type]="showPassword ? 'text' : 'password'"
+												class="flex-1 bg-transparent border-none py-2.5 text-sm focus:outline-none"
+												[disabled]="humanPay.paymentProcessing"
+											/>
+											<button type="button" (click)="togglePasswordVisibility()" class="text-zinc-400 ml-2">
+												<mat-icon class="icon-size-5">{{ showPassword ? "visibility_off" : "visibility" }}</mat-icon>
+											</button>
+										</div>
+									</div>
+									<div class="flex gap-2">
+										<button
+											type="button"
+											(click)="cancelPaymentFlow()"
+											class="flex-1 px-3 py-2.5 rounded-full border border-zinc-200/90 dark:border-white/[0.1] text-sm"
+											[disabled]="humanPay.paymentProcessing"
+										>
+											Cancel
+										</button>
+										<button
+											type="button"
+											(click)="proceedToBiometric()"
+											class="flex-1 px-3 py-2.5 rounded-full bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900 text-sm font-semibold"
+											[disabled]="humanPay.paymentProcessing"
+										>
+											Continue
+										</button>
+									</div>
+								</div>
+							}
+							<div class="border-t border-zinc-200/80 dark:border-white/[0.06] pt-4 mt-2">
+								<p class="text-xs text-center text-zinc-500 mb-3">Or verify manually</p>
+								<div class="flex gap-2 items-start">
+									<mat-form-field class="w-full text-xs" density="dense" subscriptSizing="dynamic">
+										<mat-label>Transaction hash</mat-label>
+										<input matInput [(ngModel)]="humanPay.paymentTxHash" [ngModelOptions]="{ standalone: true }" />
+									</mat-form-field>
+									<button
+										mat-icon-button
+										type="button"
+										(click)="runPreview()"
+										[disabled]="!humanPay.paymentTxHash"
+										matTooltip="Verify payment"
+										class="zp-icon-muted mt-1"
+									>
+										<mat-icon>check_circle</mat-icon>
+									</button>
+								</div>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+			}
+
+			<app-human-authn-io-panel
+				[sendPayload]="livePayload"
+				[expectedShape]="expectedShape"
+				[emptyHint]="emptyHint"
+				[response]="response"
+				[error]="error"
+				highlight="publicData"
+				[nextSteps]="nextSteps"
+				(copyResponse)="copyResponseToClipboard()"
+			></app-human-authn-io-panel>
+		</div>
+	</div>
+
+	@if (showBiometricModal) {
+		<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
+			<div
+				class="bg-white dark:bg-zinc-950 rounded-3xl w-full max-w-6xl min-h-[720px] max-h-[92vh] overflow-hidden shadow-2xl flex flex-col ring-1 ring-zinc-200/80 dark:ring-white/[0.08]"
+			>
+				<div class="px-6 py-5 flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.06]">
+					<h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Biometric verification</h2>
+					<button mat-icon-button type="button" (click)="onBiometricCancel()">
+						<mat-icon>close</mat-icon>
+					</button>
+				</div>
+				<div class="p-4 pb-8 overflow-y-auto flex-1 flex justify-center items-center">
+					<app-data-biometrics
+						class="w-full"
+						[userData]="{ domain: 'payment', masterPassword: masterPassword }"
+						[isModalContext]="true"
+						(biometricsSuccess)="onBiometricSuccess($event)"
+						(biometricsCancel)="onBiometricCancel()"
+					></app-data-biometrics>
+				</div>
+			</div>
+		</div>
+	}
+</div>

@@ -1,6 +1,13 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, QueryList, ViewChild, ViewChildren, ElementRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+	FormsModule,
+	ReactiveFormsModule,
+	FormBuilder,
+	FormGroup,
+	FormArray,
+	Validators,
+} from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -10,22 +17,51 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../../environments/environment";
 import { AuthService } from "app/core/auth/auth.service";
 import { DataBiometricsComponent, BiometricData } from "../../auth/biometric-verification/biometric-verification.component";
+import { isBiometricApiError } from "app/core/i18n/api-error-codes";
 import { PasskeyService } from "app/core/services/passkey.service";
 import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
+import { HumanAuthnPaymentService } from "../human-authn-payment.service";
+import { AnalyticsOnboardingService } from "app/modules/dashboards/analytics/analytics-onboarding.service";
+import { HumanAuthnPlayHeaderComponent } from "../human-authn-play-header/human-authn-play-header.component";
+import { HumanAuthnStepCardComponent } from "../human-authn-step-card/human-authn-step-card.component";
+import { HumanAuthnIoPanelComponent } from "../human-authn-io-panel/human-authn-io-panel.component";
+import {
+	HUMAN_AUTHN_NEXT_DECRYPT,
+	HUMAN_AUTHN_NEXT_PREVIEW,
+	HumanAuthnNextStep,
+	HumanAuthnPlayStepId,
+	resolveHumanAuthnPlayStep,
+} from "../human-authn-play.utils";
+
+/** Paid HumanAuthn encrypt — ZelfEncrypt v4. Not `/api/zelf-proof`. */
+const HUMAN_AUTHN_ENCRYPT_PATH = "/api/human-authn/encrypt";
+
+/** Encrypt credential mode — maps to the optional `password` field on POST /api/human-authn/encrypt. */
+type CredentialMode = "none" | "password" | "pin";
+
+/** Max selfie size in bytes; backend validates the image, but bail early so users get a friendly hint. */
+const MAX_SELFIE_BYTES = 5 * 1024 * 1024;
+
+/** PIN entry uses OTP-style boxes; value is still sent as one string on `credentialValue`. */
+const PIN_SLOT_COUNT = 6;
 
 @Component({
 	selector: "app-zelfproofs",
 	templateUrl: "./zelfproofs.component.html",
 	styleUrls: ["./zelfproofs.component.scss"],
+	providers: [HumanAuthnPaymentService],
 	imports: [
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
 		MatButtonModule,
+		MatButtonToggleModule,
 		MatFormFieldModule,
 		MatInputModule,
 		MatSelectModule,
@@ -34,30 +70,47 @@ import { TranslocoModule, TranslocoService } from "@jsverse/transloco";
 		MatProgressSpinnerModule,
 		MatSnackBarModule,
 		MatDialogModule,
+		MatTooltipModule,
 		DataBiometricsComponent,
 		TranslocoModule,
+		HumanAuthnPlayHeaderComponent,
+		HumanAuthnStepCardComponent,
+		HumanAuthnIoPanelComponent,
 	],
 })
 export class ZelfProofsComponent implements OnInit {
+	readonly encryptMethod = "POST";
+	readonly encryptPath = HUMAN_AUTHN_ENCRYPT_PATH;
+	readonly encryptUrl = `${environment.apiUrl}${HUMAN_AUTHN_ENCRYPT_PATH}`;
+	readonly expectedShape = `{
+  "zelfID": "<proof string>"
+}`;
+	readonly emptyHint = "A long zelfID string. That is the HumanAuthn — copy it for Preview or Decrypt.";
+	readonly nextSteps: HumanAuthnNextStep[] = [HUMAN_AUTHN_NEXT_PREVIEW, HUMAN_AUTHN_NEXT_DECRYPT];
+	private readonly playIdentifier = `play-id-${Date.now()}`;
+
+	readonly pinSlotIndices = Array.from({ length: PIN_SLOT_COUNT }, (_, i) => i);
+
+	@ViewChild(DataBiometricsComponent) biometricVerification?: DataBiometricsComponent;
+	@ViewChildren("pinBox") pinBoxRefs!: QueryList<ElementRef<HTMLInputElement>>;
+
 	encryptForm: FormGroup;
 	loading = false;
-	paymentRequired = false;
-	paymentDetails: any = null;
 	response: any = null;
 	error: any = null;
 
-	// Secure Flow State
 	masterPassword = "";
 	showPassword = false;
 	hasPasskey = false;
 	showPasswordStep = false;
 	showBiometricModal = false;
 
-	// Payment state
-	paymentProcessing = false;
-	paymentTxHash = "";
-	paymentChain = "solana";
-	walletAddress = "";
+	selfiePreviewUrl: string | null = null;
+	selfieFileName: string | null = null;
+	showCredentialValue = true;
+
+	/** One character per PIN box (`''` or a single digit); mirrors `credentialValue` in PIN mode. */
+	pinSlots: string[] = Array(PIN_SLOT_COUNT).fill("");
 
 	chains = [
 		{ value: "solana", label: "Solana", icon: "account_balance_wallet" },
@@ -66,37 +119,48 @@ export class ZelfProofsComponent implements OnInit {
 	];
 
 	livenessLevels = [
-		{ value: "SOFT", label: "Soft" },
+		{ value: "SOFT", label: "Soft (lenient)" },
 		{ value: "REGULAR", label: "Regular" },
-		{ value: "HARDENED", label: "Hardened" },
+		{ value: "HARDENED", label: "Hardened (strict)" },
+	];
+
+	credentialModes: { value: CredentialMode; label: string; icon: string }[] = [
+		{ value: "none", label: "No password", icon: "lock_open" },
+		{ value: "password", label: "Password", icon: "key" },
+		{ value: "pin", label: "PIN", icon: "pin" },
 	];
 
 	constructor(
 		private fb: FormBuilder,
 		private http: HttpClient,
 		private authService: AuthService,
+		public humanPay: HumanAuthnPaymentService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog,
 		private passkeyService: PasskeyService,
-		private translocoService: TranslocoService
+		private translocoService: TranslocoService,
+		private _analyticsOnboardingService: AnalyticsOnboardingService
 	) {}
 
 	ngOnInit(): void {
 		this.encryptForm = this.fb.group({
-			publicData: ['{"name": "Test User", "email": "test@example.com"}', Validators.required],
+			publicData: this.fb.array([
+				this.buildKvRow("name", "John Doe"),
+				this.buildKvRow("email", "john.doe@example.com"),
+			]),
+			metadata: this.fb.array([
+				this.buildKvRow("source", "play-area"),
+				this.buildKvRow("client", "dashboard"),
+			]),
 			faceBase64: ["", Validators.required],
 			os: ["DESKTOP", Validators.required],
-			livenessLevel: ["REGULAR", Validators.required],
-			metadata: ['{"device": "Browser", "location": "Test"}'],
+			livenessLevel: ["SOFT", Validators.required],
+			credentialMode: ["none" as CredentialMode, Validators.required],
+			credentialValue: [""],
 		});
 
-		// Get wallet address from auth service
-		const wallet = this.authService.wallet;
-		if (wallet) {
-			this.walletAddress = wallet.solanaAddress || "";
-		}
+		this.humanPay.initWalletFromAuth();
 
-		// Check for passkey
 		const email = this.authService.zelfAccount?.publicData?.accountEmail || this.authService.zelfAccount?.publicData?.staffEmail;
 
 		if (email) {
@@ -108,11 +172,284 @@ export class ZelfProofsComponent implements OnInit {
 		}
 	}
 
+	get publicDataRows(): FormArray {
+		return this.encryptForm.get("publicData") as FormArray;
+	}
+
+	get metadataRows(): FormArray {
+		return this.encryptForm.get("metadata") as FormArray;
+	}
+
+	private buildKvRow(key = "", value = ""): FormGroup {
+		return this.fb.group({
+			key: [key],
+			value: [value],
+		});
+	}
+
+	addPublicDataRow(): void {
+		this.publicDataRows.push(this.buildKvRow());
+	}
+
+	removePublicDataRow(index: number): void {
+		if (this.publicDataRows.length > 1) {
+			this.publicDataRows.removeAt(index);
+		} else {
+			this.publicDataRows.at(0).patchValue({ key: "", value: "" });
+		}
+	}
+
+	addMetadataRow(): void {
+		this.metadataRows.push(this.buildKvRow());
+	}
+
+	removeMetadataRow(index: number): void {
+		if (this.metadataRows.length > 1) {
+			this.metadataRows.removeAt(index);
+		} else {
+			this.metadataRows.at(0).patchValue({ key: "", value: "" });
+		}
+	}
+
+	/**
+	 * Fold a FormArray of `{ key, value }` rows into a `{ [key]: string }` object.
+	 * Trims empty keys; coerces every value to string so backend `stringKeyValueObject` validation passes.
+	 */
+	private rowsToStringObject(rows: FormArray): Record<string, string> {
+		const out: Record<string, string> = {};
+		rows.controls.forEach((row) => {
+			const rawKey = (row.value?.key ?? "").toString().trim();
+			if (!rawKey) return;
+			const rawValue = row.value?.value;
+			out[rawKey] = rawValue === null || rawValue === undefined ? "" : String(rawValue);
+		});
+		return out;
+	}
+
+	onCredentialModeChange(): void {
+		const mode: CredentialMode = this.encryptForm.get("credentialMode")?.value;
+		const valueCtrl = this.encryptForm.get("credentialValue");
+		if (!valueCtrl) return;
+		if (mode === "none") {
+			valueCtrl.setValue("");
+			valueCtrl.clearValidators();
+			this.resetPinSlots();
+		} else if (mode === "pin") {
+			this.showCredentialValue = true;
+			valueCtrl.setValidators([Validators.required, Validators.pattern(/^[0-9]{6}$/)]);
+			const digits = (valueCtrl.value ?? "").toString().replace(/\D/g, "").slice(0, PIN_SLOT_COUNT);
+			valueCtrl.setValue(digits);
+			this.pinSlots = Array.from({ length: PIN_SLOT_COUNT }, (_, i) => digits[i] ?? "");
+			setTimeout(() => {
+				this.pinBoxRefs?.forEach((ref, i) => {
+					ref.nativeElement.value = this.pinSlots[i] ?? "";
+				});
+				const focusIx = digits.length >= PIN_SLOT_COUNT ? PIN_SLOT_COUNT - 1 : digits.length;
+				this.focusPinBox(focusIx);
+			});
+		} else {
+			this.showCredentialValue = false;
+			valueCtrl.setValidators([Validators.required, Validators.minLength(4)]);
+			this.resetPinSlots();
+		}
+		valueCtrl.updateValueAndValidity();
+	}
+
+	private resetPinSlots(): void {
+		this.pinSlots = Array(PIN_SLOT_COUNT).fill("");
+	}
+
+	private flushPinSlotsToCredential(): void {
+		const pin = this.pinSlots.join("");
+		const ctrl = this.encryptForm.get("credentialValue");
+		ctrl?.setValue(pin);
+		ctrl?.markAsDirty();
+		ctrl?.updateValueAndValidity({ emitEvent: true });
+	}
+
+	focusPinBox(index: number): void {
+		const boxes = this.pinBoxRefs?.toArray();
+		const el = boxes?.[index]?.nativeElement;
+		el?.focus();
+		el?.select();
+	}
+
+	onPinSlotInput(event: Event, index: number): void {
+		const el = event.target as HTMLInputElement;
+		const digits = el.value.replace(/\D/g, "");
+		const digit = digits.slice(-1);
+		const next = [...this.pinSlots];
+		next[index] = digit;
+		this.pinSlots = next;
+		el.value = digit;
+		this.flushPinSlotsToCredential();
+		if (digit && index < PIN_SLOT_COUNT - 1) {
+			this.focusPinBox(index + 1);
+		}
+	}
+
+	onPinSlotKeydown(event: KeyboardEvent, index: number): void {
+		if (event.key === "Backspace") {
+			if (this.pinSlots[index]) {
+				const next = [...this.pinSlots];
+				next[index] = "";
+				this.pinSlots = next;
+				(event.target as HTMLInputElement).value = "";
+				this.flushPinSlotsToCredential();
+				event.preventDefault();
+				return;
+			}
+			if (index > 0) {
+				event.preventDefault();
+				const next = [...this.pinSlots];
+				next[index - 1] = "";
+				this.pinSlots = next;
+				this.flushPinSlotsToCredential();
+				const prev = this.pinBoxRefs?.toArray()[index - 1]?.nativeElement;
+				if (prev) prev.value = "";
+				this.focusPinBox(index - 1);
+			}
+			return;
+		}
+		if (event.key === "ArrowLeft" && index > 0) {
+			event.preventDefault();
+			this.focusPinBox(index - 1);
+		}
+		if (event.key === "ArrowRight" && index < PIN_SLOT_COUNT - 1) {
+			event.preventDefault();
+			this.focusPinBox(index + 1);
+		}
+	}
+
+	onPinPaste(event: ClipboardEvent): void {
+		event.preventDefault();
+		const raw = event.clipboardData?.getData("text") ?? "";
+		const digits = raw.replace(/\D/g, "").slice(0, PIN_SLOT_COUNT);
+		this.pinSlots = Array.from({ length: PIN_SLOT_COUNT }, (_, i) => digits[i] ?? "");
+		this.flushPinSlotsToCredential();
+		this.pinBoxRefs?.forEach((ref, i) => {
+			ref.nativeElement.value = this.pinSlots[i] ?? "";
+		});
+		const focusIx = digits.length >= PIN_SLOT_COUNT ? PIN_SLOT_COUNT - 1 : digits.length;
+		setTimeout(() => this.focusPinBox(focusIx));
+	}
+
+	toggleCredentialVisibility(): void {
+		this.showCredentialValue = !this.showCredentialValue;
+		if (this.credentialMode !== "pin") return;
+		setTimeout(() => {
+			this.pinBoxRefs?.forEach((ref, i) => {
+				ref.nativeElement.value = this.pinSlots[i] ?? "";
+			});
+		});
+	}
+
+	get credentialMode(): CredentialMode {
+		return this.encryptForm.get("credentialMode")?.value || "none";
+	}
+
+	get playStep(): HumanAuthnPlayStepId {
+		return resolveHumanAuthnPlayStep({
+			loading: this.loading,
+			paymentRequired: this.humanPay.paymentRequired,
+			response: this.response,
+		});
+	}
+
+	get livePayload(): Record<string, unknown> {
+		return this.buildPayload();
+	}
+
+	/**
+	 * Same object the POST sends. Safe to call while the form is incomplete so the live JSON can update.
+	 */
+	buildPayload(): Record<string, unknown> {
+		if (!this.encryptForm) return {};
+		const publicData = this.rowsToStringObject(this.publicDataRows);
+		const metadata = this.rowsToStringObject(this.metadataRows);
+		const formValue = this.encryptForm.value;
+		const credentialMode: CredentialMode = formValue.credentialMode;
+		const credentialValue = (formValue.credentialValue || "").toString();
+		const payload: Record<string, unknown> = {
+			publicData,
+			metadata,
+			faceBase64: this.humanPay.normalizeFaceBase64ForApi(formValue.faceBase64 || ""),
+			os: formValue.os,
+			livenessLevel: formValue.livenessLevel,
+			check_live_face_before_creation: true,
+			identifier: publicData.email || publicData.identifier || this.playIdentifier,
+		};
+		if (credentialMode !== "none" && credentialValue.length > 0) {
+			payload.password = credentialValue;
+		}
+		return payload;
+	}
+
+	/** Selfie file upload: read into a data URL and set `faceBase64`. Falls back to a hint if too large. */
+	onSelfieFileSelected(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const file = input?.files?.[0];
+		if (!file) return;
+
+		if (!file.type.startsWith("image/")) {
+			this.snackBar.open("Please choose an image file", "Close", { duration: 3000 });
+			input.value = "";
+			return;
+		}
+
+		if (file.size > MAX_SELFIE_BYTES) {
+			this.snackBar.open(`Image too large (max ${Math.round(MAX_SELFIE_BYTES / (1024 * 1024))} MB)`, "Close", { duration: 4000 });
+			input.value = "";
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			const dataUrl = typeof reader.result === "string" ? reader.result : "";
+			this.encryptForm.patchValue({ faceBase64: dataUrl });
+			this.selfiePreviewUrl = dataUrl;
+			this.selfieFileName = file.name;
+			this.encryptForm.get("faceBase64")?.markAsDirty();
+		};
+		reader.onerror = () => {
+			this.snackBar.open("Failed to read image", "Close", { duration: 3000 });
+		};
+		reader.readAsDataURL(file);
+	}
+
+	clearSelfie(): void {
+		this.encryptForm.patchValue({ faceBase64: "" });
+		this.selfiePreviewUrl = null;
+		this.selfieFileName = null;
+	}
+
 	async testEncrypt(isPolling = false): Promise<boolean> {
-		if (this.encryptForm.invalid) {
-			this.snackBar.open("Please fill in all required fields", "Close", { duration: 3000 });
+		const publicData = this.rowsToStringObject(this.publicDataRows);
+		const metadata = this.rowsToStringObject(this.metadataRows);
+
+		if (!this.encryptForm.get("faceBase64")?.value || Object.keys(publicData).length === 0 || Object.keys(metadata).length === 0) {
 			if (!isPolling) {
-				this.snackBar.open("Please fill in all required fields", "Close", { duration: 3000 });
+				this.snackBar.open("Please add a selfie and at least one publicData / metadata pair", "Close", { duration: 3500 });
+			}
+			return false;
+		}
+
+		const credentialMode: CredentialMode = this.encryptForm.get("credentialMode")?.value;
+		const credentialValue = (this.encryptForm.get("credentialValue")?.value || "").toString();
+
+		if (credentialMode !== "none" && credentialValue.trim().length === 0) {
+			if (!isPolling) {
+				this.snackBar.open(`Enter a ${credentialMode === "pin" ? "6-digit PIN" : "password"} or switch to "No password"`, "Close", {
+					duration: 3500,
+				});
+			}
+			return false;
+		}
+
+		if (credentialMode === "pin" && !/^[0-9]{6}$/.test(credentialValue)) {
+			if (!isPolling) {
+				this.snackBar.open("Enter all 6 PIN digits", "Close", { duration: 3500 });
+				this.encryptForm.get("credentialValue")?.markAsTouched();
 			}
 			return false;
 		}
@@ -122,50 +459,29 @@ export class ZelfProofsComponent implements OnInit {
 		}
 		this.error = null;
 		this.response = null;
-		this.paymentRequired = false;
+		this.humanPay.paymentRequired = false;
 
 		try {
-			const formValue = this.encryptForm.value;
-			const publicDataObj = JSON.parse(formValue.publicData);
-			const payload = {
-				publicData: publicDataObj,
-				faceBase64: formValue.faceBase64,
-				os: formValue.os,
-				metadata: formValue.metadata ? JSON.parse(formValue.metadata) : {},
-				livenessLevel: formValue.livenessLevel,
-				tolerance: formValue.livenessLevel,
-				identifier: publicDataObj.email || publicDataObj.identifier || `test-id-${Date.now()}`,
-			};
-
-			// Build headers
-			const headers: any = {
-				Authorization: `Bearer ${this.authService.accessToken}`,
-			};
-
-			// Add payment headers if we have them
-			if (this.paymentTxHash && this.paymentChain) {
-				headers["x-payment-chain"] = this.paymentChain;
-				headers["x-payment-tx"] = this.paymentTxHash;
-				headers["x-wallet-address"] = this.walletAddress;
-				headers["x-payment-proof"] = "verified"; // Proof that payment was made
-			}
+			const payload = this.buildPayload();
 
 			const response = await this.http
-				.post(`${environment.apiUrl}/api/zelf-proof/encrypt`, payload, {
-					headers: new HttpHeaders(headers),
+				.post(this.encryptUrl, payload, {
+					headers: this.humanPay.buildAuthPaymentHeaders(),
 				})
 				.toPromise();
 
 			this.response = response;
+			// Backend treats each proof as single-use; drop headers so the next encrypt triggers payment again.
+			this.humanPay.clearPayment();
 			this.snackBar.open("Encryption successful!", "Close", { duration: 5000 });
+			void this._analyticsOnboardingService.refresh();
 			return true;
 		} catch (error: any) {
 			console.error("Error:", error);
 
 			if (error.status === 402) {
-				// Payment required
-				this.paymentRequired = true;
-				this.paymentDetails = error.error;
+				this.humanPay.paymentRequired = true;
+				this.humanPay.paymentDetails = error.error;
 
 				if (!isPolling) {
 					this.snackBar.open("Payment required - Please complete payment", "Close", {
@@ -175,8 +491,11 @@ export class ZelfProofsComponent implements OnInit {
 			} else {
 				this.error = error.error || error.message || "Unknown error occurred";
 
-				// Don't show error snackbar if we are polling and it's likely a propagation delay
-				const errorMsg = this.getErrorMessage(error);
+				if (error.status === 409 && this.humanPay.isPaymentAlreadyUsedError(error)) {
+					this.humanPay.clearPayment();
+				}
+
+				const errorMsg = this.humanPay.getErrorMessage(error);
 				if (!isPolling || (!errorMsg.includes("Transaction not found") && error.status !== 402 && error.status !== 400)) {
 					this.snackBar.open(`Error: ${errorMsg}`, "Close", {
 						duration: 5000,
@@ -189,47 +508,35 @@ export class ZelfProofsComponent implements OnInit {
 		}
 	}
 
-	/**
-	 * Poll for payment verification
-	 */
 	async pollForVerification(attempts = 0): Promise<void> {
 		if (attempts >= 30) {
 			this.snackBar.open("Payment verification timed out. Please try manually.", "Close", { duration: 5000 });
-			this.paymentProcessing = false;
+			this.humanPay.paymentProcessing = false;
 			return;
 		}
 
-		// Try to verify
 		const success = await this.testEncrypt(true);
 
 		if (success) {
-			this.paymentProcessing = false;
+			this.humanPay.paymentProcessing = false;
 
 			this.showPasswordStep = false;
 
-			this.cancelPaymentFlow(); // Reset flow state
+			this.cancelPaymentFlow();
 
 			return;
 		}
 
-		// If not successful, check if we should retry
-		// We retry if we got a 402 (Payment Required) or if error message mentions transaction not found
 		const errorMsg = this.error && typeof this.error === "object" ? this.error.message || JSON.stringify(this.error) : String(this.error || "");
 
-		// If payment is required or specific transaction error, retry
-		if (this.paymentRequired || errorMsg.includes("Transaction not found") || errorMsg.includes("Payment Verification Failed")) {
-			// Wait 2 seconds and retry
+		if (this.humanPay.paymentRequired || errorMsg.includes("Transaction not found") || errorMsg.includes("Payment Verification Failed")) {
 			await new Promise((resolve) => setTimeout(resolve, 2200));
 			await this.pollForVerification(attempts + 1);
 		} else {
-			// Fatal error
-			this.paymentProcessing = false;
+			this.humanPay.paymentProcessing = false;
 		}
 	}
 
-	/**
-	 * Start the secure payment flow
-	 */
 	startPaymentFlow(): void {
 		this.showPasswordStep = true;
 	}
@@ -244,11 +551,8 @@ export class ZelfProofsComponent implements OnInit {
 		this.showPassword = !this.showPassword;
 	}
 
-	/**
-	 * Login with Passkey
-	 */
 	async onPasskeyLogin(): Promise<void> {
-		this.paymentProcessing = true;
+		this.humanPay.paymentProcessing = true;
 		try {
 			const email = this.authService.zelfAccount?.publicData?.accountEmail || this.authService.zelfAccount?.publicData?.staffEmail;
 			if (!email) throw new Error("No user email found");
@@ -256,16 +560,14 @@ export class ZelfProofsComponent implements OnInit {
 			const metadata = await this.passkeyService.getPasskeyMetadata(email);
 			if (!metadata) throw new Error("No passkey metadata found");
 
-			// Authenticate with passkey
 			const key = await this.passkeyService.authenticate(metadata.credentialId, this.passkeyService.base64ToBuffer(metadata.salt));
 
 			if (key) {
-				// Decrypt master password
 				const decryptedPassword = await this.passkeyService.decryptPassword(metadata.ciphertext, metadata.iv, key);
 
 				if (decryptedPassword) {
 					this.masterPassword = decryptedPassword;
-					this.paymentProcessing = false;
+					this.humanPay.paymentProcessing = false;
 					this.proceedToBiometric();
 					return;
 				}
@@ -276,101 +578,61 @@ export class ZelfProofsComponent implements OnInit {
 			this.snackBar.open("Passkey login failed. Please use your master password.", "Close", {
 				duration: 5000,
 			});
-			this.paymentProcessing = false;
+			this.humanPay.paymentProcessing = false;
 		}
 	}
 
 	/**
-	 * Proceed to biometric verification
+	 * Proceed to biometric verification. The Solana fee-payer endpoint accepts an optional
+	 * master password, so an empty value is allowed for accounts that don't use one.
 	 */
 	proceedToBiometric(): void {
-		if (!this.masterPassword.trim()) {
-			this.snackBar.open("Please enter your master password", "Close", { duration: 3000 });
-			return;
-		}
-
-		// Show biometric modal
 		this.showBiometricModal = true;
 	}
 
-	/**
-	 * Handle biometric success
-	 */
 	async onBiometricSuccess(biometricData: BiometricData): Promise<void> {
-		this.showBiometricModal = false;
-
-		const amount = this.paymentDetails?.paymentDetails?.cost || 0.1;
+		const pd = this.humanPay.paymentDetails as { paymentDetails?: { cost?: number } } | null;
+		const amount = pd?.paymentDetails?.cost ?? 0.1;
 		await this.submitPayment(biometricData, amount);
 	}
 
-	/**
-	 * Handle biometric cancel
-	 */
 	onBiometricCancel(): void {
 		this.showBiometricModal = false;
 	}
 
-	/**
-	 * Submit payment with biometric verification
-	 */
 	async submitPayment(biometricData: BiometricData, amount: number): Promise<void> {
-		this.paymentProcessing = true;
+		this.humanPay.paymentProcessing = true;
 
 		try {
-			const payload = {
-				amount,
-				faceBase64: biometricData.faceBase64,
-				masterPassword: biometricData.password,
-			};
-
-			const response: any = await this.http
-				.post(`${environment.apiUrl}/api/solana/payment`, payload, {
-					headers: new HttpHeaders({
-						Authorization: `Bearer ${this.authService.accessToken}`,
-					}),
-				})
-				.toPromise();
-
-			if (response.success && response.transactionHash) {
-				this.paymentTxHash = response.transactionHash;
-				this.paymentChain = "solana";
-
-				this.snackBar.open("Payment successful! Retrying encryption...", "Close", {
-					duration: 3000,
-				});
-
-				// Automatically poll for verification
-				await this.pollForVerification();
-			} else {
-				throw new Error("Payment failed - no transaction hash received");
-			}
-		} catch (error: any) {
+			const face = this.humanPay.normalizeFaceBase64ForApi(biometricData.faceBase64);
+			const password = biometricData.password || this.masterPassword;
+			await this.humanPay.submitSolanaPayment(face, password, amount);
+		} catch (error: unknown) {
 			console.error("Payment error:", error);
-			this.snackBar.open(`Payment failed: ${this.getErrorMessage(error)}`, "Close", {
+			if (isBiometricApiError(error) && this.biometricVerification) {
+				this.biometricVerification.handleApiError(error);
+				return;
+			}
+			this.showBiometricModal = false;
+			this.snackBar.open(`Payment failed: ${this.humanPay.getErrorMessage(error)}`, "Close", {
 				duration: 5000,
 			});
+			return;
 		} finally {
-			this.paymentProcessing = false;
+			this.humanPay.paymentProcessing = false;
 		}
-	}
 
-	clearPayment(): void {
-		this.paymentTxHash = "";
-		this.paymentRequired = false;
-		this.paymentDetails = null;
-	}
+		this.showBiometricModal = false;
+		this.snackBar.open("Payment successful! Retrying encryption...", "Close", {
+			duration: 3000,
+		});
 
-	private getErrorMessage(error: any): string {
-		if (error.error?.message) {
-			return error.error.message;
+		try {
+			await this.pollForVerification();
+		} catch (error: unknown) {
+			console.error("Encrypt retry error:", error);
+			this.snackBar.open(this.humanPay.getErrorMessage(error), "Close", { duration: 5000 });
 		}
-		if (error.error?.error) {
-			return error.error.error;
-		}
-		if (error.message) {
-			return error.message;
-		}
-		return "Unknown error";
 	}
 
 	copyResponseToClipboard(): void {
@@ -386,30 +648,35 @@ export class ZelfProofsComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Reset KV rows to a string-only sample. Backend `stringKeyValueObject` rejects non-string values,
+	 * so every value here is intentionally a string (e.g. `age: "30"`).
+	 */
 	fillSampleData(): void {
+		this.publicDataRows.clear();
+		[
+			{ key: "name", value: "John Doe" },
+			{ key: "email", value: "john.doe@example.com" },
+			{ key: "age", value: "30" },
+			{ key: "city", value: "New York" },
+		].forEach((row) => this.publicDataRows.push(this.buildKvRow(row.key, row.value)));
+
+		this.metadataRows.clear();
+		[
+			{ key: "device", value: "Chrome Browser" },
+			{ key: "location", value: "New York, USA" },
+			{ key: "timestamp", value: new Date().toISOString() },
+			{ key: "source", value: "play-area" },
+		].forEach((row) => this.metadataRows.push(this.buildKvRow(row.key, row.value)));
+
 		this.encryptForm.patchValue({
-			publicData: JSON.stringify(
-				{
-					name: "John Doe",
-					email: "john.doe@example.com",
-					age: 30,
-					city: "New York",
-				},
-				null,
-				2
-			),
-			faceBase64: "data:image/jpeg;base64,/9j/4AAQSkZJRg...(sample)",
 			os: "DESKTOP",
-			metadata: JSON.stringify(
-				{
-					device: "Chrome Browser",
-					location: "New York, USA",
-					timestamp: new Date().toISOString(),
-				},
-				null,
-				2
-			),
+			livenessLevel: "SOFT",
+			credentialMode: "none",
+			credentialValue: "",
 		});
-		this.snackBar.open("Sample data filled", "Close", { duration: 2000 });
+		this.onCredentialModeChange();
+
+		this.snackBar.open("Sample data filled — add a selfie next", "Close", { duration: 3000 });
 	}
 }

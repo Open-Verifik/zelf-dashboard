@@ -25,7 +25,6 @@ export class PortfolioPaymentComponent implements OnInit {
 	searchError = signal<string | null>(null);
 	showNameAvailable = signal<boolean>(false);
 	selectedPaymentMethod = signal<string>("ETH");
-	coinbaseUrl = signal<string | null>(null);
 	selectedDuration = signal<number>(1); // Duration in years, default 1
 	isDurationDropdownOpen = signal<boolean>(false);
 	leaseDurationOptions = [
@@ -170,10 +169,6 @@ export class PortfolioPaymentComponent implements OnInit {
 		this.selectedPaymentMethod.set("ETH");
 		this.selectedDuration.set(cachedData.duration || fallbackDuration);
 
-		if (cachedData.coinbase_hosted_url) {
-			this.coinbaseUrl.set(cachedData.coinbase_hosted_url);
-		}
-
 		if (cachedData.signedDataPrice) {
 			localStorage.setItem("signedDataPrice", cachedData.signedDataPrice);
 		}
@@ -181,7 +176,6 @@ export class PortfolioPaymentComponent implements OnInit {
 
 	private async fetchAndSavePaymentData(tagName: string, domain: string, duration: number, cacheKey: string): Promise<void> {
 		this.paymentOptions.set(null);
-		this.coinbaseUrl.set(null);
 		localStorage.removeItem("signedDataPrice");
 
 		try {
@@ -222,18 +216,11 @@ export class PortfolioPaymentComponent implements OnInit {
 
 		this.saveCachedPaymentOptions(cacheKey, data);
 		this.saveSignedDataPrice(data);
-		this.saveCoinbaseUrl(data);
 	}
 
 	private saveSignedDataPrice(data: any): void {
 		if (data.signedDataPrice) {
 			localStorage.setItem("signedDataPrice", data.signedDataPrice);
-		}
-	}
-
-	private saveCoinbaseUrl(data: any): void {
-		if (data.coinbase_hosted_url) {
-			this.coinbaseUrl.set(data.coinbase_hosted_url);
 		}
 	}
 
@@ -399,14 +386,6 @@ export class PortfolioPaymentComponent implements OnInit {
 			ethAddress: ethAddress,
 			amountToPay: amountToPay,
 		};
-
-		// Add coinbase-specific data if payment method is COINBASE
-		if (paymentMethod === "COINBASE" && this.coinbaseUrl()) {
-			queryParams.coinbaseUrl = this.coinbaseUrl();
-			if (options.coinbase_expires_at) {
-				queryParams.coinbaseExpiresAt = options.coinbase_expires_at;
-			}
-		}
 
 		// Navigate to checkout with all the details
 		this.router.navigate(["/portfolio/payment-checkout"], {

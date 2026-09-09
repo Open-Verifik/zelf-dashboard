@@ -54,6 +54,8 @@ export interface DomainConfig {
 	description: string;
 	startDate?: string;
 	endDate?: string;
+	updatedAt?: string;
+	ipfsCid?: string;
 	tags: {
 		minLength: number;
 		maxLength: number;
@@ -70,6 +72,10 @@ export interface DomainConfig {
 			rewardPrice: number;
 			whitelist: { [key: string]: string };
 			pricingTable: { [key: string]: { [key: string]: number } };
+			planPricing?: {
+				premium?: { [key: string]: { [key: string]: number } };
+				unlimited?: { [key: string]: { [key: string]: number } };
+			};
 		};
 		storage: {
 			// Moved storage inside tags
@@ -226,6 +232,10 @@ export interface PaymentSettings {
 	networks: { [key: string]: NetworkConfig };
 	whitelist: { [key: string]: string };
 	pricingTable: { [key: string]: { [key: string]: number } };
+	planPricing?: {
+		premium?: { [key: string]: { [key: string]: number } };
+		unlimited?: { [key: string]: { [key: string]: number } };
+	};
 }
 
 export interface Metadata {
@@ -278,19 +288,6 @@ export class License {
 		// Handle both nested domainConfig and flat structure from API response
 		const configData = config?.domainConfig || config;
 
-		// Helper to get networks configuration
-		const getNetworksConfig = () => {
-			let raw: { [key: string]: any };
-			if (configData?.tags?.payment?.networks) {
-				raw = { ...configData.tags.payment.networks };
-			} else if (configData?.tags?.payment?.currencies && Array.isArray(configData.tags.payment.currencies)) {
-				raw = this.migrateCurrenciesToNetworks(configData.tags.payment.currencies);
-			} else {
-				raw = this.getDefaultNetworks();
-			}
-			return this.normalizePaymentNetworks(raw);
-		};
-
 		return {
 			name: configData?.name || "",
 			type: configData?.type || "custom",
@@ -300,37 +297,9 @@ export class License {
 			description: configData?.description || "",
 			startDate: configData?.startDate || "",
 			endDate: configData?.endDate || "",
-			tags: {
-				minLength: configData?.tags?.minLength || 3,
-				maxLength: configData?.tags?.maxLength || 50,
-				allowedChars: configData?.tags?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-				reserved: configData?.tags?.reserved || ["www", "api", "admin", "support", "help"],
-				customRules: configData?.tags?.customRules || [],
-				payment: {
-					methods: configData?.tags?.payment?.methods || ["coinbase", "crypto", "stripe"],
-					networks: getNetworksConfig(),
-					discounts: configData?.tags?.payment?.discounts || {
-						yearly: 0.1,
-						lifetime: 0.2,
-					},
-					rewardPrice: configData?.tags?.payment?.rewardPrice || 10,
-					whitelist: configData?.tags?.payment?.whitelist || {},
-					pricingTable: configData?.tags?.payment?.pricingTable || this.getDefaultPricingTable(),
-				},
-				storage: {
-					// Moved storage inside tags
-					keyPrefix: configData?.tags?.storage?.keyPrefix || "tagName",
-					ipfsEnabled: configData?.tags?.storage?.ipfsEnabled ?? true,
-					arweaveEnabled: configData?.tags?.storage?.arweaveEnabled ?? true,
-					walrusEnabled: configData?.tags?.storage?.walrusEnabled ?? true,
-					backupEnabled: configData?.tags?.storage?.backupEnabled || false,
-				},
-				wallet: {
-					networks: this.getSimplifiedNetworks(
-						configData?.tags?.wallet?.networks || configData?.wallet?.networks || this.getDefaultNetworks(),
-					),
-				},
-			},
+			updatedAt: configData?.updatedAt || "",
+			ipfsCid: configData?.ipfsCid || "",
+			tags: this.buildTagsConfig(configData),
 			zelfkeys: {
 				plans: configData?.zelfkeys?.plans || [],
 				payment: {
@@ -368,6 +337,55 @@ export class License {
 				logo: configData?.metadata?.logo,
 			},
 			themeSettings: configData?.themeSettings || License.getDefaultThemeSettings(),
+		};
+	}
+
+	private buildTagsConfig(configData: any): DomainConfig["tags"] {
+		return {
+			minLength: configData?.tags?.minLength || 3,
+			maxLength: configData?.tags?.maxLength || 50,
+			allowedChars: configData?.tags?.allowedChars || /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+			reserved: configData?.tags?.reserved || ["www", "api", "admin", "support", "help"],
+			customRules: configData?.tags?.customRules || [],
+			payment: this.buildTagsPaymentConfig(configData),
+			storage: {
+				keyPrefix: configData?.tags?.storage?.keyPrefix || "tagName",
+				ipfsEnabled: configData?.tags?.storage?.ipfsEnabled ?? true,
+				arweaveEnabled: configData?.tags?.storage?.arweaveEnabled ?? true,
+				walrusEnabled: configData?.tags?.storage?.walrusEnabled ?? true,
+				backupEnabled: configData?.tags?.storage?.backupEnabled || false,
+			},
+			wallet: {
+				networks: this.getSimplifiedNetworks(
+					configData?.tags?.wallet?.networks || configData?.wallet?.networks || this.getDefaultNetworks(),
+				),
+			},
+		};
+	}
+
+	private buildTagsPaymentConfig(configData: any): DomainConfig["tags"]["payment"] {
+		const payment = configData?.tags?.payment;
+		let networks: { [key: string]: any };
+
+		if (payment?.networks) {
+			networks = { ...payment.networks };
+		} else if (Array.isArray(payment?.currencies)) {
+			networks = this.migrateCurrenciesToNetworks(payment.currencies);
+		} else {
+			networks = this.getDefaultNetworks();
+		}
+
+		return {
+			methods: payment?.methods?.filter((method: string) => ["crypto", "stripe"].includes(method)) || ["crypto", "stripe"],
+			networks: this.normalizePaymentNetworks(networks),
+			discounts: payment?.discounts || {
+				yearly: 0.1,
+				lifetime: 0.2,
+			},
+			rewardPrice: payment?.rewardPrice || 10,
+			whitelist: payment?.whitelist || {},
+			pricingTable: payment?.pricingTable || this.getDefaultPricingTable(),
+			planPricing: payment?.planPricing || {},
 		};
 	}
 
@@ -625,6 +643,7 @@ export class License {
 		tagName: string,
 		duration: string = "1",
 		referralTagName: string = "",
+		options: { plan?: "premium" | "unlimited" } = {},
 	): {
 		price: number;
 		currency: string;
@@ -663,14 +682,30 @@ export class License {
 			throw new Error("Invalid duration. Use '1', '2', '3', '4', '5' or 'lifetime'.");
 		}
 
-		let price = 24;
+		const fallbackTable = this.domainConfig.tags.payment.pricingTable;
+		const requestedPlan = options?.plan;
+		const planTable =
+			(requestedPlan === "premium" || requestedPlan === "unlimited") &&
+			this.domainConfig.tags.payment.planPricing?.[requestedPlan] &&
+			Object.keys(this.domainConfig.tags.payment.planPricing[requestedPlan] || {}).length > 0
+				? this.domainConfig.tags.payment.planPricing[requestedPlan]
+				: fallbackTable;
+		const lookup = (table: { [key: string]: { [key: string]: number } } | undefined) => {
+			if (!table) return undefined;
+			if (length >= 6 && length <= 15) return table["6-15"]?.[duration];
+			return table[length]?.[duration];
+		};
 
-		if (length >= 6 && length <= 15) {
-			price = this.domainConfig.tags.payment.pricingTable["6-15"][duration];
-		} else if (this.domainConfig.tags.payment.pricingTable[length]) {
-			price = this.domainConfig.tags.payment.pricingTable[length][duration];
-		} else {
-			throw new Error("Invalid name length. Length must be between 1 and 27.");
+		let price = lookup(planTable);
+		if (price == null && planTable !== fallbackTable) {
+			price = lookup(fallbackTable);
+		}
+
+		if (price == null) {
+			if (length < 1 || length > 27) {
+				throw new Error("Invalid name length. Length must be between 1 and 27.");
+			}
+			price = 24;
 		}
 
 		const priceWithoutDiscount = Number(price);
@@ -843,6 +878,8 @@ export class License {
 				description: data.description,
 				startDate: data.startDate,
 				endDate: data.endDate,
+				updatedAt: data.updatedAt,
+				ipfsCid: data.ipfsCid,
 				tags: data.tags,
 				zelfkeys: data.zelfkeys,
 				stripe: data.stripe,
@@ -864,6 +901,21 @@ export class License {
 	 * Create from API response with data wrapper
 	 * Handles responses like { data: { ... } }
 	 */
+	static isRemoteLicenseStale(localConfig?: DomainConfig | null, remoteConfig?: DomainConfig | null): boolean {
+		if (!localConfig) return false;
+		if (!remoteConfig) return true;
+
+		const localPlans = localConfig.tags?.payment?.planPricing;
+		const remotePlans = remoteConfig.tags?.payment?.planPricing;
+		const localHasPlans = Boolean(localPlans && Object.keys(localPlans).length > 0);
+		const remoteHasPlans = Boolean(remotePlans && Object.keys(remotePlans).length > 0);
+		if (localHasPlans && !remoteHasPlans) return true;
+
+		const localTs = Date.parse(String(localConfig.updatedAt || "")) || 0;
+		const remoteTs = Date.parse(String(remoteConfig.updatedAt || "")) || 0;
+		return localTs > remoteTs;
+	}
+
 	static fromAPIResponseWithWrapper(response: any): License {
 		// Extract data from wrapper if it exists
 		const data = response.data || response;
@@ -892,7 +944,7 @@ export class License {
 					reserved: ["www", "api", "admin", "support", "help"],
 					customRules: [],
 					payment: {
-						methods: ["coinbase", "crypto", "stripe"],
+						methods: ["crypto", "stripe"],
 						networks: {
 							ethereum: {
 								enabled: true,
@@ -942,6 +994,7 @@ export class License {
 						rewardPrice: 10,
 						whitelist: {},
 						pricingTable: {},
+						planPricing: {},
 					},
 					storage: {
 						// Moved storage inside tags

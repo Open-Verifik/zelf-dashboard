@@ -1,14 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnChanges, SimpleChanges, ViewEncapsulation } from "@angular/core";
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
-
-interface TagRecord {
-	name: string;
-	type: string;
-	origin: string;
-	registeredAt?: string;
-	expiresAt?: string;
-}
+import { TagAnalyticsRecord, buildDailySeries, isActiveTag } from "../analytics.utils";
 
 @Component({
 	selector: "app-visits-chart",
@@ -19,7 +12,7 @@ interface TagRecord {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisitsChartComponent implements OnInit, OnChanges {
-	@Input() records: TagRecord[] = [];
+	@Input() records: TagAnalyticsRecord[] = [];
 
 	chartOptions: ApexOptions = {
 		chart: { type: "area" },
@@ -29,7 +22,6 @@ export class VisitsChartComponent implements OnInit, OnChanges {
 	constructor(private _cdr: ChangeDetectorRef) {}
 
 	ngOnInit(): void {
-		// Initialize chart even if records are empty
 		this._updateChart();
 	}
 
@@ -40,45 +32,27 @@ export class VisitsChartComponent implements OnInit, OnChanges {
 	}
 
 	private _updateChart(): void {
-		// Simple sparkline - just show a flat line for total tags count
-		const totalCount = this.records && this.records.length > 0 ? this.records.length : 0;
+		const activeRecords = this.records.filter((r) => isActiveTag(r));
+		const seriesResult = buildDailySeries(activeRecords);
+		const data = seriesResult.data.map((p) => p.count);
 
 		this.chartOptions = {
 			chart: {
-				animations: {
-					enabled: false,
-				},
+				animations: { enabled: false },
 				fontFamily: "inherit",
 				foreColor: "inherit",
 				width: "100%",
 				height: 320,
 				type: "area",
-				sparkline: {
-					enabled: true,
-				},
+				sparkline: { enabled: true },
 			},
-			colors: ["#FB7185"],
-			fill: {
-				colors: ["#FB7185"],
-				opacity: 0.5,
-			},
-			series: [{ data: Array(30).fill(Math.max(0, totalCount)) }],
-			stroke: {
-				curve: "smooth",
-			},
-			tooltip: {
-				followCursor: true,
-				theme: "dark",
-			},
-			xaxis: {
-				type: "category",
-				categories: [],
-			},
-			yaxis: {
-				labels: {
-					formatter: (val): string => val.toString(),
-				},
-			},
+			colors: ["#94A3B8"],
+			fill: { colors: ["#94A3B8"], opacity: 0.35 },
+			series: [{ data: data.length ? data : [0] }],
+			stroke: { curve: "smooth" },
+			tooltip: { followCursor: true, theme: "dark" },
+			xaxis: { type: "category", categories: [] },
+			yaxis: { labels: { formatter: (val): string => val.toString() } },
 		};
 
 		this._cdr.markForCheck();

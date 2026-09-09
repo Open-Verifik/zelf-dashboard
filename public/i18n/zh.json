@@ -230,7 +230,6 @@
         "payment_settings": {
             "title": "支付设置",
             "payment_methods": "支付方式",
-            "coinbase": "Coinbase",
             "crypto_payments": "加密货币支付",
             "stripe": "Stripe",
             "supported_currencies": "支持的货币",
@@ -612,7 +611,6 @@
         "lifetime": "终身",
         "total": "总计",
         "ourPurchaseRate": "我们的购买率",
-        "payWithCoinbase": "使用Coinbase支付",
         "choosePaymentMethod": "选择支付方式",
         "lowFees": "低费用",
         "purchaseNow": "立即购买",
@@ -644,7 +642,6 @@
         "sendReceipt": "发送收据",
         "sending": "发送中...",
         "payWith": "使用",
-        "coinbasePaymentUrl": "Coinbase支付链接",
         "uniquePaymentAddress": "唯一支付地址",
         "copy": "复制",
         "openLink": "打开链接",
@@ -853,6 +850,7 @@
         "centerFaceSubtitle": "将面部置于椭圆中央",
         "getCloser": "靠近一些",
         "getCloserSubtitle": "请将面部靠近摄像头",
+        "faceNotCentral": "请将面部移到椭圆中央并靠近镜头，然后重试。",
         "livenessCheckFailedReason": "活体检测失败。请按照指示重试。"
     }
 }

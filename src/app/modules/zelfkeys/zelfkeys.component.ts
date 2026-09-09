@@ -11,6 +11,7 @@ import { TranslocoModule } from "@jsverse/transloco";
 import { ActivatedRoute } from "@angular/router";
 import { ZelfKeysService, ZelfKeyItem } from "./zelfkeys.service";
 import { LicenseService } from "../pages/settings/license/license.service";
+import { AnalyticsOnboardingService } from "../dashboards/analytics/analytics-onboarding.service";
 import { Subject, takeUntil } from "rxjs";
 
 const CATEGORIES = [
@@ -67,10 +68,12 @@ export class ZelfKeysComponent implements OnInit, OnDestroy {
 		private _zelfKeysService: ZelfKeysService,
 		private _route: ActivatedRoute,
 		private _licenseService: LicenseService,
-		private _cdr: ChangeDetectorRef
+		private _cdr: ChangeDetectorRef,
+		private _analyticsOnboardingService: AnalyticsOnboardingService
 	) {}
 
 	ngOnInit(): void {
+		this._analyticsOnboardingService.markVisited("zelfKeys");
 		this._checkDarkMode();
 		this._watchDarkMode();
 		this._readQueryParams();

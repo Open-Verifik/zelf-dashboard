@@ -43,6 +43,8 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
     private _intervals: any = {};
     private _resizeObserver?: ResizeObserver;
     private _onWindowResize = () => this._handleResize();
+    /** Guards against queueing detections when one run takes longer than the interval. */
+    private _detecting = false;
 
     // Camera and face detection properties
     camera = {
@@ -51,23 +53,30 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         isLowQuality: false,
         dimensions: {
             video: { width: 0, height: 0, max: { width: 800, height: 600 } },
-            result: { width: 0, height: 0, offsetX: 0, offsetY: 0 },
             real: { width: 0, height: 0, offsetX: 0, offsetY: 0 },
         } as { [key: string]: { width: number; height: number; offsetX?: number; offsetY?: number; max?: { width: number; height: number } } },
         configuration: {
             facingMode: "user",
-            width: { ideal: 800 },
-            height: { ideal: 600 },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
         },
     };
 
     face = {
+        /** Oval as drawn, in CSS pixels of the camera view. */
         video: { center: { x: 0, y: 0 }, radius: { x: 0, y: 0 }, margin: { x: 0, y: 0 } },
+        /** Same oval mapped into raw stream pixels, where face-api reports boxes. */
         real: { center: { x: 0, y: 0 }, radius: { x: 0, y: 0 }, margin: { x: 0, y: 0 } },
-        minHeight: 200,
-        minPixels: 200,
+        minHeight: 224,
+        /** Floor on the detected face height so the upload is not upscaled beyond recognition. */
+        minFacePixels: 120,
         successPosition: 0,
-        threshold: 0.25,
+        /** Consecutive good frames (~100ms each) before auto-capture. */
+        successHoldFrames: 12,
+        /** Face box must fill this fraction of the oval height before capture. */
+        threshold: 0.45,
+        /** How far the face center may sit from the oval center, as a fraction of its radii. */
+        centerTolerance: 0.25,
     };
 
     response = {
@@ -137,12 +146,14 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         this.unsubscriber$.complete();
     }
 
-    private _setupResizeListener(videoElement: HTMLVideoElement): void {
+    private _setupResizeListener(): void {
         this._teardownResizeListener();
 
-        if (typeof ResizeObserver !== "undefined") {
+        const maskResultCanvas: HTMLCanvasElement | undefined = this.maskResultCanvasRef?.nativeElement;
+
+        if (typeof ResizeObserver !== "undefined" && maskResultCanvas) {
             this._resizeObserver = new ResizeObserver(() => this._handleResize());
-            this._resizeObserver.observe(videoElement);
+            this._resizeObserver.observe(maskResultCanvas);
         }
 
         window.addEventListener("resize", this._onWindowResize, { passive: true });
@@ -159,10 +170,6 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
     }
 
     private _handleResize(): void {
-        const videoNgx = this.webcamRef?.nativeVideoElement;
-        if (!videoNgx) return;
-        if (!videoNgx.clientWidth || !videoNgx.clientHeight) return;
-        this._setVideoDimensions(videoNgx);
         this._drawOvalCenterAndMask();
     }
 
@@ -174,9 +181,6 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
      * Handle successful biometrics verification
      */
     onBiometricsSuccess(faceBase64: string, password?: string): void {
-        // Stop camera before emitting success
-        this._stopCamera();
-
         this.biometricsSuccess.emit({
             faceBase64,
             password: this.masterPassword || password,
@@ -290,7 +294,9 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
             this.apiError = this._transloco.translate("biometricVerification.noFaceDetectedMessage");
         } else if (lower.includes("face not recognized")) {
             this.apiError = this._transloco.translate("biometricVerification.faceNotRecognized");
-        } else if (lower.includes("biometric") || lower.includes("face quality") || lower.includes("face is not central") || lower.includes("not central")) {
+        } else if (lower.includes("face is not central") || lower.includes("not central") || lower.includes("close to border")) {
+            this.apiError = this._transloco.translate("biometricVerification.faceNotCentral");
+        } else if (lower.includes("biometric") || lower.includes("face quality") || lower.includes("face too small") || lower.includes("face too large")) {
             this.apiError = this._transloco.translate("biometricVerification.biometricVerificationFailed");
         } else if (msg && !msg.startsWith("Http failure response")) {
             this.apiError = msg;
@@ -461,20 +467,18 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Seed the view with a portrait guess. The real numbers come from the first
+     * measurement of the camera view once it is laid out.
+     */
     private async _setMaxVideoDimensions(): Promise<void> {
-        const maxWidth = 640;
-        const maxHeight = 480;
+        const initialWidth = 440;
+        const initialHeight = 587;
 
-        // Set initial video dimensions
-        this.camera.dimensions.video.width = maxWidth;
-        this.camera.dimensions.video.height = maxHeight;
+        this.camera.dimensions.video.width = initialWidth;
+        this.camera.dimensions.video.height = initialHeight;
 
-        // Set result dimensions
-        this.camera.dimensions.result.width = maxWidth;
-        this.camera.dimensions.result.height = maxHeight;
-
-        // Initialize face dimensions
-        this.face.video = this._getCenterAndRadius(maxHeight, maxWidth);
+        this.face.video = this._getCenterAndRadius(initialHeight, initialWidth);
 
         this._changeDetectorRef.markForCheck();
     }
@@ -503,37 +507,55 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
             () => {
                 this._startFaceDetectionInterval();
 
-                this._setVideoDimensions(videoNgx);
                 this._drawOvalCenterAndMask();
-                this._setupResizeListener(videoNgx);
+                this._setupResizeListener();
             },
             { once: true },
         );
 
-        this._setVideoDimensions(videoNgx);
         this._drawOvalCenterAndMask();
     };
 
-    private _setVideoDimensions(videoElement: HTMLVideoElement) {
-        const actualWidth = videoElement.clientWidth;
-        const actualHeight = videoElement.clientHeight;
+    /**
+     * The mask canvas is stretched to the whole camera view, so its box is the
+     * display area by definition. Measuring it avoids depending on the <video>
+     * element, which ngx-webcam letterboxes to the stream aspect ratio.
+     */
+    private _getDisplayBox(): { width: number; height: number } | null {
+        const maskResultCanvas: HTMLCanvasElement | undefined = this.maskResultCanvasRef?.nativeElement;
 
-        this.camera.dimensions.video.height = actualHeight;
-        this.camera.dimensions.video.width = actualWidth;
-        this.camera.dimensions.result = { height: 0, width: 0, offsetX: 0, offsetY: 0 };
+        if (!maskResultCanvas) return null;
 
-        this._setResultDimensions("result", actualHeight, actualWidth);
+        const rect = maskResultCanvas.getBoundingClientRect();
+        const width = Math.round(rect.width);
+        const height = Math.round(rect.height);
 
-        this.face.video = this._getCenterAndRadius(actualHeight, actualWidth);
+        if (!width || !height) return null;
 
-        const maskResultCanvas = this.maskResultCanvasRef?.nativeElement;
+        return { width, height };
+    }
 
-        if (maskResultCanvas) {
-            maskResultCanvas.style.marginLeft = `0px`;
-            maskResultCanvas.style.marginTop = `0px`;
-        }
+    /**
+     * Refresh the on-screen oval whenever the display box changes, so a resize,
+     * a re-render after an error, or the initial layout all converge.
+     */
+    private _syncDisplayDimensions(): boolean {
+        const box = this._getDisplayBox();
+
+        if (!box) return false;
+
+        const current = this.camera.dimensions.video;
+
+        if (current.width === box.width && current.height === box.height) return true;
+
+        current.width = box.width;
+        current.height = box.height;
+
+        this.face.video = this._getCenterAndRadius(box.height, box.width);
 
         this._changeDetectorRef.markForCheck();
+
+        return true;
     }
 
     private _getCenterAndRadius(
@@ -546,14 +568,14 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         };
 
         const margin = {
-            y: height * 0.05,
+            y: height * 0.08,
             x: 0,
         };
 
-        margin.x = margin.y * 0.8;
+        margin.x = margin.y;
 
         const radius = {
-            y: height * 0.42,
+            y: height * 0.4,
             x: 0,
         };
 
@@ -567,40 +589,49 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         return { center, radius, margin };
     }
 
-    private _setResultDimensions(type: string, height: number, width: number): void {
-        const dimensions = this.camera.dimensions[type as keyof typeof this.camera.dimensions] as any;
-        if (!dimensions) return;
+    /**
+     * Prepare the mask canvas so drawing happens in CSS pixels at native device
+     * resolution. Sizing the backing store to the CSS box is what keeps the oval
+     * from being stretched by the browser.
+     */
+    private _getMaskContext(): CanvasRenderingContext2D | null {
+        const maskResultCanvas: HTMLCanvasElement | undefined = this.maskResultCanvasRef?.nativeElement;
 
-        dimensions.height = height;
-        dimensions.offsetY = 0;
-        dimensions.width = Math.min(2.8 * (this.face.real?.radius?.x || 0), width);
-        dimensions.offsetX = (this.face.real?.center?.x || 0) - dimensions.width / 2;
+        if (!maskResultCanvas) return null;
+
+        const ctx = maskResultCanvas.getContext("2d");
+
+        if (!ctx) return null;
+
+        if (!this._syncDisplayDimensions()) return null;
+
+        const { width, height } = this.camera.dimensions.video;
+        const ratio = window.devicePixelRatio || 1;
+        const backingWidth = Math.round(width * ratio);
+        const backingHeight = Math.round(height * ratio);
+
+        if (maskResultCanvas.width !== backingWidth || maskResultCanvas.height !== backingHeight) {
+            maskResultCanvas.width = backingWidth;
+            maskResultCanvas.height = backingHeight;
+        }
+
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        return ctx;
     }
 
     private _drawOvalCenterAndMask(): void {
-        const maskResultCanvas = this.maskResultCanvasRef?.nativeElement;
-        if (!maskResultCanvas) {
-            return;
-        }
+        const ctx = this._getMaskContext();
 
-        const ctx = maskResultCanvas.getContext("2d");
-        if (!ctx) {
-            return;
-        }
+        if (!ctx) return;
 
-        const videoDim = this.camera.dimensions.video;
-        if (!videoDim.width || !videoDim.height) {
-            return;
-        }
-        maskResultCanvas.width = videoDim.width;
-        maskResultCanvas.height = videoDim.height;
+        const { width, height } = this.camera.dimensions.video;
+        const { center, radius } = this.face.video;
 
-        const { center, radius } = this.face.video || { center: { x: 0, y: 0 }, radius: { x: 0, y: 0 } };
-
-        ctx.clearRect(0, 0, maskResultCanvas.width, maskResultCanvas.height);
+        ctx.clearRect(0, 0, width, height);
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-        ctx.fillRect(0, 0, maskResultCanvas.width, maskResultCanvas.height);
+        ctx.fillRect(0, 0, width, height);
 
         ctx.globalCompositeOperation = "destination-out";
 
@@ -613,8 +644,12 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         ctx.globalCompositeOperation = "source-over";
     }
 
-    private _drawStatusOval(ctx: any, isOk: boolean): void {
-        const { center, radius } = this.face.video || { center: { x: 0, y: 0 }, radius: { x: 0, y: 0 } };
+    private _drawStatusOval(isOk: boolean): void {
+        const ctx = this._getMaskContext();
+
+        if (!ctx) return;
+
+        const { center, radius } = this.face.video;
 
         ctx.beginPath();
         ctx.ellipse(center.x, center.y, radius.x, radius.y, 0, 0, 2 * Math.PI);
@@ -624,27 +659,91 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         ctx.closePath();
     }
 
-    private _inRange(value: number, min: number, max: number): boolean {
-        return value >= min && value <= max;
+    private _pickPrimaryFace(detection: Array<{ detection?: { box?: { width: number; height: number } } }>): {
+        primary: any;
+        hasExtraFace: boolean;
+    } {
+        const ranked = [...detection].sort((a, b) => {
+            const areaA = (a.detection?.box?.width || 0) * (a.detection?.box?.height || 0);
+            const areaB = (b.detection?.box?.width || 0) * (b.detection?.box?.height || 0);
+            return areaB - areaA;
+        });
+        const primary = ranked[0];
+        const primaryHeight = primary?.detection?.box?.height || 0;
+        const hasExtraFace = ranked.slice(1).some((face) => (face.detection?.box?.height || 0) >= Math.max(80, primaryHeight * 0.45));
+
+        return { primary, hasExtraFace };
     }
 
-    private _isFaceCentered(nose: any): void {
-        const faceCenterX = nose.x;
-        const faceCenterY = nose.y;
+    /**
+     * Map the oval the user sees into raw stream pixels, which is the space
+     * face-api reports detections in. This is the inverse of `object-fit: cover`:
+     * the video is scaled up until it covers the box, then center-cropped.
+     */
+    private _mapDisplayOvalToVideo(streamWidth: number, streamHeight: number): void {
+        const { width, height } = this.camera.dimensions.video;
 
-        const { center, margin } = this.face.real || { center: { x: 0, y: 0 }, margin: { x: 0, y: 0 } };
+        if (!width || !height || !streamWidth || !streamHeight) return;
 
-        const inRangeX = this._inRange(faceCenterX, center.x - margin.x, center.x + margin.x);
-        const inRangeY = this._inRange(faceCenterY, center.y, center.y + margin.y * 2.5);
+        const scale = Math.max(width / streamWidth, height / streamHeight);
+        const offsetX = (width - streamWidth * scale) / 2;
+        const offsetY = (height - streamHeight * scale) / 2;
 
-        const isFaceCentered = inRangeX && inRangeY;
+        this.face.real = {
+            center: {
+                x: (this.face.video.center.x - offsetX) / scale,
+                y: (this.face.video.center.y - offsetY) / scale,
+            },
+            radius: {
+                x: this.face.video.radius.x / scale,
+                y: this.face.video.radius.y / scale,
+            },
+            margin: {
+                x: this.face.video.margin.x / scale,
+                y: this.face.video.margin.y / scale,
+            },
+        };
+    }
 
-        if (isFaceCentered) return;
+    /**
+     * The preview is mirrored by CSS while detections come back in unmirrored
+     * stream coordinates. Flipping the box puts it in the same orientation the
+     * user sees, which is what the guidance arrows have to be based on. The oval
+     * is horizontally centered, so this does not change the containment result.
+     */
+    private _mirrorBox(
+        box: { x: number; y: number; width: number; height: number },
+        streamWidth: number,
+    ): { x: number; y: number; width: number; height: number } {
+        return { x: streamWidth - box.x - box.width, y: box.y, width: box.width, height: box.height };
+    }
 
+    private _isFaceInsideOval(box: { x: number; y: number; width: number; height: number } | undefined): boolean {
+        if (!box) return false;
+
+        const { center, radius } = this.face.real;
+        if (!radius.x || !radius.y) return false;
+
+        const dx = (box.x + box.width / 2 - center.x) / radius.x;
+        const dy = (box.y + box.height / 2 - center.y) / radius.y;
+
+        if (Math.hypot(dx, dy) > this.face.centerTolerance) return false;
+
+        // Only the extent is checked, not the corners: a rectangle large enough to
+        // fill the oval always pokes its corners outside of it.
+        return box.width <= radius.x * 2 * 0.95 && box.height <= radius.y * 2 * 0.95;
+    }
+
+    private _setCenterFaceError(box: { x: number; y: number; width: number; height: number } | undefined): void {
+        const { center } = this.face.real;
+        const faceCenterX = box ? box.x + box.width / 2 : 0;
+        const faceCenterY = box ? box.y + box.height / 2 : 0;
         let direction = "";
 
-        if (!inRangeX) direction += `${faceCenterX < center.x - margin.x ? "←" : "→"}`;
-        if (!inRangeY) direction += `${faceCenterY < center.y ? "↓" : "↑"}`;
+        if (faceCenterX < center.x) direction += "→";
+        if (faceCenterX > center.x) direction += "←";
+        if (faceCenterY < center.y) direction += "↓";
+        if (faceCenterY > center.y) direction += "↑";
 
         this.errorFace = {
             canvas: direction,
@@ -653,18 +752,18 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
         };
     }
 
-    private _isFaceClose(landmarks: any): void {
-        const realDim = this.camera.dimensions.real || { height: 0, width: 0 };
-        const totalFaceArea = landmarks.imageHeight * landmarks.imageWidth;
-        const totalImageArea = realDim.height * realDim.width;
-        const faceProportion = totalFaceArea / totalImageArea;
+    /**
+     * Judged against the oval rather than an absolute pixel size: the API's 224px
+     * face box requirement applies to the uploaded crop, which `_computeOutputSize`
+     * guarantees independently of the webcam resolution.
+     */
+    private _isFaceCloseEnough(box: { width?: number; height?: number } | undefined): boolean {
+        const ovalHeight = this.face.real.radius.y * 2;
+        const faceHeight = box?.height || 0;
 
-        if (faceProportion < this.face.threshold || landmarks.imageHeight < this.face.minPixels || landmarks.imageWidth < this.face.minPixels) {
-            this.errorFace = {
-                title: this._transloco.translate("biometricVerification.getCloser"),
-                subtitle: this._transloco.translate("biometricVerification.getCloserSubtitle"),
-            };
-        }
+        if (ovalHeight <= 0) return false;
+
+        return faceHeight >= ovalHeight * this.face.threshold && faceHeight >= this.face.minFacePixels;
     }
 
     private _startFaceDetectionInterval(): void {
@@ -680,38 +779,51 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
 
     private async _detectFace(): Promise<void> {
         const videoNgx = this.webcamRef?.nativeVideoElement;
-        if (!videoNgx || this.response.base64Image) {
+        if (!videoNgx || this.response.base64Image || this._detecting) {
             return;
         }
 
-        try {
-            const detection = await faceapi.detectAllFaces(videoNgx, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.2 })).withFaceLandmarks();
+        if (!videoNgx.videoWidth || !videoNgx.videoHeight) return;
 
-            const context = this.maskResultCanvasRef?.nativeElement.getContext("2d", { willReadFrequently: true });
-            if (!context) return;
+        this._detecting = true;
+
+        try {
+            const detection = await faceapi.detectAllFaces(videoNgx, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })).withFaceLandmarks();
 
             // Always redraw the base oval mask first
             this._drawOvalCenterAndMask();
 
             if (detection.length > 0) {
-                this.lastFace = detection[0];
-                this.errorFace = null;
-
-                // Set real dimensions for face positioning calculations
                 this.camera.dimensions.real = {
                     height: videoNgx.videoHeight,
                     width: videoNgx.videoWidth,
                     offsetX: 0,
                     offsetY: 0,
                 };
-                this.face.real = this._getCenterAndRadius(videoNgx.videoHeight, videoNgx.videoWidth);
+                this._mapDisplayOvalToVideo(videoNgx.videoWidth, videoNgx.videoHeight);
 
-                // Check face positioning
-                this._isFaceCentered(this.lastFace.landmarks.getNose()[3]);
-                this._isFaceClose(this.lastFace.landmarks);
+                const { primary, hasExtraFace } = this._pickPrimaryFace(detection);
+                this.lastFace = primary;
+                this.errorFace = null;
 
-                // Draw status oval (green if no errors, red if errors)
-                this._drawStatusOval(context, !this.errorFace);
+                const detectedBox = primary.detection?.box;
+                const box = detectedBox ? this._mirrorBox(detectedBox, videoNgx.videoWidth) : undefined;
+
+                if (hasExtraFace) {
+                    this.errorFace = {
+                        title: this._transloco.translate("biometricVerification.multipleFacesDetected"),
+                        subtitle: this._transloco.translate("biometricVerification.noFaceDetectedSubtitle"),
+                    };
+                } else if (!this._isFaceCloseEnough(box)) {
+                    this.errorFace = {
+                        title: this._transloco.translate("biometricVerification.getCloser"),
+                        subtitle: this._transloco.translate("biometricVerification.getCloserSubtitle"),
+                    };
+                } else if (!this._isFaceInsideOval(box)) {
+                    this._setCenterFaceError(box);
+                }
+
+                this._drawStatusOval(!this.errorFace);
 
                 if (!this.errorFace) {
                     ++this.face.successPosition;
@@ -719,14 +831,12 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
                     this.face.successPosition = 0;
                 }
 
-                // Update liveness detection if active
                 if (this.livenessDetection.isActive) {
                     this._updateLivenessProgress(this.lastFace);
-                } else if (this.face.successPosition > 2) {
-                    // Capture after 3 successful frames (original behavior)
+                } else if (this.face.successPosition >= this.face.successHoldFrames) {
                     this.face.successPosition = 0;
-                    this._takePicture.next(); // Trigger image capture
-                    clearInterval(this._intervals.detectFace); // Stop detection after capture
+                    this._takePicture.next();
+                    clearInterval(this._intervals.detectFace);
                 }
             } else {
                 this.face.successPosition = 0;
@@ -735,52 +845,111 @@ export class DataBiometricsComponent implements OnInit, OnDestroy {
                     subtitle: this._transloco.translate("biometricVerification.noFaceDetectedSubtitle"),
                 };
                 // Draw red oval if no face detected
-                this._drawStatusOval(context, false);
+                this._drawStatusOval(false);
             }
 
             this._changeDetectorRef.markForCheck();
         } catch (error: any) {
             console.error("Face detection error:", error);
-            const context = this.maskResultCanvasRef?.nativeElement.getContext("2d");
-            if (context) this._drawStatusOval(context, false);
+            this._drawStatusOval(false);
+        } finally {
+            this._detecting = false;
         }
     }
 
-    private _setImageOnCanvas(canvas: HTMLCanvasElement, img: HTMLImageElement, dimensions: any, resultDimensions: any): void {
+    private _drawCrop(
+        canvas: HTMLCanvasElement,
+        img: HTMLImageElement,
+        src: { x: number; y: number; width: number; height: number },
+        dst: { width: number; height: number },
+    ): void {
         const context = canvas.getContext("2d");
         if (!context) return;
 
-        canvas.width = resultDimensions.width;
-        canvas.height = resultDimensions.height;
+        canvas.width = dst.width;
+        canvas.height = dst.height;
+        context.drawImage(img, src.x, src.y, src.width, src.height, 0, 0, dst.width, dst.height);
+    }
 
-        context.drawImage(
-            img,
-            dimensions.offsetX,
-            dimensions.offsetY,
-            dimensions.width,
-            dimensions.height,
-            0,
-            0,
-            resultDimensions.width,
-            resultDimensions.height,
-        );
+    /**
+     * Crop around the detected face with ≥25px / ~40% padding so the uploaded
+     * still is centered and not flush against the image border.
+     * See FACE-CAPTURE.md.
+     *
+     * Detection boxes and the snapshot share the same unmirrored stream space:
+     * `mirrorImage` is a CSS transform on the preview, and ngx-webcam's
+     * `takeSnapshot()` draws the raw video frame. So no flip belongs here.
+     */
+    private _computeFaceCrop(imgWidth: number, imgHeight: number): { x: number; y: number; width: number; height: number } | null {
+        const box = this.lastFace?.detection?.box;
+        if (!box?.width || !box?.height) return null;
+        if (box.height < this.face.minFacePixels) return null;
+
+        const padX = Math.max(25, box.width * 0.4);
+        const padY = Math.max(25, box.height * 0.4);
+
+        let x = box.x - padX;
+        let y = box.y - padY;
+        let width = box.width + padX * 2;
+        let height = box.height + padY * 2;
+
+        if (x < 0) {
+            width += x;
+            x = 0;
+        }
+        if (y < 0) {
+            height += y;
+            y = 0;
+        }
+        if (x + width > imgWidth) width = imgWidth - x;
+        if (y + height > imgHeight) height = imgHeight - y;
+
+        if (width <= 0 || height <= 0) return null;
+
+        return { x, y, width, height };
+    }
+
+    /**
+     * Size the upload so the face box lands near 360px tall. Uploading the crop at
+     * its source size leaves the face box hovering around the API's 224px minimum
+     * on lower-resolution webcams. See FACE-CAPTURE.md.
+     */
+    private _computeOutputSize(crop: { width: number; height: number }, faceHeight: number): { width: number; height: number } {
+        const targetFaceHeight = 360;
+        const maxEdge = 1280;
+
+        let scale = faceHeight > 0 ? targetFaceHeight / faceHeight : 1;
+        const longest = Math.max(crop.width, crop.height);
+
+        if (longest * scale > maxEdge) scale = maxEdge / longest;
+
+        return {
+            width: Math.round(crop.width * scale),
+            height: Math.round(crop.height * scale),
+        };
     }
 
     private _takePictureLiveness(img: HTMLImageElement): void {
-        const maskResultCanvas = this.maskResultCanvasRef?.nativeElement;
         const toSendCanvas = this.ToSendCanvasRef?.nativeElement;
 
-        if (!maskResultCanvas || !toSendCanvas) return;
+        if (!toSendCanvas) return;
 
-        if (!this.camera.dimensions.real || !this.camera.dimensions.result) {
-            console.error("Camera dimensions not properly initialized");
+        const imgWidth = img.naturalWidth || img.width;
+        const imgHeight = img.naturalHeight || img.height;
+        const crop = this._computeFaceCrop(imgWidth, imgHeight);
+
+        if (!crop) {
+            console.error("Face crop is not ready");
+            this.response.base64Image = "";
+            this.response.isLoading = false;
+            this._startFaceDetectionInterval();
             return;
         }
 
-        this._setImageOnCanvas(maskResultCanvas, img, this.camera.dimensions.real, this.camera.dimensions.result);
-        this._setImageOnCanvas(toSendCanvas, img, this.camera.dimensions.real, this.camera.dimensions.real);
+        const sendDst = this._computeOutputSize(crop, this.lastFace?.detection?.box?.height || 0);
+        this._drawCrop(toSendCanvas, img, crop, sendDst);
 
-        this.response.base64Image = toSendCanvas.toDataURL("image/jpeg");
+        this.response.base64Image = toSendCanvas.toDataURL("image/jpeg", 0.92);
         this.response.isLoading = true;
 
         this._emitBiometricCapture();

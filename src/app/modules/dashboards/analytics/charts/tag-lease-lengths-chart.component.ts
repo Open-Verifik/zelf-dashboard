@@ -3,13 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, O
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
 import { TranslocoService } from "@jsverse/transloco";
 
-interface TagRecord {
-	name: string;
-	type: string;
-	origin: string;
-	registeredAt?: string;
-	expiresAt?: string;
-}
+import { TagAnalyticsRecord, calculateLeaseYears } from "../analytics.utils";
 
 @Component({
 	selector: "app-tag-lease-lengths-chart",
@@ -20,7 +14,7 @@ interface TagRecord {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagLeaseLengthsChartComponent implements OnInit, OnChanges {
-	@Input() records: TagRecord[] = [];
+	@Input() records: TagAnalyticsRecord[] = [];
 
 	chartOptions: ApexOptions = {
 		chart: { type: "donut" },
@@ -68,7 +62,7 @@ export class TagLeaseLengthsChartComponent implements OnInit, OnChanges {
 					enabled: true,
 				},
 			},
-			colors: ["#3182CE", "#63B3ED", "#90CDF4", "#BEE3F8", "#DBEAFE", "#EFF6FF"],
+			colors: ["#475569", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0", "#F1F5F9"],
 			labels: this.labels || [],
 			plotOptions: {
 				pie: {
@@ -116,32 +110,6 @@ export class TagLeaseLengthsChartComponent implements OnInit, OnChanges {
 		this._cdr.markForCheck();
 	}
 
-	private _parseDateToDate(s?: string): Date | null {
-		if (!s) return null;
-		try {
-			if (s.includes(" ") && !s.includes("T")) {
-				const [datePart, timePart] = s.split(" ");
-				const [year, month, day] = datePart.split("-").map(Number);
-				const [hour, minute, second] = timePart.split(":").map(Number);
-				return new Date(year, month - 1, day, hour || 0, minute || 0, second || 0);
-			}
-			const d = new Date(s);
-			return isNaN(d.getTime()) ? null : d;
-		} catch {
-			return null;
-		}
-	}
-
-	private _calculateLeaseYears(registeredAt?: string, expiresAt?: string): number | null {
-		if (!registeredAt || !expiresAt) return null;
-		const regDate = this._parseDateToDate(registeredAt);
-		const expDate = this._parseDateToDate(expiresAt);
-		if (!regDate || !expDate) return null;
-		const diffMs = expDate.getTime() - regDate.getTime();
-		const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-		return years;
-	}
-
 	private _calculateLeaseBuckets(): { labels: string[]; series: number[]; counts: number[] } {
 		const leaseBuckets: { [key: string]: number } = {
 			"1": 0,
@@ -158,7 +126,7 @@ export class TagLeaseLengthsChartComponent implements OnInit, OnChanges {
 		}
 
 		for (const r of this.records) {
-			const years = this._calculateLeaseYears(r.registeredAt, r.expiresAt);
+			const years = calculateLeaseYears(r.registeredAt, r.expiresAt);
 			if (years === null || years < 0.5) continue;
 
 			if (years >= 0.5 && years < 2.0) {

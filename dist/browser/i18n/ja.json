@@ -230,7 +230,6 @@
         "payment_settings": {
             "title": "支払い設定",
             "payment_methods": "支払い方法",
-            "coinbase": "Coinbase",
             "crypto_payments": "暗号通貨支払い",
             "stripe": "Stripe",
             "supported_currencies": "サポート通貨",
@@ -612,7 +611,6 @@
         "lifetime": "生涯",
         "total": "合計",
         "ourPurchaseRate": "当社の購入レート",
-        "payWithCoinbase": "Coinbaseで支払う",
         "choosePaymentMethod": "支払い方法を選択",
         "lowFees": "低手数料",
         "purchaseNow": "今すぐ購入",
@@ -644,7 +642,6 @@
         "sendReceipt": "領収書を送信",
         "sending": "送信中...",
         "payWith": "で支払う",
-        "coinbasePaymentUrl": "Coinbase支払いURL",
         "uniquePaymentAddress": "固有の支払いアドレス",
         "copy": "コピー",
         "openLink": "リンクを開く",
@@ -853,6 +850,7 @@
         "centerFaceSubtitle": "楕円内に顔を中央に配置してください",
         "getCloser": "近づいてください",
         "getCloserSubtitle": "顔をカメラに近づけてください",
+        "faceNotCentral": "楕円の中央に顔を合わせ、近づいてから再試行してください。",
         "livenessCheckFailedReason": "ライブネスチェックに失敗しました。指示に従って再試行してください。"
     }
 }

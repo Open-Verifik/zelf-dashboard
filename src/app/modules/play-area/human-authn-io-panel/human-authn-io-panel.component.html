@@ -1,0 +1,79 @@
+<div class="hap-io">
+	<section class="hap-io-block">
+		<div class="hap-io-head">
+			<span class="hap-io-kicker">You send</span>
+			<h3 class="hap-io-title">Request body</h3>
+		</div>
+		<p class="hap-io-hint">Live JSON for the POST. Face and proof strings are truncated here.</p>
+		<pre class="hap-io-pre">{{ sendJson }}</pre>
+	</section>
+
+	<section class="hap-io-block" [class.hap-io-block--success]="response">
+		<div class="hap-io-head">
+			<span class="hap-io-kicker">{{ response ? "You got" : "You get" }}</span>
+			<h3 class="hap-io-title">{{ response ? "Response" : "Expected response" }}</h3>
+			@if (response) {
+				<button
+					mat-icon-button
+					type="button"
+					class="hap-io-copy"
+					matTooltip="Copy JSON"
+					(click)="onCopy()"
+				>
+					<mat-icon>content_copy</mat-icon>
+				</button>
+			}
+		</div>
+
+		@if (!response) {
+			@if (emptyHint) {
+				<p class="hap-io-hint">{{ emptyHint }}</p>
+			}
+			<pre class="hap-io-pre hap-io-pre--muted">{{ expectedShape }}</pre>
+		} @else {
+			@if (qrImageSrc) {
+				<div class="hap-io-qr">
+					<img [src]="qrImageSrc" alt="HumanAuthn QR" />
+					<button
+						mat-stroked-button
+						type="button"
+						class="hap-io-next-link mt-3"
+						(click)="downloadQr.emit()"
+					>
+						<mat-icon class="icon-size-4">download</mat-icon>
+						Download PNG
+					</button>
+				</div>
+			}
+			@if (highlightCaption) {
+				<div class="hap-io-callout">
+					<p class="hap-io-callout-text">{{ highlightCaption }}</p>
+					@if (highlightedValue !== null && highlightedValue !== undefined && highlight !== "zelfIDQR") {
+						<pre class="hap-io-pre hap-io-pre--inset">{{ highlightedValue | json }}</pre>
+					}
+				</div>
+			}
+			<pre class="hap-io-pre">{{ response | json }}</pre>
+			@if (nextSteps.length) {
+				<nav class="hap-io-next" aria-label="What to try next">
+					@for (step of nextSteps; track step.path) {
+						<a mat-stroked-button [routerLink]="step.path" class="hap-io-next-link">
+							<mat-icon class="icon-size-4">arrow_forward</mat-icon>
+							{{ step.label }}
+						</a>
+					}
+				</nav>
+			}
+		}
+	</section>
+
+	@if (error) {
+		<section class="hap-io-block hap-io-block--error">
+			<div class="hap-io-head">
+				<span class="hap-io-kicker">Error</span>
+				<h3 class="hap-io-title">Request failed</h3>
+			</div>
+			<pre class="hap-io-pre hap-io-pre--error">{{ error | json }}</pre>
+		</section>
+	}
+</div>

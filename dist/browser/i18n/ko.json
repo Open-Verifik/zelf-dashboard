@@ -230,7 +230,6 @@
         "payment_settings": {
             "title": "결제 설정",
             "payment_methods": "결제 방법",
-            "coinbase": "Coinbase",
             "crypto_payments": "암호화폐 결제",
             "stripe": "Stripe",
             "supported_currencies": "지원 통화",
@@ -612,7 +611,6 @@
         "lifetime": "평생",
         "total": "합계",
         "ourPurchaseRate": "당사의 구매율",
-        "payWithCoinbase": "Coinbase로 결제",
         "choosePaymentMethod": "결제 방법 선택",
         "lowFees": "저수수료",
         "purchaseNow": "지금 구매",
@@ -644,7 +642,6 @@
         "sendReceipt": "영수증 보내기",
         "sending": "전송 중...",
         "payWith": "로 결제",
-        "coinbasePaymentUrl": "Coinbase 결제 URL",
         "uniquePaymentAddress": "고유 결제 주소",
         "copy": "복사",
         "openLink": "링크 열기",
@@ -853,6 +850,7 @@
         "centerFaceSubtitle": "타원 안에 얼굴을 중앙에 배치하세요",
         "getCloser": "가까이 오세요",
         "getCloserSubtitle": "얼굴을 카메라에 가까이 대세요",
+        "faceNotCentral": "타원 중앙에 얼굴을 맞추고 가까이 다가간 뒤 다시 시도하세요.",
         "livenessCheckFailedReason": "라이브니스 확인에 실패했습니다. 안내에 따라 다시 시도하세요."
     }
 }

@@ -1,0 +1,72 @@
+@if (progress && !progress.loading) {
+	<div class="analytics-onboarding">
+		<div class="analytics-panel analytics-onboarding__header">
+			<div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+				<div>
+					<p class="analytics-section-label">{{ "analytics.onboarding.eyebrow" | transloco }}</p>
+					<h2 class="analytics-onboarding__title">{{ "analytics.onboarding.title" | transloco }}</h2>
+					<p class="analytics-onboarding__subtitle">{{ "analytics.onboarding.subtitle" | transloco }}</p>
+				</div>
+				<p class="analytics-onboarding__progress-text">
+					{{
+						"analytics.onboarding.progress"
+							| transloco
+								: {
+										completed: progress.completedRequiredCount,
+										total: progress.totalRequired,
+								  }
+					}}
+				</p>
+			</div>
+			<div class="analytics-onboarding__progress-track mt-4">
+				<div class="analytics-onboarding__progress-fill" [style.width.%]="progressPercent"></div>
+			</div>
+		</div>
+
+		<div class="analytics-panel analytics-onboarding__steps mt-4 divide-y">
+			@for (step of progress.steps; track trackByStepId($index, step)) {
+				<div
+					class="analytics-onboarding__step"
+					[class.analytics-onboarding__step--current]="step.status === 'current'"
+					[class.analytics-onboarding__step--complete]="step.status === 'complete'"
+				>
+					<div class="analytics-onboarding__step-status">
+						@if (step.complete) {
+							<mat-icon class="icon-size-5 text-green-600 dark:text-green-400" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+						} @else if (step.status === "current") {
+							<div class="analytics-onboarding__step-ring"></div>
+						} @else {
+							<div class="analytics-onboarding__step-dot"></div>
+						}
+					</div>
+
+					<div class="min-w-0 flex-1">
+						<div class="flex flex-wrap items-center gap-2">
+							<h3 class="analytics-onboarding__step-title">{{ step.titleKey | transloco }}</h3>
+							@if (step.optional) {
+								<span class="analytics-onboarding__optional">{{ "analytics.onboarding.optional" | transloco }}</span>
+							}
+							<span class="analytics-onboarding__route-badge">{{ step.routeLabelKey | transloco }}</span>
+						</div>
+						<p class="analytics-onboarding__step-description">{{ step.descriptionKey | transloco }}</p>
+					</div>
+
+					@if (!step.complete) {
+						<a mat-stroked-button class="analytics-onboarding__cta" [routerLink]="step.route">
+							{{ "analytics.onboarding.open" | transloco }}
+						</a>
+					}
+				</div>
+			}
+		</div>
+
+		<div class="analytics-panel analytics-onboarding__locked mt-4">
+			<div class="flex items-center gap-3">
+				<mat-icon class="text-secondary icon-size-5" [svgIcon]="'heroicons_outline:lock-closed'"></mat-icon>
+				<p class="text-secondary text-sm">{{ "analytics.onboarding.lockedPreview" | transloco }}</p>
+			</div>
+		</div>
+	</div>
+} @else {
+	<div class="analytics-onboarding__loading text-secondary text-sm">{{ "analytics.stats.loading" | transloco }}</div>
+}

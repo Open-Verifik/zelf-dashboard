@@ -78,7 +78,15 @@
 			></zns-payment-configuration>
 
 			<!-- Pricing Table -->
-			<zns-pricing-table [rows]="pricingTableRows" (resetDefault)="resetPricingTable()"></zns-pricing-table>
+			<zns-pricing-table
+				[rows]="activePricingRows"
+				[activeTab]="pricingTableTab"
+				[hasUnsavedChanges]="pricingDirty"
+				(activeTabChange)="onPricingTableTabChange($event)"
+				(resetDefault)="resetPricingTable()"
+				(cellChange)="onPricingCellChange($event)"
+				(saveRequested)="saveLicense()"
+			></zns-pricing-table>
 
 			<!-- Storage Options (ZNS) -->
 			<zns-storage-options [formGroup]="accountForm"></zns-storage-options>

@@ -1,0 +1,249 @@
+<div class="zp-play-area flex flex-col w-full">
+	<app-human-authn-play-header
+		title="Decrypt a HumanAuthn"
+		subtitle="Same face as Create. Unlocks metadata. Password only if you set one at encrypt time."
+		[method]="decryptMethod"
+		[path]="decryptPath"
+		[currentStep]="playStep"
+	></app-human-authn-play-header>
+
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+		<mat-card class="zp-panel">
+			<mat-card-content>
+				<form [formGroup]="form" class="space-y-8 mt-2">
+					<app-human-authn-step-card
+						[step]="1"
+						title="Same face"
+						field="faceBase64"
+						hint="Use the same person as Create. A different face will fail."
+					>
+						<div
+							class="zp-dropzone flex items-center gap-4 p-5 rounded-2xl bg-zinc-50/90 dark:bg-white/[0.03] ring-1 ring-zinc-200/70 dark:ring-white/[0.06]"
+						>
+							@if (selfiePreviewUrl) {
+								<img [src]="selfiePreviewUrl" alt="" class="w-20 h-20 rounded-full object-cover ring-1 ring-zinc-200/80" />
+							} @else {
+								<div class="w-20 h-20 rounded-full bg-zinc-100 dark:bg-white/[0.05] flex items-center justify-center">
+									<mat-icon class="icon-size-7 text-zinc-400">person</mat-icon>
+								</div>
+							}
+							<div class="flex-1 min-w-0">
+								<input #selfieIn type="file" accept="image/*" class="hidden" (change)="onSelfieFileSelected($event)" />
+								<button type="button" mat-flat-button color="primary" (click)="selfieIn.click()" class="zp-btn-primary">
+									<mat-icon class="mr-2">upload</mat-icon>
+									{{ selfieFileName ? "Replace image" : "Upload image" }}
+								</button>
+								@if (selfieFileName) {
+									<button type="button" mat-button (click)="clearSelfie()" class="ml-2">Remove</button>
+								}
+							</div>
+						</div>
+						<details class="mt-3 text-xs">
+							<summary class="cursor-pointer text-zinc-500">Or paste Base64</summary>
+							<mat-form-field class="w-full mt-2" appearance="outline">
+								<mat-label>Face Base64</mat-label>
+								<textarea matInput formControlName="faceBase64" rows="2"></textarea>
+							</mat-form-field>
+						</details>
+					</app-human-authn-step-card>
+
+					<app-human-authn-step-card
+						[step]="2"
+						title="Paste zelfID"
+						field="zelfProof"
+						hint="The long string Create returned. This is the locked box."
+					>
+						<mat-form-field class="w-full" appearance="outline">
+							<mat-label>zelfID</mat-label>
+							<textarea matInput formControlName="zelfProof" rows="5" placeholder="Paste the zelfID from Create"></textarea>
+						</mat-form-field>
+					</app-human-authn-step-card>
+
+					<app-human-authn-step-card
+						[step]="3"
+						title="Password if you set one"
+						field="password"
+						hint="Skip this if Create used No password. Required if you chose Password or PIN."
+					>
+						<mat-form-field class="w-full" appearance="outline">
+							<mat-label>Password (optional)</mat-label>
+							<input matInput type="password" formControlName="password" autocomplete="off" />
+						</mat-form-field>
+					</app-human-authn-step-card>
+
+					<app-human-authn-step-card
+						[step]="4"
+						title="Settings"
+						field="os · livenessLevel"
+						hint="Match the device the selfie came from. Verifier key is optional."
+					>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<mat-form-field appearance="outline">
+								<mat-label>OS</mat-label>
+								<mat-select formControlName="os">
+									<mat-option value="DESKTOP">Desktop</mat-option>
+									<mat-option value="ANDROID">Android</mat-option>
+									<mat-option value="IOS">iOS</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<mat-form-field appearance="outline">
+								<mat-label>Liveness (optional)</mat-label>
+								<mat-select formControlName="livenessLevel">
+									<mat-option value="">(omit)</mat-option>
+									<mat-option value="SOFT">Soft</mat-option>
+									<mat-option value="REGULAR">Regular</mat-option>
+									<mat-option value="HARDENED">Hardened</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
+						<mat-form-field class="w-full mt-4" appearance="outline">
+							<mat-label>Verifier key (optional)</mat-label>
+							<input matInput formControlName="verifierKey" />
+						</mat-form-field>
+					</app-human-authn-step-card>
+
+					<button mat-raised-button color="primary" class="w-full py-3 zp-btn-primary" type="button" (click)="runDecrypt()" [disabled]="loading">
+						@if (loading) {
+							<span class="zp-submit-label">
+								<mat-spinner diameter="20" class="zp-submit-spinner"></mat-spinner>
+								Processing...
+							</span>
+						} @else {
+							<span class="zp-submit-label">
+								<mat-icon class="zp-submit-icon">send</mat-icon>
+								Decrypt
+							</span>
+						}
+					</button>
+				</form>
+			</mat-card-content>
+		</mat-card>
+
+		<div class="space-y-8 lg:sticky lg:top-6 lg:self-start">
+			@if (humanPay.paymentRequired && humanPay.paymentDetails) {
+				<mat-card class="zp-panel zp-status zp-status-payment">
+					<mat-card-header class="zp-panel-header zp-status-head">
+						<mat-card-title class="flex items-center gap-2 font-medium">
+							<span class="zp-status-dot zp-status-dot--amber"></span>
+							<mat-icon class="text-zinc-400 icon-size-5">payment</mat-icon>
+							Step 3 — Pay with ZNS, then we retry decrypt
+							<span class="text-zinc-400 font-normal text-sm font-mono">402</span>
+						</mat-card-title>
+					</mat-card-header>
+					<mat-card-content class="space-y-5">
+						<div class="zp-inset p-4 rounded-xl">
+							<h3 class="text-[13px] font-medium mb-3">Payment details</h3>
+							<div class="space-y-2.5 text-sm">
+								<div class="flex justify-between gap-3">
+									<span class="text-zinc-500">Cost</span>
+									<span class="font-mono font-semibold">{{ humanPay.paymentDetails.paymentDetails?.cost }} ZNS</span>
+								</div>
+								<div class="flex justify-between gap-3">
+									<span class="text-zinc-500">Token</span>
+									<span class="font-mono truncate text-right">{{ humanPay.paymentDetails.paymentDetails?.token }}</span>
+								</div>
+							</div>
+						</div>
+						<div class="space-y-4">
+							@if (!showPasswordStep) {
+								<button
+									mat-raised-button
+									color="primary"
+									class="w-full py-3 zp-btn-primary"
+									type="button"
+									(click)="startPaymentFlow()"
+									[disabled]="humanPay.paymentProcessing"
+								>
+									<mat-icon class="mr-2">fingerprint</mat-icon>
+									Pay with ZNS
+								</button>
+							} @else {
+								<div class="zp-inset p-4 rounded-xl space-y-4">
+									@if (hasPasskey) {
+										<button
+											type="button"
+											(click)="onPasskeyLogin()"
+											[disabled]="humanPay.paymentProcessing"
+											class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm bg-zinc-100 dark:bg-white/[0.08]"
+										>
+											@if (humanPay.paymentProcessing) {
+												<mat-spinner diameter="20"></mat-spinner>
+											} @else {
+												<mat-icon>fingerprint</mat-icon>
+											}
+											Continue with passkey
+										</button>
+									}
+									<div>
+										<label class="text-xs text-zinc-600">Master password (optional)</label>
+										<div class="flex rounded-full border border-zinc-200 dark:border-white/[0.08] px-3 mt-1">
+											<input
+												[(ngModel)]="masterPassword"
+												[ngModelOptions]="{ standalone: true }"
+												[type]="showPassword ? 'text' : 'password'"
+												class="flex-1 bg-transparent py-2 text-sm outline-none"
+												[disabled]="humanPay.paymentProcessing"
+											/>
+											<button type="button" (click)="togglePasswordVisibility()">
+												<mat-icon class="icon-size-5">{{ showPassword ? "visibility_off" : "visibility" }}</mat-icon>
+											</button>
+										</div>
+									</div>
+									<div class="flex gap-2">
+										<button type="button" class="flex-1 py-2 rounded-full border text-sm" (click)="cancelPaymentFlow()">Cancel</button>
+										<button type="button" class="flex-1 py-2 rounded-full bg-zinc-900 text-white text-sm font-semibold" (click)="proceedToBiometric()">
+											Continue
+										</button>
+									</div>
+								</div>
+							}
+							<div class="border-t pt-4">
+								<p class="text-xs text-center text-zinc-500 mb-3">Or verify manually</p>
+								<div class="flex gap-2">
+									<mat-form-field class="flex-1 text-xs" density="dense" subscriptSizing="dynamic">
+										<mat-label>Tx hash</mat-label>
+										<input matInput [(ngModel)]="humanPay.paymentTxHash" [ngModelOptions]="{ standalone: true }" />
+									</mat-form-field>
+									<button mat-icon-button type="button" (click)="runDecrypt()" [disabled]="!humanPay.paymentTxHash" matTooltip="Verify">
+										<mat-icon>check_circle</mat-icon>
+									</button>
+								</div>
+							</div>
+						</div>
+					</mat-card-content>
+				</mat-card>
+			}
+
+			<app-human-authn-io-panel
+				[sendPayload]="livePayload"
+				[expectedShape]="expectedShape"
+				[emptyHint]="emptyHint"
+				[response]="response"
+				[error]="error"
+				highlight="metadata"
+				[nextSteps]="nextSteps"
+				(copyResponse)="copyResponseToClipboard()"
+			></app-human-authn-io-panel>
+		</div>
+	</div>
+
+	@if (showBiometricModal) {
+		<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+			<div class="bg-white dark:bg-zinc-950 rounded-3xl w-full max-w-6xl min-h-[720px] max-h-[92vh] overflow-hidden shadow-2xl flex flex-col ring-1 ring-zinc-200/80 dark:ring-white/[0.08]">
+				<div class="px-6 py-4 flex justify-between border-b dark:border-white/[0.06]">
+					<h2 class="text-lg font-semibold">Biometric verification</h2>
+					<button mat-icon-button type="button" (click)="onBiometricCancel()"><mat-icon>close</mat-icon></button>
+				</div>
+				<div class="p-4 flex-1 flex items-center justify-center overflow-auto">
+					<app-data-biometrics
+						class="w-full"
+						[userData]="{ domain: 'payment', masterPassword: masterPassword }"
+						[isModalContext]="true"
+						(biometricsSuccess)="onBiometricSuccess($event)"
+						(biometricsCancel)="onBiometricCancel()"
+					></app-data-biometrics>
+				</div>
+			</div>
+		</div>
+	}
+</div>

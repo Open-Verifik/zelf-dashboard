@@ -27,8 +27,8 @@
 
 				.camera-view {
 					width: 100%;
-					max-width: 720px;
-					aspect-ratio: 4 / 3;
+					max-width: 440px;
+					aspect-ratio: 3 / 4;
 					height: auto;
 					margin: 0 auto 20px;
 				}
@@ -51,8 +51,8 @@
 			.camera-view {
 				position: relative;
 				width: 100%;
-				max-width: 720px;
-				aspect-ratio: 4 / 3;
+				max-width: 440px;
+				aspect-ratio: 3 / 4;
 				margin: 0 auto 24px;
 				border-radius: 16px;
 				overflow: hidden;
@@ -64,6 +64,15 @@
 					width: 100%;
 					height: 100%;
 					border-radius: 16px;
+
+					// ngx-webcam sizes the <video> to fit inside [width]x[height] while
+					// preserving the stream ratio, so the wrapper must be stretched or the
+					// video's height:100% collapses against an auto-height parent.
+					::ng-deep .webcam-wrapper {
+						display: block;
+						width: 100%;
+						height: 100%;
+					}
 
 					::ng-deep video {
 						display: block;
@@ -412,7 +421,7 @@
 
 				.camera-view {
 					width: 100%;
-					max-width: 100%;
+					max-width: min(100%, 380px);
 					margin: 0 auto 16px;
 					border-radius: 12px;
 				}
@@ -532,7 +541,7 @@
 					max-width: 100%;
 
 					.camera-view {
-						max-width: 100%;
+						max-width: min(100%, 380px);
 						width: 100%;
 						margin: 0 auto;
 						border-radius: 8px;

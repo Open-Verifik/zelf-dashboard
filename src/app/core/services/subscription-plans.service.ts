@@ -101,12 +101,15 @@ export interface CancelSubscriptionResponse {
 	message: string;
 }
 
+const MY_SUBSCRIPTION_TTL_MS = 5 * 60 * 1000;
+
 @Injectable({
 	providedIn: "root",
 })
 export class SubscriptionPlansService {
-	private _httpClient = inject(HttpClient);
 	private _httpWrapper = inject(HttpWrapperService);
+	private _mySubscriptionCache: { expiresAt: number; value: any } | null = null;
+	private _mySubscriptionInflight: Promise<any> | null = null;
 
 	/**
 	 * Get all subscription plans (includes `pricingMeta` when supported by the API).
@@ -134,7 +137,7 @@ export class SubscriptionPlansService {
 		try {
 			const response = await this._httpWrapper.sendRequest(
 				"get",
-				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.getById}/${productId}`
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.getById}/${productId}`,
 			);
 			return response.data;
 		} catch (error) {
@@ -150,10 +153,12 @@ export class SubscriptionPlansService {
 			const response = await this._httpWrapper.sendRequest(
 				"post",
 				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.subscribe}`,
-				request
+				request,
 			);
 
 			// Handle both direct response and nested data response
+			this._clearMySubscriptionCache();
+
 			if (response.data) {
 				return response.data;
 			} else {
@@ -168,15 +173,28 @@ export class SubscriptionPlansService {
 	 * Get my plan from API
 	 */
 	async getMySubscription(): Promise<any> {
-		try {
-			const response = await this._httpWrapper.sendRequest(
-				"get",
-				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.mySubscription}`
-			);
-			return response.data;
-		} catch (error) {
-			throw error;
+		if (this._mySubscriptionCache && this._mySubscriptionCache.expiresAt > Date.now()) {
+			return this._mySubscriptionCache.value;
 		}
+
+		if (this._mySubscriptionInflight) {
+			return this._mySubscriptionInflight;
+		}
+
+		this._mySubscriptionInflight = this._httpWrapper
+			.sendRequest("get", `${environment.apiUrl}${environment.endpoints.subscriptionPlans.mySubscription}`)
+			.then((response: any) => {
+				const value = response.data;
+				this._mySubscriptionCache = { expiresAt: Date.now() + MY_SUBSCRIPTION_TTL_MS, value };
+				this._mySubscriptionInflight = null;
+				return value;
+			})
+			.catch((error: unknown) => {
+				this._mySubscriptionInflight = null;
+				throw error;
+			});
+
+		return this._mySubscriptionInflight;
 	}
 
 	/**
@@ -186,12 +204,17 @@ export class SubscriptionPlansService {
 		try {
 			const response = await this._httpWrapper.sendRequest(
 				"post",
-				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.createPortalSession}`
+				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.createPortalSession}`,
 			);
 			return response.data || response;
 		} catch (error) {
 			throw error;
 		}
+	}
+
+	private _clearMySubscriptionCache(): void {
+		this._mySubscriptionCache = null;
+		this._mySubscriptionInflight = null;
 	}
 
 	/**
@@ -202,8 +225,9 @@ export class SubscriptionPlansService {
 			const response = await this._httpWrapper.sendRequest(
 				"post",
 				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.cancelSubscription}`,
-				{ subscriptionId }
+				{ subscriptionId },
 			);
+			this._clearMySubscriptionCache();
 			return response.data || response;
 		} catch (error) {
 			throw error;
@@ -218,8 +242,9 @@ export class SubscriptionPlansService {
 			const response = await this._httpWrapper.sendRequest(
 				"post",
 				`${environment.apiUrl}${environment.endpoints.subscriptionPlans.upgradeSubscription}`,
-				{ subscriptionId, newPriceId }
+				{ subscriptionId, newPriceId },
 			);
+			this._clearMySubscriptionCache();
 			return response.data || response;
 		} catch (error) {
 			throw error;
@@ -234,6 +259,7 @@ export class SubscriptionPlansService {
 			const response = await this._httpWrapper.sendRequest("post", `${environment.apiUrl}/api/subscription-plans/verify-session`, {
 				sessionId,
 			});
+			this._clearMySubscriptionCache();
 			return response.data || response;
 		} catch (error) {
 			throw error;

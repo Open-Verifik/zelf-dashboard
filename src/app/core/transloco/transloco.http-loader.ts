@@ -4,6 +4,8 @@ import { Translation, TranslocoLoader } from "@jsverse/transloco";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { PLAN_BILLING_PRICING_OVERLAY } from "./plan-billing-pricing-overlay";
+import { getAnalyticsI18nOverlay } from "./analytics-i18n-overlay";
+import { getTagsI18nOverlay } from "./tags-i18n-overlay";
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -33,9 +35,12 @@ export class TranslocoHttpLoader implements TranslocoLoader {
 	 */
 	getTranslation(lang: string): Observable<Translation> {
 		return this._httpClient.get<Translation>(`/i18n/${lang}.json`).pipe(
-			map((base) =>
-				deepMergeTranslations(base as Record<string, unknown>, PLAN_BILLING_PRICING_OVERLAY) as Translation,
-			),
+			map((base) => {
+				let merged = deepMergeTranslations(base as Record<string, unknown>, PLAN_BILLING_PRICING_OVERLAY);
+				merged = deepMergeTranslations(merged, getAnalyticsI18nOverlay(lang));
+				merged = deepMergeTranslations(merged, getTagsI18nOverlay(lang));
+				return merged as Translation;
+			}),
 		);
 	}
 }

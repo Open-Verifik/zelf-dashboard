@@ -9,11 +9,15 @@ export interface LicenseResponse {
 	};
 }
 
+const MY_LICENSE_TTL_MS = 5 * 60 * 1000;
+
 @Injectable({
 	providedIn: "root",
 })
 export class LicenseService {
 	private readonly baseUrl = `${environment.apiUrl}/api/license`;
+	private readonly _myLicenseCache = new Map<string, { expiresAt: number; value: LicenseResponse }>();
+	private readonly _myLicenseInflight = new Map<string, Promise<LicenseResponse>>();
 
 	constructor(private httpWrapper: HttpWrapperService) {}
 
@@ -22,7 +26,32 @@ export class LicenseService {
 	 * @returns Promise of license response
 	 */
 	getMyLicense(withJSON: boolean = false): Promise<LicenseResponse> {
-		return this.httpWrapper.sendRequest("get", `${this.baseUrl}/my-license`, { withJSON });
+		const key = withJSON ? "json" : "plain";
+		const cached = this._myLicenseCache.get(key);
+
+		if (cached && cached.expiresAt > Date.now()) {
+			return Promise.resolve(cached.value);
+		}
+
+		const inflight = this._myLicenseInflight.get(key);
+
+		if (inflight) return inflight;
+
+		const request = this.httpWrapper
+			.sendRequest("get", `${this.baseUrl}/my-license`, { withJSON })
+			.then((response: LicenseResponse) => {
+				this._myLicenseCache.set(key, { expiresAt: Date.now() + MY_LICENSE_TTL_MS, value: response });
+				this._myLicenseInflight.delete(key);
+				return response;
+			})
+			.catch((error: unknown) => {
+				this._myLicenseInflight.delete(key);
+				throw error;
+			});
+
+		this._myLicenseInflight.set(key, request);
+
+		return request;
 	}
 
 	/**
@@ -31,7 +60,10 @@ export class LicenseService {
 	 * @returns Promise of license response
 	 */
 	createOrUpdateLicense(licenseData: any): Promise<any> {
-		return this.httpWrapper.sendRequest("post", this.baseUrl, licenseData);
+		return this.httpWrapper.sendRequest("post", this.baseUrl, licenseData).then((response: any) => {
+			this._clearMyLicenseCache();
+			return response;
+		});
 	}
 
 	/**
@@ -49,6 +81,14 @@ export class LicenseService {
 	 * @returns Promise of delete response
 	 */
 	deleteLicense(ipfsHash: string): Promise<any> {
-		return this.httpWrapper.sendRequest("delete", `${this.baseUrl}/${ipfsHash}`);
+		return this.httpWrapper.sendRequest("delete", `${this.baseUrl}/${ipfsHash}`).then((response: any) => {
+			this._clearMyLicenseCache();
+			return response;
+		});
+	}
+
+	private _clearMyLicenseCache(): void {
+		this._myLicenseCache.clear();
+		this._myLicenseInflight.clear();
 	}
 }

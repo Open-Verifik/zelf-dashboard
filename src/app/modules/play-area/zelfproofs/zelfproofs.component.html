@@ -1,211 +1,414 @@
-<div class="flex flex-col w-full p-6 sm:p-8">
-	<!-- Header -->
-	<div class="flex items-center justify-between mb-8">
-		<div>
-			<h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">ZelfProof Testing</h1>
-			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Test HTTP 402 payment flow with ZNS tokens</p>
-		</div>
-		<button mat-raised-button color="primary" (click)="fillSampleData()" class="ml-4">
+<div class="zp-play-area flex flex-col w-full">
+	<app-human-authn-play-header
+		title="Create a new HumanAuthn"
+		subtitle="Paid encrypt. Expect HTTP 402, then pay with ZNS. This is not /api/zelf-proof."
+		[method]="encryptMethod"
+		[path]="encryptPath"
+		[currentStep]="playStep"
+	>
+		<button mat-stroked-button color="primary" (click)="fillSampleData()" class="zp-btn-secondary shrink-0">
 			<mat-icon class="icon-size-5 mr-2">auto_awesome</mat-icon>
-			Fill Sample Data
+			Fill sample data
 		</button>
-	</div>
+	</app-human-authn-play-header>
 
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-		<!-- Left Column: Encryption Form -->
-		<mat-card class="shadow-lg">
-			<mat-card-header>
-				<mat-card-title class="flex items-center">
-					<mat-icon class="mr-2">lock</mat-icon>
-					Encrypt Data
-				</mat-card-title>
-			</mat-card-header>
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+		<mat-card class="zp-panel">
 			<mat-card-content>
-				<form [formGroup]="encryptForm" class="space-y-4 mt-4">
-					<!-- Public Data -->
-					<mat-form-field class="w-full" appearance="outline">
-						<mat-label>Public Data (JSON)</mat-label>
-						<textarea matInput formControlName="publicData" rows="4" placeholder='{"name": "John Doe"}'></textarea>
-						<mat-hint>Enter valid JSON data to encrypt</mat-hint>
-					</mat-form-field>
+				<form [formGroup]="encryptForm" class="space-y-8 mt-2">
+					<app-human-authn-step-card
+						[step]="1"
+						title="Face lock"
+						field="faceBase64"
+						hint="The selfie is the lock, not a profile picture. Decrypt later needs this same face."
+					>
+						<div class="flex items-start justify-end mb-3">
+							@if (selfiePreviewUrl) {
+								<button type="button" mat-stroked-button color="primary" (click)="clearSelfie()" class="zp-btn-secondary shrink-0">
+									<mat-icon class="icon-size-4 mr-1">close</mat-icon>
+									Remove
+								</button>
+							}
+						</div>
+						<div
+							class="zp-dropzone flex items-center gap-4 p-5 rounded-2xl bg-zinc-50/90 dark:bg-white/[0.03] ring-1 ring-zinc-200/70 dark:ring-white/[0.06]"
+						>
+							@if (selfiePreviewUrl) {
+								<img
+									[src]="selfiePreviewUrl"
+									alt="Selfie preview"
+									class="w-20 h-20 rounded-full object-cover ring-1 ring-zinc-200/80 dark:ring-white/10"
+								/>
+							} @else {
+								<div
+									class="w-20 h-20 rounded-full bg-zinc-100 dark:bg-white/[0.05] flex items-center justify-center text-zinc-400 dark:text-zinc-500"
+								>
+									<mat-icon class="icon-size-7">person</mat-icon>
+								</div>
+							}
+							<div class="flex-1 min-w-0">
+								<input #selfieFileInput type="file" accept="image/*" (change)="onSelfieFileSelected($event)" class="hidden" />
+								<button type="button" mat-flat-button color="primary" (click)="selfieFileInput.click()" class="zp-btn-primary">
+									<mat-icon class="mr-2">upload</mat-icon>
+									{{ selfieFileName ? "Replace image" : "Upload image" }}
+								</button>
+								<p *ngIf="selfieFileName" class="mt-2 text-xs text-zinc-500 dark:text-zinc-500 truncate">
+									{{ selfieFileName }}
+								</p>
+								<p *ngIf="!selfieFileName" class="mt-2 text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">
+									JPEG or PNG, up to 5 MB. Stored locally as a Base64 data URL.
+								</p>
+							</div>
+						</div>
+						<details class="mt-4 text-xs">
+							<summary
+								class="cursor-pointer text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
+							>
+								Or paste a Base64 string
+							</summary>
+							<mat-form-field class="w-full mt-2" appearance="outline">
+								<mat-label>Face Base64</mat-label>
+								<textarea matInput formControlName="faceBase64" rows="3" placeholder="data:image/jpeg;base64,..."></textarea>
+							</mat-form-field>
+						</details>
+					</app-human-authn-step-card>
 
-					<!-- Face Base64 -->
-					<mat-form-field class="w-full" appearance="outline">
-						<mat-label>Face Base64</mat-label>
-						<textarea matInput formControlName="faceBase64" rows="3" placeholder="data:image/jpeg;base64,..."></textarea>
-						<mat-hint>Base64 encoded face image</mat-hint>
-					</mat-form-field>
+					<app-human-authn-step-card
+						[step]="2"
+						title="Anyone can read"
+						field="publicData"
+						hint="Preview can show these fields without a face. Values must be strings."
+					>
+						<div class="flex justify-end mb-3">
+							<button type="button" mat-stroked-button color="primary" (click)="addPublicDataRow()" class="zp-btn-secondary shrink-0">
+								<mat-icon class="icon-size-4 mr-1">add</mat-icon>
+								Add field
+							</button>
+						</div>
+						<div class="space-y-2" formArrayName="publicData">
+							<div
+								*ngFor="let row of publicDataRows.controls; let i = index"
+								[formGroupName]="i"
+								class="flex items-stretch gap-2"
+							>
+								<mat-form-field class="flex-1" appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Key</mat-label>
+									<input matInput formControlName="key" placeholder="e.g. name" />
+								</mat-form-field>
+								<mat-form-field class="flex-[2]" appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Value</mat-label>
+									<input matInput formControlName="value" placeholder="e.g. John Doe" />
+								</mat-form-field>
+								<button
+									type="button"
+									mat-icon-button
+									(click)="removePublicDataRow(i)"
+									matTooltip="Remove field"
+									class="zp-icon-muted self-center"
+								>
+									<mat-icon>delete_outline</mat-icon>
+								</button>
+							</div>
+						</div>
+					</app-human-authn-step-card>
 
-					<!-- OS -->
-					<mat-form-field class="w-full" appearance="outline">
-						<mat-label>Operating System</mat-label>
-						<mat-select formControlName="os">
-							<mat-option value="DESKTOP">Desktop</mat-option>
-							<mat-option value="ANDROID">Android</mat-option>
-							<mat-option value="IOS">iOS</mat-option>
-						</mat-select>
-					</mat-form-field>
+					<app-human-authn-step-card
+						[step]="3"
+						title="Only you can read"
+						field="metadata"
+						hint="Encrypted payload. Decrypt needs the same face. At least one entry is required."
+					>
+						<div class="flex justify-end mb-3">
+							<button type="button" mat-stroked-button color="primary" (click)="addMetadataRow()" class="zp-btn-secondary shrink-0">
+								<mat-icon class="icon-size-4 mr-1">add</mat-icon>
+								Add field
+							</button>
+						</div>
+						<div class="space-y-2" formArrayName="metadata">
+							<div
+								*ngFor="let row of metadataRows.controls; let i = index"
+								[formGroupName]="i"
+								class="flex items-stretch gap-2"
+							>
+								<mat-form-field class="flex-1" appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Key</mat-label>
+									<input matInput formControlName="key" placeholder="e.g. device" />
+								</mat-form-field>
+								<mat-form-field class="flex-[2]" appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Value</mat-label>
+									<input matInput formControlName="value" placeholder="e.g. Browser" />
+								</mat-form-field>
+								<button
+									type="button"
+									mat-icon-button
+									(click)="removeMetadataRow(i)"
+									matTooltip="Remove field"
+									class="zp-icon-muted self-center"
+								>
+									<mat-icon>delete_outline</mat-icon>
+								</button>
+							</div>
+						</div>
+					</app-human-authn-step-card>
 
-					<!-- Liveness Level -->
-					<mat-form-field class="w-full" appearance="outline">
-						<mat-label>Liveness Level</mat-label>
-						<mat-select formControlName="livenessLevel">
-							<mat-option *ngFor="let level of livenessLevels" [value]="level.value">
-								{{ level.label }}
-							</mat-option>
-						</mat-select>
-						<mat-hint>Select required liveness tolerance</mat-hint>
-					</mat-form-field>
+					<app-human-authn-step-card
+						[step]="4"
+						title="Extra secret"
+						field="password"
+						hint="Optional. If you set a password or PIN, Decrypt will need it too."
+					>
+						<mat-button-toggle-group
+							formControlName="credentialMode"
+							(change)="onCredentialModeChange()"
+							class="w-full zp-toggle-group zp-toggle-group--credential"
+						>
+							<mat-button-toggle *ngFor="let mode of credentialModes" [value]="mode.value">
+								<span class="zp-credential-toggle-label">
+									<mat-icon class="icon-size-4 zp-credential-toggle-icon">{{ mode.icon }}</mat-icon>
+									{{ mode.label }}
+								</span>
+							</mat-button-toggle>
+						</mat-button-toggle-group>
+						@if (credentialMode !== "none") {
+							@if (credentialMode === "pin") {
+								<div class="zp-pin-field mt-3 space-y-2">
+									<div class="flex items-center justify-between gap-2">
+										<span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">PIN</span>
+										<button
+											type="button"
+											mat-icon-button
+											(click)="toggleCredentialVisibility()"
+											[matTooltip]="showCredentialValue ? 'Hide' : 'Show'"
+											class="zp-icon-muted !w-9 !h-9"
+										>
+											<mat-icon class="icon-size-5">{{ showCredentialValue ? "visibility_off" : "visibility" }}</mat-icon>
+										</button>
+									</div>
+									<div class="zp-pin-row" (paste)="onPinPaste($event)">
+										@for (i of pinSlotIndices; track i) {
+											<input
+												#pinBox
+												type="text"
+												inputmode="numeric"
+												pattern="[0-9]*"
+												autocomplete="one-time-code"
+												autocorrect="off"
+												spellcheck="false"
+												maxlength="1"
+												class="zp-pin-box"
+												[class.zp-pin-box--masked]="!showCredentialValue"
+												[attr.aria-label]="'PIN digit ' + (i + 1)"
+												(input)="onPinSlotInput($event, i)"
+												(keydown)="onPinSlotKeydown($event, i)"
+											/>
+										}
+									</div>
+									<p class="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed">6 digits. Paste or type; arrow keys move between boxes.</p>
+									@if (encryptForm.get('credentialValue')?.invalid && encryptForm.get('credentialValue')?.touched) {
+										<p class="text-xs text-red-600 dark:text-red-400">Enter exactly 6 numeric digits.</p>
+									}
+								</div>
+							} @else {
+								<mat-form-field class="w-full mt-3" appearance="outline">
+									<mat-label>Password</mat-label>
+									<input
+										matInput
+										formControlName="credentialValue"
+										[type]="showCredentialValue ? 'text' : 'password'"
+										inputmode="text"
+										placeholder="Enter a secret"
+										autocomplete="new-password"
+									/>
+									<button
+										type="button"
+										mat-icon-button
+										matSuffix
+										(click)="toggleCredentialVisibility()"
+										[matTooltip]="showCredentialValue ? 'Hide' : 'Show'"
+									>
+										<mat-icon>{{ showCredentialValue ? "visibility_off" : "visibility" }}</mat-icon>
+									</button>
+									<mat-hint>Minimum 4 characters.</mat-hint>
+								</mat-form-field>
+							}
+						}
+					</app-human-authn-step-card>
 
-					<!-- Metadata -->
-					<mat-form-field class="w-full" appearance="outline">
-						<mat-label>Metadata (JSON)</mat-label>
-						<textarea matInput formControlName="metadata" rows="3" placeholder='{"device": "Browser"}'></textarea>
-						<mat-hint>Optional metadata</mat-hint>
-					</mat-form-field>
+					<app-human-authn-step-card
+						[step]="5"
+						title="Settings"
+						field="os · livenessLevel"
+						hint="Liveness is always checked on this selfie. Soft is easiest to pass; Hardened is strictest."
+					>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<mat-form-field class="w-full" appearance="outline">
+								<mat-label>Operating System</mat-label>
+								<mat-select formControlName="os">
+									<mat-option value="DESKTOP">Desktop</mat-option>
+									<mat-option value="ANDROID">Android</mat-option>
+									<mat-option value="IOS">iOS</mat-option>
+								</mat-select>
+							</mat-form-field>
+							<mat-form-field class="w-full" appearance="outline">
+								<mat-label>Liveness Level</mat-label>
+								<mat-select formControlName="livenessLevel">
+									<mat-option *ngFor="let level of livenessLevels" [value]="level.value">
+										{{ level.label }}
+									</mat-option>
+								</mat-select>
+								<mat-hint>How strict the live-face check is</mat-hint>
+							</mat-form-field>
+						</div>
+					</app-human-authn-step-card>
 
-					<!-- Submit Button -->
-					<button mat-raised-button color="primary" class="w-full py-3" (click)="testEncrypt()" [disabled]="loading || encryptForm.invalid">
+					<button mat-raised-button color="primary" class="w-full py-3 zp-btn-primary zp-btn-submit" (click)="testEncrypt()" [disabled]="loading">
 						<ng-container *ngIf="loading">
-							<mat-spinner diameter="20" class="inline-block mr-2"></mat-spinner>
-							Processing...
+							<span class="zp-submit-label">
+								<mat-spinner diameter="20" class="zp-submit-spinner"></mat-spinner>
+								Processing...
+							</span>
 						</ng-container>
 						<ng-container *ngIf="!loading">
-							<mat-icon class="mr-2">send</mat-icon>
-							Test Encrypt
+							<span class="zp-submit-label">
+								<mat-icon class="zp-submit-icon">send</mat-icon>
+								Create HumanAuthn
+							</span>
 						</ng-container>
 					</button>
 				</form>
 			</mat-card-content>
 		</mat-card>
 
-		<!-- Right Column: Payment & Response -->
-		<div class="space-y-6">
-			<!-- Payment Required Card -->
-			@if (paymentRequired && paymentDetails) {
-				<mat-card class="shadow-lg border-2 border-orange-500">
-					<mat-card-header class="bg-orange-50 dark:bg-orange-900/20 -m-4 mb-4 p-4">
-						<mat-card-title class="flex items-center text-orange-700 dark:text-orange-400">
-							<mat-icon class="mr-2">payment</mat-icon>
-							Payment Required (HTTP 402)
+		<div class="space-y-8 lg:sticky lg:top-6 lg:self-start">
+			@if (humanPay.paymentRequired && humanPay.paymentDetails) {
+				<mat-card class="zp-panel zp-status zp-status-payment">
+					<mat-card-header class="zp-panel-header zp-status-head">
+						<mat-card-title class="flex flex-col items-start gap-1 font-medium">
+							<span class="flex items-center gap-2">
+								<span class="zp-status-dot zp-status-dot--amber"></span>
+								<mat-icon class="text-zinc-400 dark:text-zinc-500 icon-size-5">payment</mat-icon>
+								Step 3 — Pay with ZNS, then we retry encrypt
+								<span class="text-zinc-400 dark:text-zinc-500 font-normal text-sm font-mono">402</span>
+							</span>
 						</mat-card-title>
 					</mat-card-header>
-					<mat-card-content class="space-y-4">
-						<!-- Payment Details -->
-						<div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-							<h3 class="font-semibold mb-2">Payment Details:</h3>
-							<div class="space-y-2 text-sm">
-								<div class="flex justify-between items-center">
-									<span class="text-gray-600 dark:text-gray-400">Cost:</span>
-									<span class="font-mono font-bold text-lg text-primary-600">{{ paymentDetails.paymentDetails?.cost }} ZNS</span>
+					<mat-card-content class="space-y-5">
+						<div class="zp-inset p-4 rounded-xl">
+							<h3 class="text-[13px] font-medium text-zinc-800 dark:text-zinc-200 mb-3">Payment details</h3>
+							<div class="space-y-2.5 text-sm">
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-zinc-500 dark:text-zinc-500">Cost</span>
+									<span class="font-mono font-semibold text-base text-zinc-900 dark:text-zinc-100 tabular-nums">
+										{{ humanPay.paymentDetails.paymentDetails?.cost }} ZNS
+									</span>
 								</div>
-								<div class="flex justify-between items-center">
-									<span class="text-gray-600 dark:text-gray-400">Token:</span>
-									<span class="font-mono">{{ paymentDetails.paymentDetails?.token }}</span>
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-zinc-500 dark:text-zinc-500">Token</span>
+									<span class="font-mono text-zinc-800 dark:text-zinc-200 truncate text-right">{{ humanPay.paymentDetails.paymentDetails?.token }}</span>
 								</div>
-								<div class="flex justify-between items-center">
-									<span class="text-gray-600 dark:text-gray-400">Chain:</span>
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-zinc-500 dark:text-zinc-500">Chain</span>
 									<span
-										class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+										class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-white/[0.06] dark:text-zinc-300 ring-1 ring-zinc-200/80 dark:ring-white/[0.08]"
 									>
-										<mat-icon class="icon-size-3 mr-1">link</mat-icon>
+										<mat-icon class="icon-size-3">link</mat-icon>
 										Solana
 									</span>
 								</div>
 							</div>
 						</div>
-
-						<!-- Payment Action -->
-						<div class="space-y-3">
+						<div class="space-y-4">
 							@if (!showPasswordStep) {
-								<div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-									<h3 class="font-semibold mb-1 text-blue-900 dark:text-blue-300">Fast Payment</h3>
-									<p class="text-xs text-blue-800 dark:text-blue-200 mb-3">
-										Pay securely with your ZNS tokens. The transaction will be signed automatically after biometric verification.
-									</p>
-
+								<div class="zp-callout p-4 rounded-xl space-y-3">
+									<div>
+										<h3 class="text-[13px] font-medium text-zinc-800 dark:text-zinc-200 mb-1">Fast payment</h3>
+										<p class="text-xs text-zinc-600 dark:text-zinc-500 leading-relaxed">
+											Pay with your ZNS balance. The transaction is signed after biometric verification.
+										</p>
+									</div>
 									<button
 										mat-raised-button
 										color="primary"
-										class="w-full py-3 text-lg"
+										class="w-full py-3 text-base zp-btn-primary"
 										(click)="startPaymentFlow()"
-										[disabled]="paymentProcessing"
+										[disabled]="humanPay.paymentProcessing"
 									>
 										<div class="flex items-center justify-center">
 											<mat-icon class="mr-2">fingerprint</mat-icon>
 											Pay with ZNS
 										</div>
 									</button>
-									<p class="text-[10px] text-center mt-2 text-gray-500">Gas fees are covered by the service (Fee Payer)</p>
+									<p class="text-[11px] text-center text-zinc-500 dark:text-zinc-500 leading-snug">
+										Gas is covered by the service (fee payer).
+									</p>
 								</div>
 							} @else {
-								<!-- Password Step -->
-								<div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 animate-fade-in">
-									<h3 class="font-semibold mb-4 text-gray-900 dark:text-white">Verify Identity</h3>
-
-									<!-- Passkey Option -->
+								<div class="zp-inset p-4 rounded-xl animate-fade-in space-y-4">
+									<h3 class="text-[13px] font-medium text-zinc-800 dark:text-zinc-200">Verify identity</h3>
 									@if (hasPasskey) {
-										<div class="mb-4">
+										<div class="space-y-3">
 											<button
 												type="button"
 												(click)="onPasskeyLogin()"
-												[disabled]="paymentProcessing"
-												class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-xl font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-200 dark:border-blue-800"
+												[disabled]="humanPay.paymentProcessing"
+												class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium bg-zinc-100 text-zinc-900 hover:bg-zinc-200/90 dark:bg-white/[0.08] dark:text-zinc-100 dark:hover:bg-white/[0.12] transition-colors ring-1 ring-zinc-200/80 dark:ring-white/[0.08]"
 											>
-												@if (paymentProcessing) {
+												@if (humanPay.paymentProcessing) {
 													<mat-spinner diameter="20" class="mr-2"></mat-spinner>
 												} @else {
 													<mat-icon class="icon-size-5">fingerprint</mat-icon>
 												}
-												Continue with Passkey
+												Continue with passkey
 											</button>
-											<div class="mt-3 flex items-center gap-3">
-												<div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-												<span class="text-[10px] font-medium text-gray-400 uppercase">OR USE PASSWORD</span>
-												<div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
+											<div class="flex items-center gap-3">
+												<div class="h-px bg-zinc-200/90 dark:bg-white/[0.08] flex-1"></div>
+												<span class="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 tracking-wide">or password</span>
+												<div class="h-px bg-zinc-200/90 dark:bg-white/[0.08] flex-1"></div>
 											</div>
 										</div>
 									}
-
-									<!-- Password Form -->
 									<div class="space-y-3">
 										<div class="space-y-1">
-											<label class="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Master Password</label>
+											<label class="text-xs font-medium text-zinc-600 dark:text-zinc-400 ml-0.5">
+												Master password <span class="text-zinc-400 dark:text-zinc-500 font-normal">(optional)</span>
+											</label>
 											<div
-												class="flex items-center w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 focus-within:border-blue-500 transition-colors"
+												class="flex items-center w-full bg-white dark:bg-white/[0.04] border border-zinc-200/90 dark:border-white/[0.08] rounded-full px-3 focus-within:ring-1 focus-within:ring-zinc-300 dark:focus-within:ring-white/20 transition-shadow"
 											>
-												<mat-icon class="text-gray-400 icon-size-5 mr-2">lock</mat-icon>
+												<mat-icon class="text-zinc-400 dark:text-zinc-500 icon-size-5 mr-2">lock</mat-icon>
 												<input
 													[(ngModel)]="masterPassword"
 													[type]="showPassword ? 'text' : 'password'"
-													class="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white py-2.5 text-sm font-medium placeholder-gray-400 focus:outline-none"
-													placeholder="Enter password to sign"
-													[disabled]="paymentProcessing"
+													class="flex-1 bg-transparent border-none focus:ring-0 text-zinc-900 dark:text-zinc-100 py-2.5 text-sm placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none"
+													placeholder="Leave empty if not required"
+													[disabled]="humanPay.paymentProcessing"
 												/>
 												<button
 													type="button"
 													(click)="togglePasswordVisibility()"
-													class="text-gray-400 hover:text-gray-600 transition-colors ml-2"
+													class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors ml-2"
 												>
 													<mat-icon class="icon-size-5">{{ showPassword ? "visibility_off" : "visibility" }}</mat-icon>
 												</button>
 											</div>
+											<p class="text-[11px] text-zinc-500 dark:text-zinc-500 ml-0.5 leading-relaxed">
+												Skip if your wallet flow does not use a master password.
+											</p>
 										</div>
-
-										<div class="flex gap-2 pt-2">
+										<div class="flex gap-2 pt-1">
 											<button
 												type="button"
 												(click)="cancelPaymentFlow()"
-												class="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-												[disabled]="paymentProcessing"
+												class="flex-1 px-3 py-2.5 rounded-full border border-zinc-200/90 dark:border-white/[0.1] text-zinc-600 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-white/[0.04] transition-colors"
+												[disabled]="humanPay.paymentProcessing"
 											>
 												Cancel
 											</button>
 											<button
 												type="button"
 												(click)="proceedToBiometric()"
-												[disabled]="!masterPassword || paymentProcessing"
-												class="flex-1 px-3 py-2 rounded-xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+												[disabled]="humanPay.paymentProcessing"
+												class="flex-1 px-3 py-2.5 rounded-full bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
 											>
 												Continue
 											</button>
@@ -213,21 +416,19 @@
 									</div>
 								</div>
 							}
-
-							<!-- Manual Fallback -->
-							<div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-4">
-								<p class="text-xs text-center text-gray-500 mb-3">Or verify manually</p>
-								<div class="flex gap-2">
+							<div class="border-t border-zinc-200/80 dark:border-white/[0.06] pt-4 mt-2">
+								<p class="text-xs text-center text-zinc-500 dark:text-zinc-500 mb-3">Or verify manually</p>
+								<div class="flex gap-2 items-start">
 									<mat-form-field class="w-full text-xs" density="dense" subscriptSizing="dynamic">
-										<mat-label>Transaction Hash</mat-label>
-										<input matInput [(ngModel)]="paymentTxHash" placeholder="Tx Hash" />
+										<mat-label>Transaction hash</mat-label>
+										<input matInput [(ngModel)]="humanPay.paymentTxHash" placeholder="Tx hash" />
 									</mat-form-field>
 									<button
 										mat-icon-button
-										color="primary"
 										(click)="testEncrypt()"
-										[disabled]="!paymentTxHash"
-										matTooltip="Verify Payment"
+										[disabled]="!humanPay.paymentTxHash"
+										matTooltip="Verify payment"
+										class="zp-icon-muted mt-1"
 									>
 										<mat-icon>check_circle</mat-icon>
 									</button>
@@ -238,104 +439,50 @@
 				</mat-card>
 			}
 
-			<!-- Success Response Card -->
-			@if (response) {
-				<mat-card class="shadow-lg border-2 border-green-500">
-					<mat-card-header class="bg-green-50 dark:bg-green-900/20 -m-4 mb-4 p-4">
-						<mat-card-title class="flex items-center text-green-700 dark:text-green-400">
-							<mat-icon class="mr-2">check_circle</mat-icon>
-							Success
-						</mat-card-title>
-					</mat-card-header>
-					<mat-card-content>
-						<div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-							<div class="flex items-center justify-between mb-2">
-								<h3 class="font-semibold">Response:</h3>
-								<button mat-icon-button (click)="copyResponseToClipboard()">
-									<mat-icon>content_copy</mat-icon>
-								</button>
-							</div>
-							<pre class="text-xs overflow-auto max-h-96 bg-white dark:bg-gray-900 p-3 rounded">{{ response | json }}</pre>
-						</div>
-					</mat-card-content>
-				</mat-card>
-			}
-
-			<!-- Error Card -->
-			@if (error) {
-				<mat-card class="shadow-lg border-2 border-red-500">
-					<mat-card-header class="bg-red-50 dark:bg-red-900/20 -m-4 mb-4 p-4">
-						<mat-card-title class="flex items-center text-red-700 dark:text-red-400">
-							<mat-icon class="mr-2">error</mat-icon>
-							Error
-						</mat-card-title>
-					</mat-card-header>
-					<mat-card-content>
-						<div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-							<pre class="text-xs overflow-auto max-h-96 text-red-600 dark:text-red-400">{{ error | json }}</pre>
-						</div>
-					</mat-card-content>
-				</mat-card>
-			}
-
-			<!-- Info Card -->
-			@if (!paymentRequired && !response && !error) {
-				<mat-card class="shadow-lg">
-					<mat-card-header>
-						<mat-card-title class="flex items-center">
-							<mat-icon class="mr-2">info</mat-icon>
-							How it works
-						</mat-card-title>
-					</mat-card-header>
-					<mat-card-content class="space-y-3 text-sm">
-						<p><strong>Step 1:</strong> Fill in the encryption data (or use sample data)</p>
-						<p><strong>Step 2:</strong> Click "Test Encrypt" - you'll get a 402 Payment Required response</p>
-						<p><strong>Step 3:</strong> Click "Pay with ZNS" to authenticate with biometrics</p>
-						<p><strong>Step 4:</strong> The transaction is automatically signed and submitted</p>
-						<p><strong>Step 5:</strong> Encryption succeeds with payment proof!</p>
-
-						<div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded mt-4">
-							<p class="text-xs text-blue-800 dark:text-blue-200">
-								<strong>Fee Payer:</strong> You don't need SOL to pay gas fees. The service covers the transaction costs.
-							</p>
-						</div>
-					</mat-card-content>
-				</mat-card>
-			}
+			<app-human-authn-io-panel
+				[sendPayload]="livePayload"
+				[expectedShape]="expectedShape"
+				[emptyHint]="emptyHint"
+				[response]="response"
+				[error]="error"
+				highlight="zelfID"
+				[nextSteps]="nextSteps"
+				(copyResponse)="copyResponseToClipboard()"
+			></app-human-authn-io-panel>
 		</div>
 	</div>
 
-	<!-- Biometric Verification Modal - Full Screen (Matches Sign In Style) -->
 	@if (showBiometricModal) {
 		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300 animate-fade-in"
+			class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300 animate-fade-in"
 		>
-			<div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl min-h-[600px] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-				<!-- Header -->
-				<div class="px-6 py-5 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-800">
-					<div class="flex flex-col">
-						<h2 class="text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">Biometric Verification</h2>
-						<div class="flex items-center gap-1.5 mt-1">
+			<div
+				class="bg-white dark:bg-zinc-950 rounded-3xl w-full max-w-6xl min-h-[720px] max-h-[92vh] overflow-hidden shadow-2xl flex flex-col ring-1 ring-zinc-200/80 dark:ring-white/[0.08]"
+			>
+				<div class="px-6 py-5 flex items-center justify-between shrink-0 border-b border-zinc-100 dark:border-white/[0.06]">
+					<div class="flex flex-col gap-1">
+						<h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50 leading-tight tracking-tight">
+							Biometric verification
+						</h2>
+						<div class="flex items-center gap-2 mt-0.5 flex-wrap">
 							<div
-								class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide flex items-center gap-1"
+								class="rounded-full px-2 py-0.5 text-[11px] font-medium tracking-wide flex items-center gap-1 bg-zinc-100 text-zinc-700 dark:bg-white/[0.08] dark:text-zinc-300 ring-1 ring-zinc-200/80 dark:ring-white/[0.06]"
 							>
 								<mat-icon class="icon-size-3">lock</mat-icon>
-								<span>SECURE</span>
+								<span>Secure</span>
 							</div>
-							<span class="text-xs font-medium text-gray-500 dark:text-gray-400"> Payment Authorization </span>
+							<span class="text-xs font-medium text-zinc-500 dark:text-zinc-500">Payment authorization</span>
 						</div>
 					</div>
 					<button
 						mat-icon-button
 						(click)="onBiometricCancel()"
-						class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors"
+						class="w-9 h-9 flex items-center justify-center bg-zinc-100 hover:bg-zinc-200/90 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] rounded-full transition-colors"
 					>
-						<mat-icon class="icon-size-4 text-gray-500 dark:text-gray-400">close</mat-icon>
+						<mat-icon class="icon-size-4 text-zinc-500 dark:text-zinc-400">close</mat-icon>
 					</button>
 				</div>
-
 				<div class="p-0 pt-4 pb-8 overflow-y-auto flex-1 flex flex-col justify-center items-center w-full relative">
-					<!-- Biometric Component -->
 					<app-data-biometrics
 						class="w-full h-full flex flex-col items-center justify-center"
 						[userData]="{

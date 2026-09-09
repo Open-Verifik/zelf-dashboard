@@ -57,11 +57,7 @@
 			<!-- {{ "checkout.total" | transloco }} -->
 			<div class="mb-6">
 				<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ "checkout.total" | transloco }}</p>
-				@if (paymentMethod() === "COINBASE") {
-					<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">${{ price() }}</p>
-				} @else {
-					<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ amountToPay() }} {{ paymentMethod() }}</p>
-				}
+				<p class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ amountToPay() }} {{ paymentMethod() }}</p>
 				<div class="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg">
 					{{ getPriceInUSD() }}
 				</div>
@@ -147,25 +143,13 @@
 				<!-- {{ "checkout.uniquePaymentAddress" | transloco }} -->
 				<div>
 					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-2">
-						@if (paymentMethod() === "COINBASE") {
-							{{ "checkout.coinbasePaymentUrl" | transloco }}
-						} @else {
-							{{ "checkout.uniquePaymentAddress" | transloco }}
-						}
+						{{ "checkout.uniquePaymentAddress" | transloco }}
 						<button
 							(click)="copyAddress()"
 							class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-2 py-1 rounded transition"
 						>
 							{{ "checkout.copy" | transloco }}
 						</button>
-						@if (paymentMethod() === "COINBASE" && coinbaseUrl()) {
-							<button
-								(click)="openCoinbaseLink()"
-								class="text-xs bg-blue-100 dark:bg-blue-700 hover:bg-blue-200 dark:hover:bg-blue-600 text-blue-700 dark:text-blue-300 px-2 py-1 rounded transition"
-							>
-								↗ {{ "checkout.openLink" | transloco }}
-							</button>
-						}
 					</p>
 					<div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
 						<code class="text-xs break-all text-gray-900 dark:text-gray-100 flex-1">{{ getAddressToDisplay() }}</code>
@@ -184,11 +168,7 @@
 						</button>
 					</p>
 					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-						@if (paymentMethod() === "COINBASE") {
-							<p class="text-lg font-bold text-gray-900 dark:text-gray-100">${{ price() }}</p>
-						} @else {
-							<p class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ amountToPay() }} {{ paymentMethod() }}</p>
-						}
+						<p class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ amountToPay() }} {{ paymentMethod() }}</p>
 					</div>
 				</div>
 
@@ -238,17 +218,9 @@
 					<p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ "checkout.amountDetected" | transloco }}</p>
 					<div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
 						@if (isPaymentConfirmed() && amountReceived()) {
-							@if (paymentMethod() === "COINBASE") {
-								<p class="text-lg font-bold text-green-600 dark:text-green-400">${{ amountReceived() }}</p>
-							} @else {
-								<p class="text-lg font-bold text-green-600 dark:text-green-400">{{ amountReceived() }} {{ paymentMethod() }}</p>
-							}
+							<p class="text-lg font-bold text-green-600 dark:text-green-400">{{ amountReceived() }} {{ paymentMethod() }}</p>
 						} @else {
-							@if (paymentMethod() === "COINBASE") {
-								<p class="text-lg font-bold text-gray-900 dark:text-gray-100">$0.00</p>
-							} @else {
-								<p class="text-lg font-bold text-gray-900 dark:text-gray-100">0 {{ paymentMethod() }}</p>
-							}
+							<p class="text-lg font-bold text-gray-900 dark:text-gray-100">0 {{ paymentMethod() }}</p>
 						}
 					</div>
 				</div>

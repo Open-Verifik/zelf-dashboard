@@ -1,0 +1,19 @@
+<section class="hap-step">
+	<header class="hap-step-head">
+		<span class="hap-step-num" aria-hidden="true">{{ step }}</span>
+		<div class="hap-step-copy min-w-0">
+			<h3 class="hap-step-title">
+				{{ title }}
+				@if (field) {
+					<code class="hap-step-field">{{ field }}</code>
+				}
+			</h3>
+			@if (hint) {
+				<p class="hap-step-hint">{{ hint }}</p>
+			}
+		</div>
+	</header>
+	<div class="hap-step-body">
+		<ng-content></ng-content>
+	</div>
+</section>

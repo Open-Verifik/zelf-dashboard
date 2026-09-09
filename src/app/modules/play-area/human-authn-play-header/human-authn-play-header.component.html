@@ -1,0 +1,31 @@
+<div class="hap-header">
+	<div class="hap-header-row">
+		<div class="hap-header-copy">
+			<p class="hap-eyebrow">{{ eyebrow }}</p>
+			<h1 class="hap-title">{{ title }}</h1>
+			<div class="hap-endpoint" role="status" [attr.aria-label]="method + ' ' + path">
+				<span class="hap-endpoint-method">{{ method }}</span>
+				<code class="hap-endpoint-path">{{ path }}</code>
+			</div>
+			@if (subtitle) {
+				<p class="hap-subtitle">{{ subtitle }}</p>
+			}
+		</div>
+		<div class="hap-header-actions">
+			<ng-content></ng-content>
+		</div>
+	</div>
+
+	<ol class="hap-rail" aria-label="Play-area steps">
+		@for (step of rail; track step.id; let i = $index) {
+			<li
+				class="hap-rail-item"
+				[class.hap-rail-item--current]="isCurrent(step.id)"
+				[class.hap-rail-item--done]="isDone(step.id)"
+			>
+				<span class="hap-rail-index">{{ i + 1 }}</span>
+				<span class="hap-rail-label">{{ step.label }}</span>
+			</li>
+		}
+	</ol>
+</div>

@@ -230,7 +230,6 @@
         "payment_settings": {
             "title": "Configuración de Pagos",
             "payment_methods": "Métodos de Pago",
-            "coinbase": "Coinbase",
             "crypto_payments": "Pagos con Criptomonedas",
             "stripe": "Stripe",
             "supported_currencies": "Monedas Soportadas",
@@ -612,7 +611,6 @@
         "lifetime": "De por vida",
         "total": "Total",
         "ourPurchaseRate": "Nuestra tasa de compra",
-        "payWithCoinbase": "Pagar con Coinbase",
         "choosePaymentMethod": "Elegir método de pago",
         "lowFees": "TARIFAS BAJAS",
         "purchaseNow": "Comprar ahora",
@@ -644,7 +642,6 @@
         "sendReceipt": "Enviar recibo",
         "sending": "Enviando...",
         "payWith": "Pagar con",
-        "coinbasePaymentUrl": "URL de pago de Coinbase",
         "uniquePaymentAddress": "Dirección de pago única",
         "copy": "COPIAR",
         "openLink": "Abrir enlace",
@@ -862,6 +859,7 @@
         "centerFaceSubtitle": "Centra tu rostro en el óvalo",
         "getCloser": "Acércate más",
         "getCloserSubtitle": "Acerca tu rostro a la cámara",
+        "faceNotCentral": "Centra tu rostro en el óvalo, acércate más e intenta de nuevo.",
         "livenessCheckFailedReason": "Verificación de vida fallida. Sigue las instrucciones e intenta de nuevo."
     }
 }

@@ -1,425 +1,259 @@
-<div class="flex w-full flex-auto flex-col">
-	<div class="mx-auto flex w-full max-w-screen-xl flex-wrap p-6 md:p-8">
-		<!-- Title and action buttons -->
-		<div class="flex w-full items-center justify-between">
-			<div>
-				<div class="text-3xl font-semibold leading-8 tracking-tight">{{ "analytics.title" | transloco }}</div>
-				<div class="text-secondary font-medium tracking-tight">{{ "analytics.description" | transloco }}</div>
-			</div>
-			<div class="ml-6 flex items-center">
-				<!-- <button class="hidden sm:inline-flex" mat-stroked-button>
-					<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
-					<span class="ml-2">Settings</span>
-				</button>
-				<button class="ml-3 hidden sm:inline-flex" mat-flat-button [color]="'primary'">
-					<mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:arrow-up-tray'"></mat-icon>
-					<span class="ml-2">Export</span>
-				</button> -->
+<div class="analytics-page flex w-full flex-auto flex-col">
+	<div class="analytics-page__header">
+		<h1 class="analytics-page__title">{{ "analytics.title" | transloco }}</h1>
+		<p class="analytics-page__subtitle">{{ "analytics.description" | transloco }}</p>
+	</div>
 
-				<!-- Actions menu (visible on xs) -->
-				<!-- <div class="sm:hidden">
-					<button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
-						<mat-icon [svgIcon]="'heroicons_outline:ellipsis-vertical'"></mat-icon>
-					</button>
-					<mat-menu #actionsMenu="matMenu">
-						<button mat-menu-item>Export</button>
-						<button mat-menu-item>Settings</button>
-					</mat-menu>
-				</div> -->
-			</div>
+	@if (snapshot?.loading && showOnboarding) {
+		<div class="text-secondary mt-8 text-center text-sm">{{ "analytics.stats.loading" | transloco }}</div>
+	}
+
+	@if (showRealError) {
+		<div class="analytics-panel mt-6 px-4 py-3 text-sm text-red-500 sm:px-5">{{ snapshot.error }}</div>
+	}
+
+	@if (showOnboarding) {
+		<div class="mt-6">
+			<analytics-onboarding></analytics-onboarding>
 		</div>
-
-		<div class="mt-8 grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-			<!-- Visitors overview -->
-			<div class="bg-card dark flex flex-auto flex-col overflow-hidden rounded-2xl shadow sm:col-span-2 lg:col-span-3">
-				<div class="ml-10 mr-6 mt-10 flex items-center justify-between sm:mr-10">
-					<div class="flex flex-col">
-						<div class="mr-4 text-2xl font-semibold leading-7 tracking-tight md:text-3xl">
-							{{ "analytics.tagDomainsOverview.title" | transloco }}
-						</div>
-						<div class="text-secondary font-medium">{{ "analytics.tagDomainsOverview.subtitle" | transloco }}</div>
-						<!-- Daily Stats -->
-						@if (dailyStats && dailyStats.highestDay && dailyStats.lowestDay) {
-							<div class="mt-3 flex flex-wrap gap-4 text-sm">
-								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">{{ "analytics.stats.peak" | transloco }}:</span>
-									<span class="font-semibold text-green-500">{{ dailyStats.highestDay.count }} {{ "analytics.stats.tags" | transloco }}</span>
-									<span class="text-secondary">{{ "analytics.stats.on" | transloco }} {{ dailyStats.highestDay.date }}</span>
-								</div>
-								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">{{ "analytics.stats.low" | transloco }}:</span>
-									<span class="font-semibold text-red-500">{{ dailyStats.lowestDay.count }} {{ "analytics.stats.tags" | transloco }}</span>
-									<span class="text-secondary">{{ "analytics.stats.on" | transloco }} {{ dailyStats.lowestDay.date }}</span>
-								</div>
-								<div class="flex items-center gap-1.5">
-									<span class="text-secondary">{{ "analytics.stats.total" | transloco }}:</span>
-									<span class="font-semibold">{{ dailyStats.totalRecords }} {{ "analytics.stats.records" | transloco }}</span>
-								</div>
-							</div>
-						}
+	} @else {
+		<!-- Compact KPI strip -->
+		<div class="analytics-kpi-grid">
+			<div class="analytics-kpi">
+				<p class="analytics-kpi__label">{{ "analytics.paidTags.title" | transloco }}</p>
+				<p class="analytics-kpi__value">{{ paidTagsCount | number: "1.0-0" }}</p>
+				@if (paidTagsTrend !== 0) {
+					<div class="analytics-kpi__trend">
+						<mat-icon
+							class="icon-size-4"
+							[ngClass]="paidTagsTrend > 0 ? 'text-green-600' : 'text-red-500'"
+							[svgIcon]="paidTagsTrend > 0 ? 'heroicons_mini:arrow-trending-up' : 'heroicons_mini:arrow-trending-down'"
+						></mat-icon>
+						<span [ngClass]="paidTagsTrend > 0 ? 'text-green-600' : 'text-red-500'">
+							{{ paidTagsTrend > 0 ? "+" : "" }}{{ paidTagsTrend | number: "1.1-1" }}%
+						</span>
+						<span class="text-secondary">{{ "analytics.stats.vsPreviousPeriod" | transloco }}</span>
 					</div>
-					<div class="ml-2">
-						<mat-button-toggle-group
-							class="hidden space-x-1 border-none sm:inline-flex"
-							value="this-month"
-							#visitorsYearSelector="matButtonToggleGroup"
-						>
-							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="previous-month"
-								>{{ "analytics.tagDomainsOverview.previousMonth" | transloco }}
-							</mat-button-toggle>
-							<mat-button-toggle class="overflow-hidden rounded-full border-none px-1.5 font-medium" value="this-month"
-								>{{ "analytics.tagDomainsOverview.thisMonth" | transloco }}
-							</mat-button-toggle>
-						</mat-button-toggle-group>
-						<div class="sm:hidden">
-							<button mat-icon-button [matMenuTriggerFor]="visitorsMenu">
-								<mat-icon [svgIcon]="'heroicons_outline:ellipsis-vertical'"></mat-icon>
-							</button>
-							<mat-menu #visitorsMenu="matMenu">
-								<button mat-menu-item>{{ "analytics.tagDomainsOverview.thisMonth" | transloco }}</button>
-								<button mat-menu-item>{{ "analytics.tagDomainsOverview.previousMonth" | transloco }}</button>
-							</mat-menu>
-						</div>
-					</div>
-				</div>
-				<div class="flex h-80 flex-auto flex-col">
-					<app-all-tags-overview-chart
-						[records]="records"
-						[selectedPeriod]="visitorsYearSelector.value || 'this-month'"
-					></app-all-tags-overview-chart>
-				</div>
-			</div>
-			<!-- Conversions -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow sm:col-span-2 lg:col-span-1">
-				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.paidTags.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #conversionMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
-					</div>
-				</div>
-				<div class="mx-6 mt-3 flex flex-col lg:flex-row lg:items-center">
-					<div class="text-7xl font-bold leading-tight tracking-tighter">
-						{{ data.conversions.amount | number: "1.0-0" }}
-					</div>
-					<div class="flex lg:ml-3 lg:flex-col">
-						<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
-						<div class="text-secondary ml-1 flex items-center whitespace-nowrap text-md leading-none lg:ml-0 lg:mt-0.5">
-							<span class="font-medium text-red-500">2%</span>
-							<span class="ml-1">{{ "analytics.stats.belowTarget" | transloco }}</span>
-						</div>
-					</div>
-				</div>
-				<div class="flex h-20 flex-auto flex-col">
+				}
+				<div class="mt-3 h-12">
 					<app-conversions-chart [records]="records"></app-conversions-chart>
 				</div>
 			</div>
-			<!-- Impressions -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
-				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.zelfkeySubscriptions.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="impressionsMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #impressionsMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
+
+			<div class="analytics-kpi">
+				<p class="analytics-kpi__label">{{ "analytics.activeTags.title" | transloco }}</p>
+				<p class="analytics-kpi__value">{{ activeTagsCount | number: "1.0-0" }}</p>
+				@if (activeTagsTrend !== 0) {
+					<div class="analytics-kpi__trend">
+						<mat-icon
+							class="icon-size-4"
+							[ngClass]="activeTagsTrend > 0 ? 'text-green-600' : 'text-red-500'"
+							[svgIcon]="activeTagsTrend > 0 ? 'heroicons_mini:arrow-trending-up' : 'heroicons_mini:arrow-trending-down'"
+						></mat-icon>
+						<span [ngClass]="activeTagsTrend > 0 ? 'text-green-600' : 'text-red-500'">
+							{{ activeTagsTrend > 0 ? "+" : "" }}{{ activeTagsTrend | number: "1.1-1" }}%
+						</span>
+						<span class="text-secondary">{{ "analytics.stats.vsPreviousPeriod" | transloco }}</span>
 					</div>
-				</div>
-				<div class="mx-6 mt-6 flex h-20 items-center justify-center text-secondary">{{ "analytics.stats.comingSoon" | transloco }}</div>
-			</div>
-			<!-- Visits -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
-				<div class="m-6 mb-0 flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.activeTags.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="impressionsMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #impressionsMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
-					</div>
-				</div>
-				<div class="mx-6 mt-3 flex flex-col lg:flex-row lg:items-center">
-					<div class="text-7xl font-bold leading-tight tracking-tighter">
-						{{ data.visits.amount | number: "1.0-0" }}
-					</div>
-					<div class="flex lg:ml-3 lg:flex-col">
-						<mat-icon class="text-red-500 icon-size-5" [svgIcon]="'heroicons_mini:arrow-trending-down'"></mat-icon>
-						<div class="text-secondary ml-1 flex items-center whitespace-nowrap text-md leading-none lg:ml-0 lg:mt-0.5">
-							<span class="font-medium text-red-500">4%</span>
-							<span class="ml-1">{{ "analytics.stats.belowTarget" | transloco }}</span>
-						</div>
-					</div>
-				</div>
-				<div class="flex h-20 flex-auto flex-col">
+				}
+				<div class="mt-3 h-12">
 					<app-visits-chart [records]="records"></app-visits-chart>
 				</div>
 			</div>
+
+			<div class="analytics-kpi">
+				<p class="analytics-kpi__label">{{ "analytics.metrics.conversionRate.title" | transloco }}</p>
+				<p class="analytics-kpi__value">{{ conversionRateLabel }}</p>
+				@if (conversionRateTrend !== 0) {
+					<div class="analytics-kpi__trend">
+						<span [ngClass]="conversionRateTrend > 0 ? 'text-green-600' : 'text-red-500'">
+							{{ conversionRateTrend > 0 ? "+" : "" }}{{ conversionRateTrend | number: "1.1-1" }}%
+						</span>
+						<span class="text-secondary">{{ "analytics.stats.vsPreviousPeriod" | transloco }}</span>
+					</div>
+				}
+			</div>
+
+			<div class="analytics-kpi">
+				<p class="analytics-kpi__label">{{ "analytics.metrics.newPaidZelfIds.title" | transloco }}</p>
+				<p class="analytics-kpi__value">{{ newPaidCount | number: "1.0-0" }}</p>
+				@if (newPaidTrend !== 0) {
+					<div class="analytics-kpi__trend">
+						<span [ngClass]="newPaidTrend > 0 ? 'text-green-600' : 'text-red-500'">
+							{{ newPaidTrend > 0 ? "+" : "" }}{{ newPaidTrend | number: "1.1-1" }}%
+						</span>
+						<span class="text-secondary">{{ "analytics.stats.vsPreviousPeriod" | transloco }}</span>
+					</div>
+				}
+			</div>
 		</div>
 
-		<!-- Visitors vs. Page Views -->
-		<div class="bg-card mt-8 flex flex-auto flex-col overflow-hidden rounded-2xl shadow">
-			<div class="m-6 mb-0 flex items-start justify-between">
-				<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.allTagsVsPaidTags.title" | transloco }}</div>
-				<div class="ml-2">
-					<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-						<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-					</button>
-					<mat-menu #conversionMenu="matMenu">
-						<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-						<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-						<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-					</mat-menu>
+		<!-- Zelf IDs overview chart -->
+		<div class="analytics-chart-section mt-6">
+			<div class="analytics-chart-section__header">
+				<div>
+					<p class="analytics-section-label">{{ "analytics.tagDomainsOverview.title" | transloco }}</p>
+					<p class="analytics-chart-section__title">{{ "analytics.tagDomainsOverview.subtitle" | transloco }}</p>
 				</div>
+				<mat-button-toggle-group class="hidden border-none sm:inline-flex" value="this-month" #visitorsYearSelector="matButtonToggleGroup">
+					<mat-button-toggle class="text-xs" value="previous-month">
+						{{ "analytics.tagDomainsOverview.previousMonth" | transloco }}
+					</mat-button-toggle>
+					<mat-button-toggle class="text-xs" value="this-month">
+						{{ "analytics.tagDomainsOverview.thisMonth" | transloco }}
+					</mat-button-toggle>
+				</mat-button-toggle-group>
 			</div>
-			<div class="mx-6 mt-6 flex items-start">
-				<div class="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-12">
-					<div class="flex flex-col">
-						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">{{ "analytics.metrics.conversionRate.title" | transloco }}</div>
-							<mat-icon
-								class="text-hint ml-1.5 icon-size-4"
-								[svgIcon]="'heroicons_mini:information-circle'"
-								[matTooltip]="'analytics.metrics.conversionRate.description' | transloco"
-							></mat-icon>
-						</div>
-						<div class="mt-2 flex items-start">
-							<div class="text-4xl font-bold leading-none tracking-tight">
-								{{ data.visitorsVsPageViews.overallScore }}
-							</div>
-							@if (conversionRateTrend !== 0) {
-								<div class="ml-2 flex items-center">
-									<mat-icon
-										class="icon-size-5"
-										[ngClass]="conversionRateTrend > 0 ? 'text-green-500' : 'text-red-500'"
-										[svgIcon]="conversionRateTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'"
-									></mat-icon>
-									<div class="ml-1 text-md font-medium" [ngClass]="conversionRateTrend > 0 ? 'text-green-500' : 'text-red-500'">
-										{{ conversionRateTrend > 0 ? "+" : "" }}{{ conversionRateTrend | number: "1.1-1" }}%
-									</div>
-								</div>
-							}
-						</div>
-					</div>
-					<div class="flex flex-col">
-						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">{{ "analytics.metrics.premiumAdoption.title" | transloco }}</div>
-							<mat-icon
-								class="text-hint ml-1.5 icon-size-4"
-								[svgIcon]="'heroicons_mini:information-circle'"
-								[matTooltip]="'analytics.metrics.premiumAdoption.description' | transloco"
-							></mat-icon>
-						</div>
-						<div class="mt-2 flex items-start">
-							<div class="text-4xl font-bold leading-none tracking-tight">
-								{{ data.visitorsVsPageViews.averageRatio | number: "1.0-0" }}%
-							</div>
-							@if (premiumAdoptionTrend !== 0) {
-								<div class="ml-2 flex items-center">
-									<mat-icon
-										class="icon-size-5"
-										[ngClass]="premiumAdoptionTrend > 0 ? 'text-green-500' : 'text-red-500'"
-										[svgIcon]="premiumAdoptionTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'"
-									></mat-icon>
-									<div class="ml-1 text-md font-medium" [ngClass]="premiumAdoptionTrend > 0 ? 'text-green-500' : 'text-red-500'">
-										{{ premiumAdoptionTrend > 0 ? "+" : "" }}{{ premiumAdoptionTrend | number: "1.1-1" }}%
-									</div>
-								</div>
-							}
-						</div>
-					</div>
-					<div class="flex flex-col">
-						<div class="flex items-center">
-							<div class="text-secondary font-medium leading-5">{{ "analytics.metrics.revenuePotential.title" | transloco }}</div>
-							<mat-icon
-								class="text-hint ml-1.5 icon-size-4"
-								[svgIcon]="'heroicons_mini:information-circle'"
-								[matTooltip]="'analytics.metrics.revenuePotential.description' | transloco"
-							></mat-icon>
-						</div>
-						<div class="mt-2 flex items-start">
-							<div class="text-4xl font-bold leading-none tracking-tight">
-								{{ data.visitorsVsPageViews.predictedRatio | number: "1.0-0" }}%
-							</div>
-							@if (revenuePotentialTrend !== 0) {
-								<div class="ml-2 flex items-center">
-									<mat-icon
-										class="icon-size-5"
-										[ngClass]="revenuePotentialTrend > 0 ? 'text-green-500' : 'text-red-500'"
-										[svgIcon]="
-											revenuePotentialTrend > 0 ? 'heroicons_solid:arrow-up-circle' : 'heroicons_solid:arrow-down-circle'
-										"
-									></mat-icon>
-									<div class="ml-1 text-md font-medium" [ngClass]="revenuePotentialTrend > 0 ? 'text-green-500' : 'text-red-500'">
-										{{ revenuePotentialTrend > 0 ? "+" : "" }}{{ revenuePotentialTrend | number: "1.1-1" }}%
-									</div>
-								</div>
-							}
-						</div>
-					</div>
+			@if (dailyStats && dailyStats.highestDay && dailyStats.lowestDay) {
+				<div class="analytics-chart-section__meta">
+					<span
+						>{{ "analytics.stats.peak" | transloco }}: {{ dailyStats.highestDay.count }}
+						{{ "analytics.stats.tags" | transloco }} {{ "analytics.stats.on" | transloco }}
+						{{ dailyStats.highestDay.date }}</span
+					>
+					<span
+						>{{ "analytics.stats.low" | transloco }}: {{ dailyStats.lowestDay.count }}
+						{{ "analytics.stats.tags" | transloco }} {{ "analytics.stats.on" | transloco }}
+						{{ dailyStats.lowestDay.date }}</span
+					>
+					<span>{{ "analytics.stats.total" | transloco }}: {{ dailyStats.totalRecords }} {{ "analytics.stats.records" | transloco }}</span>
 				</div>
+			}
+			<div class="analytics-chart-section__body h-72">
+				<app-all-tags-overview-chart
+					[records]="records"
+					[selectedPeriod]="visitorsYearSelector.value || 'this-month'"
+				></app-all-tags-overview-chart>
 			</div>
-			<div class="mt-3 flex h-80 flex-auto flex-col">
+		</div>
+
+		<!-- All vs Paid chart -->
+		<div class="analytics-chart-section mt-4">
+			<div class="analytics-chart-section__header">
+				<div>
+					<p class="analytics-section-label">{{ "analytics.allTagsVsPaidTags.title" | transloco }}</p>
+					<p class="analytics-chart-section__title">{{ "analytics.allTagsVsPaidTags.subtitle" | transloco }}</p>
+				</div>
+				<span class="text-xs text-secondary">{{ "analytics.timePeriods.30days" | transloco }}</span>
+			</div>
+			<div class="analytics-chart-section__meta">
+				<span>{{ "analytics.metrics.premiumAdoption.title" | transloco }}: {{ premiumAdoptionLabel }}</span>
+				@if (premiumAdoptionTrend !== 0) {
+					<span [ngClass]="premiumAdoptionTrend > 0 ? 'text-green-600' : 'text-red-500'">
+						{{ premiumAdoptionTrend > 0 ? "+" : "" }}{{ premiumAdoptionTrend | number: "1.1-1" }}%
+						{{ "analytics.stats.vsPreviousPeriod" | transloco }}
+					</span>
+				}
+			</div>
+			<div class="analytics-chart-section__body h-64">
 				<app-visitors-vs-page-views-chart [records]="records"></app-visitors-vs-page-views-chart>
 			</div>
 		</div>
 
-		<!-- Section title -->
-		<div class="mt-12 w-full">
-			<div class="text-2xl font-semibold leading-6 tracking-tight">{{ "analytics.zelfUsers.title" | transloco }}</div>
-			<div class="text-secondary font-medium tracking-tight">{{ "analytics.zelfUsers.subtitle" | transloco }}</div>
+		<!-- Distribution charts -->
+		<div class="mt-8">
+			<p class="analytics-section-label">{{ "analytics.zelfUsers.title" | transloco }}</p>
+			<p class="text-secondary text-sm">{{ "analytics.zelfUsers.subtitle" | transloco }}</p>
 		</div>
-		<div class="mt-6 grid w-full grid-cols-1 gap-8 sm:grid-cols-2 md:mt-8 lg:grid-cols-4">
-			<!-- Tag Lease Lengths -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
-				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.tagLeaseLengths.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #conversionMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
-					</div>
+
+		<div class="analytics-distribution-grid">
+			<div class="analytics-chart-section">
+				<div class="analytics-chart-section__header">
+					<p class="analytics-chart-section__title">{{ "analytics.tagLeaseLengths.title" | transloco }}</p>
+					<span class="text-xs text-secondary">{{ "analytics.timePeriods.30days" | transloco }}</span>
 				</div>
-				<div class="mt-6 flex h-44 flex-auto flex-col">
+				<div class="analytics-chart-section__body h-40">
 					<app-tag-lease-lengths-chart [records]="records" #tagLeaseChart></app-tag-lease-lengths-chart>
 				</div>
-				<div class="mt-8">
-					<div class="-my-3 divide-y">
-						@for (dataset of tagLeaseChart.series; track i; let i = $index) {
-							<div class="grid grid-cols-3 py-3">
-								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="tagLeaseLengthsColors[i]"></div>
-									<div class="ml-3 truncate">
-										{{
-											"analytics.chartLabels.tagLeaseLengths." +
-												(tagLeaseChart.labels[i] === "1 Year"
-													? "1year"
-													: tagLeaseChart.labels[i] === "2 Years"
-														? "2years"
-														: tagLeaseChart.labels[i] === "3 Years"
-															? "3years"
-															: tagLeaseChart.labels[i] === "4 Years"
-																? "4years"
-																: tagLeaseChart.labels[i] === "5 Years"
-																	? "5years"
-																	: "lifetime") | transloco
-										}}
-									</div>
+				<div class="border-t px-4 py-3 sm:px-5">
+					@for (dataset of tagLeaseChart.series; track i; let i = $index) {
+						<div class="grid grid-cols-3 py-2 text-sm">
+							<div class="flex items-center">
+								<div class="h-2 w-2 rounded-full" [style.backgroundColor]="tagLeaseLengthsColors[i]"></div>
+								<div class="ml-2 truncate text-secondary">
+									{{
+										"analytics.chartLabels.tagLeaseLengths." +
+											(tagLeaseChart.labels[i] === "1 Year"
+												? "1year"
+												: tagLeaseChart.labels[i] === "2 Years"
+													? "2years"
+													: tagLeaseChart.labels[i] === "3 Years"
+														? "3years"
+														: tagLeaseChart.labels[i] === "4 Years"
+															? "4years"
+															: tagLeaseChart.labels[i] === "5 Years"
+																? "5years"
+																: "lifetime") | transloco
+									}}
 								</div>
-								<div class="text-right font-medium">
-									{{ tagLeaseChart.counts[i] || 0 }}
-								</div>
-								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
-						}
-					</div>
+							<div class="text-right font-medium">{{ tagLeaseChart.counts[i] || 0 }}</div>
+							<div class="text-secondary text-right">{{ dataset }}%</div>
+						</div>
+					}
 				</div>
 			</div>
-			<!-- Domain Length -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
-				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.domainLength.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #conversionMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
-					</div>
+
+			<div class="analytics-chart-section">
+				<div class="analytics-chart-section__header">
+					<p class="analytics-chart-section__title">{{ "analytics.domainLength.title" | transloco }}</p>
+					<span class="text-xs text-secondary">{{ "analytics.timePeriods.30days" | transloco }}</span>
 				</div>
-				<div class="mt-6 flex h-44 flex-auto flex-col">
+				<div class="analytics-chart-section__body h-40">
 					<app-domain-length-chart [records]="records" [currentDomain]="currentDomain" #domainLengthChart></app-domain-length-chart>
 				</div>
-				<div class="mt-8">
-					<div class="-my-3 divide-y">
-						@for (dataset of domainLengthChart.series; track i; let i = $index) {
-							<div class="grid grid-cols-3 py-3">
-								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="domainLengthColors[i]"></div>
-									<div class="ml-3 truncate">
-										{{
-											"analytics.chartLabels.domainLength." +
-												(domainLengthChart.labels[i] === "1-3"
-													? "1to3"
-													: domainLengthChart.labels[i] === "4-10"
-														? "4to10"
-														: domainLengthChart.labels[i] === "11-20"
-															? "11to20"
-															: "21to27") | transloco
-										}}
-									</div>
+				<div class="border-t px-4 py-3 sm:px-5">
+					@for (dataset of domainLengthChart.series; track i; let i = $index) {
+						<div class="grid grid-cols-3 py-2 text-sm">
+							<div class="flex items-center">
+								<div class="h-2 w-2 rounded-full" [style.backgroundColor]="domainLengthColors[i]"></div>
+								<div class="ml-2 truncate text-secondary">
+									{{
+										"analytics.chartLabels.domainLength." +
+											(domainLengthChart.labels[i] === "1-3"
+												? "1to3"
+												: domainLengthChart.labels[i] === "4-10"
+													? "4to10"
+													: domainLengthChart.labels[i] === "11-20"
+														? "11to20"
+														: "21to27") | transloco
+									}}
 								</div>
-								<div class="text-right font-medium">
-									{{ domainLengthChart.counts[i] || 0 }}
-								</div>
-								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
-						}
-					</div>
+							<div class="text-right font-medium">{{ domainLengthChart.counts[i] || 0 }}</div>
+							<div class="text-secondary text-right">{{ dataset }}%</div>
+						</div>
+					}
 				</div>
 			</div>
-			<!-- Origin -->
-			<div class="bg-card flex flex-auto flex-col overflow-hidden rounded-2xl p-6 shadow">
-				<div class="flex items-start justify-between">
-					<div class="truncate text-lg font-medium leading-6 tracking-tight">{{ "analytics.origin.title" | transloco }}</div>
-					<div class="ml-2">
-						<button class="bg-hover h-6 min-h-6 rounded-full px-2" mat-button [matMenuTriggerFor]="conversionMenu">
-							<span class="text-secondary text-sm font-medium">{{ "analytics.timePeriods.30days" | transloco }}</span>
-						</button>
-						<mat-menu #conversionMenu="matMenu">
-							<button mat-menu-item>{{ "analytics.timePeriods.30days" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.3months" | transloco }}</button>
-							<button mat-menu-item>{{ "analytics.timePeriods.9months" | transloco }}</button>
-						</mat-menu>
-					</div>
+
+			<div class="analytics-chart-section">
+				<div class="analytics-chart-section__header">
+					<p class="analytics-chart-section__title">{{ "analytics.origin.title" | transloco }}</p>
+					<span class="text-xs text-secondary">{{ "analytics.timePeriods.30days" | transloco }}</span>
 				</div>
-				<div class="mt-6 flex h-44 flex-auto flex-col">
+				<div class="analytics-chart-section__body h-40">
 					<app-origin-chart [records]="records" #originChart></app-origin-chart>
 				</div>
-				<div class="mt-8">
-					<div class="-my-3 divide-y">
-						@for (dataset of originChart.series; track i; let i = $index) {
-							<div class="grid grid-cols-3 py-3">
-								<div class="flex items-center">
-									<div class="h-2 w-2 flex-0 rounded-full" [style.backgroundColor]="originColors[i]"></div>
-									<div class="ml-3 break-words" [title]="originChart.labels[i]">
-										@if (originChart.labels[i]) {
-											{{ originChart.labels[i].charAt(0).toUpperCase() + originChart.labels[i].slice(1).toLowerCase() }}
-										} @else {
-											{{ "analytics.stats.unknown" | transloco }}
-										}
-									</div>
+				<div class="border-t px-4 py-3 sm:px-5">
+					@for (dataset of originChart.series; track i; let i = $index) {
+						<div class="grid grid-cols-3 py-2 text-sm">
+							<div class="flex items-center">
+								<div class="h-2 w-2 rounded-full" [style.backgroundColor]="originColors[i]"></div>
+								<div class="ml-2 break-words text-secondary" [title]="originChart.labels[i]">
+									@if (originChart.labels[i]) {
+										{{ originChart.labels[i].charAt(0).toUpperCase() + originChart.labels[i].slice(1).toLowerCase() }}
+									} @else {
+										{{ "analytics.stats.unknown" | transloco }}
+									}
 								</div>
-								<div class="text-right font-medium">
-									{{ originChart.counts[i] || 0 }}
-								</div>
-								<div class="text-secondary text-right">{{ dataset }}%</div>
 							</div>
-						}
-					</div>
+							<div class="text-right font-medium">{{ originChart.counts[i] || 0 }}</div>
+							<div class="text-secondary text-right">{{ dataset }}%</div>
+						</div>
+					}
 				</div>
 			</div>
 		</div>
-	</div>
+	}
 </div>

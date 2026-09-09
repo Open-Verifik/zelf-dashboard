@@ -44,6 +44,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	logoBase64: string | null = null;
 	logoPreviewUrl: string | null = null;
 	pricingTableRows: PricingRow[] = [];
+	premiumPricingRows: PricingRow[] = [];
+	unlimitedPricingRows: PricingRow[] = [];
 	reservedWords: string[] = ["www", "api", "admin", "support", "help"];
 	showAlert: boolean = false;
 	whitelistItems: WhitelistItem[] = [];
@@ -145,7 +147,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			zelfkeysKeyPrefix: ["tagName", Validators.required],
 
 			// Payment Settings
-			coinbaseEnabled: [true],
 			cryptoEnabled: [true],
 			stripeEnabled: [true],
 			networks: this.createNetworksFormGroup(),
@@ -312,18 +313,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		const currentMethods = this.getPaymentMethods();
 		if (currentMethods.includes(method)) {
 			// Remove method
-			if (method === "coinbase") {
-				this.accountForm.get("coinbaseEnabled")?.setValue(false);
-			} else if (method === "crypto") {
+			if (method === "crypto") {
 				this.accountForm.get("cryptoEnabled")?.setValue(false);
 			} else if (method === "stripe") {
 				this.accountForm.get("stripeEnabled")?.setValue(false);
 			}
 		} else {
 			// Add method
-			if (method === "coinbase") {
-				this.accountForm.get("coinbaseEnabled")?.setValue(true);
-			} else if (method === "crypto") {
+			if (method === "crypto") {
 				this.accountForm.get("cryptoEnabled")?.setValue(true);
 			} else if (method === "stripe") {
 				this.accountForm.get("stripeEnabled")?.setValue(true);
@@ -396,7 +393,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	getPaymentMethods(): string[] {
 		const methods: string[] = [];
-		if (this.accountForm.get("coinbaseEnabled")?.value) methods.push("coinbase");
 		if (this.accountForm.get("cryptoEnabled")?.value) methods.push("crypto");
 		if (this.accountForm.get("stripeEnabled")?.value) methods.push("stripe");
 		return methods;
@@ -488,8 +484,14 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Check pricing table
 		const currentPricingTable = currentConfig.tags?.payment?.pricingTable || {};
-		const newPricingTable = this.getPricingTableFromRows();
+		const newPricingTable = this.getPricingTableFromRows(this.pricingTableRows);
 		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) return true;
+		const currentPlanPricing = currentConfig.tags?.payment?.planPricing || {};
+		const newPlanPricing = {
+			premium: this.getPricingTableFromRows(this.premiumPricingRows),
+			unlimited: this.getPricingTableFromRows(this.unlimitedPricingRows),
+		};
+		if (JSON.stringify(currentPlanPricing) !== JSON.stringify(newPlanPricing)) return true;
 
 		// Check metadata
 		if (currentConfig.metadata.launchDate !== formValue.launchDate) return true;
@@ -600,9 +602,17 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Check pricing table
 		const currentPricingTable = currentConfig.tags?.payment?.pricingTable || {};
-		const newPricingTable = this.getPricingTableFromRows();
+		const newPricingTable = this.getPricingTableFromRows(this.pricingTableRows);
 		if (JSON.stringify(currentPricingTable) !== JSON.stringify(newPricingTable)) {
 			changes.push(`Pricing Table: Updated`);
+		}
+		const currentPlanPricing = currentConfig.tags?.payment?.planPricing || {};
+		const newPlanPricing = {
+			premium: this.getPricingTableFromRows(this.premiumPricingRows),
+			unlimited: this.getPricingTableFromRows(this.unlimitedPricingRows),
+		};
+		if (JSON.stringify(currentPlanPricing) !== JSON.stringify(newPlanPricing)) {
+			changes.push(`Plan pricing: Updated`);
 		}
 	}
 
@@ -646,11 +656,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	private cleanupInvalidData(): void {
 		// Clean up invalid payment methods (this shouldn't happen with checkboxes, but just in case)
 		const paymentMethods = this.getPaymentMethods();
-		const validMethods = paymentMethods.filter((method) => ["coinbase", "crypto", "stripe"].includes(method));
+		const validMethods = paymentMethods.filter((method) => ["crypto", "stripe"].includes(method));
 		if (validMethods.length !== paymentMethods.length) {
-			const removedMethods = paymentMethods.filter((method) => !["coinbase", "crypto", "stripe"].includes(method));
+			const removedMethods = paymentMethods.filter((method) => !["crypto", "stripe"].includes(method));
 			// Reset payment method checkboxes to only valid ones
-			this.accountForm.get("coinbaseEnabled")?.setValue(validMethods.includes("coinbase"));
 			this.accountForm.get("cryptoEnabled")?.setValue(validMethods.includes("crypto"));
 			this.accountForm.get("stripeEnabled")?.setValue(validMethods.includes("stripe"));
 			if (removedMethods.length > 0) {
@@ -667,9 +676,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 
 		// Validate payment methods
 		const paymentMethods = this.getPaymentMethods();
-		const invalidMethods = paymentMethods.filter((method) => !["coinbase", "crypto", "stripe"].includes(method));
+		const invalidMethods = paymentMethods.filter((method) => !["crypto", "stripe"].includes(method));
 		if (invalidMethods.length > 0) {
-			errors.push(`Invalid payment methods: ${invalidMethods.join(", ")}. Allowed: coinbase, crypto, stripe`);
+			errors.push(`Invalid payment methods: ${invalidMethods.join(", ")}. Allowed: crypto, stripe`);
 		}
 
 		return { valid: errors.length === 0, errors };
@@ -717,7 +726,11 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 					},
 					rewardPrice: 10,
 					whitelist: whitelist,
-					pricingTable: this.getPricingTableFromRows(),
+					pricingTable: this.getPricingTableFromRows(this.pricingTableRows),
+					planPricing: {
+						premium: this.getPricingTableFromRows(this.premiumPricingRows),
+						unlimited: this.getPricingTableFromRows(this.unlimitedPricingRows),
+					},
 				},
 				storage: {
 					// Moved storage inside tags
@@ -791,9 +804,12 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				return;
 			}
 
-			this.currentLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
+			const remoteLicense = License.fromAPIResponseWithWrapper(response.data.myLicense.domainConfig);
+			if (License.isRemoteLicenseStale(this.currentLicense?.domainConfig, remoteLicense.domainConfig)) {
+				return;
+			}
 
-			// Save to localStorage
+			this.currentLicense = remoteLicense;
 			localStorage.setItem("license", JSON.stringify(this.currentLicense.toJSON()));
 		} catch (error) {
 			console.error("Error fetching license from backend:", error);
@@ -810,13 +826,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 * Load license from localStorage or fetch from backend if not found
 	 */
 	async loadLicense(): Promise<void> {
-		// First try to load from localStorage
-		// this.loadCurrentLicense();
-
-		// If no license in localStorage, fetch from backend
-		if (!this.currentLicense?.domain) {
-			await this.fetchLicenseFromBackend();
-		}
+		this.loadCurrentLicense();
+		await this.fetchLicenseFromBackend();
 	}
 
 	/**
@@ -880,7 +891,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	}
 
 	private populatePaymentSettings(config: DomainConfig): void {
-		this.accountForm.get("coinbaseEnabled")?.setValue(config.tags?.payment?.methods?.includes("coinbase") ?? true);
 		this.accountForm.get("cryptoEnabled")?.setValue(config.tags?.payment?.methods?.includes("crypto") ?? true);
 		this.accountForm.get("stripeEnabled")?.setValue(config.tags?.payment?.methods?.includes("stripe") ?? true);
 
@@ -893,6 +903,7 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 		if (config.tags?.payment?.pricingTable) {
 			this.loadPricingTableFromConfig(config.tags.payment.pricingTable);
 		}
+		this.loadPlanPricingFromConfig(config.tags?.payment?.planPricing, config.tags?.payment?.pricingTable);
 
 		this.populateWhitelist(config);
 
@@ -1073,47 +1084,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	 */
 	initializePricingTable(): void {
 		const defaultPricing = this.getDefaultPricingTable();
-		this.pricingTableRows = [];
-
-		// Add individual length rows (1-5)
-		for (let i = 1; i <= 5; i++) {
-			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
-				length: i.toString(),
-				oneYear: prices[1] || 0,
-				twoYears: prices[2] || 0,
-				threeYears: prices[3] || 0,
-				fourYears: prices[4] || 0,
-				fiveYears: prices[5] || 0,
-				lifetime: prices.lifetime || 0,
-			});
-		}
-
-		// Add range row (6-15)
-		const rangePrices = defaultPricing["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-		this.pricingTableRows.push({
-			length: "6-15",
-			oneYear: rangePrices[1] || 0,
-			twoYears: rangePrices[2] || 0,
-			threeYears: rangePrices[3] || 0,
-			fourYears: rangePrices[4] || 0,
-			fiveYears: rangePrices[5] || 0,
-			lifetime: rangePrices.lifetime || 0,
-		});
-
-		// Add individual length rows (16-27)
-		for (let i = 16; i <= 27; i++) {
-			const prices = defaultPricing[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
-				length: i.toString(),
-				oneYear: prices[1] || 0,
-				twoYears: prices[2] || 0,
-				threeYears: prices[3] || 0,
-				fourYears: prices[4] || 0,
-				fiveYears: prices[5] || 0,
-				lifetime: prices.lifetime || 0,
-			});
-		}
+		this.pricingTableRows = this.rowsFromPricingTable(defaultPricing);
+		this.premiumPricingRows = this.clonePricingRows(this.pricingTableRows);
+		this.unlimitedPricingRows = this.clonePricingRows(this.pricingTableRows);
 	}
 
 	/**
@@ -1133,10 +1106,10 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 	/**
 	 * Get pricing table as object for domain config
 	 */
-	getPricingTableFromRows(): { [key: string]: { [key: string]: number } } {
+	getPricingTableFromRows(rows: PricingRow[] = this.pricingTableRows): { [key: string]: { [key: string]: number } } {
 		const pricingTable: { [key: string]: { [key: string]: number } } = {};
 
-		this.pricingTableRows.forEach((row) => {
+		rows.forEach((row) => {
 			pricingTable[row.length] = {
 				1: row.oneYear || 0,
 				2: row.twoYears || 0,
@@ -1159,12 +1132,40 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			return;
 		}
 
-		this.pricingTableRows = [];
+		this.pricingTableRows = this.rowsFromPricingTable(pricingTable);
+	}
 
-		// Add individual length rows (1-5)
+	loadPlanPricingFromConfig(
+		planPricing?: {
+			premium?: { [key: string]: { [key: string]: number } };
+			unlimited?: { [key: string]: { [key: string]: number } };
+		},
+		fallback?: { [key: string]: { [key: string]: number } },
+	): void {
+		const fallbackRows = this.pricingTableRows.length
+			? this.clonePricingRows(this.pricingTableRows)
+			: this.rowsFromPricingTable(fallback || this.getDefaultPricingTable());
+		this.premiumPricingRows = this.isEmptyPricingTable(planPricing?.premium)
+			? this.clonePricingRows(fallbackRows)
+			: this.rowsFromPricingTable(planPricing?.premium);
+		this.unlimitedPricingRows = this.isEmptyPricingTable(planPricing?.unlimited)
+			? this.clonePricingRows(fallbackRows)
+			: this.rowsFromPricingTable(planPricing?.unlimited);
+	}
+
+	private isEmptyPricingTable(pricingTable?: { [key: string]: { [key: string]: number } }): boolean {
+		return !pricingTable || Object.keys(pricingTable).length === 0;
+	}
+
+	private clonePricingRows(rows: PricingRow[]): PricingRow[] {
+		return rows.map((row) => ({ ...row }));
+	}
+
+	private rowsFromPricingTable(pricingTable: { [key: string]: { [key: string]: number } } = {}): PricingRow[] {
+		const rows: PricingRow[] = [];
 		for (let i = 1; i <= 5; i++) {
 			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
+			rows.push({
 				length: i.toString(),
 				oneYear: prices[1] || 0,
 				twoYears: prices[2] || 0,
@@ -1174,10 +1175,8 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				lifetime: prices.lifetime || 0,
 			});
 		}
-
-		// Add range row (6-15)
 		const rangePrices = pricingTable["6-15"] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-		this.pricingTableRows.push({
+		rows.push({
 			length: "6-15",
 			oneYear: rangePrices[1] || 0,
 			twoYears: rangePrices[2] || 0,
@@ -1186,11 +1185,9 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 			fiveYears: rangePrices[5] || 0,
 			lifetime: rangePrices.lifetime || 0,
 		});
-
-		// Add individual length rows (16-27)
 		for (let i = 16; i <= 27; i++) {
 			const prices = pricingTable[i] || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, lifetime: 0 };
-			this.pricingTableRows.push({
+			rows.push({
 				length: i.toString(),
 				oneYear: prices[1] || 0,
 				twoYears: prices[2] || 0,
@@ -1200,5 +1197,6 @@ export class SettingsLicenseComponent implements OnInit, AfterViewInit {
 				lifetime: prices.lifetime || 0,
 			});
 		}
+		return rows;
 	}
 }

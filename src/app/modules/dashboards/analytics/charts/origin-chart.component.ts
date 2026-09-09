@@ -3,13 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, O
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
 import { TranslocoService } from "@jsverse/transloco";
 
-interface TagRecord {
-	name: string;
-	type: string;
-	origin: string;
-	registeredAt?: string;
-	expiresAt?: string;
-}
+import { TagAnalyticsRecord } from "../analytics.utils";
 
 @Component({
 	selector: "app-origin-chart",
@@ -20,7 +14,7 @@ interface TagRecord {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OriginChartComponent implements OnInit, OnChanges {
-	@Input() records: TagRecord[] = [];
+	@Input() records: TagAnalyticsRecord[] = [];
 
 	chartOptions: ApexOptions = {
 		chart: { type: "donut" },
@@ -68,7 +62,7 @@ export class OriginChartComponent implements OnInit, OnChanges {
 					enabled: true,
 				},
 			},
-			colors: ["#DD6B20", "#F6AD55", "#FED7AA"],
+			colors: ["#57534E", "#78716C", "#A8A29E"],
 			labels: this.labels || [],
 			plotOptions: {
 				pie: {

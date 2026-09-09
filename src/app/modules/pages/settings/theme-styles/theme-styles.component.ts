@@ -15,6 +15,7 @@ import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { ThemeStylesService } from "./theme-styles.service";
 import { ThemeSettings } from "../license/license.class";
 import { SaveConfirmationService } from "../../../../core/services/save-confirmation.service";
+import { AnalyticsOnboardingService } from "app/modules/dashboards/analytics/analytics-onboarding.service";
 
 @Component({
 	selector: "settings-theme-styles",
@@ -53,12 +54,14 @@ export class SettingsThemeStylesComponent implements OnInit {
 		private _router: Router,
 		private _saveConfirmationService: SaveConfirmationService,
 		private _themeService: ThemeStylesService,
-		private _translocoService: TranslocoService
+		private _translocoService: TranslocoService,
+		private _analyticsOnboardingService: AnalyticsOnboardingService
 	) {
 		this.isLoadingColors = true;
 	}
 
 	ngOnInit(): void {
+		this._analyticsOnboardingService.markVisited("themeStyles");
 		if (!this.hasLicense()) {
 			this.showError("License is required to access theme settings. Please configure your license first.");
 
@@ -235,6 +238,12 @@ export class SettingsThemeStylesComponent implements OnInit {
 		}
 
 		// Set save data in service
+		try {
+			localStorage.setItem("analyticsOnboarding.themeSaved", "true");
+		} catch {
+			// ignore storage errors
+		}
+
 		this._saveConfirmationService.setSaveData({
 			domain: null, // Not needed for theme operations
 			domainConfig: null, // Not needed for theme operations

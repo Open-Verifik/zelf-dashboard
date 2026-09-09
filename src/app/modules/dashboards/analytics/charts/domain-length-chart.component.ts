@@ -3,13 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, O
 import { ApexOptions, NgApexchartsModule } from "ng-apexcharts";
 import { TranslocoService } from "@jsverse/transloco";
 
-interface TagRecord {
-	name: string;
-	type: string;
-	origin: string;
-	registeredAt?: string;
-	expiresAt?: string;
-}
+import { TagAnalyticsRecord, getBaseName } from "../analytics.utils";
 
 @Component({
 	selector: "app-domain-length-chart",
@@ -20,7 +14,7 @@ interface TagRecord {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DomainLengthChartComponent implements OnInit, OnChanges {
-	@Input() records: TagRecord[] = [];
+	@Input() records: TagAnalyticsRecord[] = [];
 	@Input() currentDomain: string | null = null;
 
 	chartOptions: ApexOptions = {
@@ -69,7 +63,7 @@ export class DomainLengthChartComponent implements OnInit, OnChanges {
 					enabled: true,
 				},
 			},
-			colors: ["#319795", "#4FD1C5", "#81E6D9", "#B2F5EA"],
+			colors: ["#334155", "#64748B", "#94A3B8", "#CBD5E1"],
 			labels: this.labels || [],
 			plotOptions: {
 				pie: {
@@ -119,12 +113,7 @@ export class DomainLengthChartComponent implements OnInit, OnChanges {
 	}
 
 	private _getBaseName(tagName: string): string {
-		let name = tagName;
-		if (this.currentDomain && name.endsWith(`.${this.currentDomain}`)) {
-			name = name.slice(0, -1 * (this.currentDomain.length + 1));
-		}
-		if (name.endsWith(".hold")) name = name.slice(0, -5);
-		return name.split(".")[0];
+		return getBaseName(tagName, this.currentDomain);
 	}
 
 	private _calculateRangeBuckets(): { labels: string[]; series: number[]; counts: number[] } {

@@ -139,8 +139,6 @@ export interface PaymentOptionsResponse {
               ttl: number;
               duration: number;
               count: number;
-              coinbase_hosted_url?: string;
-              coinbase_expires_at?: string;
               payment: {
                   registeredAt: string;
                   expiresAt: string;

@@ -56,6 +56,9 @@ export const environment = {
 			upgradeSubscription: "/api/subscription-plans/upgrade-subscription",
 			reconcileZns: "/api/subscription-plans/reconcile-zns",
 		},
+		humanAuthn: {
+			onboardingProgress: "/api/human-authn/onboarding-progress",
+		},
 	},
 	// Feature flags
 	features: {

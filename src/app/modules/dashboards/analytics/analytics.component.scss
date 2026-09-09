@@ -1,0 +1,63 @@
+.analytics-page {
+	@apply mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10;
+
+	.analytics-page__title {
+		@apply text-2xl font-semibold tracking-tight text-default;
+	}
+
+	.analytics-page__subtitle {
+		@apply mt-1 text-sm text-secondary;
+	}
+
+	.analytics-section-label {
+		@apply text-xs font-medium uppercase tracking-wide text-secondary;
+	}
+
+	.analytics-panel {
+		@apply rounded-lg border bg-card;
+	}
+
+	.analytics-kpi-grid {
+		@apply mt-6 grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-gray-200 dark:bg-gray-700 sm:grid-cols-2 lg:grid-cols-4;
+	}
+
+	.analytics-kpi {
+		@apply bg-card px-4 py-4 sm:px-5;
+	}
+
+	.analytics-kpi__label {
+		@apply text-xs font-medium uppercase tracking-wide text-secondary;
+	}
+
+	.analytics-kpi__value {
+		@apply mt-2 text-2xl font-semibold tracking-tight text-default;
+	}
+
+	.analytics-kpi__trend {
+		@apply mt-1 flex items-center gap-1 text-xs;
+	}
+
+	.analytics-chart-section {
+		@apply mt-4 rounded-lg border bg-card;
+	}
+
+	.analytics-chart-section__header {
+		@apply flex items-center justify-between border-b px-4 py-3 sm:px-5;
+	}
+
+	.analytics-chart-section__title {
+		@apply text-sm font-medium text-default;
+	}
+
+	.analytics-chart-section__body {
+		@apply px-2 py-2 sm:px-4 sm:py-4;
+	}
+
+	.analytics-chart-section__meta {
+		@apply flex flex-wrap gap-4 border-b px-4 py-3 text-xs text-secondary sm:px-5;
+	}
+
+	.analytics-distribution-grid {
+		@apply mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3;
+	}
+}

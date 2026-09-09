@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -10,6 +10,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { Subject, takeUntil } from "rxjs";
 import { TranslocoService, TranslocoModule } from "@jsverse/transloco";
 import { DataBiometricsComponent, BiometricData } from "../../auth/biometric-verification/biometric-verification.component";
+import { isBiometricApiError } from "app/core/i18n/api-error-codes";
 import { SaveConfirmationService, SaveConfirmationData } from "../../../core/services/save-confirmation.service";
 import { HttpWrapperService } from "../../../http-wrapper.service";
 import { PasskeyService } from "../../../core/services/passkey.service";
@@ -39,6 +40,8 @@ import { TagsService } from "../../tags/tags.service";
     styleUrls: ["./save-confirmation.component.scss"],
 })
 export class SaveConfirmationComponent implements OnInit, OnDestroy {
+    @ViewChild(DataBiometricsComponent) biometricVerification?: DataBiometricsComponent;
+
     private destroy$ = new Subject<void>();
 
     // Form data
@@ -175,13 +178,12 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
      * Handle successful biometric verification
      */
     onBiometricSuccess(biometricData: BiometricData): void {
-        this.showBiometricModal = false;
-        // Don't set isLoading here if we came from passkey, as we might already be processing
         if (!this.isLoading) {
             this.isLoading = true;
         }
 
         if (!this.saveData) {
+            this.showBiometricModal = false;
             this.showError("No save data available");
             this.isLoading = false;
             return;
@@ -210,6 +212,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
             // Handle tag extension operation
             this.handleTagExtensionOperation(biometricData);
         } else {
+            this.showBiometricModal = false;
             this.showError("Invalid operation data");
             this.isLoading = false;
         }
@@ -258,7 +261,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
             }
         } catch (error) {
             const operation = this.saveData?.securityData?.operation === "loadApiKey" ? "load API key" : "change password";
-            this.showError(`Failed to ${operation}. Please try again.`);
+            this._handleSaveError(error, `Failed to ${operation}. Please try again.`);
         } finally {
             this.isLoading = false;
         }
@@ -289,7 +292,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 this.isLoading = false;
             }
         } catch (error) {
-            this.showError("Failed to update theme settings. Please try again.");
+            this._handleSaveError(error, "Failed to update theme settings. Please try again.");
         } finally {
             this.isLoading = false;
         }
@@ -318,7 +321,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 
             await this.createLicense(licenseData);
         } catch (error) {
-            this.showError("Failed to save license. Please try again.");
+            this._handleSaveError(error, "Failed to save license. Please try again.");
         } finally {
             this.isLoading = false;
         }
@@ -345,7 +348,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
 
             await this.createLicense(updateData);
         } catch (error) {
-            this.showError("Failed to update license configuration. Please try again.");
+            this._handleSaveError(error, "Failed to update license configuration. Please try again.");
         } finally {
             this.isLoading = false;
         }
@@ -372,7 +375,6 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
         } catch (error) {
             let errorMessage = "Failed to update profile. Please try again.";
 
-            // Handle specific error cases
             if (error?.message) {
                 if (error.message.includes("error_decrypting_zelf_account")) {
                     errorMessage = "Biometric verification failed. Please check your face image and master password.";
@@ -387,7 +389,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 }
             }
 
-            this.showError(errorMessage);
+            this._handleSaveError(error, errorMessage);
         } finally {
             this.isLoading = false;
         }
@@ -434,11 +436,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
             let errorMessage = "Failed to complete operation. Please try again.";
 
             if (apiMessage) {
-                if (apiMessage.includes("LIVENESS")) {
-                    errorMessage = "Liveness check failed. Please ensure your face is clearly visible, well-lit, and centered.";
-                } else if (apiMessage.includes("FACE IS NOT CENTRAL")) {
-                    errorMessage = "Face is not central. Please use an image with a central face.";
-                } else if (apiMessage.includes("error_decrypting_zelf_account")) {
+                if (apiMessage.includes("error_decrypting_zelf_account")) {
                     errorMessage = "Biometric verification failed. Please check your face image and master password.";
                 } else if (apiMessage.includes("staff_already_exists") || apiMessage.includes("lawyer_already_exists")) {
                     errorMessage = "This member already exists.";
@@ -453,7 +451,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 }
             }
 
-            this.showError(errorMessage);
+            this._handleSaveError(error, errorMessage);
         } finally {
             this.isLoading = false;
         }
@@ -669,6 +667,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
      * Show success message
      */
     private showSuccess(message: string): void {
+        this.showBiometricModal = false;
         this.isSuccess = true;
         this.alertMessage = message;
         this.alertType = "success";
@@ -771,6 +770,17 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
     /**
      * Show error message
      */
+    private _handleSaveError(error: unknown, fallback: string): void {
+        if (isBiometricApiError(error) && this.biometricVerification) {
+            this.biometricVerification.handleApiError(error);
+            this.isLoading = false;
+            return;
+        }
+
+        this.showBiometricModal = false;
+        this.showError(fallback);
+    }
+
     private showError(message: string): void {
         this.alertMessage = message;
         this.alertType = "error";
@@ -827,7 +837,7 @@ export class SaveConfirmationComponent implements OnInit, OnDestroy {
                 }
             }
 
-            this.showError(errorMessage);
+            this._handleSaveError(error, errorMessage);
         } finally {
             this.isLoading = false;
         }

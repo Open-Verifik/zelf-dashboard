@@ -27,8 +27,6 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
     ethAddress = signal<string>("");
     amountToPay = signal<string>("");
     qrcodeUrl = signal<string>("");
-    coinbaseUrl = signal<string>("");
-    coinbaseExpiresAt = signal<string>("");
     isCheckingPayment = signal<boolean>(false);
     isPaymentConfirmed = signal<boolean>(false);
     amountReceived = signal<string>("");
@@ -78,8 +76,6 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
             this.paymentMethod.set(params["paymentMethod"] || "ETH");
             this.ethAddress.set(params["ethAddress"] || "");
             this.amountToPay.set(params["amountToPay"] || "");
-            this.coinbaseUrl.set(params["coinbaseUrl"] || "");
-            this.coinbaseExpiresAt.set(params["coinbaseExpiresAt"] || "");
 
             // Generate QR code for payment address
             void this.generateQRCode();
@@ -167,13 +163,6 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
 
     getNetworkFromPaymentMethod(): string {
         const method = this.paymentMethod();
-
-        // Backend accepts: [coinbase, CB, ETH, SOL, BTC, AVAX]
-        // Only COINBASE needs special handling, others pass through
-        if (method === "COINBASE") {
-            return "coinbase";
-        }
-
         return method || "ETH"; // Return method as-is, default to ETH
     }
 
@@ -186,14 +175,7 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
     }
 
     private async generateQRCode(): Promise<void> {
-        // Determine what data to encode in QR code
-        // For COINBASE, use the coinbase URL; for others, use the payment address
-        let dataToEncode: string;
-        if (this.paymentMethod() === "COINBASE" && this.coinbaseUrl()) {
-            dataToEncode = this.coinbaseUrl();
-        } else {
-            dataToEncode = this.ethAddress();
-        }
+        const dataToEncode = this.ethAddress();
 
         if (!dataToEncode) return;
 
@@ -267,48 +249,21 @@ export class PortfolioPaymentCheckoutComponent implements OnInit, OnDestroy {
     }
 
     copyAddress(): void {
-        const textToCopy = this.paymentMethod() === "COINBASE" && this.coinbaseUrl() ? this.coinbaseUrl() : this.ethAddress();
-        navigator.clipboard.writeText(textToCopy).then(() => {
+        navigator.clipboard.writeText(this.ethAddress()).then(() => {
             this.snackBar.open("Address copied to clipboard", "Close", { duration: 2500 });
         });
     }
 
-    openCoinbaseLink(): void {
-        if (this.paymentMethod() === "COINBASE" && this.coinbaseUrl()) {
-            window.open(this.coinbaseUrl(), "_blank", "noopener,noreferrer");
-        }
-    }
-
     getAddressToDisplay(): string {
-        if (this.paymentMethod() === "COINBASE" && this.coinbaseUrl()) {
-            return this.coinbaseUrl();
-        }
         return this.ethAddress();
     }
 
     getExpirationDate(): string {
-        if (this.paymentMethod() === "COINBASE" && this.coinbaseExpiresAt()) {
-            const expiration = new Date(this.coinbaseExpiresAt());
-            const now = new Date();
-            const diffMs = expiration.getTime() - now.getTime();
-            const diffMins = Math.floor(diffMs / 60000);
-
-            if (diffMins > 0) {
-                const hours = Math.floor(diffMins / 60);
-                const mins = diffMins % 60;
-                if (hours > 0) {
-                    return `${hours}h ${mins}m`;
-                }
-                return `${diffMins} minutes`;
-            }
-            return "Expired";
-        }
         return "30 minutes";
     }
 
     copyAmount(): void {
-        const amountToCopy = this.paymentMethod() === "COINBASE" ? `$${this.price()}` : this.amountToPay();
-        navigator.clipboard.writeText(amountToCopy).then(() => {
+        navigator.clipboard.writeText(this.amountToPay()).then(() => {
             this.snackBar.open("Amount copied to clipboard", "Close", { duration: 2500 });
         });
     }
